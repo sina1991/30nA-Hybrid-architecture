@@ -1,4 +1,4 @@
-"""WORKER MANAGER domain primitives and Runtime adapter boundary."""
+"""WORKER MANAGER domain primitives, persistence, and Runtime adapter boundary."""
 
 from .models import Schedule, WorkerDefinition, WorkerLifecycle, WorkerRecord
 from .runtime_gateway import ExecutionRequest, RuntimeGateway
@@ -10,6 +10,7 @@ from .service import (
     WorkerNotEnabled,
     WorkerNotFound,
 )
+from .sqlite_store import SQLiteWorkerStore
 
 __all__ = [
     "Schedule",
@@ -18,6 +19,7 @@ __all__ = [
     "WorkerRecord",
     "ExecutionRequest",
     "RuntimeGateway",
+    "SQLiteWorkerStore",
     "WorkerManager",
     "WorkerManagerError",
     "WorkerNotFound",
