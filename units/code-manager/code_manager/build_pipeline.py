@@ -42,6 +42,10 @@ _DEPENDENCY_FILES = {
 }
 _TEXT_SUFFIXES = {".py", ".txt", ".md", ".toml", ".ini", ".cfg", ".json", ".yaml", ".yml", ".sh"}
 _TEST_NAME = re.compile(r"(^|/)test[^/]*\.py$", re.IGNORECASE)
+_SENSITIVE_BASENAMES = {
+    ".netrc", ".npmrc", ".pypirc", "credentials", "credentials.json",
+    "secrets.json", "id_rsa", "id_ed25519", "id_ecdsa", "authorized_keys",
+}
 
 
 class BuildPipelineError(RuntimeError):
@@ -74,6 +78,13 @@ def normalize_source_archive(source_bytes: bytes, *, include_tests: bool) -> byt
             if info.is_dir():
                 continue
             parts = PurePosixPath(name).parts
+            basename = PurePosixPath(name).name.lower()
+            if (basename == ".env" or basename.startswith(".env.")
+                    or basename in _SENSITIVE_BASENAMES
+                    or basename.endswith((".pem", ".key", ".p12", ".pfx", ".token", ".secret"))
+                    or any(part.lower() in {".ssh", ".aws"} for part in parts[:-1])
+                    and basename in {"credentials", "config"}):
+                raise SourceValidationError("Source archive contains a credential-like file: " + name)
             if any(part in {".git", "__pycache__"} for part in parts) or name.endswith((".pyc", ".pyo")):
                 continue
             if not include_tests and (
@@ -560,7 +571,16 @@ class BuildPipeline:
                 return self._save(owner_id, report)
             source_bytes = source.get("source_bytes")
             inspection = inspect_source_archive(source_bytes, source.get("entrypoint"))
-            normalized = normalize_source_archive(source_bytes, include_tests=True)
+            try:
+                normalized = normalize_source_archive(source_bytes, include_tests=True)
+            except SourceValidationError as exc:
+                record("normalize_working_copy", "failed", str(exc))
+                record("test", "not_run", "Normalization failed")
+                record("reproducibility", "not_run", "Normalization failed")
+                record("package", "not_run", "Normalization failed")
+                record("hash", "not_run", "No final artifact exists")
+                report["status"] = "failed"
+                return self._save(owner_id, report)
             record("normalize_working_copy", "passed",
                    "Normalized line endings, file permissions, timestamps and ZIP ordering")
             try:
