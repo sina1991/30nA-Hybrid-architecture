@@ -189,7 +189,7 @@ class WorkerRuntime:
             try:
                 proc = subprocess.Popen([sys.executable, '-I', str(runner), str(archive),
                     request.definition.entrypoint], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL, text=True, start_new_session=True)
+                    stderr=subprocess.DEVNULL, start_new_session=True)
             except OSError:
                 self._capacity.release()
                 return finish('failed', error=ExecutionError('EXECUTION_ERROR', 'Cannot start worker'))
