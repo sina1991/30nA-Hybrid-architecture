@@ -277,9 +277,8 @@ def analyze_imports(source_bytes: bytes) -> dict:
                           and node.func.value.id == "importlib"):
                         dynamic_name = node.args[0] if node.args else None
                     if dynamic_name is not None:
-                        if not isinstance(dynamic_name, ast.Constant) or not isinstance(dynamic_name.value, str):
-                            external.add("<dynamic-import>")
-                        else:
+                        external.add("<dynamic-import>")
+                        if isinstance(dynamic_name, ast.Constant) and isinstance(dynamic_name.value, str):
                             root = dynamic_name.value.lstrip(".").split(".", 1)[0]
                             if root and root not in stdlib and root not in local_roots:
                                 external.add(root)
