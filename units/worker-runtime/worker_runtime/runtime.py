@@ -199,19 +199,54 @@ class WorkerRuntime:
                 cancelled = eid in self._cancelled
             if cancelled:
                 self._terminate(proc)
+            # Drain stdout concurrently and retain at most max_output_bytes + 1.
+            # communicate() buffers the complete output before returning, which lets
+            # a noisy worker exhaust the parent process memory despite a post-hoc cap.
+            captured = bytearray()
+            output_exceeded = threading.Event()
+
+            def drain_stdout():
+                try:
+                    while True:
+                        chunk = proc.stdout.read(8192)
+                        if not chunk:
+                            break
+                        room = self.max_output_bytes + 1 - len(captured)
+                        if room > 0:
+                            captured.extend(chunk[:room])
+                        if len(chunk) > room or len(captured) > self.max_output_bytes:
+                            output_exceeded.set()
+                            self._terminate(proc)
+                            # Keep draining until process exit so the pipe cannot block.
+                except (OSError, ValueError):
+                    pass
+
+            reader = threading.Thread(target=drain_stdout, name=f"worker-stdout-{eid}", daemon=True)
+            reader.start()
             try:
                 remaining = deadline - time.monotonic()
                 if remaining <= 0:
                     raise subprocess.TimeoutExpired(proc.args, request.timeout_seconds)
-                stdout, _ = proc.communicate(json.dumps({'input': request.input_payload,
-                    'configuration': request.configuration}), timeout=remaining)
-            except subprocess.TimeoutExpired:
+                payload = json.dumps({'input': request.input_payload,
+                    'configuration': request.configuration}, allow_nan=False).encode('utf-8')
+                try:
+                    proc.stdin.write(payload)
+                    proc.stdin.close()
+                except (BrokenPipeError, OSError, ValueError):
+                    # The child may have already exited or exceeded its output limit.
+                    pass
+                try:
+                    proc.wait(timeout=remaining)
+                except subprocess.TimeoutExpired:
+                    self._terminate(proc)
+                    proc.wait()
+                    reader.join()
+                    return finish('failed', error=ExecutionError('TIMEOUT', 'Execution timed out', True))
+                reader.join()
+            except (BrokenPipeError, OSError, ValueError, TypeError):
                 self._terminate(proc)
-                proc.communicate()
-                return finish('failed', error=ExecutionError('TIMEOUT', 'Execution timed out', True))
-            except (BrokenPipeError, OSError):
-                self._terminate(proc)
-                proc.communicate()
+                proc.wait()
+                reader.join()
                 return finish('failed', error=ExecutionError('EXECUTION_ERROR', 'Worker process interrupted'))
             finally:
                 with self._lock:
@@ -220,9 +255,12 @@ class WorkerRuntime:
             with self._lock:
                 if eid in self._cancelled:
                     return finish('cancelled')
-            if proc.returncode != 0 or len(stdout.encode('utf-8')) > self.max_output_bytes:
-                return finish('failed', error=ExecutionError('EXECUTION_ERROR', 'Worker failed or output exceeded limit'))
+            if output_exceeded.is_set() or len(captured) > self.max_output_bytes:
+                return finish('failed', error=ExecutionError('OUTPUT_LIMIT_EXCEEDED', 'Worker output exceeded limit'))
+            if proc.returncode != 0:
+                return finish('failed', error=ExecutionError('EXECUTION_ERROR', 'Worker process failed'))
             try:
+                stdout = captured.decode('utf-8')
                 output = json.loads(stdout)
                 if not isinstance(output, dict) or type(output.get('ok')) is not bool:
                     raise ValueError('Invalid worker response')
