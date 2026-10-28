@@ -36,7 +36,7 @@ README می‌گوید مالک احراز‌شده از `REMOTE_USER` مورد 
 
 ## وضعیت و محدودیت‌های فعلی
 
-مسیر Build و Publication Gate پیاده‌سازی و در CI با Docker واقعی آزموده شده است. import خارجی فقط با root `requirements.txt` دارای version/hash دقیق، allowlist مورداعتماد و wheelhouse آفلاین پذیرفته می‌شود؛ wheelهای pure-Python با dependencyهای انتقالی فقط در صورت pin دقیق و unconditional، و وجود تمام wheelها در allowlist و wheelhouse پذیرفته می‌شوند؛ Worker Runtime hash همه را دوباره بررسی می‌کند. Native extensionها هنوز رد می‌شوند. import پویا، native extension، `.pth`، shadow کردن standard library، manifestهای دیگر، فایل credential-like یا نبود تست باعث رد Build می‌شود. Build بدون `test*.py` و اجرای موفق تست‌ها publishable نیست. پذیرش روی میزبان Production و پشتیبانی dependencyهای انتقالی/native هنوز باقی است.
+مسیر Build و Publication Gate پیاده‌سازی و در CI با Docker واقعی آزموده شده است. import خارجی فقط با root `requirements.txt` دارای version/hash دقیق، allowlist مورداعتماد و wheelhouse آفلاین پذیرفته می‌شود؛ wheelهای pure-Python با dependencyهای انتقالی فقط در صورت pin دقیق و unconditional، و وجود تمام wheelها در allowlist و wheelhouse پذیرفته می‌شوند؛ Worker Runtime hash همه را دوباره بررسی می‌کند. Native extensionها هنوز رد می‌شوند. import پویا، native extension، `.pth`، shadow کردن standard library، manifestهای دیگر، فایل credential-like یا نبود تست باعث رد Build می‌شود. Build بدون `test*.py` و اجرای موفق تست‌ها publishable نیست. پذیرش روی میزبان Production و پشتیبانی native wheelها و پذیرش روی میزبان Production هنوز باقی است.
 
 ## موارد ممیزی
 
