@@ -65,3 +65,27 @@ Workflow روی Commit ثابت تاریخی اجرا می‌شود. این کا
 ## قواعد گزارش تست
 
 هر گزارش باید Commit، نسخه Python، سیستم‌عامل، فرمان، suite، تعداد passed/failed/skipped، exit code، لینک Run و محدودیت‌های محیطی را ثبت کند. «تست وجود دارد» و «تست موفق است» دو ادعای متفاوت‌اند.
+
+
+## وضعیت جاری پس از رفع collection و فعال‌سازی integration — 2026-10-29
+
+Baseline تاریخی بالا عمداً روی SHA ثابت مانده و همچنان سندی از شکست تاریخی است. برای کد جاری، workflow جداگانه `.github/workflows/ci.yml` اضافه شده است.
+
+- CI جاری روی PR و push به `main` اجرا می‌شود.
+- نام ماژول‌های تست تکراری با `--import-mode=importlib` مدیریت می‌شوند؛ هیچ suite حذف نشده است.
+- Workflow یک DATA MANAGER محلی و loopback راه‌اندازی می‌کند و تست integration واقعی CODE MANAGER ↔ DATA MANAGER را فعال می‌کند.
+- PR #4: https://github.com/sina1991/30nA-Hybrid-architecture/pull/4
+- Run PR #4: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40773833064
+- Run روی main پس از merge: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40773918393
+- نتیجه: `158 passed, 0 skipped, 1 warning, 55 subtests passed`.
+- پس از ادغام مستندات نیز CI روی SHA `016e8ad08e2b9c639fff1b0d799159dd14c94201` موفق شد: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40774066518
+
+### مواردی که هنوز مانع تکمیل نهایی‌اند
+
+- [ ] تعیین تکلیف هشدار deprecation در CI.
+- [ ] پیاده‌سازی Build pipeline واقعی؛ قرارداد draft کافی نیست.
+- [ ] قرارداد و endpoint انتشار/دریافت artifact ساخته‌شده، با مالکیت و hash.
+- [ ] sandbox واقعی برای اجرای کد غیرقابل اعتماد؛ subprocess به‌تنهایی sandbox نیست.
+- [ ] persistence/API/scheduler واقعی WORKER MANAGER طبق تصمیم معماری.
+- [ ] آزمون E2E کامل از ثبت source تا build/publish/download/execute/result.
+- [ ] تکمیل بررسی امنیتی و استقرار تمیز با dependencyهای تثبیت‌شده.

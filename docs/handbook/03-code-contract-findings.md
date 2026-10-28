@@ -147,3 +147,18 @@ Workflow فعلی روی Commit ثابت `3606ea7bac656e9292e57387b3d7ef9969ce4a
 ## محدودیت
 
 این گزارش بر اساس شواهد CI مورخ 2026-10-28 و محتوای فایل‌های قابل مشاهده در شاخه main تهیه شده است. این گزارش نتیجه اجرای مجدد تست‌ها نیست؛ تغییر کد محصول یا قراردادها در این مرحله انجام نشده است.
+
+
+## 9. به‌روزرسانی وضعیت לאחר اصلاح CI — 2026-10-29
+
+این بخش supersede نمی‌کند شواهد تاریخی بالا؛ آن شواهد شکست baseline قدیمی را توصیف می‌کنند. وضعیت جاری پس از اصلاحات:
+
+- قرارداد `contracts/code/build/contract.yaml` اکنون در `main` وجود دارد، اما هنوز `status: draft` است و پیاده‌سازی واقعی Build را اثبات نمی‌کند.
+- Workflow جاری `.github/workflows/ci.yml` برای Pull Request و push به `main` اجرا می‌شود و با `pytest --import-mode=importlib` تداخل نام ماژول تست‌ها را رفع کرده است.
+- یک DATA MANAGER موقت فقط روی `127.0.0.1` در runner اجرا می‌شود و تست واقعی CODE ↔ DATA MANAGER فعال است.
+- Run روی `main` بعد از merge: [40774066518](https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40774066518)
+- SHA: `016e8ad08e2b9c639fff1b0d799159dd14c94201`
+- نتیجه: CI موفق؛ گزارش suite: `158 passed, 0 skipped, 1 warning, 55 subtests passed`.
+- تست `test_register_and_retrieve_through_real_data_manager_api` در اجرای جدید **PASSED** است، نه skipped.
+
+موارد باقیمانده: warning مربوط به deprecation؛ Build pipeline اجرایی؛ Artifact API برای artifactهای واقعاً ساخته و تأییدشده؛ sandbox تولیدی؛ و E2E کامل تا WORKER RUNTIME. تا رفع این موارد، آمادگی Production تأیید نمی‌شود.

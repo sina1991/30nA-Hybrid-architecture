@@ -59,3 +59,19 @@
 ## وضعیت فعلی
 
 مرحله 0 آغاز شده است. این نسخه اولیه از روی مخزن GitHub و مستندات قابل مشاهده تهیه شده؛ بررسی کامل کد و اجرای همه تست‌ها هنوز انجام نشده است.
+
+
+## وضعیت اجرایی به‌روزشده — 2026-10-29
+
+مرحله 0 هنوز فقط از نظر موجودی و خط مبنا تکمیل‌شده محسوب می‌شود؛ مراحل 1 تا 6 در حال اجرا هستند. دو مانع CI رفع شده‌اند:
+
+- pytest collection: حل شد با `--import-mode=importlib`.
+- تست integration واقعی CODE ↔ DATA MANAGER: در CI فعال و موفق شد؛ نتیجه `158 passed, 0 skipped, 55 subtests passed`.
+
+شواهد:
+- PR اصلاح CI: https://github.com/sina1991/30nA-Hybrid-architecture/pull/3
+- PR فعال‌سازی integration: https://github.com/sina1991/30nA-Hybrid-architecture/pull/4
+- CI روی main: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40774066518
+- SHA مبنای این نتیجه: `016e8ad08e2b9c639fff1b0d799159dd14c94201`
+
+اولویت بعدی، تکمیل مسیر Build/Artifact با آزمون و امنیت معتبر است. endpoint دانلود نباید ZIP خام source را به‌عنوان artifact build شده جا بزند؛ تا زمان تکمیل pipeline و وضعیت validation، مسیر اجرا باید fail-closed باقی بماند.
