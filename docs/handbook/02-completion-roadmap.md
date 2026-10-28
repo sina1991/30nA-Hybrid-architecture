@@ -69,10 +69,11 @@
 
 ### وضعیت فعلی Build
 
-PR شماره 9 برای `feat/code-manager-static-build-validation` دارای CI موفق است:
-https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40775184421
+PR شماره 9 برای `feat/code-manager-static-build-validation` با CI موفق ادغام شده است؛ merge commit:
+`97c3b31c5d1901e52c3f3d6448ff078d97baea29`.
+CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40775184421
 
-این PR در زمان ثبت این یادداشت **باز و ادغام‌نشده** است؛ بنابراین تغییر آن هنوز بخشی از `main` نیست. دامنه آن صرفاً پیش‌بررسی ایستای غیر اجرایی است و ساخت Artifact قابل انتشار را پیاده‌سازی نمی‌کند.
+دامنه آن صرفاً پیش‌بررسی ایستای غیر اجرایی است و ساخت Artifact قابل انتشار را پیاده‌سازی نمی‌کند. مستندات Runtime در PR شماره 10 نیز با CI موفق ادغام شده است (merge commit `10d6fa1575d370e064f394d3611c0b1a31d4743d`).
 
 ### موارد باقی‌مانده و اولویت‌ها
 
@@ -80,7 +81,7 @@ https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40775184421
 2. **P0 — Publication gate:** انتشار HTTP باید فقط پس از موفقیت تمام مراحل اجباری مجاز شود؛ ZIP خام منبع نباید به‌عنوان Artifact ساخته‌شده معرفی شود.
 3. **P0 — Sandbox:** subprocess با `-I` مرز امنیتی نیست. اجرای Source غیرقابل‌اعتماد در Production مجاز نیست.
 4. **P0 — Runtime E2E:** دانلود Artifact از CODE MANAGER با احراز هویت واقعی و اجرای مسیر کامل تا نتیجه هنوز اثبات نشده است.
-5. **P0 — محدودیت خروجی:** محدود کردن stdout فقط پس از خروج subprocess برای جلوگیری از مصرف حافظه کافی نیست؛ محدودیت باید هنگام stream اعمال شود.
+5. **P0 — محدودیت خروجی:** در شاخهٔ فعلی، stdout هنگام stream خوانده می‌شود و با عبور از سقف، subprocess متوقف می‌شود؛ تست چاپ نامحدود اضافه شده است. این تغییر تا پایان CI و ادغام، در `main` تأییدشده محسوب نمی‌شود.
 6. **P1 — Auth integration:** reverse proxy/identity gateway باید Authorization را اعتبارسنجی کند و هویت قابل‌اعتماد را در `REMOTE_USER` قرار دهد.
 7. **P1 — Worker Manager:** persistence، API عمومی، scheduler واقعی و Runtime adapter عملیاتی باز هستند.
 8. **P1 — Dashboard:** اتصال upstream و نگاشت مجوز/هویت نیازمند تکمیل و تست است.
