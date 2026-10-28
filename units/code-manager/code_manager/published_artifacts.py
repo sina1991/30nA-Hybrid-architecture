@@ -1,8 +1,8 @@
-"""Owner-scoped, immutable publication of registered source ZIP artifacts.
+"""Owner-scoped, immutable publication of validated built artifacts.
 
-Publication is explicit: registering a source never publishes an artifact.
-Manifests are atomically linked into place and never overwritten by this module.
-This component does not execute source code or change DATA MANAGER persistence.
+Registering a source never publishes an artifact. Manifests are atomically
+linked and never overwritten. Source ZIPs are not downloadable through the
+built-artifact API. This component never executes submitted source code.
 """
 
 from __future__ import annotations
