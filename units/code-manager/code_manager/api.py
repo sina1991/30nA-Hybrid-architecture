@@ -610,6 +610,7 @@ def create_application(
                     or len(source_version) > 128
                     or "/" in source_version
                     or "\\" in source_version
+                    or "@" in source_version
                 ):
                     raise APIError(
                         400, "SOURCE_INVALID",
