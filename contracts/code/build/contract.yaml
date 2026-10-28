@@ -130,8 +130,9 @@ implementation_status:
     - production_host_acceptance_and_daemon_fault_injection
   publication_eligible: conditional_on_all_stages_passed
   note: >-
-    POST /api/v1/builds runs the real pipeline, but only the stdlib-only profile
-    is supported. External imports and dependency manifests fail closed until
-    an allowlisted, hash-pinned offline resolver and runtime dependency package
-    format are implemented. A build without tests, with an invalid sandbox,
-    or with any non-passed mandatory stage is never publishable.
+    POST /api/v1/builds runs the real pipeline. Third-party dependencies are
+    accepted only as allowlisted, hash-pinned pure-Python wheels from an offline
+    wheelhouse, and are vendored into the artifact with a hash manifest.
+    Transitive/native dependencies and unsupported manifests fail closed.
+    A build without tests, with an invalid sandbox, or with any non-passed
+    mandatory stage is never publishable.
