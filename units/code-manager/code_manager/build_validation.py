@@ -80,9 +80,14 @@ def validate_build_preflight(source: dict) -> dict:
             record("contract_check", "failed", key + " must be a JSON Schema object")
             return {"status": "failed", "publishable": False, "stages": stages}
         try:
-            json.dumps(value, allow_nan=False)
+            encoded_schema = json.dumps(
+                value, sort_keys=True, separators=(",", ":"), allow_nan=False
+            ).encode("utf-8")
         except (TypeError, ValueError):
             record("contract_check", "failed", key + " is not JSON serializable")
+            return {"status": "failed", "publishable": False, "stages": stages}
+        if len(encoded_schema) > 8192:
+            record("contract_check", "failed", key + " exceeds the 8 KiB schema limit")
             return {"status": "failed", "publishable": False, "stages": stages}
     record("contract_check", "passed", "Input/output schema objects are present; full JSON Schema meta-validation remains pending")
 
