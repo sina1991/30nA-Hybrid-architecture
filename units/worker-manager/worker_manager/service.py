@@ -1,13 +1,15 @@
-"""In-memory management service with an injectable Runtime adapter boundary."""
+"""Worker management service with injectable Runtime and durable-store boundaries."""
 
 from __future__ import annotations
 
+import sqlite3
 from dataclasses import replace
 from threading import RLock
 from typing import Any, Mapping
 
 from .models import Schedule, WorkerDefinition, WorkerLifecycle, WorkerRecord
 from .runtime_gateway import ExecutionRequest, RuntimeGateway
+from .sqlite_store import SQLiteWorkerStore
 
 
 class WorkerManagerError(Exception):
@@ -31,10 +33,23 @@ class RuntimeGatewayUnavailable(WorkerManagerError):
 
 
 class WorkerManager:
-    """Manage workers without loading or executing worker code."""
+    """Manage worker metadata without loading or executing worker code.
 
-    def __init__(self, runtime_gateway: RuntimeGateway | None = None) -> None:
-        self._records: dict[str, WorkerRecord] = {}
+    When a store is provided, metadata is loaded on startup and every
+    successful mutation is persisted before the in-memory snapshot is changed.
+    The store is optional to preserve lightweight in-memory tests and use cases.
+    """
+
+    def __init__(
+        self,
+        runtime_gateway: RuntimeGateway | None = None,
+        *,
+        store: SQLiteWorkerStore | None = None,
+    ) -> None:
+        self._store = store
+        self._records: dict[str, WorkerRecord] = {
+            record.definition.worker_id: record for record in store.list()
+        } if store is not None else {}
         self._lock = RLock()
         self._runtime_gateway = runtime_gateway
 
@@ -52,16 +67,17 @@ class WorkerManager:
             schedule=Schedule() if schedule is None else schedule,
         )
         with self._lock:
-            existing = self._records.get(definition.worker_id)
-            if existing is not None:
-                if existing.definition == definition:
-                    raise WorkerConflict(
-                        f"worker already registered: {definition.worker_id}"
-                    )
+            if definition.worker_id in self._records:
                 raise WorkerConflict(
-                    "worker identifier already belongs to another definition: "
-                    f"{definition.worker_id}"
+                    f"worker identifier already registered: {definition.worker_id}"
                 )
+            if self._store is not None:
+                try:
+                    self._store.save_new(record)
+                except sqlite3.IntegrityError as exc:
+                    raise WorkerConflict(
+                        f"worker identifier already registered: {definition.worker_id}"
+                    ) from exc
             self._records[definition.worker_id] = record
             return record
 
@@ -84,13 +100,10 @@ class WorkerManager:
             current = self._require(worker_id)
             updated = replace(
                 current,
-                configuration=(
-                    current.configuration
-                    if configuration is None
-                    else configuration
-                ),
+                configuration=current.configuration if configuration is None else configuration,
                 schedule=current.schedule if schedule is None else schedule,
             )
+            self._save(updated)
             self._records[worker_id] = updated
             return updated
 
@@ -98,6 +111,7 @@ class WorkerManager:
         with self._lock:
             current = self._require(worker_id)
             updated = replace(current, lifecycle=WorkerLifecycle.ENABLED)
+            self._save(updated)
             self._records[worker_id] = updated
             return updated
 
@@ -105,6 +119,7 @@ class WorkerManager:
         with self._lock:
             current = self._require(worker_id)
             updated = replace(current, lifecycle=WorkerLifecycle.DISABLED)
+            self._save(updated)
             self._records[worker_id] = updated
             return updated
 
@@ -116,20 +131,14 @@ class WorkerManager:
         timeout_seconds: float = 30.0,
         idempotency_key: str | None = None,
     ) -> Any:
-        """Submit an enabled worker's request through the injected gateway.
-
-        The Runtime execution result is returned unchanged. This method
-        submits a request; it does not execute worker code itself.
-        """
+        """Submit an enabled worker's request through the injected gateway."""
         if input_payload is not None and not isinstance(input_payload, Mapping):
             raise ValueError("input_payload must be a mapping")
 
         with self._lock:
             record = self._require(worker_id)
             if record.lifecycle != WorkerLifecycle.ENABLED:
-                raise WorkerNotEnabled(
-                    f"worker is not enabled: {worker_id}"
-                )
+                raise WorkerNotEnabled(f"worker is not enabled: {worker_id}")
             gateway = self._runtime_gateway
             if gateway is None:
                 raise RuntimeGatewayUnavailable(
@@ -149,7 +158,13 @@ class WorkerManager:
     def remove(self, worker_id: str) -> None:
         with self._lock:
             self._require(worker_id)
+            if self._store is not None:
+                self._store.delete(worker_id)
             del self._records[worker_id]
+
+    def _save(self, record: WorkerRecord) -> None:
+        if self._store is not None:
+            self._store.save(record)
 
     def _require(self, worker_id: str) -> WorkerRecord:
         try:
@@ -160,17 +175,21 @@ class WorkerManager:
     def cancel_execution(self, execution_id: str) -> bool:
         """Cancel by execution identity; does not change worker lifecycle."""
         if not isinstance(execution_id, str) or not execution_id:
-            raise ValueError('execution_id must be a nonempty string')
+            raise ValueError("execution_id must be a nonempty string")
         with self._lock:
             gateway = self._runtime_gateway
-        if gateway is None or not callable(getattr(gateway, 'cancel', None)):
-            raise RuntimeGatewayUnavailable('runtime gateway does not support cancellation')
+        if gateway is None or not callable(getattr(gateway, "cancel", None)):
+            raise RuntimeGatewayUnavailable(
+                "runtime gateway does not support cancellation"
+            )
         return gateway.cancel(execution_id)
 
     def get_execution(self, execution_id: str) -> Any:
         """Read execution state independently from lifecycle state."""
         with self._lock:
             gateway = self._runtime_gateway
-        if gateway is None or not callable(getattr(gateway, 'get', None)):
-            raise RuntimeGatewayUnavailable('runtime gateway does not support execution lookup')
+        if gateway is None or not callable(getattr(gateway, "get", None)):
+            raise RuntimeGatewayUnavailable(
+                "runtime gateway does not support execution lookup"
+            )
         return gateway.get(execution_id)
