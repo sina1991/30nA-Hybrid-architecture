@@ -22,6 +22,7 @@ from .data_manager_client import (
 )
 from .errors import CodeManagerError, SourceValidationError
 from .source_archive import inspect_source_archive
+from .build_validation import validate_build_preflight
 from .published_artifacts import (
     PublishedArtifactRegistry, ArtifactInvalid, ArtifactNotFound,
     ArtifactConflict, ArtifactIntegrityError,
@@ -513,12 +514,54 @@ def create_application(
                     404, "ARTIFACT_NOT_FOUND", "Artifact route not found"
                 )
 
-            if route == "/builds":
-                if method in {"POST", "GET"}:
+            if route == "/builds" and method == "POST":
+                body = read_json_body()
+                if "owner_id" in body:
                     raise APIError(
-                        501,
-                        "OPERATION_NOT_IMPLEMENTED",
-                        "Build operations are reserved and not implemented",
+                        400, "SOURCE_INVALID",
+                        "owner_id must not be supplied in request JSON",
+                    )
+                source_id = body.get("source_id")
+                source_version = body.get("source_version")
+                if (
+                    not isinstance(source_id, str)
+                    or not _ID_PATTERN.fullmatch(source_id)
+                    or not isinstance(source_version, str)
+                    or not source_version
+                    or len(source_version) > 128
+                    or "/" in source_version
+                    or "\\\\" in source_version
+                ):
+                    raise APIError(
+                        400, "SOURCE_INVALID",
+                        "source_id and source_version are required",
+                    )
+                _, registry = client_and_services()
+                source = registry.get_source(
+                    owner_id=owner_id,
+                    source_id=source_id,
+                    source_version=source_version,
+                )
+                report = validate_build_preflight(source)
+                return _json_response(
+                    start_response, 200,
+                    {
+                        "contract_version": CONTRACT_VERSION,
+                        **({"correlation_id": correlation_id} if correlation_id else {}),
+                        "payload": {
+                            "source_id": source_id,
+                            "source_version": source_version,
+                            "build": report,
+                        },
+                    },
+                    correlation_id,
+                )
+
+            if route == "/builds":
+                if method == "GET":
+                    raise APIError(
+                        501, "OPERATION_NOT_IMPLEMENTED",
+                        "Build history storage is not implemented",
                     )
 
             raise APIError(404, "SOURCE_NOT_FOUND", "Route not found")
