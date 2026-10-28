@@ -7,6 +7,7 @@ allowlisted, hash-locked resolver is configured.
 """
 from __future__ import annotations
 
+import ast
 import hashlib
 from contextlib import contextmanager
 import io
@@ -17,6 +18,7 @@ import re
 import shutil
 import sqlite3
 import stat
+import sys
 import subprocess
 import tempfile
 import threading
@@ -180,6 +182,60 @@ if __name__ == "__main__":
                           "summary":type(exc).__name__+": "+str(exc)[:500]}))
         raise SystemExit(1)
 '''
+
+
+def analyze_imports(source_bytes: bytes) -> dict:
+    """Conservatively allow only standard-library and archive-local imports."""
+    with zipfile.ZipFile(io.BytesIO(source_bytes), "r") as archive:
+        names = [info.filename for info in archive.infolist() if not info.is_dir()]
+        local_roots = set()
+        for name in names:
+            if not name.endswith(".py"):
+                continue
+            path = PurePosixPath(name)
+            if path.name == "__init__.py":
+                if len(path.parts) > 1:
+                    local_roots.add(path.parts[0])
+            else:
+                local_roots.add(path.parts[0].removesuffix(".py"))
+        stdlib = set(getattr(sys, "stdlib_module_names", ()))
+        shadowed = sorted(local_roots & stdlib)
+        external = set()
+        for name in names:
+            if not name.endswith(".py"):
+                continue
+            try:
+                tree = ast.parse(archive.read(name).decode("utf-8"), filename=name)
+            except (UnicodeDecodeError, SyntaxError, ValueError) as exc:
+                raise SourceValidationError("Unable to analyze imports in " + name) from exc
+            for node in ast.walk(tree):
+                module = None
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        root = alias.name.split(".", 1)[0]
+                        if root not in stdlib and root not in local_roots:
+                            external.add(root)
+                elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                    root = node.module.split(".", 1)[0]
+                    if root not in stdlib and root not in local_roots:
+                        external.add(root)
+                elif isinstance(node, ast.Call):
+                    dynamic_name = None
+                    if isinstance(node.func, ast.Name) and node.func.id == "__import__":
+                        dynamic_name = node.args[0] if node.args else None
+                    elif (isinstance(node.func, ast.Attribute)
+                          and node.func.attr == "import_module"
+                          and isinstance(node.func.value, ast.Name)
+                          and node.func.value.id == "importlib"):
+                        dynamic_name = node.args[0] if node.args else None
+                    if dynamic_name is not None:
+                        if not isinstance(dynamic_name, ast.Constant) or not isinstance(dynamic_name.value, str):
+                            external.add("<dynamic-import>")
+                        else:
+                            root = dynamic_name.value.lstrip(".").split(".", 1)[0]
+                            if root and root not in stdlib and root not in local_roots:
+                                external.add(root)
+        return {"external": sorted(external), "stdlib_shadowing": shadowed}
 
 
 class BuildHistoryStore:
@@ -469,7 +525,14 @@ class BuildPipeline:
                     record(name, "not_run", "A mandatory preflight stage failed")
                 report["status"] = "failed"
                 return self._save(owner_id, report)
-            dependency_stage = next((s for s in preflight["stages"] if s["stage"] == "dependency_check"), None)
+            dependency_stage = next((s for s in report["stages"] if s["stage"] == "dependency_check"), None)
+            import_report = analyze_imports(source.get("source_bytes"))
+            if dependency_stage and (import_report["external"] or import_report["stdlib_shadowing"]):
+                dependency_stage["status"] = "blocked"
+                dependency_stage["detail"] = (
+                    "Imports require unavailable dependencies or shadow the standard library: "
+                    + json.dumps(import_report, sort_keys=True)
+                )[:1000]
             if dependency_stage and dependency_stage["status"] != "passed":
                 record("normalize_working_copy", "not_run", "Dependency policy blocked the build")
                 record("test", "not_run", "Dependency policy blocked the build")
