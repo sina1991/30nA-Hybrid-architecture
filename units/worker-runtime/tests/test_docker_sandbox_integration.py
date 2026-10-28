@@ -220,12 +220,17 @@ def test_real_docker_memory_cgroup_kills_over_limit_process():
         )
         assert run.returncode != 0, "memory allocation unexpectedly exceeded the configured cgroup limit"
         inspect = subprocess.run(
-            ["docker", "inspect", "--format", "{{.State.OOMKilled}}", name],
+            ["docker", "inspect", "--format", "{{.State.OOMKilled}} {{.HostConfig.Memory}} {{.State.ExitCode}}", name],
             stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
             timeout=5, check=False,
         )
         assert inspect.returncode == 0, "memory-test container disappeared before inspection"
-        assert inspect.stdout.decode("ascii", "replace").strip() == "true"
+        oom_killed, memory_limit, container_exit = inspect.stdout.decode("ascii", "replace").strip().split()
+        assert memory_limit == str(64 * 1024 * 1024), "Docker did not configure the requested memory cgroup limit"
+        assert run.returncode != 0, "over-limit memory allocation unexpectedly succeeded"
+        assert oom_killed == "true" or (
+            container_exit == "1" and "MemoryError" in run.stderr.decode("utf-8", "replace")
+        ), "memory limit neither killed the process nor rejected its allocation"
     finally:
         subprocess.run(
             ["docker", "rm", "--force", name], stdin=subprocess.DEVNULL,
