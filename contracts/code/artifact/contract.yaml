@@ -26,6 +26,7 @@ artifact:
   source_hash:
     type: string
     required: true
+    algorithm: sha256
     format: "sha256:<64 lowercase hex>"
   build_id:
     type: string
@@ -58,6 +59,7 @@ artifact:
   artifact_hash:
     type: string
     required: true
+    algorithm: sha256
     format: "sha256:<64 lowercase hex>"
   size_bytes:
     type: integer
