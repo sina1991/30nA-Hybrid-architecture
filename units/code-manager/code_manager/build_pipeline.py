@@ -270,10 +270,10 @@ def analyze_imports(source_bytes: bytes) -> dict:
                 elif isinstance(node, ast.Call):
                     dynamic_name = None
                     if isinstance(node.func, ast.Name) and node.func.id in {"__import__", "exec", "eval", "compile"}:
-                        dynamic_name = node.args[0] if node.args else None
+                        dynamic_name = node.args[0] if node.args else ast.Constant(value="")
                     elif (isinstance(node.func, ast.Attribute)
                           and node.func.attr in {"import_module", "spec_from_file_location", "run_module", "run_path"}):
-                        dynamic_name = node.args[0] if node.args else None
+                        dynamic_name = node.args[0] if node.args else ast.Constant(value="")
                     if dynamic_name is not None:
                         external.add("<dynamic-import>")
                         if isinstance(dynamic_name, ast.Constant) and isinstance(dynamic_name.value, str):
