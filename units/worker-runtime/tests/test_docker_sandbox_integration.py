@@ -1,4 +1,3 @@
-import io
 import json
 import os
 from pathlib import Path
@@ -22,7 +21,7 @@ def test_real_docker_container_enforces_identity_and_read_only_root(tmp_path):
     )
     if probe.returncode != 0:
         pytest.skip("Docker daemon is not available")
-    source = b'''import os\ndef run(data, config):\n    try:\n        with open("/etc/sandbox-write-probe", "w") as f: f.write("bad")\n        readonly = False\n    except OSError:\n        readonly = True\n    return {"uid": os.geteuid(), "readonly": readonly}\n'''
+    source = b'''import os\ndef run(data, config):\n    readonly = bool(os.statvfs("/").f_flag & os.ST_RDONLY)\n    return {"uid": os.geteuid(), "readonly": readonly}\n'''
     archive = tmp_path / "artifact.zip"
     with zipfile.ZipFile(archive, "w") as zf:
         zf.writestr("worker.py", source)
