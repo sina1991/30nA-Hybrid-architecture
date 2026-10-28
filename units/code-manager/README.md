@@ -42,9 +42,9 @@ does not, by itself, populate `REMOTE_USER`.
 - `GET /api/v1/sources/{source_id}/versions/{source_version}`: retrieve metadata.
 - `POST /api/v1/sources/{source_id}/versions/{source_version}/inspect`:
   validate archive structure without executing the source.
-- `POST /api/v1/builds`: reserved; returns `501` until build isolation exists.
-- `GET /api/v1/artifacts/{artifact_id}`: reserved.
-- `POST /api/v1/artifacts/{artifact_id}/publish`: reserved.
+- `POST /api/v1/builds`: reserved; returns `501` until a validated build pipeline and build isolation exist.
+- `GET /api/v1/artifacts/{artifact_id}/content`: returns byte-exact content only for an already-published, owner-scoped artifact; verifies manifest/blob integrity and exposes the SHA-256 digest.
+- `POST /api/v1/artifacts/{artifact_id}/publish`: remains reserved and returns `501`; publication is intentionally blocked until build validation exists. Service-level publication of source ZIPs is not equivalent to a validated build.
 
 Successful and error responses use the shared contract version and may preserve
 a valid `X-Correlation-ID`. Errors do not expose stack traces or secrets.
@@ -65,3 +65,8 @@ Submitted source code is never executed by the API. Build execution must later
 run in a restricted environment, separate from the privileged CODE MANAGER
 process. Artifact packaging, immutable artifact versions, and publication
 remain unimplemented.
+
+
+## Artifact download boundary
+
+The download API only reads an artifact that was explicitly published through the local registry and verifies its immutable manifest and content-addressed blob. It does not build, validate dependencies, or make submitted code safe. The publication HTTP route remains disabled. Do not expose the Runtime to untrusted source archives in production: subprocess execution is not a security sandbox. Production identity middleware must validate the Authorization header and set trusted `REMOTE_USER`; this WSGI module does not parse bearer tokens itself.
