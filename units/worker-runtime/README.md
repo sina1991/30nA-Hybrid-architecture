@@ -6,10 +6,16 @@ and propagates a cancellation request to descendant executions. Worker lifecycle
 is maintained separately by WORKER MANAGER. Disabling/removing a worker affects
 future submissions only; already accepted executions are not implicitly cancelled.
 
-The idempotency map is in-memory, process-local and not durable across restarts.
-A repeated key while an execution is in flight returns its current snapshot,
-not a future/promise; poll by execution ID. A retry with a new idempotency key
-is a new execution. Max concurrent subprocesses, archive size, serialized input size, output size,
+By default, execution history and idempotency are in-memory and are not durable across restarts. An optional `SQLiteExecutionStore` persists JSON-compatible execution snapshots and idempotency mappings:
+
+```python
+from worker_runtime import SQLiteExecutionStore, WorkerRuntime
+
+store = SQLiteExecutionStore("./var/runtime.sqlite3")
+runtime = WorkerRuntime(artifact_provider, execution_store=store)
+```
+
+On startup, persisted `accepted`/`running` records are marked failed with `RUNTIME_RESTARTED` and `retryable=true`; live processes are not resumed. This is durable history, not exactly-once execution or a distributed scheduler. Use one Runtime process per database file. A repeated key while an execution is in flight returns its current snapshot, not a future/promise; poll by execution ID. A retry with a new idempotency key is a new execution. Max concurrent subprocesses, archive size, serialized input size, output size,
 child count and depth are configurable. The default serialized input/configuration
 limit is 1 MiB; oversized or non-JSON payloads fail as `INVALID_INPUT` before
 subprocess launch. Artifact, input and output byte limits, and the concurrency
