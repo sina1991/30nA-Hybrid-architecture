@@ -1,0 +1,97 @@
+contract: code.build
+contract_version: "1.0.0"
+status: draft
+
+purpose:
+  description: >-
+    Define the deterministic validation and packaging pipeline for Python source
+    bundles submitted to CODE MANAGER. This contract describes required stages;
+    it does not claim that every stage is implemented by the current service.
+  language: python
+  source_format: zip
+
+pipeline:
+  stages:
+    - inspect_archive
+    - verify_source_hash
+    - validate_archive_paths
+    - normalize_working_copy
+    - syntax_check
+    - dependency_check
+    - contract_check
+    - test
+    - package
+    - hash
+
+stage_requirements:
+  inspect_archive:
+    required: true
+    rules:
+      - "Treat uploaded ZIP content as untrusted input."
+      - "Reject malformed archives before extracting any member."
+  verify_source_hash:
+    required: true
+    algorithm: sha256
+    rules:
+      - "Compute the hash over the exact original ZIP bytes before normalization or extraction."
+      - "Reject a source bundle when its declared hash does not match the original bytes."
+  validate_archive_paths:
+    required: true
+    rules:
+      - "Reject absolute paths, traversal paths, and paths escaping the working directory."
+      - "Reject unsafe symlink entries and ambiguous duplicate paths."
+      - "Enforce configured archive entry-count and expanded-size limits."
+  normalize_working_copy:
+    required: true
+    rules:
+      - "Process a working copy only after original-byte integrity has been verified."
+      - "Never modify the bytes used to establish source_hash."
+  syntax_check:
+    required: true
+    language: python
+    rules:
+      - "Compile or parse all eligible Python source files without executing submitted code."
+  dependency_check:
+    required: true
+    rules:
+      - "Validate dependency declarations against the supported dependency policy."
+      - "Do not silently install arbitrary dependencies during archive inspection."
+  contract_check:
+    required: true
+    rules:
+      - "Validate the declared entrypoint and input/output JSON Schemas."
+      - "Validate required source metadata and supported contract versions."
+  test:
+    required: true
+    rules:
+      - "Run only in an explicitly isolated build environment."
+      - "A test result must distinguish passed, failed, skipped, and not-run states."
+  package:
+    required: true
+    rules:
+      - "Package only the normalized and validated working copy."
+      - "Exclude credentials, environment files, caches, and generated secrets."
+  hash:
+    required: true
+    algorithm: sha256
+    rules:
+      - "Compute artifact_hash over the exact final packaged bytes."
+      - "Record source_hash and artifact_hash separately."
+
+outcomes:
+  passed:
+    description: "Every mandatory stage completed successfully."
+  failed:
+    description: "At least one mandatory stage failed."
+  not_run:
+    description: "The stage was not executed; this is not a passing result."
+
+rules:
+  - "Pipeline stage order is normative and MUST be preserved."
+  - "inspect_archive MUST precede verify_source_hash as required by the current contract tests; inspection MUST be metadata-only and MUST NOT extract or execute source before hash verification."
+  - "verify_source_hash MUST precede normalize_working_copy."
+  - "A successful build MUST NOT be interpreted as proof that the artifact is safe to execute."
+  - "Only artifacts whose mandatory validation stages passed may be eligible for publication."
+  - "Build execution MUST use resource limits and isolation appropriate to untrusted source."
+  - "An implementation MUST NOT report a skipped or unimplemented stage as passed."
+  - "The source hash identifies original uploaded ZIP bytes; the artifact hash identifies final packaged bytes."
