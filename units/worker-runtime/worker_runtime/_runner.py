@@ -62,11 +62,11 @@ def _load_vendored_wheels(archive_path):
 def main():
     archive, entrypoint = sys.argv[1:3]
     sys.path.insert(0, archive)
-    wheels = _load_vendored_wheels(archive)
-    for path in reversed(wheels):
-        sys.path.insert(1, path)
     data = json.load(sys.stdin)
     try:
+        wheels = _load_vendored_wheels(archive)
+        for path in reversed(wheels):
+            sys.path.insert(1, path)
         module, function = entrypoint.split(':', 1)
         result = getattr(importlib.import_module(module), function)(data['input'], data['configuration'])
         print(json.dumps({'ok': True, 'result': result}, allow_nan=False))
