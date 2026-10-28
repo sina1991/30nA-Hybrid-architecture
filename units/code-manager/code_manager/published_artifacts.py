@@ -117,7 +117,20 @@ class PublishedArtifactRegistry:
                     or re.fullmatch(r"[0-9a-f]{32}", metadata["build_id"]) is None
                     or not isinstance(metadata.get("provenance"), dict)
                     or metadata["provenance"].get("artifact_hash") != metadata.get("artifact_hash")
-                    or metadata["provenance"].get("source_hash") != metadata.get("source_hash")):
+                    or metadata["provenance"].get("source_hash") != metadata.get("source_hash")
+                    or metadata.get("source_id") != _identity(owner_id, artifact_id)[0]
+                    or metadata.get("source_version") != _identity(owner_id, artifact_id)[1]
+                    or metadata.get("artifact_version") != metadata.get("blob_digest")
+                    or not isinstance(metadata.get("build_version"), str)
+                    or not metadata["build_version"]
+                    or not isinstance(metadata.get("calculation_version"), str)
+                    or not metadata["calculation_version"]
+                    or metadata.get("validation_status") != "passed"
+                    or metadata.get("dependency_lock") != "stdlib-only"
+                    or not isinstance(metadata.get("input_schema"), dict)
+                    or not isinstance(metadata.get("output_schema"), dict)
+                    or len(_canonical(metadata["input_schema"])) > 16384
+                    or len(_canonical(metadata["output_schema"])) > 16384):
                 raise ArtifactIntegrityError("Built artifact provenance is missing or inconsistent")
         return metadata
 
