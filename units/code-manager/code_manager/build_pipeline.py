@@ -80,6 +80,8 @@ def normalize_source_archive(source_bytes: bytes, *, include_tests: bool) -> byt
             parts = PurePosixPath(name).parts
             basename = PurePosixPath(name).name.lower()
             if (basename == ".env" or basename.startswith(".env.")
+                    or basename.endswith(".env")
+                    or basename.startswith(("secret.", "credentials."))
                     or basename in _SENSITIVE_BASENAMES
                     or basename.endswith((".pem", ".key", ".p12", ".pfx", ".token", ".secret"))
                     or any(part.lower() in {".ssh", ".aws"} for part in parts[:-1])
