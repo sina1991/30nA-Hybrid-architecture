@@ -103,4 +103,4 @@ rules:
   - "Artifact retrieval MUST use the owning authorization interface."
   - "Artifact content MUST NOT contain credentials or secrets."
   - "The artifact MUST preserve the declared entrypoint, input/output schemas and calculation version."
-  - "The current dependency policy is stdlib-only; external imports and dependency manifests MUST fail closed."
+  - "The dependency lock MUST identify stdlib-only artifacts or the canonical hash of the exact allowlisted pure-Python wheel manifest. Every wheel's SHA-256 MUST be reverified by Worker Runtime before import."
