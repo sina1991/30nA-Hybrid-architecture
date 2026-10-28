@@ -12,7 +12,9 @@ not a future/promise; poll by execution ID. A retry with a new idempotency key
 is a new execution. Max concurrent subprocesses, archive size, serialized input size, output size,
 child count and depth are configurable. The default serialized input/configuration
 limit is 1 MiB; oversized or non-JSON payloads fail as `INVALID_INPUT` before
-subprocess launch. Children inherit the parent's remaining
+subprocess launch. Artifact, input and output byte limits, and the concurrency
+limit must be positive integers; invalid resource-limit configuration is rejected
+at Runtime initialization. Children inherit the parent's remaining
 time budget and cancellation. No automatic retry is performed.
 
 ## CODE MANAGER dependency
