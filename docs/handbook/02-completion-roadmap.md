@@ -90,6 +90,37 @@ CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/4077518442
 7. **P1 — Worker Manager/Runtime:** persistence اطلاعات مدیریتی Worker و snapshotهای تاریخچه/idempotency Runtime در SQLite اختیاری پیاده‌سازی شده‌اند؛ API عمومی، scheduler واقعی/lease، هماهنگ‌سازی چندپردازه، resume اجرای زنده و اتصال Runtime از سرویس واقعی همچنان باز هستند. Storeها برای یک process مالک DB طراحی شده‌اند و تضمین exactly-once ندارند.
 8. **P1 — Dashboard:** اتصال upstream و نگاشت مجوز/هویت نیازمند تکمیل و تست است.
 
+
+### صف کارهای باقی‌مانده در GitHub
+
+برای اینکه اجرای مرحله‌ای قابل پیگیری باشد، شکاف‌های باز به Issueهای مستقل با دامنه و معیار پذیرش تقسیم شده‌اند:
+
+| اولویت | کار | Issue |
+|---|---|---|
+| P0 | Sandbox واقعی برای Build و Runtime | [#22](https://github.com/sina1991/30nA-Hybrid-architecture/issues/22) |
+| P0 | Build pipeline واقعی و بازتولیدپذیر | [#21](https://github.com/sina1991/30nA-Hybrid-architecture/issues/21) |
+| P0 | Publication gate و تفکیک source/build artifact | [#23](https://github.com/sina1991/30nA-Hybrid-architecture/issues/23) |
+| P0 | تست E2E با احراز هویت واقعی CODE ↔ Runtime | [#24](https://github.com/sina1991/30nA-Hybrid-architecture/issues/24) |
+| P1 | API و scheduler پایدار WORKER MANAGER | [#25](https://github.com/sina1991/30nA-Hybrid-architecture/issues/25) |
+| P1 | اتصال Dashboard و نگاشت مجوزها | [#26](https://github.com/sina1991/30nA-Hybrid-architecture/issues/26) |
+| P1 | hardening، CI و Release Gate | [#27](https://github.com/sina1991/30nA-Hybrid-architecture/issues/27) |
+
+#### ترتیب پیشنهادی اجرا
+
+1. **Issue #22 — Sandbox:** ابتدا threat model، انتخاب فناوری، policy و تست‌های منفی را تعیین کن؛ هیچ Build واقعی پیش از enforce شدن مرز ایزوله‌سازی روی source غیرقابل‌اعتماد اجرا نشود.
+2. **Issue #21 — Build pipeline:** پس از مشخص‌شدن interface و محدودیت Sandbox، مراحل واقعی validate/test/package/hash را پیاده کن.
+3. **Issue #23 — Publication gate:** فقط خروجی موفق و قابل‌اثبات Build اجازه انتشار داشته باشد.
+4. **Issue #24 — E2E:** سرویس‌های واقعی آزمایشی را اجرا کن و مسیر Artifact تا نتیجه را با هویت و مالکیت واقعی اثبات کن.
+5. **Issue #25 و #26 — Worker Manager و Dashboard:** API/scheduler و اتصال upstream/permission را مستقل، با قرارداد و integration test کامل کن.
+6. **Issue #27 — Release gate:** پس از ادغام موارد بالا، clean install، security scans، کل تست‌ها و مستندات انتشار را روی یک SHA نهایی اجرا کن.
+
+#### قانون ادغام و خاتمه
+
+- هر Issue باید PR جداگانه، تست‌های مرتبط و به‌روزرسانی فصل مستندات خودش را داشته باشد.
+- برای P0های امنیتی، fallback ناامن مجاز نیست؛ در نبود Sandbox یا Build معتبر باید درخواست رد شود.
+- Issueها فقط با معیار پذیرش و شواهد CI بسته شوند؛ وجود کد یا سبز بودن تست واحد به‌تنهایی اثبات E2E یا آمادگی تولید نیست.
+- آخرین Release Gate باید به SHA دقیق main و لینک CI همان SHA ارجاع دهد.
+
 ### معیار پذیرش Build
 
 - منبع نامعتبر و ZIP مخرب با شکست ایمن رد شوند.
