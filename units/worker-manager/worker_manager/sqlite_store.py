@@ -6,6 +6,7 @@ executes worker code. A single manager process should own a database file.
 from __future__ import annotations
 
 import json
+import math
 import sqlite3
 from pathlib import Path
 
@@ -16,12 +17,13 @@ class SQLiteWorkerStore:
     """Small SQLite repository for worker definitions and manager configuration."""
 
     def __init__(self, database_path: str | Path, *, timeout_seconds: float = 5.0):
-        if not isinstance(timeout_seconds, (int, float)) or isinstance(timeout_seconds, bool) or timeout_seconds <= 0:
+        if not isinstance(timeout_seconds, (int, float)) or isinstance(timeout_seconds, bool) or not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
-        self.database_path = str(database_path)
-        if not self.database_path.strip() or self.database_path == ":memory:":
+        if not str(database_path).strip() or str(database_path) == ":memory:":
             raise ValueError("database_path must identify a durable SQLite file")
-        Path(self.database_path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
+        path = Path(database_path).expanduser()
+        path.parent.resolve().mkdir(parents=True, exist_ok=True)
+        self.database_path = str(path)
         self.timeout_seconds = float(timeout_seconds)
         self._initialize()
 
