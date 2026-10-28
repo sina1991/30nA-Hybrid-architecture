@@ -565,7 +565,16 @@ class DockerBuildExecutor:
             dependency_lock_path = root / "dependency-lock.json"
             cidfile = root / "container.cid"
             container_name = "cm-build-" + uuid.uuid4().hex
-            wheel_files = list(wheel_files or [])
+            wheel_files = [dict(item) for item in (wheel_files or [])]
+            for wheel in wheel_files:
+                wheel_bytes = Path(wheel["path"]).read_bytes()
+                if hashlib.sha256(wheel_bytes).hexdigest() != wheel["sha256"]:
+                    return {"status": "failed", "tests": 0, "failures": 1,
+                            "summary": "Allowlisted wheel changed before sandbox launch"}
+                wheel_copy = root / wheel["filename"]
+                wheel_copy.write_bytes(wheel_bytes)
+                wheel_copy.chmod(0o644)
+                wheel["container_path"] = str(wheel_copy)
             dependency_lock = {"version": 1, "wheels": [
                 {"filename": item["filename"], "sha256": item["sha256"]}
                 for item in wheel_files
@@ -599,7 +608,7 @@ class DockerBuildExecutor:
             for wheel in wheel_files:
                 command.extend([
                     "--mount",
-                    f"type=bind,src={wheel['path']},dst=/{wheel['filename']},readonly",
+                    f"type=bind,src={wheel['container_path']},dst=/{wheel['filename']},readonly",
                 ])
             command.extend([
                 self.image, "python", "-I", "/runner.py", "/source.zip", entrypoint,
