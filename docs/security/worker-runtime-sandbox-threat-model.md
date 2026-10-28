@@ -1,6 +1,6 @@
 # مدل تهدید و قرارداد پذیرش Sandbox برای WORKER RUNTIME
 
-- وضعیت: backend Docker به Runtime متصل است و CI run #70 برای commit `5350ff2e199d8e02bc6d581c5c63a35df6551aea` موفق شده است؛ **تأیید امنیتی میزبان هدف و آزمون‌های خصمانه هنوز انجام نشده‌اند**.
+- وضعیت: backend Docker به Runtime متصل است. CI run #110 برای commit `2facb0dcaceaebeaf0435d882278d756f0ae6483` موفق شد: ۲۱۱ تست، ۶۵ subtest و ساخت image آزمایشی Docker؛ **تأیید روی میزبان Production هنوز انجام نشده است**.
 - Issue: [#22](https://github.com/sina1991/30nA-Hybrid-architecture/issues/22)
 - مبنای بررسی: `main` در Commit `a011a7cbfc1d6eddb5fbc5637510c928ef2dabd2` (2026-10-29).
 - محدوده: `units/worker-runtime/worker_runtime/runtime.py` و `_runner.py`، ورودی Artifact، فرایندهای فرزند و مسیرهای Build آینده.
@@ -71,9 +71,9 @@
 
 تست واحد `units/worker-runtime/tests/test_docker_sandbox.py` سیاست فرمان Docker، اعتبارسنجی تنظیمات، الزام digest و رد اجرای بدون backend را بررسی می‌کند. تست یکپارچه `units/worker-runtime/tests/test_docker_sandbox_integration.py` در CI image آزمایشی Docker را اجرا می‌کند و هویت غیرممتاز، read-only بودن root، نبود interface شبکه غیر از loopback، محدودیت‌های cgroup و حذف کانتینر پس از لغو را بررسی می‌کند.
 
-CI run #70 با موفقیت تمام هفت مرحله را گذراند، از جمله ساخت image و اجرای کل مجموعه قرارداد/واحد. تست‌های خصمانه مستقل برای خواندن فایل محرمانه میزبان، نوشتن بیرون workspace، fork storm، فشار حافظه/CPU تا سقف، و fault-injection برای خرابی daemon هنوز انجام/تأیید نشده‌اند؛ موفقیت CI به معنی تأیید Production نیست.
+CI run #110 با موفقیت تمام مراحل را گذراند. تست‌های Docker اکنون بررسی می‌کنند: عدم دسترسی به فایل محرمانه میزبان، رد نوشتن روی root filesystem، فقط loopback و شکست اتصال outbound، UID غیرممتاز، read-only root، محدودیت‌های memory/cpu/PID از cgroup، شکست تخصیص حافظه بیش از سقف، جلوگیری از fork storm، CPU quota زیر یک هسته و حذف کانتینر پس از لغو. تست timeout/cancellation موجود نیز اجرا می‌شود. این‌ها آزمون‌های واقعی در GitHub-hosted CI هستند، اما fault-injection daemon و تکرار آزمون روی میزبان Production هنوز انجام نشده‌اند؛ موفقیت CI به معنی تأیید Production نیست.
 
-شاخه Build pipeline نیز اکنون تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند؛ اگر image معتبر وجود نداشته باشد، تست‌ها پیدا نشوند یا dependency manifest وجود داشته باشد، Build قابل انتشار نمی‌شود. resolver وابستگی allowlist/hash-pinned هنوز پیاده‌سازی نشده و به‌صورت fail-closed مسدود می‌ماند.
+شاخه Build pipeline نیز تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند؛ اگر image معتبر وجود نداشته باشد، تست‌ها پیدا نشوند، فایل credential-like وجود داشته باشد یا import خارجی/manifest وابستگی شناسایی شود، Build قابل انتشار نمی‌شود. resolver وابستگی allowlist/hash-pinned و بسته‌بندی dependencyهای خارجی هنوز پیاده‌سازی نشده‌اند و به‌صورت fail-closed مسدود می‌مانند.
 
 ## دروازه انتشار
 
@@ -84,4 +84,4 @@ CI run #70 با موفقیت تمام هفت مرحله را گذراند، از
 4. تست‌های integration/security روی CI مناسب اجرا شوند؛
 5. راه‌اندازی، نیازمندی‌های میزبان، threat model و محدودیت‌های شناخته‌شده مستند باشند.
 
-Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. این دروازه هنوز جایگزین آزمون خصمانه روی میزبان هدف و تکمیل resolver وابستگی نیست. Issues #21/#23 نباید تا تکمیل این موارد Production-complete تلقی شوند.
+Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. Issue #22 تا اجرای پذیرش روی میزبان هدف و fault-injection daemon باز می‌ماند. Issue #21 نیز تا تکمیل resolver آفلاین allowlist/hash-pinned و پشتیبانی runtime از dependencyهای خارجی باز می‌ماند. Issue #23 پیاده‌سازی و CI شده، اما تا review/merge نهایی باز است.
