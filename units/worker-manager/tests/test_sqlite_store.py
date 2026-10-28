@@ -71,6 +71,10 @@ class SQLiteWorkerStoreTests(unittest.TestCase):
         with self.assertRaises(WorkerNotFound):
             WorkerManager(store=self.store).get("missing")
 
+    def test_memory_database_is_rejected(self):
+        with self.assertRaises(ValueError):
+            SQLiteWorkerStore(":memory:")
+
 
 if __name__ == "__main__":
     unittest.main()
