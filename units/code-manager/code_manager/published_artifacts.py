@@ -287,7 +287,13 @@ class PublishedArtifactRegistry:
                     and existing.get("artifact_hash") == artifact_hash
                     and existing.get("source_hash") == source_hash
                     and existing.get("entrypoint") == entrypoint
-                    and existing.get("size_bytes") == len(data)):
+                    and existing.get("size_bytes") == len(data)
+                    and existing.get("build_version") == build_version
+                    and existing.get("calculation_version") == calculation_version
+                    and existing.get("dependency_lock") == dependency_lock
+                    and existing.get("input_schema") == input_schema
+                    and existing.get("output_schema") == output_schema
+                    and existing.get("provenance") == safe_provenance):
                 public, _ = self.get_built(owner_id, artifact_id)
                 return public, False
             raise ArtifactConflict("Artifact identity already has a different publication")
@@ -316,7 +322,13 @@ class PublishedArtifactRegistry:
                         or existing.get("artifact_hash") != artifact_hash
                         or existing.get("source_hash") != source_hash
                         or existing.get("entrypoint") != entrypoint
-                        or existing.get("size_bytes") != len(data)):
+                        or existing.get("size_bytes") != len(data)
+                        or existing.get("build_version") != build_version
+                        or existing.get("calculation_version") != calculation_version
+                        or existing.get("dependency_lock") != dependency_lock
+                        or existing.get("input_schema") != input_schema
+                        or existing.get("output_schema") != output_schema
+                        or existing.get("provenance") != safe_provenance):
                     raise ArtifactConflict("Artifact identity already has a different publication")
         finally:
             if temporary_path is not None:
