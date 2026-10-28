@@ -29,7 +29,8 @@ class OperationalTests(unittest.TestCase):
     def setUp(self):
         self.sources = {'slow': artifact('import time\ndef run(input, configuration):\n time.sleep(3)\n return 1\n'),
                         'fast': artifact('def run(input, configuration):\n return input\n'),
-                        'parent': artifact('def run(input, configuration):\n return {"value":1,"children":[{"worker_id":"slow"}]}\n')}
+                        'parent': artifact('def run(input, configuration):\n return {"value":1,"children":[{"worker_id":"slow"}]}\n'),
+                        'flood': artifact('def run(input, configuration):\n while True: print("x" * 4096, flush=True)\n')}
         self.definitions = {k: WorkerDefinition(k, k, 'sha256:' + hashlib.sha256(v).hexdigest(), 'task:run') for k, v in self.sources.items()}
         self.runtime = WorkerRuntime(Provider(self.sources), self.definitions, max_concurrent=1)
         self.manager = WorkerManager(self.runtime)
