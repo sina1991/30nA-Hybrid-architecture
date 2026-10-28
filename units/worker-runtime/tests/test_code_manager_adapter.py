@@ -1,4 +1,3 @@
-import io
 import sys
 import unittest
 from email.message import Message
