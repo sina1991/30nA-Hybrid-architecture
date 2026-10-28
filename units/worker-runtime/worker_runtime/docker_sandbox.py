@@ -17,7 +17,7 @@ class SandboxUnavailable(RuntimeError):
     """Raised when the required sandbox cannot be configured or launched."""
 
 
-_IMAGE_DIGEST = re.compile(r"[^/@\\s]+(?:/[^/@\\s]+)*@sha256:[0-9a-f]{64}$")
+_IMAGE_DIGEST = re.compile(r"[^/@\s]+(?:/[^/@\s]+)*@sha256:[0-9a-f]{64}$")
 _IMAGE_ID = re.compile(r"sha256:[0-9a-f]{64}$")
 
 
