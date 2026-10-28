@@ -15,7 +15,6 @@ pipeline:
     - inspect_archive
     - verify_source_hash
     - validate_archive_paths
-    - normalize_working_copy
     - syntax_check
     - dependency_check
     - contract_check
