@@ -6,7 +6,7 @@ Run this on the actual deployment host or an isolated staging host with the same
 
 1. Install the repository's test dependencies in a trusted environment.
 2. Preload the approved immutable sandbox image; do not let the acceptance run pull images.
-3. Run `scripts/security/run_sandbox_acceptance.sh sha256:<image-id>`.
+3. Run `bash scripts/security/run_sandbox_acceptance.sh sha256:<image-id>`.
 4. Archive the complete command output, Docker server version/security options, image ID, commit SHA, and test summary as release evidence.
 5. Repeat after changes to the kernel, Docker/containerd, cgroup configuration, seccomp/AppArmor/SELinux policy, image, or sandbox launch flags.
 
