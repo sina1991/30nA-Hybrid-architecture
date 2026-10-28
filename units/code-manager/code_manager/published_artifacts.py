@@ -90,7 +90,7 @@ class PublishedArtifactRegistry:
             raise ArtifactNotFound("Artifact has not been published") from exc
         except OSError as exc:
             raise ArtifactIntegrityError("Manifest cannot be read") from exc
-        if len(raw) > 4096:
+        if len(raw) > 65536:
             raise ArtifactIntegrityError("Manifest exceeds maximum size")
         try:
             metadata = json.loads(raw.decode("ascii"))
@@ -208,9 +208,16 @@ class PublishedArtifactRegistry:
     def publish_built(
         self, owner_id: str, artifact_id: str, data: bytes, *,
         entrypoint: str, source_hash: str, build_id: str, provenance: dict,
+        artifact_version: str | None = None,
+        build_version: str = "code-manager-build-v1",
+        calculation_version: str = "1.0.0",
+        dependency_lock: str = "stdlib-only",
+        input_schema: dict | None = None,
+        output_schema: dict | None = None,
+        validation_status: str = "passed",
     ) -> tuple[dict, bool]:
         """Publish only a pipeline-produced artifact with a verified immutable digest."""
-        _identity(owner_id, artifact_id)
+        source_id, source_version = _identity(owner_id, artifact_id)
         if not isinstance(data, bytes) or not 0 < len(data) <= self.max_bytes:
             raise ArtifactInvalid("Built artifact exceeds the configured size limit")
         if not isinstance(source_hash, str) or re.fullmatch(r"sha256:[0-9a-f]{64}", source_hash) is None:
