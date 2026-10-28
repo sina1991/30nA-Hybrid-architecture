@@ -67,6 +67,8 @@
 - دانلود Artifact: `GET /api/v1/artifacts/{artifact_id}/content` به CODE MANAGER اضافه شده؛ داده باینری دقیق، مالکیت‌محور و با تأیید manifest/blob و SHA-256 ارائه می‌شود.
 - اسناد مرجع: فهرست مرکزی و فصل‌های یونیت‌ها نگهداری می‌شوند.
 - WORKER MANAGER metadata persistence: PR شماره 13 با CI موفق ادغام شده است؛ commit ادغام `e213c8e88543a519562581200ddbc9952b865b19`. پیاده‌سازی `SQLiteWorkerStore` تعریف Worker، lifecycle، تنظیمات JSON و schedule را ذخیره می‌کند و تست restart/reload دارد. فصل `docs/handbook/units/03-worker-manager.md` جزئیات و محدودیت‌ها را ثبت می‌کند.
+- WORKER RUNTIME input/resource guards: PR شماره 15 با CI موفق ادغام شده است؛ commit `18f8c5f495b1972b0e1b3717af46a33a707f64b4` سقف پیش‌فرض ۱ MiB برای ورودی سریال‌شده را اضافه می‌کند؛ PR شماره 16 با CI موفق ادغام شده و commit `bbd2c82cf6f7fd33fec4dc352612744f56df19d9` پیکربندی نامعتبر سقف منابع را رد می‌کند.
+- WORKER RUNTIME execution history: PR شماره 17 با CI موفق ادغام شده است؛ commit `a79ea984eee1ff52e4ac82b5c8e77f74e74166b7` امکان اختیاری ذخیره snapshot نتیجه و کلیدهای idempotency در SQLite را اضافه می‌کند. وضعیت nonterminal پس از restart به `RUNTIME_RESTARTED` تبدیل می‌شود؛ فرایند زنده resume نمی‌شود. این قابلیت exactly-once یا scheduler توزیع‌شده نیست.
 
 ### وضعیت فعلی Build
 
@@ -82,9 +84,9 @@ CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/4077518442
 2. **P0 — Publication gate:** انتشار HTTP باید فقط پس از موفقیت تمام مراحل اجباری مجاز شود؛ ZIP خام منبع نباید به‌عنوان Artifact ساخته‌شده معرفی شود.
 3. **P0 — Sandbox:** subprocess با `-I` مرز امنیتی نیست. اجرای Source غیرقابل‌اعتماد در Production مجاز نیست.
 4. **P0 — Runtime E2E:** دانلود Artifact از CODE MANAGER با احراز هویت واقعی و اجرای مسیر کامل تا نتیجه هنوز اثبات نشده است.
-5. **P0 — محدودیت خروجی:** PR شماره 11 ادغام شده است؛ stdout هنگام stream خوانده می‌شود و با عبور از سقف، subprocess متوقف می‌شود. تست چاپ نامحدود اضافه شده و CI مربوط به PR سبز است: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40776068224. CI روی commit ادغام‌شدهٔ `d9a8afeddc245b24d374eb44209e3f95c24d0199` هنگام ثبت این سند هنوز در حال اجرا بود. این کنترل جای Sandbox واقعی را نمی‌گیرد.
+5. **P0 — محدودیت منابع Runtime:** PR شماره 11 stdout را هنگام stream محدود می‌کند؛ PR شماره 15 ورودی سریال‌شده را پیش از اجرای subprocess به‌طور پیش‌فرض به ۱ MiB محدود می‌کند؛ PR شماره 16 سقف‌های ورودی/خروجی/Artifact و concurrency را در زمان راه‌اندازی اعتبارسنجی می‌کند. این کنترل‌ها جای Sandbox واقعی و محدودیت CPU/RAM/شبکه/فایل‌سیستم را نمی‌گیرند.
 6. **P1 — Auth integration:** reverse proxy/identity gateway باید Authorization را اعتبارسنجی کند و هویت قابل‌اعتماد را در `REMOTE_USER` قرار دهد.
-7. **P1 — Worker Manager:** persistence اطلاعات مدیریتی در SQLite انجام شده است؛ API عمومی، scheduler واقعی، ذخیره‌سازی تاریخچه/وضعیت اجرای Runtime و اتصال Runtime عملیاتی همچنان باز هستند. Store فعلی برای یک process مالک DB طراحی شده و هماهنگ‌سازی توزیع‌شده نیست.
+7. **P1 — Worker Manager/Runtime:** persistence اطلاعات مدیریتی Worker و snapshotهای تاریخچه/idempotency Runtime در SQLite اختیاری پیاده‌سازی شده‌اند؛ API عمومی، scheduler واقعی/lease، هماهنگ‌سازی چندپردازه، resume اجرای زنده و اتصال Runtime از سرویس واقعی همچنان باز هستند. Storeها برای یک process مالک DB طراحی شده‌اند و تضمین exactly-once ندارند.
 8. **P1 — Dashboard:** اتصال upstream و نگاشت مجوز/هویت نیازمند تکمیل و تست است.
 
 ### معیار پذیرش Build
