@@ -115,3 +115,27 @@
 3. بازبینی تست skip شده و هشدار dependency.
 4. ادامه ممیزی route-by-route و تبدیل یافته‌های DATA/CODE به تست‌های نقص/پذیرش.
 5. عدم اعلام Production readiness تا تکمیل artifact download/build و مرز sandbox و real Worker Runtime adapter.
+
+
+## 8. اجرای واقعی integration در CI
+
+پس از سبز شدن suite یکپارچه، علت تست skip شده بررسی شد: تست `test_register_and_retrieve_through_real_data_manager_api` فقط در صورت `CODE_MANAGER_INTEGRATION=1` اجرا می‌شود. به جای پذیرفتن skip، workflow به‌روزرسانی شد تا یک DATA MANAGER موقت روی `127.0.0.1` اجرا کند و تست واقعی CODE MANAGER ↔ DATA MANAGER را فعال سازد.
+
+- Pull Request: https://github.com/sina1991/30nA-Hybrid-architecture/pull/4
+- Workflow run: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40773833064
+- SHA آزموده‌شده: `770a7c77bc1f7263dccfa34f4e25b7a2c5590586`
+- نتیجه: `158 passed, 0 skipped, 1 warning, 55 subtests passed`
+- تست واقعی `test_register_and_retrieve_through_real_data_manager_api`: **PASSED**
+- تغییر از طریق squash merge وارد `main` شد: `f20c77bbb8b1453eb6ae31c0058cafb8bebadfc2`.
+
+هدر توسعه‌ای DATA MANAGER فقط در دو step مربوط به اجرای سرویس محلی و تست integration فعال است؛ سرویس به loopback محدود شده و این تغییر پیکربندی Production را تغییر نمی‌دهد.
+
+## 9. وضعیت پس از رفع دو مانع
+
+- رفع تداخل collection: ثبت و merge شده.
+- قرارداد Build CODE: ثبت و merge شده، اما وضعیت آن `draft` است و قرارداد به تنهایی پیاده‌سازی pipeline نیست.
+- integration واقعی CODE ↔ DATA MANAGER: در CI اجرا و سبز شده.
+- اجرای کل مجموعه: `158 passed, 0 skipped` در SHA PR شماره 4.
+- هشدار deprecation: یک warning در test logs باقی مانده و باید جداگانه triage شود.
+- همچنان باز: artifact download API، pipeline اجرایی build، sandbox قابل‌اتکا، persistence و API/scheduler واقعی Worker Manager، و تکمیل امنیت/مجوزهای Dashboard.
+- هنوز نباید پروژه را Production-ready اعلام کرد؛ این نتیجه صرفاً مجموعه تست‌های تعریف‌شده در CI را تأیید می‌کند.
