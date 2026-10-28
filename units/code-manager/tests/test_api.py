@@ -401,5 +401,49 @@ class CodeManagerAPITests(unittest.TestCase):
         self.assertEqual(hidden["error"]["code"], "BUILD_NOT_FOUND")
 
 
+    def test_build_publish_download_end_to_end_in_docker(self):
+        if not os.environ.get("CODE_MANAGER_BUILD_SANDBOX_IMAGE"):
+            self.skipTest("CI Docker build image is not configured")
+        build_source = io.BytesIO()
+        with zipfile.ZipFile(build_source, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("sample/__init__.py", "")
+            archive.writestr("sample/main.py", "def run(data): return {'ok': True}\n")
+            archive.writestr("tests/__init__.py", "")
+            archive.writestr(
+                "tests/test_smoke.py",
+                "import unittest\nfrom sample.main import run\n"
+                "class Smoke(unittest.TestCase):\n"
+                " def test_entrypoint(self): self.assertEqual(run({}), {'ok': True})\n",
+            )
+        source_bytes = build_source.getvalue()
+        payload = self.source_payload(
+            source_content_base64=base64.b64encode(source_bytes).decode("ascii")
+        )
+        status, _, registered = self.request("POST", "/api/v1/sources", payload)
+        self.assertEqual(status, 201)
+        status, _, built = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        self.assertEqual(status, 200)
+        report = built["payload"]["build"]
+        self.assertEqual(report["status"], "succeeded", report["stages"])
+        self.assertTrue(report["publishable"])
+        status, _, published = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": report["build_id"]},
+        )
+        self.assertEqual(status, 201)
+        self.assertEqual(published["payload"]["artifact"]["artifact_type"], "built_artifact")
+        status, _, downloaded = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content",
+        )
+        self.assertEqual(status, 200)
+        self.assertNotEqual(downloaded, source_bytes)
+        with zipfile.ZipFile(io.BytesIO(downloaded)) as artifact:
+            self.assertIn("sample/main.py", artifact.namelist())
+            self.assertFalse(any(name.startswith("tests/") for name in artifact.namelist()))
+
+
 if __name__ == "__main__":
     unittest.main()
