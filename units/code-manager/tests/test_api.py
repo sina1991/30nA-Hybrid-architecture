@@ -189,8 +189,9 @@ class CodeManagerAPITests(unittest.TestCase):
         self.assertEqual(response["error"]["code"], "SOURCE_NOT_FOUND")
 
     def _publish_built(self, owner="alice"):
-        self.request("POST", "/api/v1/sources", self.source_payload(), owner=owner)
-        data = make_zip()
+        payload = self.source_payload()
+        data = base64.b64decode(payload["source_content_base64"])
+        self.request("POST", "/api/v1/sources", payload, owner=owner)
         import hashlib
         source_hash = "sha256:" + hashlib.sha256(data).hexdigest()
         artifact_hash = "sha256:" + hashlib.sha256(data).hexdigest()
@@ -323,6 +324,46 @@ class CodeManagerAPITests(unittest.TestCase):
         )
         self.assertEqual(status, 404)
         self.assertEqual(response["error"]["code"], "BUILD_NOT_FOUND")
+
+
+    def test_publish_endpoint_requires_successful_build_and_downloads_built_artifact(self):
+        import hashlib
+        from code_manager.build_pipeline import BuildHistoryStore
+
+        payload = self.source_payload()
+        source_bytes = base64.b64decode(payload["source_content_base64"])
+        self.request("POST", "/api/v1/sources", payload)
+        artifact_bytes = make_zip()
+        artifact_digest = self.storage.put_bytes(artifact_bytes)
+        build_id = "b" * 32
+        source_hash = "sha256:" + hashlib.sha256(source_bytes).hexdigest()
+        artifact_hash = "sha256:" + artifact_digest
+        stages = [
+            {"stage": name, "status": "passed", "detail": "test fixture"}
+            for name in ("inspect_archive", "verify_source_hash", "validate_archive_paths",
+                         "syntax_check", "dependency_check", "contract_check",
+                         "normalize_working_copy", "test", "reproducibility", "package", "hash")
+        ]
+        report = {
+            "build_id": build_id, "source_id": "pricing-model", "source_version": "1.0.0",
+            "created_at": "2026-10-29T00:00:00Z", "status": "succeeded", "publishable": True,
+            "stages": stages, "source_hash": source_hash, "artifact_hash": artifact_hash,
+            "artifact_digest": artifact_digest, "artifact_size": len(artifact_bytes),
+            "entrypoint": "sample.main:run",
+            "provenance": {"builder_version": "test", "source_hash": source_hash,
+                           "artifact_hash": artifact_hash},
+        }
+        BuildHistoryStore(self.storage.root / "build-history.sqlite3").save("alice", report)
+        status, _, response = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish", {"build_id": build_id}
+        )
+        self.assertEqual(status, 201)
+        self.assertEqual(response["payload"]["artifact"]["artifact_type"], "built_artifact")
+        status, _, downloaded = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content"
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(downloaded, artifact_bytes)
 
 
 if __name__ == "__main__":
