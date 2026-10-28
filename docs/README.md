@@ -8,6 +8,7 @@
 - [خط مبنای ممیزی](handbook/00-audit-baseline.md)
 - [قواعد مستندسازی و حاکمیت تغییر](handbook/01-documentation-governance.md)
 - [نقشه راه تکمیل پروژه](handbook/02-completion-roadmap.md)
+- [گزارش مرحله ۱: تحلیل شکست‌های CI و قراردادهای CODE](handbook/03-code-contract-findings.md)
 - [تست‌ها و CI](handbook/testing-and-ci.md)
 - [دفتر تصمیم‌های معماری](handbook/decisions/README.md)
 
