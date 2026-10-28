@@ -1,0 +1,23 @@
+contract: core.message-envelope
+contract_version: "1.0.0"
+status: draft
+
+fields:
+  contract_version:
+    type: string
+    required: true
+  correlation_id:
+    type: string
+    required: false
+  payload:
+    type: object
+    required: true
+
+rules:
+  - "Payload structure MUST be defined by the owning domain contract."
+  - "The envelope MUST NOT replace domain validation."
+  - "Consumers MUST explicitly reject unsupported incompatible contract versions."
+  - "Unknown optional metadata fields SHOULD be ignored when safe and compatible."
+  - "Unknown required fields or unsupported payload semantics MUST NOT be silently ignored."
+  - "Authentication and authorization MUST NOT rely on correlation_id."
+  - "resource_id is not a universal envelope field; domain contracts define when it is required."

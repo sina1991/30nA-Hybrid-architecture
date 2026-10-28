@@ -1,0 +1,27 @@
+contract: code.versioning-policy
+contract_version: "1.0.0"
+status: draft
+
+version_domains:
+  source_version:
+    purpose: "Identity of the original submitted source revision."
+  build_version:
+    purpose: "Identity of the build process/profile/toolchain revision."
+  artifact_version:
+    purpose: "Identity of a produced packaged artifact."
+  calculation_version:
+    purpose: "Version of calculation semantics that can affect outputs."
+  shared_contract_version:
+    purpose: "Version of a consumed shared contract."
+  api_version:
+    purpose: "Version of the public Code Manager API."
+
+rules:
+  - "Version domains MUST remain independent."
+  - "A source change MUST NOT silently reuse the same immutable source version."
+  - "A build profile or toolchain change MUST be recorded in build metadata."
+  - "A change affecting calculation semantics SHOULD increment calculation_version."
+  - "Contract compatibility MUST follow the owning contract's rules."
+  - "Incompatible versions MUST be rejected explicitly."
+  - "A version label alone MUST NOT be treated as proof of compatibility."
+  - "Published artifact versions MUST be immutable."

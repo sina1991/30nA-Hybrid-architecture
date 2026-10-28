@@ -1,0 +1,22 @@
+contract: data.api
+contract_version: "1.0.0"
+status: draft
+base_path: /api/v1
+identity:
+  development_header: X-Manager-ID
+  production_requirement: trusted-authentication-integration
+endpoints:
+  - {method: POST, path: /models, operation: register_model}
+  - {method: GET, path: "/models/{model_id}", operation: get_model}
+  - {method: POST, path: /resources, operation: create_resource}
+  - {method: GET, path: "/resources/{resource_id}", operation: get_resource}
+  - {method: POST, path: "/resources/{resource_id}/records", operation: write_record}
+  - {method: GET, path: "/resources/{resource_id}/records", operation: list_records}
+  - {method: GET, path: "/resources/{resource_id}/records/{record_id}", operation: read_record}
+  - {method: PUT, path: "/resources/{resource_id}/records/{record_id}", operation: replace_record}
+  - {method: PATCH, path: "/resources/{resource_id}/records/{record_id}", operation: update_record}
+  - {method: DELETE, path: "/resources/{resource_id}/records/{record_id}", operation: delete_record}
+rules:
+  - "Responses use JSON."
+  - "Errors use stable machine-readable codes."
+  - "The API MUST NOT expose database credentials or internal SQL errors."

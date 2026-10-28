@@ -1,0 +1,31 @@
+contract: code.release
+contract_version: "1.0.0"
+status: draft
+
+release:
+  artifact_id:
+    type: string
+    required: true
+  artifact_hash:
+    type: string
+    required: true
+  validation_status:
+    type: string
+    required: true
+  release_status:
+    type: string
+    required: true
+    allowed_values:
+      - unpublished
+      - published
+      - revoked
+
+rules:
+  - "Only an artifact with validation_status passed may be published."
+  - "Publication MUST bind to an exact artifact_id and artifact_hash."
+  - "Published artifact content MUST remain immutable."
+  - "Revocation MUST prevent new authorized retrieval for execution."
+  - "Revocation MUST NOT rewrite or delete historical build metadata."
+  - "Worker Manager MUST select a published artifact by explicit identity."
+  - "Code Manager release status MUST NOT be conflated with operation status."
+  - "Publication MUST NOT be treated as permission to bypass Runtime isolation."

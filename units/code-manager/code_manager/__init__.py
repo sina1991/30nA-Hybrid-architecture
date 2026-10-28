@@ -1,0 +1,1 @@
+"""CODE MANAGER domain primitives."""

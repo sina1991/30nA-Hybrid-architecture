@@ -1,0 +1,190 @@
+"""Owner-scoped, immutable publication of registered source ZIP artifacts.
+
+Publication is explicit: registering a source never publishes an artifact.
+Manifests are atomically linked into place and never overwritten by this module.
+This component does not execute source code or change DATA MANAGER persistence.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import re
+import tempfile
+from pathlib import Path
+
+from .errors import BlobIntegrityError
+
+_ARTIFACT_ID = re.compile(
+    r"^([A-Za-z0-9][A-Za-z0-9._-]{0,63})@([A-Za-z0-9][A-Za-z0-9._-]{0,63})$"
+)
+_DIGEST = re.compile(r"^[0-9a-f]{64}$")
+_MAX_ARTIFACT_BYTES = 16 * 1024 * 1024
+
+
+class ArtifactNotFound(Exception):
+    """No published artifact is visible to this owner."""
+
+
+class ArtifactInvalid(ValueError):
+    """An artifact reference or source is invalid."""
+
+
+class ArtifactConflict(Exception):
+    """An immutable artifact identity already has different metadata."""
+
+
+class ArtifactIntegrityError(Exception):
+    """A published manifest or its blob is missing, corrupt, or inconsistent."""
+
+
+def _identity(owner_id: str, artifact_id: str) -> tuple[str, str]:
+    if not isinstance(owner_id, str) or not owner_id or len(owner_id) > 512:
+        raise ArtifactInvalid("Invalid authenticated owner")
+    if not isinstance(artifact_id, str):
+        raise ArtifactInvalid("Invalid artifact ID")
+    match = _ARTIFACT_ID.fullmatch(artifact_id)
+    if match is None:
+        raise ArtifactInvalid("Expected source_id@source_version")
+    return match.group(1), match.group(2)
+
+
+def _canonical(value: dict) -> bytes:
+    return json.dumps(value, sort_keys=True, separators=(",", ":"),
+                      ensure_ascii=True, allow_nan=False).encode("ascii")
+
+
+class PublishedArtifactRegistry:
+    """Local publication registry backed by immutable JSON manifests.
+
+    The root must be a trusted, persistent directory writable only by the
+    CODE MANAGER service account. A trusted identity provider must supply
+    owner_id; never accept it from an HTTP request body.
+    """
+
+    def __init__(self, blob_storage, root=None, max_bytes=_MAX_ARTIFACT_BYTES):
+        from .blob_storage import BlobStorage
+
+        if not isinstance(blob_storage, BlobStorage):
+            raise TypeError("blob_storage must be BlobStorage")
+        if isinstance(max_bytes, bool) or not isinstance(max_bytes, int) or max_bytes < 1:
+            raise ValueError("max_bytes must be a positive integer")
+        self.blob_storage = blob_storage
+        self.max_bytes = max_bytes
+        self.root = (Path(root) if root is not None else
+                     blob_storage.root / "published-artifacts").expanduser().resolve()
+        self.root.mkdir(parents=True, exist_ok=True, mode=0o700)
+
+    def _path(self, owner_id: str, artifact_id: str) -> Path:
+        _identity(owner_id, artifact_id)
+        key = hashlib.sha256(_canonical({"owner_id": owner_id,
+                                         "artifact_id": artifact_id})).hexdigest()
+        return self.root / key[:2] / (key + ".json")
+
+    def _read(self, owner_id: str, artifact_id: str) -> dict:
+        path = self._path(owner_id, artifact_id)
+        try:
+            raw = path.read_bytes()
+        except FileNotFoundError as exc:
+            raise ArtifactNotFound("Artifact has not been published") from exc
+        except OSError as exc:
+            raise ArtifactIntegrityError("Manifest cannot be read") from exc
+        if len(raw) > 4096:
+            raise ArtifactIntegrityError("Manifest exceeds maximum size")
+        try:
+            metadata = json.loads(raw.decode("ascii"))
+        except (ValueError, UnicodeError) as exc:
+            raise ArtifactIntegrityError("Invalid manifest") from exc
+        if not isinstance(metadata, dict) or _canonical(metadata) != raw:
+            raise ArtifactIntegrityError("Manifest is not canonical")
+        if (metadata.get("owner_id") != owner_id or
+                metadata.get("artifact_id") != artifact_id or
+                metadata.get("artifact_type") != "source_zip" or
+                metadata.get("manifest_version") != 1 or
+                not isinstance(metadata.get("entrypoint"), str) or
+                not metadata["entrypoint"] or
+                type(metadata.get("size_bytes")) is not int or
+                not 0 < metadata["size_bytes"] <= self.max_bytes or
+                not isinstance(metadata.get("blob_digest"), str) or
+                _DIGEST.fullmatch(metadata["blob_digest"]) is None or
+                metadata.get("artifact_hash") != "sha256:" + metadata["blob_digest"]):
+            raise ArtifactIntegrityError("Manifest identity or metadata mismatch")
+        return metadata
+
+    def get(self, owner_id: str, artifact_id: str) -> tuple[dict, bytes]:
+        """Return verified metadata and byte-exact content, or fail closed."""
+        metadata = self._read(owner_id, artifact_id)
+        try:
+            data = self.blob_storage.get_bytes(metadata["blob_digest"])
+        except (FileNotFoundError, BlobIntegrityError, OSError, ValueError) as exc:
+            raise ArtifactIntegrityError("Published blob failed verification") from exc
+        if len(data) != metadata["size_bytes"] or len(data) > self.max_bytes:
+            raise ArtifactIntegrityError("Published blob size mismatch")
+        public = {key: value for key, value in metadata.items() if key != "owner_id"}
+        return public, data
+
+    def publish(self, registry, owner_id: str, artifact_id: str) -> tuple[dict, bool]:
+        """Publish an existing registered source ZIP. Returns (metadata, created).
+
+        Repeated publication of the same immutable source is idempotent.
+        No source is executed or transformed. Concurrent publishers converge
+        on a single manifest via an atomic hard link (no replacement).
+        """
+        source_id, source_version = _identity(owner_id, artifact_id)
+        source = registry.get_source(owner_id=owner_id, source_id=source_id,
+                                     source_version=source_version)
+        data = source["source_bytes"]
+        if not isinstance(data, bytes) or not 0 < len(data) <= self.max_bytes:
+            raise ArtifactInvalid("Source ZIP exceeds artifact size limit")
+        digest = hashlib.sha256(data).hexdigest()
+        if digest != source.get("source_hash"):
+            raise ArtifactIntegrityError("Registered source digest mismatch")
+        entrypoint = source.get("entrypoint")
+        if not isinstance(entrypoint, str) or not entrypoint:
+            raise ArtifactInvalid("Source entrypoint is invalid")
+        try:
+            self.blob_storage.put_bytes(data, expected_digest=digest)
+        except (BlobIntegrityError, OSError) as exc:
+            raise ArtifactIntegrityError("Artifact blob could not be stored") from exc
+        metadata = {
+            "manifest_version": 1,
+            "owner_id": owner_id,
+            "artifact_id": artifact_id,
+            "artifact_type": "source_zip",
+            "artifact_hash": "sha256:" + digest,
+            "blob_digest": digest,
+            "entrypoint": entrypoint,
+            "size_bytes": len(data),
+        }
+        encoded = _canonical(metadata)
+        path = self._path(owner_id, artifact_id)
+        path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        temporary_path = None
+        created = False
+        try:
+            with tempfile.NamedTemporaryFile(mode="wb", dir=path.parent,
+                                             prefix=".manifest-", delete=False) as temp:
+                temporary_path = Path(temp.name)
+                os.chmod(temporary_path, 0o600)
+                temp.write(encoded)
+                temp.flush()
+                os.fsync(temp.fileno())
+            try:
+                os.link(temporary_path, path)
+                created = True
+                directory_fd = os.open(path.parent, os.O_RDONLY)
+                try:
+                    os.fsync(directory_fd)
+                finally:
+                    os.close(directory_fd)
+            except FileExistsError:
+                pass
+        finally:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)
+        existing = self._read(owner_id, artifact_id)
+        if existing != metadata:
+            raise ArtifactConflict("Artifact identity already published differently")
+        public, _ = self.get(owner_id, artifact_id)
+        return public, created

@@ -1,0 +1,16 @@
+contract: data.access
+contract_version: "1.0.0"
+status: draft
+permissions:
+  - model:register
+  - resource:create
+  - data:read
+  - data:write
+  - data:delete
+  - migration:execute
+  - permission:manage
+rules:
+  - "Authentication identity MUST come from a trusted runtime integration."
+  - "A caller-supplied owner_id is not proof of identity."
+  - "Ownership is checked on every resource access."
+  - "correlation_id MUST NOT be used for authorization."

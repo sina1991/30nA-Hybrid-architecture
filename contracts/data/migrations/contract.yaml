@@ -1,0 +1,14 @@
+contract: data.migration
+contract_version: "1.0.0"
+status: draft
+required_fields:
+  migration_id: string
+  from_version: integer
+  to_version: integer
+  status: string
+rules:
+  - "Migrations MUST execute in a controlled order."
+  - "The applied schema version MUST be recorded."
+  - "A failed migration MUST NOT be reported as successful."
+  - "Destructive data migrations require an explicit recovery plan."
+note: "Schema migrations for versions 1 and 2 are implemented in units/data-manager/storage.py and applied transactionally. The migration registry is code-defined rather than dynamically configurable."

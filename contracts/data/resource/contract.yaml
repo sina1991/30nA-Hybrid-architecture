@@ -1,0 +1,13 @@
+contract: data.resource
+contract_version: "1.0.0"
+status: draft
+required_fields:
+  resource_id: string
+  owner_id: string
+  model_id: string
+  model_version: string
+statuses: [active]
+rules:
+  - "Each resource has one owner."
+  - "Resource identifiers are opaque and storage-independent."
+  - "Every resource refers to an explicitly registered model version."

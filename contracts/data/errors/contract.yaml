@@ -1,0 +1,14 @@
+contract: data.errors
+contract_version: "1.0.0"
+status: draft
+codes:
+  INVALID_INPUT: 400
+  FORBIDDEN: 403
+  NOT_FOUND: 404
+  CONFLICT: 409
+  UNSUPPORTED_VERSION: 400
+  INTERNAL_ERROR: 500
+rules:
+  - "Errors extend core.error without changing its semantics."
+  - "Messages are for humans; clients branch on code."
+  - "Sensitive details MUST NOT be exposed."

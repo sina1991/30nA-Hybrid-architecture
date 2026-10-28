@@ -1,0 +1,67 @@
+contract: code.source
+contract_version: "1.0.0"
+status: draft
+
+source:
+  source_id:
+    type: string
+    required: true
+    description: "Stable domain identifier for a managed source."
+  source_version:
+    type: string
+    required: true
+    description: "Immutable version label for the submitted source."
+  language:
+    type: string
+    required: true
+    allowed_values:
+      - python
+  source_format:
+    type: string
+    required: true
+    allowed_values:
+      - zip
+    description: "A ZIP archive containing a Python project."
+  source_content:
+    type: binary
+    required: true
+    description: "Exact submitted ZIP bytes; the archive is preserved unchanged."
+  source_hash:
+    type: string
+    required: true
+    algorithm: sha256
+    description: "SHA-256 digest of the exact submitted ZIP bytes."
+  entrypoint:
+    type: string
+    required: true
+    format: "module:function"
+    description: "Python module and callable declared by the source."
+  input_schema:
+    type: object
+    required: true
+    description: "JSON Schema describing accepted input."
+  output_schema:
+    type: object
+    required: true
+    description: "JSON Schema describing produced output."
+  contract_dependencies:
+    type: array
+    required: true
+  calculation_version:
+    type: string
+    required: true
+
+rules:
+  - "The submitted source format MUST be ZIP."
+  - "The archive MUST contain a Python project and a valid declared entrypoint."
+  - "The entrypoint MUST use module:function syntax."
+  - "The input_schema and output_schema MUST be valid JSON Schema documents."
+  - "The source hash MUST be SHA-256 over the exact submitted ZIP bytes before extraction or normalization."
+  - "Original submitted ZIP bytes MUST be preserved unchanged after registration."
+  - "A changed source MUST be registered as a distinct source version."
+  - "A source version MUST NOT be silently rebound to different content."
+  - "The language MUST be python; other languages are unsupported."
+  - "Untrusted source MUST NOT be executed in the Code Manager process."
+  - "Archive inspection MUST reject unsafe paths that escape the extraction root."
+  - "Archive inspection MUST apply configured limits for archive size, expanded size, file count, and compression ratio."
+  - "Source archives MUST NOT contain credentials or secrets."

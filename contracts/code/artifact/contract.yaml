@@ -1,0 +1,77 @@
+contract: code.artifact
+contract_version: "1.0.0"
+status: draft
+
+artifact:
+  artifact_id:
+    type: string
+    required: true
+  artifact_version:
+    type: string
+    required: true
+  source_id:
+    type: string
+    required: true
+  source_version:
+    type: string
+    required: true
+  source_format:
+    type: string
+    required: true
+    allowed_values:
+      - zip
+  source_hash:
+    type: string
+    required: true
+    algorithm: sha256
+  build_version:
+    type: string
+    required: true
+  build_profile:
+    type: string
+    required: true
+  runtime_target:
+    type: object
+    required: true
+    fields:
+      operating_system:
+        type: string
+        required: true
+      python_version:
+        type: string
+        required: true
+  entrypoint:
+    type: string
+    required: true
+    format: "module:function"
+  dependency_lock:
+    type: string
+    required: true
+  input_schema:
+    type: object
+    required: true
+  output_schema:
+    type: object
+    required: true
+  calculation_version:
+    type: string
+    required: true
+  artifact_hash:
+    type: string
+    required: true
+    algorithm: sha256
+  validation_status:
+    type: string
+    required: true
+
+rules:
+  - "An artifact MUST identify its exact source version and build version."
+  - "An artifact MUST identify the source ZIP hash from which it was built."
+  - "The artifact hash MUST be SHA-256 over the exact packaged artifact bytes."
+  - "Published artifacts MUST be immutable."
+  - "A rebuild MUST create a new artifact identity or version when its content differs."
+  - "Consumers MUST verify artifact identity and integrity before use."
+  - "Only artifacts passing all mandatory validation stages may be published."
+  - "Artifact retrieval MUST use the owning authorization interface."
+  - "Artifact content MUST NOT contain credentials or secrets."
+  - "The artifact MUST preserve the declared entrypoint and input/output schemas."

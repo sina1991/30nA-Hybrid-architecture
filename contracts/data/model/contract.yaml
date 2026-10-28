@@ -1,0 +1,14 @@
+contract: data.model
+contract_version: "1.0.0"
+status: draft
+required_fields:
+  model_id: string
+  owner_id: string
+  version: string
+  fields: object
+optional_fields:
+  required: array
+rules:
+  - "A model version is immutable once registered."
+  - "Field types MUST be explicitly declared."
+  - "Only the authenticated owner may register a model."

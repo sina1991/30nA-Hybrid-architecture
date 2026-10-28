@@ -1,0 +1,30 @@
+contract: core.identifiers
+contract_version: "1.0.0"
+status: draft
+
+identifiers:
+  resource_id:
+    description: "Stable identifier for a domain resource."
+    format: opaque-string
+    required_by: resource-owning-contract
+    storage_independent: true
+
+  correlation_id:
+    description: "Identifier used to correlate related operations."
+    format: opaque-string
+    required: false
+    propagation: preserve-when-present
+
+  idempotency_key:
+    description: "Optional key for detecting duplicate operations."
+    format: opaque-string
+    required: false
+    scope: defined-by-consuming-contract
+
+rules:
+  - "Consumers MUST NOT infer resource semantics from identifier format."
+  - "Identifiers MUST NOT require a specific database or storage engine."
+  - "Domain-specific identifiers MAY be defined by domain contracts."
+  - "resource_id is required only where the owning contract requires it."
+  - "A correlation_id MUST NOT be treated as an authorization credential."
+  - "An idempotency_key MUST NOT imply deduplication unless implemented by the consumer."

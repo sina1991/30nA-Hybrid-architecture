@@ -1,0 +1,50 @@
+contract: code.validation
+contract_version: "1.0.0"
+status: draft
+
+result:
+  validation_status:
+    type: string
+    required: true
+    allowed_values:
+      - passed
+      - failed
+      - blocked
+  checks:
+    type: array
+    required: true
+    item_fields:
+      check_id:
+        type: string
+        required: true
+      status:
+        type: string
+        required: true
+      message:
+        type: string
+        required: true
+  source_hash:
+    type: string
+    required: true
+  build_profile:
+    type: string
+    required: true
+
+mandatory_checks:
+  - source_integrity
+  - python_syntax
+  - dependency_resolution
+  - dependency_policy
+  - entrypoint
+  - input_output_contract
+  - contract_version_compatibility
+  - required_tests
+  - artifact_integrity
+
+rules:
+  - "A missing mandatory check MUST NOT be treated as passed."
+  - "A failed mandatory check MUST block publication."
+  - "Validation results MUST identify the source hash and build profile."
+  - "Unsupported incompatible contract versions MUST be rejected explicitly."
+  - "Validation MUST NOT claim that static checks prove arbitrary code safe."
+  - "Detailed diagnostics MUST NOT expose secrets or sensitive environment data."

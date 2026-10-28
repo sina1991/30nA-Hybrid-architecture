@@ -1,0 +1,29 @@
+[Unit]
+Description=30nA CODE MANAGER authenticated loopback service
+After=local-fs.target
+
+[Service]
+Type=simple
+User=30na-code-manager
+Group=30na-code-manager
+WorkingDirectory=/home/sina/projects/30nA-Hybrid-architecture
+Environment=PYTHONPATH=/home/sina/projects/30nA-Hybrid-architecture/units/code-manager
+Environment=DATA_MANAGER_DB=/var/lib/30na-data-manager/data.sqlite3
+Environment=CODE_MANAGER_BLOB_ROOT=/var/lib/30na-code-manager/blobs
+Environment=CODE_MANAGER_CREDENTIAL_FILE=/etc/30na-code-manager/credentials.json
+ExecStart=/usr/bin/python3 -m code_manager.production
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/var/lib/30na-data-manager /var/lib/30na-code-manager
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_UNIX
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

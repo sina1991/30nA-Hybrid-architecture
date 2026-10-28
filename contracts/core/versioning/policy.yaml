@@ -1,0 +1,32 @@
+contract: core.versioning-policy
+contract_version: "1.0.0"
+status: draft
+
+version_domains:
+  shared_contract:
+    purpose: "Compatibility version for shared contract definitions."
+  api:
+    purpose: "Version of an externally consumed API."
+  implementation:
+    purpose: "Version of a concrete implementation."
+  calculation:
+    purpose: "Version of calculation logic affecting produced results."
+
+compatibility:
+  compatible_change_examples:
+    - "Adding an optional field with documented default behavior."
+    - "Adding an enum value when consumers are specified to tolerate unknown values."
+  breaking_change_examples:
+    - "Removing or renaming a required field."
+    - "Changing a field type or its established meaning."
+    - "Changing requiredness or behavior in a way that breaks existing consumers."
+  incompatible_version_behavior: "Reject explicitly; do not silently reinterpret."
+
+rules:
+  - "Version domains are independent and MUST NOT be conflated."
+  - "Compatible additive changes SHOULD preserve existing consumer behavior."
+  - "Breaking changes MUST be explicitly versioned and documented."
+  - "Consumers MUST NOT assume implementation version equals contract version."
+  - "Calculation version changes SHOULD reflect changes that can affect result semantics."
+  - "Unknown fields MAY be ignored only when the owning contract permits it and doing so is safe."
+  - "A version label alone does not prove compatibility; compatibility MUST follow documented rules."

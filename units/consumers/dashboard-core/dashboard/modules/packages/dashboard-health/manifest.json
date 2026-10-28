@@ -1,0 +1,8 @@
+{
+  "id": "dashboard-health",
+  "name": "Dashboard Health",
+  "description": "Show the dashboard service health.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "health"
+}

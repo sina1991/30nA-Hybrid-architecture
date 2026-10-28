@@ -1,0 +1,54 @@
+contract: code.errors
+contract_version: "1.0.0"
+status: draft
+
+errors:
+  SOURCE_NOT_FOUND:
+    category: not_found
+    retryable: false
+  SOURCE_VERSION_CONFLICT:
+    category: conflict
+    retryable: false
+  SOURCE_INVALID:
+    category: validation
+    retryable: false
+  BUILD_PROFILE_UNSUPPORTED:
+    category: validation
+    retryable: false
+  DEPENDENCY_RESOLUTION_FAILED:
+    category: build
+    retryable: false
+  BUILD_FAILED:
+    category: build
+    retryable: false
+  VALIDATION_FAILED:
+    category: validation
+    retryable: false
+  ARTIFACT_NOT_FOUND:
+    category: not_found
+    retryable: false
+  ARTIFACT_INTEGRITY_FAILED:
+    category: integrity
+    retryable: false
+  ARTIFACT_NOT_PUBLISHABLE:
+    category: state_conflict
+    retryable: false
+  ARTIFACT_REVOKED:
+    category: state_conflict
+    retryable: false
+  ACCESS_DENIED:
+    category: authorization
+    retryable: false
+  UNSUPPORTED_CONTRACT_VERSION:
+    category: compatibility
+    retryable: false
+  INTERNAL_ERROR:
+    category: internal
+    retryable: false
+
+rules:
+  - "Errors MUST preserve the semantics of the shared CORE error contract."
+  - "Error codes MUST be stable within a compatible contract version."
+  - "Human-readable messages MUST NOT be used as machine-readable identifiers."
+  - "Error context MUST NOT expose secrets, credentials, or sensitive host details."
+  - "Retryability MUST be evaluated for the specific operation and failure."

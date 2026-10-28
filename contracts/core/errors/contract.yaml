@@ -1,0 +1,32 @@
+contract: core.error
+contract_version: "1.0.0"
+status: draft
+
+required_fields:
+  code:
+    type: string
+    description: "Stable machine-readable error code."
+  message:
+    type: string
+    description: "Human-readable explanation safe for the intended recipient."
+
+optional_fields:
+  retryable:
+    type: boolean
+    description: "Whether retry may be appropriate under the owning contract."
+  correlation_id:
+    type: string
+    description: "Correlation identifier, when available."
+  context:
+    type: object
+    description: "Non-sensitive structured diagnostic context."
+  contract_version:
+    type: string
+    description: "Version of the error contract."
+
+rules:
+  - "Error codes MUST remain stable within a compatible contract version."
+  - "Messages MUST NOT be used as machine-readable identifiers."
+  - "Secrets, credentials, and sensitive data MUST NOT be included in context."
+  - "retryable describes retry suitability, not a guarantee of success."
+  - "Domain-specific errors MAY extend this contract without changing its core semantics."

@@ -1,0 +1,11 @@
+contract: data.record
+contract_version: "1.0.0"
+status: draft
+required_fields:
+  record_id: string
+  resource_id: string
+  data: object
+rules:
+  - "Records MUST be validated against the resource model version."
+  - "Unknown fields are rejected in version 1."
+  - "Consumers MUST NOT access internal storage directly."

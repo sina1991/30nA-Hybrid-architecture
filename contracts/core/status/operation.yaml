@@ -1,0 +1,41 @@
+contract: core.operation-status
+contract_version: "1.0.0"
+status: draft
+
+statuses:
+  accepted:
+    description: "Request accepted; execution may not have started."
+    terminal: false
+  running:
+    description: "Operation is executing."
+    terminal: false
+  succeeded:
+    description: "Operation completed successfully."
+    terminal: true
+  failed:
+    description: "Operation completed unsuccessfully."
+    terminal: true
+  cancelled:
+    description: "Operation was cancelled before normal completion."
+    terminal: true
+
+transitions:
+  accepted:
+    - running
+    - failed
+    - cancelled
+  running:
+    - succeeded
+    - failed
+    - cancelled
+  succeeded: []
+  failed: []
+  cancelled: []
+
+rules:
+  - "This contract applies to operation execution only."
+  - "Domain resource lifecycle statuses MUST remain domain-specific."
+  - "Calculation and output statuses MUST NOT be silently mapped to these values."
+  - "Terminal statuses MUST NOT transition to another status under this contract."
+  - "Consumers SHOULD tolerate unknown future status values where practical."
+  - "Operation owners MUST define recovery and retry as new or explicitly modeled operations."

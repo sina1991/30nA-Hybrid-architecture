@@ -1,0 +1,10 @@
+contract: core.shared-config-policy
+contract_version: "1.0.0"
+status: draft
+
+rules:
+  - "Only configuration genuinely shared by multiple components belongs in CORE."
+  - "Service-specific configuration remains owned by its service."
+  - "Each shared setting MUST document its type, meaning, default, and missing-value behavior."
+  - "Secrets MUST be supplied through an appropriate secret-management mechanism, not committed configuration files."
+  - "New optional settings SHOULD NOT break existing consumers."

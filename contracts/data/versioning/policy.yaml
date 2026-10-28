@@ -1,0 +1,13 @@
+contract: data.versioning-policy
+contract_version: "1.0.0"
+status: draft
+version_domains:
+  contract: "Version of this shared DATA contract."
+  api: "Version of the public API."
+  model: "Version of a model definition."
+  storage_schema: "Version of the physical storage schema."
+rules:
+  - "Version domains MUST NOT be conflated."
+  - "Registered model versions are immutable."
+  - "Incompatible versions MUST be rejected explicitly."
+  - "A version label alone does not prove compatibility."
