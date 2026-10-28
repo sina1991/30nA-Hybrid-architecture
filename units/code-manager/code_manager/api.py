@@ -525,10 +525,20 @@ def create_application(
                     if expected_artifact_id != parts[1]:
                         raise APIError(404, "BUILD_NOT_FOUND", "Build does not belong to this artifact identity")
                     stages = report.get("stages")
+                    required_stages = {
+                        "inspect_archive", "verify_source_hash", "validate_archive_paths",
+                        "syntax_check", "dependency_check", "contract_check",
+                        "normalize_working_copy", "test", "reproducibility", "package", "hash",
+                    }
+                    stage_names = {
+                        stage.get("stage") for stage in stages
+                        if isinstance(stage, dict)
+                    } if isinstance(stages, list) else set()
                     if (report.get("status") != "succeeded"
                             or report.get("publishable") is not True
                             or not isinstance(stages, list)
-                            or not stages
+                            or len(stage_names) != len(stages)
+                            or not required_stages.issubset(stage_names)
                             or any(not isinstance(stage, dict) or stage.get("status") != "passed"
                                    for stage in stages)):
                         raise APIError(409, "BUILD_NOT_PUBLISHABLE",
