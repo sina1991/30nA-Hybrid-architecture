@@ -84,4 +84,4 @@ CI run #110 با موفقیت تمام مراحل را گذراند. تست‌ه
 4. تست‌های integration/security روی CI مناسب اجرا شوند؛
 5. راه‌اندازی، نیازمندی‌های میزبان، threat model و محدودیت‌های شناخته‌شده مستند باشند.
 
-Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. Issue #22 تا اجرای پذیرش روی میزبان هدف و fault-injection daemon باز می‌ماند. Issue #21 تا پشتیبانی dependencyهای انتقالی/native و پذیرش روی میزبان Production باز می‌ماند. Issue #23 پیاده‌سازی و CI شده، اما تا review/merge نهایی باز است.
+Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. Issue #22 تا اجرای پذیرش روی میزبان هدف و fault-injection daemon باز می‌ماند. Issue #21 تا پذیرش روی میزبان Production و تصمیم/پیاده‌سازی پشتیبانی native wheelها باز می‌ماند. Issue #23 پیاده‌سازی و CI شده، اما تا review/merge نهایی باز است.
