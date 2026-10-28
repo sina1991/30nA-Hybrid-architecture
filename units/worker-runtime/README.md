@@ -9,8 +9,10 @@ future submissions only; already accepted executions are not implicitly cancelle
 The idempotency map is in-memory, process-local and not durable across restarts.
 A repeated key while an execution is in flight returns its current snapshot,
 not a future/promise; poll by execution ID. A retry with a new idempotency key
-is a new execution. Max concurrent subprocesses, archive size, output size,
-child count and depth are configurable. Children inherit the parent's remaining
+is a new execution. Max concurrent subprocesses, archive size, serialized input size, output size,
+child count and depth are configurable. The default serialized input/configuration
+limit is 1 MiB; oversized or non-JSON payloads fail as `INVALID_INPUT` before
+subprocess launch. Children inherit the parent's remaining
 time budget and cancellation. No automatic retry is performed.
 
 ## CODE MANAGER dependency
