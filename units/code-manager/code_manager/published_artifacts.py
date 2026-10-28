@@ -259,6 +259,11 @@ class PublishedArtifactRegistry:
             "manifest_version": 1, "owner_id": owner_id, "artifact_id": artifact_id,
             "artifact_type": "built_artifact", "artifact_hash": artifact_hash,
             "blob_digest": digest, "entrypoint": entrypoint, "size_bytes": len(data),
+            "source_id": source_id, "source_version": source_version,
+            "artifact_version": artifact_version, "build_version": build_version,
+            "calculation_version": calculation_version, "dependency_lock": dependency_lock,
+            "input_schema": input_schema, "output_schema": output_schema,
+            "validation_status": validation_status,
             "source_hash": source_hash, "build_id": build_id, "provenance": safe_provenance,
         }
         path = self._path(owner_id, artifact_id)
