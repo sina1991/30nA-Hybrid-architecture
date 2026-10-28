@@ -130,11 +130,13 @@ def normalize_source_archive(
 
 
 _TEST_RUNNER = r'''import contextlib
+import hashlib
 import importlib
 import io
 import json
 import os
 from pathlib import Path
+import re
 import sys
 import unittest
 import zipfile
@@ -166,6 +168,19 @@ def main():
     entrypoint = sys.argv[2]
     root = Path("/tmp/build-source")
     root.mkdir(mode=0o700)
+    dependency_lock = json.loads(Path("/dependency-lock.json").read_text(encoding="utf-8"))
+    wheels = dependency_lock.get("wheels", [])
+    if not isinstance(wheels, list) or len(wheels) > 64:
+        raise ValueError("invalid dependency lock")
+    for item in reversed(wheels):
+        filename = item.get("filename") if isinstance(item, dict) else None
+        digest = item.get("sha256") if isinstance(item, dict) else None
+        if not isinstance(filename, str) or re.fullmatch(r"[A-Za-z0-9_.+-]+-py3-none-any\\.whl", filename) is None:
+            raise ValueError("invalid vendored wheel name")
+        wheel_path = Path("/") / filename
+        if not wheel_path.is_file() or hashlib.sha256(wheel_path.read_bytes()).hexdigest() != digest:
+            raise ValueError("vendored wheel SHA-256 mismatch")
+        sys.path.insert(0, str(wheel_path))
     with zipfile.ZipFile(archive_path) as archive:
         for info in archive.infolist():
             name = info.filename
@@ -533,7 +548,7 @@ class DockerBuildExecutor:
         self.tmpfs_size = tmpfs_size
         self.max_output_bytes = max_output_bytes
 
-    def run_tests(self, source_archive: bytes, entrypoint: str) -> dict:
+    def run_tests(self, source_archive: bytes, entrypoint: str, wheel_files=None) -> dict:
         binary = shutil.which(self.docker_binary)
         if binary is None:
             return {"status": "blocked", "tests": 0, "failures": 0,
@@ -542,14 +557,25 @@ class DockerBuildExecutor:
             root = Path(directory)
             archive_path = root / "source.zip"
             runner_path = root / "build_test_runner.py"
+            dependency_lock_path = root / "dependency-lock.json"
             cidfile = root / "container.cid"
             container_name = "cm-build-" + uuid.uuid4().hex
+            wheel_files = list(wheel_files or [])
+            dependency_lock = {"version": 1, "wheels": [
+                {"filename": item["filename"], "sha256": item["sha256"]}
+                for item in wheel_files
+            ]}
             archive_path.write_bytes(source_archive)
             runner_path.write_text(_TEST_RUNNER, encoding="utf-8")
+            dependency_lock_path.write_text(
+                json.dumps(dependency_lock, sort_keys=True, separators=(",", ":")),
+                encoding="utf-8",
+            )
             # The container runs as UID 65532; mounted inputs must be readable.
             # The parent temp directory remains private to the host process.
             archive_path.chmod(0o644)
             runner_path.chmod(0o644)
+            dependency_lock_path.chmod(0o644)
             command = [
                 binary, "run", "--rm", "--pull=never", "--interactive",
                 "--name", container_name, "--cidfile", str(cidfile),
@@ -563,8 +589,16 @@ class DockerBuildExecutor:
                 "--log-driver=none",
                 "--mount", f"type=bind,src={archive_path},dst=/source.zip,readonly",
                 "--mount", f"type=bind,src={runner_path},dst=/runner.py,readonly",
-                self.image, "python", "-I", "/runner.py", "/source.zip", entrypoint,
+                "--mount", f"type=bind,src={dependency_lock_path},dst=/dependency-lock.json,readonly",
             ]
+            for wheel in wheel_files:
+                command.extend([
+                    "--mount",
+                    f"type=bind,src={wheel['path']},dst=/{wheel['filename']},readonly",
+                ])
+            command.extend([
+                self.image, "python", "-I", "/runner.py", "/source.zip", entrypoint,
+            ])
             try:
                 proc = subprocess.Popen(
                     command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
