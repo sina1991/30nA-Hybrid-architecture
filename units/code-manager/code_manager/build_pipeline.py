@@ -301,6 +301,8 @@ def _wheel_metadata(wheel_path: Path, package: str, version: str) -> None:
             raise SourceValidationError("Dependency wheel contains too many files")
         expanded = 0
         metadata_files = []
+        wheel_metadata_files = []
+        top_level_modules = set()
         for info in infos:
             name = info.filename.rstrip("/")
             if not _safe_name(name):
@@ -317,11 +319,22 @@ def _wheel_metadata(wheel_path: Path, package: str, version: str) -> None:
                 raise SourceValidationError("Dependency wheel expands beyond 16 MiB")
             if lower.endswith(".dist-info/metadata"):
                 metadata_files.append(name)
-        if len(metadata_files) != 1:
-            raise SourceValidationError("Dependency wheel must contain exactly one METADATA file")
+            if lower.endswith(".dist-info/wheel"):
+                wheel_metadata_files.append(name)
+            if lower.endswith(".py"):
+                top_level_modules.add(PurePosixPath(name).parts[0].removesuffix(".py"))
+        if len(metadata_files) != 1 or len(wheel_metadata_files) != 1:
+            raise SourceValidationError("Dependency wheel must contain exactly one METADATA and WHEEL file")
         metadata = Parser().parsestr(wheel.read(metadata_files[0]).decode("utf-8"))
         if _normalize_distribution(metadata.get("Name", "")) != package or metadata.get("Version") != version:
             raise SourceValidationError("Wheel metadata does not match the allowlisted package/version")
+        wheel_metadata = Parser().parsestr(wheel.read(wheel_metadata_files[0]).decode("utf-8"))
+        if (wheel_metadata.get("Root-Is-Purelib", "").lower() != "true"
+                or wheel_metadata.get_all("Tag") != ["py3-none-any"]):
+            raise SourceValidationError("Wheel WHEEL metadata must declare pure py3-none-any")
+        stdlib = set(getattr(sys, "stdlib_module_names", ())) | set(sys.builtin_module_names)
+        if top_level_modules & stdlib:
+            raise SourceValidationError("Dependency wheel shadows a standard-library module")
         if metadata.get_all("Requires-Dist"):
             raise SourceValidationError("Wheels with transitive dependencies are not supported by this profile")
 
