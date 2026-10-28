@@ -1,15 +1,15 @@
 # مدل تهدید و قرارداد پذیرش Sandbox برای WORKER RUNTIME
 
-- وضعیت: طراحی/معیار پذیرش؛ **پیاده‌سازی Sandbox هنوز انجام نشده است**.
+- وضعیت: backend اولیه Docker پیاده‌سازی شده و به Runtime متصل است؛ **تأیید امنیتی و عملیاتی هنوز انجام نشده است**.
 - Issue: [#22](https://github.com/sina1991/30nA-Hybrid-architecture/issues/22)
 - مبنای بررسی: `main` در Commit `a011a7cbfc1d6eddb5fbc5637510c928ef2dabd2` (2026-10-29).
 - محدوده: `units/worker-runtime/worker_runtime/runtime.py` و `_runner.py`، ورودی Artifact، فرایندهای فرزند و مسیرهای Build آینده.
 
 ## خلاصه تصمیم امنیتی
 
-اجرای فعلی با `subprocess` و `python -I` مرز امنیتی نیست. تا وقتی یک backend ایزوله‌سازی واقعی نصب و فعال نشده و آزمون‌های منفی آن در محیط هدف موفق نشده‌اند، اجرای Artifact غیرقابل‌اعتماد باید غیرفعال بماند. نباید در نبود Docker/OCI runtime، policy، محدودیت منابع یا تنظیمات معتبر به اجرای مستقیم روی میزبان fallback کرد.
+اجرای فعلی با `subprocess` و `python -I` مرز امنیتی نیست. تا وقتی backend Docker با image digest ثابت پیکربندی نشده و آزمون‌های منفی آن در محیط هدف موفق نشده‌اند، اجرای Artifact غیرقابل‌اعتماد باید غیرفعال بماند. Runtime اکنون به‌صورت پیش‌فرض بدون backend اجرای کد را رد می‌کند. نباید در نبود Docker/OCI runtime، policy، محدودیت منابع یا تنظیمات معتبر به اجرای مستقیم روی میزبان fallback کرد.
 
-این سند به‌تنهایی هیچ Sandboxای ایجاد یا enforce نمی‌کند و به‌عنوان شواهد پیاده‌سازی یا تأیید Production قابل استفاده نیست.
+پیاده‌سازی اولیه در `units/worker-runtime/worker_runtime/docker_sandbox.py` با fail-closed پیش‌فرض در `WorkerRuntime` موجود است. این کد، به‌تنهایی، مدرک تأیید Production نیست؛ آزمون‌های واقعی runtime/host و بررسی CI هنوز لازم‌اند.
 
 ## دارایی‌ها و مرز اعتماد
 
