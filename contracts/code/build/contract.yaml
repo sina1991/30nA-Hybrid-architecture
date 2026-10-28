@@ -126,7 +126,7 @@ implementation_status:
     - durable_owner_scoped_build_history
     - publication_gate
   blocked_or_not_implemented:
-    - transitive_or_native_dependency_support
+    - native_dependency_support
     - production_host_acceptance_and_daemon_fault_injection
   publication_eligible: conditional_on_all_stages_passed
   note: >-
