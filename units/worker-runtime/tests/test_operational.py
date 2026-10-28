@@ -29,7 +29,8 @@ class OperationalTests(unittest.TestCase):
     def setUp(self):
         self.sources = {'slow': artifact('import time\ndef run(input, configuration):\n time.sleep(3)\n return 1\n'),
                         'fast': artifact('def run(input, configuration):\n return input\n'),
-                        'parent': artifact('def run(input, configuration):\n return {"value":1,"children":[{"worker_id":"slow"}]}\n')}
+                        'parent': artifact('def run(input, configuration):\n return {"value":1,"children":[{"worker_id":"slow"}]}\n'),
+                        'flood': artifact('def run(input, configuration):\n while True: print("x" * 4096, flush=True)\n')}
         self.definitions = {k: WorkerDefinition(k, k, 'sha256:' + hashlib.sha256(v).hexdigest(), 'task:run') for k, v in self.sources.items()}
         self.runtime = WorkerRuntime(Provider(self.sources), self.definitions, max_concurrent=1)
         self.manager = WorkerManager(self.runtime)
@@ -100,6 +101,21 @@ class OperationalTests(unittest.TestCase):
     def test_input_validation(self):
         r = self.manager.request_execution('fast', timeout_seconds=float('nan'))
         self.assertEqual(r.error.code, 'INVALID_INPUT')
+
+    def test_stdout_limit_is_enforced_while_streaming(self):
+        runtime = WorkerRuntime(Provider(self.sources), self.definitions,
+                                max_concurrent=1, max_output_bytes=128)
+        manager = WorkerManager(runtime)
+        manager.register(self.definitions['flood'])
+        manager.enable('flood')
+        started = time.monotonic()
+        result = manager.request_execution('flood', timeout_seconds=5)
+        elapsed = time.monotonic() - started
+        self.assertEqual(result.status, 'failed')
+        self.assertEqual(result.error.code, 'OUTPUT_LIMIT_EXCEEDED')
+        self.assertLess(elapsed, 4)
+        self.assertLessEqual(len(result.error.message), 128)
+
 
     def test_code_manager_requires_https(self):
         with self.assertRaises(ValueError):

@@ -40,8 +40,10 @@ CPU/memory/PID limits, no inherited credentials, and audited egress), plus
 external scheduling and persistent state. ZIP path/symlink checks, hash checks,
 size limits and subprocess timeouts are defense-in-depth, not a substitute.
 
-Captured stdout is bounded only *after* the subprocess exits: a malicious worker
-can still exhaust memory by printing indefinitely. Output limits must be enforced
-while streaming, before the data is accumulated in memory. Run only trusted
-artifacts until the sandbox and streaming output controls are independently
-implemented and tested.
+Captured stdout is now drained by a reader thread and retained only up to
+`max_output_bytes + 1`. Crossing the cap triggers process termination and
+returns `OUTPUT_LIMIT_EXCEEDED`; this prevents unbounded stdout accumulation in
+the parent process. The regression test uses a worker that prints indefinitely.
+This is a memory-protection improvement, **not a sandbox**: a worker can still
+consume CPU, memory outside stdout, filesystem or network resources. Run only
+trusted artifacts until a real sandbox is implemented and independently tested.
