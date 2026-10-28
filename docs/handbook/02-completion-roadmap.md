@@ -66,6 +66,7 @@
 - تست integration واقعی CODE ↔ DATA MANAGER: در CI فعال شده است.
 - دانلود Artifact: `GET /api/v1/artifacts/{artifact_id}/content` به CODE MANAGER اضافه شده؛ داده باینری دقیق، مالکیت‌محور و با تأیید manifest/blob و SHA-256 ارائه می‌شود.
 - اسناد مرجع: فهرست مرکزی و فصل‌های یونیت‌ها نگهداری می‌شوند.
+- WORKER MANAGER metadata persistence: PR شماره 13 با CI موفق ادغام شده است؛ commit ادغام `e213c8e88543a519562581200ddbc9952b865b19`. پیاده‌سازی `SQLiteWorkerStore` تعریف Worker، lifecycle، تنظیمات JSON و schedule را ذخیره می‌کند و تست restart/reload دارد. فصل `docs/handbook/units/03-worker-manager.md` جزئیات و محدودیت‌ها را ثبت می‌کند.
 
 ### وضعیت فعلی Build
 
@@ -83,7 +84,7 @@ CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/4077518442
 4. **P0 — Runtime E2E:** دانلود Artifact از CODE MANAGER با احراز هویت واقعی و اجرای مسیر کامل تا نتیجه هنوز اثبات نشده است.
 5. **P0 — محدودیت خروجی:** PR شماره 11 ادغام شده است؛ stdout هنگام stream خوانده می‌شود و با عبور از سقف، subprocess متوقف می‌شود. تست چاپ نامحدود اضافه شده و CI مربوط به PR سبز است: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40776068224. CI روی commit ادغام‌شدهٔ `d9a8afeddc245b24d374eb44209e3f95c24d0199` هنگام ثبت این سند هنوز در حال اجرا بود. این کنترل جای Sandbox واقعی را نمی‌گیرد.
 6. **P1 — Auth integration:** reverse proxy/identity gateway باید Authorization را اعتبارسنجی کند و هویت قابل‌اعتماد را در `REMOTE_USER` قرار دهد.
-7. **P1 — Worker Manager:** persistence، API عمومی، scheduler واقعی و Runtime adapter عملیاتی باز هستند.
+7. **P1 — Worker Manager:** persistence اطلاعات مدیریتی در SQLite انجام شده است؛ API عمومی، scheduler واقعی، ذخیره‌سازی تاریخچه/وضعیت اجرای Runtime و اتصال Runtime عملیاتی همچنان باز هستند. Store فعلی برای یک process مالک DB طراحی شده و هماهنگ‌سازی توزیع‌شده نیست.
 8. **P1 — Dashboard:** اتصال upstream و نگاشت مجوز/هویت نیازمند تکمیل و تست است.
 
 ### معیار پذیرش Build
