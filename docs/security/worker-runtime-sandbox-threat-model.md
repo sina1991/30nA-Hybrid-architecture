@@ -73,7 +73,7 @@
 
 CI run #110 با موفقیت تمام مراحل را گذراند. تست‌های Docker اکنون بررسی می‌کنند: عدم دسترسی به فایل محرمانه میزبان، رد نوشتن روی root filesystem، فقط loopback و شکست اتصال outbound، UID غیرممتاز، read-only root، محدودیت‌های memory/cpu/PID از cgroup، شکست تخصیص حافظه بیش از سقف، جلوگیری از fork storm، CPU quota زیر یک هسته و حذف کانتینر پس از لغو. تست timeout/cancellation موجود نیز اجرا می‌شود. این‌ها آزمون‌های واقعی در GitHub-hosted CI هستند، اما fault-injection daemon و تکرار آزمون روی میزبان Production هنوز انجام نشده‌اند؛ موفقیت CI به معنی تأیید Production نیست.
 
-شاخه Build pipeline نیز تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند؛ اگر image معتبر وجود نداشته باشد، تست‌ها پیدا نشوند، فایل credential-like وجود داشته باشد یا import خارجی/manifest وابستگی شناسایی شود، Build قابل انتشار نمی‌شود. resolver وابستگی allowlist/hash-pinned و بسته‌بندی dependencyهای خارجی هنوز پیاده‌سازی نشده‌اند و به‌صورت fail-closed مسدود می‌مانند.
+شاخه Build pipeline تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند. dependencyهای خارجی فقط از `requirements.txt` با version/hash دقیق، allowlist مورداعتماد و wheelhouse آفلاین پذیرفته می‌شوند؛ فقط wheelهای pure-Python بدون dependency انتقالی پشتیبانی می‌شوند و در artifact به‌صورت vendored قرار می‌گیرند. Worker Runtime پیش از import دوباره hash wheelها را بررسی می‌کند. manifestهای دیگر، import پویا، native extensions، `.pth` و shadow کردن standard library همچنان fail-closed رد می‌شوند.
 
 ## دروازه انتشار
 
@@ -84,4 +84,4 @@ CI run #110 با موفقیت تمام مراحل را گذراند. تست‌ه
 4. تست‌های integration/security روی CI مناسب اجرا شوند؛
 5. راه‌اندازی، نیازمندی‌های میزبان، threat model و محدودیت‌های شناخته‌شده مستند باشند.
 
-Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. Issue #22 تا اجرای پذیرش روی میزبان هدف و fault-injection daemon باز می‌ماند. Issue #21 نیز تا تکمیل resolver آفلاین allowlist/hash-pinned و پشتیبانی runtime از dependencyهای خارجی باز می‌ماند. Issue #23 پیاده‌سازی و CI شده، اما تا review/merge نهایی باز است.
+Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. Issue #22 تا اجرای پذیرش روی میزبان هدف و fault-injection daemon باز می‌ماند. Issue #21 تا پشتیبانی dependencyهای انتقالی/native و پذیرش روی میزبان Production باز می‌ماند. Issue #23 پیاده‌سازی و CI شده، اما تا review/merge نهایی باز است.
