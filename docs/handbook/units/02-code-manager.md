@@ -36,7 +36,7 @@ README می‌گوید مالک احراز‌شده از `REMOTE_USER` مورد 
 
 ## وضعیت و محدودیت‌های فعلی
 
-مسیر Build و Publication Gate پیاده‌سازی اولیه شده است؛ اما dependency manifestها فعلاً به‌صورت fail-closed build را مسدود می‌کنند تا resolver آفلاین و allowlist/hash pinning اضافه شود. Build بدون `test*.py` و اجرای موفق تست‌ها publishable نیست. اجرای CI و تست میزبان هدف باید پیش از ادعای آمادگی Production تأیید شود.
+مسیر Build و Publication Gate پیاده‌سازی و در CI با Docker واقعی آزموده شده است. پروفایل فعلی stdlib-only است: import خارجی، import پویا، shadow کردن standard library، dependency manifest، فایل credential-like یا نبود تست باعث رد Build می‌شود. Build بدون `test*.py` و اجرای موفق تست‌ها publishable نیست. resolver آفلاین allowlist/hash-pinned و بسته‌بندی runtime dependencyهای خارجی هنوز تکمیل نشده‌اند؛ تست روی میزبان Production نیز قبل از ادعای آمادگی Production الزامی است.
 
 ## موارد ممیزی
 
