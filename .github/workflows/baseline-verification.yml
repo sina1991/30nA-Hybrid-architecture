@@ -1,0 +1,126 @@
+name: Read-only baseline verification (TASK-20261028-001)
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_runtime:
+        description: "Run subprocess-based Worker Runtime and Agent 08 tests on an ephemeral GitHub runner"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: baseline-verification-${{ github.ref }}-${{ github.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  baseline:
+    name: Contracts, services and dashboard tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PYTHONPATH: units/code-manager:units/worker-manager:units/worker-runtime:units/consumers/dashboard-core
+      CODE_MANAGER_INTEGRATION: "0"
+      DATA_MANAGER_ALLOW_INSECURE_HEADER: "0"
+      CODE_MANAGER_ALLOW_INSECURE_HEADER: "0"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Checkout audited commit (not mutable branch HEAD)
+        uses: actions/checkout@v4
+        with:
+          ref: 3606ea7bac656e9292e57387b3d7ef9969ce4a34
+          persist-credentials: false
+      - name: Confirm audited commit
+        run: |
+          test "$(git rev-parse HEAD)" = "3606ea7bac656e9292e57387b3d7ef9969ce4a34"
+          git status --short
+          git rev-parse HEAD
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - name: Install test dependencies
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python -m pip freeze
+      - name: Run non-subprocess suites and capture output
+        shell: bash
+        run: |
+          mkdir -p verification-logs
+          set +e
+          suites=(
+            contracts/core/tests
+            contracts/code/tests
+            units/data-manager/tests
+            units/code-manager/tests
+            units/worker-manager/tests
+            units/consumers/dashboard-core/tests
+            units/consumers/dashboard-core/legacy-tests
+          )
+          failed=0
+          for suite in "${suites[@]}"; do
+            label="${suite//\//_}"
+            python -m pytest "$suite" -v --tb=short >"verification-logs/${label}.log" 2>&1
+            code=$?
+            cat "verification-logs/${label}.log"
+            printf '%s exit_code=%s\n' "$suite" "$code" | tee -a verification-logs/exit-codes.txt
+            if [ "$code" -ne 0 ]; then failed=1; fi
+          done
+          exit "$failed"
+      - name: Upload baseline evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: baseline-evidence
+          path: verification-logs/
+          if-no-files-found: warn
+
+  runtime:
+    name: Explicitly opted-in subprocess tests
+    if: ${{ inputs.run_runtime == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      PYTHONPATH: units/code-manager:units/worker-manager:units/worker-runtime
+      CODE_MANAGER_INTEGRATION: "0"
+      DATA_MANAGER_ALLOW_INSECURE_HEADER: "0"
+      CODE_MANAGER_ALLOW_INSECURE_HEADER: "0"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 3606ea7bac656e9292e57387b3d7ef9969ce4a34
+          persist-credentials: false
+      - name: Confirm audited commit
+        run: test "$(git rev-parse HEAD)" = "3606ea7bac656e9292e57387b3d7ef9969ce4a34"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Run subprocess suites and capture output
+        shell: bash
+        run: |
+          mkdir -p verification-logs
+          set +e
+          failed=0
+          for suite in units/worker-runtime/tests units/integration/agent08/tests; do
+            label="${suite//\//_}"
+            python -m pytest "$suite" -v --tb=short >"verification-logs/${label}.log" 2>&1
+            code=$?
+            cat "verification-logs/${label}.log"
+            printf '%s exit_code=%s\n' "$suite" "$code" | tee -a verification-logs/exit-codes.txt
+            if [ "$code" -ne 0 ]; then failed=1; fi
+          done
+          exit "$failed"
+      - name: Upload runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: runtime-evidence
+          path: verification-logs/
+          if-no-files-found: warn
