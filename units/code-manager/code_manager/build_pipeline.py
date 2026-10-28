@@ -374,7 +374,9 @@ class DockerBuildExecutor:
             raise ValueError("timeout_seconds must be between 1 and 3600")
         if not isinstance(memory, str) or not re.fullmatch(r"[1-9][0-9]*(m|g)", memory):
             raise ValueError("memory must be a positive m/g value")
-        if not isinstance(cpus, str) or not re.fullmatch(r"[1-9][0-9]*(\.[0-9]+)?", cpus):
+        if (not isinstance(cpus, str)
+                or not re.fullmatch(r"[0-9]+(?:\.[0-9]+)?", cpus)
+                or float(cpus) <= 0):
             raise ValueError("cpus must be a positive decimal")
         if type(pids_limit) is not int or pids_limit <= 0:
             raise ValueError("pids_limit must be positive")
