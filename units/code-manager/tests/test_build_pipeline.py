@@ -181,5 +181,24 @@ class BuildPipelineTests(unittest.TestCase):
         self.assertEqual(stages["dependency_check"], "blocked")
 
 
+    def test_credential_like_files_block_build_before_tests(self):
+        data = make_source({
+            "sample/main.py": "def run(data): return data\n",
+            "tests/__init__.py": "",
+            "tests/test_smoke.py": "import unittest\nclass T(unittest.TestCase):\n def test_ok(self): self.assertTrue(True)\n",
+            ".env": "TOKEN=do-not-package\n",
+        })
+        pipeline = BuildPipeline(self.blobs, history_store=self.history, image="")
+        report = pipeline.run(
+            owner_id="alice", source_id="secret", source_version="1",
+            source=source_record(data),
+        )
+        self.assertEqual(report["status"], "failed")
+        stages = {item["stage"]: item["status"] for item in report["stages"]}
+        self.assertEqual(stages["normalize_working_copy"], "failed")
+        self.assertEqual(stages["test"], "not_run")
+        self.assertNotIn("artifact_digest", report)
+
+
 if __name__ == "__main__":
     unittest.main()
