@@ -23,8 +23,10 @@ README یونیت، این اجزا را توصیف می‌کند:
 - `GET /api/v1/sources`
 - `GET /api/v1/sources/{source_id}/versions/{source_version}`
 - `POST /api/v1/sources/{source_id}/versions/{source_version}/inspect`
-- `POST /api/v1/builds` فعلاً رزرو شده و 501 برمی‌گرداند.
-- مسیرهای Artifact نیز طبق README رزرو شده‌اند.
+- `POST /api/v1/builds` گزارش پایدار و مرحله‌به‌مرحله می‌سازد؛ تست‌ها فقط در Docker محدودشده اجرا می‌شوند.
+- `GET /api/v1/builds` و `GET /api/v1/builds/{build_id}` تاریخچه مالک‌محور را ارائه می‌کنند.
+- `POST /api/v1/artifacts/{artifact_id}/publish` فقط build موفق با تمام مراحل `passed` را می‌پذیرد.
+- دانلود فقط `built_artifact` منتشرشده را برمی‌گرداند؛ source ZIP قابل دانلود از مسیر Artifact نیست.
 
 این فهرست باید در مرحله ممیزی با Routeها و قراردادهای `contracts/code/` تطبیق داده شود.
 
@@ -32,9 +34,9 @@ README یونیت، این اجزا را توصیف می‌کند:
 
 README می‌گوید مالک احراز‌شده از `REMOTE_USER` مورد اعتماد WSGI می‌آید. Header توسعه‌ای `X-Code-Manager-ID` به‌صورت پیش‌فرض غیرفعال است. فعال‌سازی Headerهای ناامن فقط برای loopback/آزمایش مجاز است و در تولید ممنوع است. Bearer token به‌تنهایی `REMOTE_USER` را تنظیم نمی‌کند.
 
-## شکاف مهم یکپارچگی
+## وضعیت و محدودیت‌های فعلی
 
-WORKER RUNTIME انتظار endpoint احراز هویت‌شده‌ای برای دریافت bytes خام ZIP از Artifact دارد، اما README فعلی CODE MANAGER می‌گوید Artifact routes هنوز 501 هستند. بنابراین مسیر واقعی انتشار و دریافت Artifact تا زمان پیاده‌سازی و تست E2E مسدود است.
+مسیر Build و Publication Gate پیاده‌سازی اولیه شده است؛ اما dependency manifestها فعلاً به‌صورت fail-closed build را مسدود می‌کنند تا resolver آفلاین و allowlist/hash pinning اضافه شود. Build بدون `test*.py` و اجرای موفق تست‌ها publishable نیست. اجرای CI و تست میزبان هدف باید پیش از ادعای آمادگی Production تأیید شود.
 
 ## موارد ممیزی
 
