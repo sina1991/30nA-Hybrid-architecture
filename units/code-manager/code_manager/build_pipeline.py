@@ -522,7 +522,12 @@ class BuildPipeline:
 
         try:
             preflight = validate_build_preflight(source)
-            report["source_hash"] = preflight.get("source_hash")
+            raw_source_hash = preflight.get("source_hash")
+            report["source_hash"] = (
+                "sha256:" + raw_source_hash
+                if isinstance(raw_source_hash, str) and re.fullmatch(r"[0-9a-f]{64}", raw_source_hash)
+                else None
+            )
             report["source_archive_size"] = preflight.get("archive_size")
             # Replace preflight placeholders with actual stage outcomes below.
             report["stages"].extend(
@@ -542,6 +547,10 @@ class BuildPipeline:
                     "Imports require unavailable dependencies or shadow the standard library: "
                     + json.dumps(import_report, sort_keys=True)
                 )[:1000]
+            elif dependency_stage:
+                dependency_stage["detail"] = (
+                    "Static imports are standard-library or archive-local; stdlib-only policy enforced"
+                )
             if dependency_stage and dependency_stage["status"] != "passed":
                 record("normalize_working_copy", "not_run", "Dependency policy blocked the build")
                 record("test", "not_run", "Dependency policy blocked the build")
