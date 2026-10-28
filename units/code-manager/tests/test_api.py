@@ -445,5 +445,33 @@ class CodeManagerAPITests(unittest.TestCase):
             self.assertFalse(any(name.startswith("tests/") for name in artifact.namelist()))
 
 
+    def test_publish_rejects_success_flag_when_mandatory_stage_is_missing(self):
+        from code_manager.build_pipeline import BuildHistoryStore
+
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        _, _, created = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        blocked = created["payload"]["build"]
+        forged = dict(blocked)
+        forged["build_id"] = "c" * 32
+        forged["status"] = "succeeded"
+        forged["publishable"] = True
+        forged["stages"] = [
+            {"stage": name, "status": "passed", "detail": "fixture"}
+            for name in ("inspect_archive", "verify_source_hash", "validate_archive_paths",
+                         "syntax_check", "dependency_check", "contract_check",
+                         "normalize_working_copy", "test", "reproducibility", "package")
+        ]
+        BuildHistoryStore(self.storage.root / "build-history.sqlite3").save("alice", forged)
+        status, _, response = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": forged["build_id"]},
+        )
+        self.assertEqual(status, 409)
+        self.assertEqual(response["error"]["code"], "BUILD_NOT_PUBLISHABLE")
+
+
 if __name__ == "__main__":
     unittest.main()
