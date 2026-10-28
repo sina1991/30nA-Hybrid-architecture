@@ -39,13 +39,16 @@ class WorkerRuntime:
     def __init__(self, artifact_provider, definitions=None, max_depth=3, max_children=8,
                  max_concurrent=16, max_artifact_bytes=16 * 1024 * 1024,
                  max_output_bytes=1024 * 1024, max_input_bytes=1024 * 1024):
-        if any(type(n) is not int or n < 0 for n in (max_depth, max_children, max_concurrent)):
-            raise ValueError('Limits must be nonnegative integers')
+        if any(type(n) is not int or n < 0 for n in (max_depth, max_children)):
+            raise ValueError('max_depth and max_children must be nonnegative integers')
+        if type(max_concurrent) is not int or max_concurrent <= 0:
+            raise ValueError('max_concurrent must be a positive integer')
+        if any(type(n) is not int or n <= 0 for n in
+               (max_artifact_bytes, max_output_bytes, max_input_bytes)):
+            raise ValueError('artifact, output and input byte limits must be positive integers')
         self.provider = artifact_provider
         self.definitions = {} if definitions is None else dict(definitions)
         self.max_depth, self.max_children = max_depth, max_children
-        if type(max_input_bytes) is not int or max_input_bytes <= 0:
-            raise ValueError('max_input_bytes must be a positive integer')
         self.max_artifact_bytes, self.max_output_bytes = max_artifact_bytes, max_output_bytes
         self.max_input_bytes = max_input_bytes
         self._capacity = threading.BoundedSemaphore(max_concurrent)
