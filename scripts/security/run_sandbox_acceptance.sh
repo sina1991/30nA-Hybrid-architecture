@@ -34,7 +34,8 @@ export CODE_MANAGER_BUILD_SANDBOX_IMAGE="$IMAGE"
 export DATA_MANAGER_DB="/tmp/data-manager-host-acceptance-$$.sqlite3"
 export CODE_MANAGER_DATA_MANAGER_URL="http://127.0.0.1:8080"
 
-python -m pip install -r requirements-dev.txt
+python -c 'import pytest' || { echo "Install requirements-dev.txt in a trusted virtual environment before running acceptance" >&2; exit 2; }
+command -v curl >/dev/null || { echo "curl is required" >&2; exit 2; }
 python - <<'PY' >/tmp/data-manager-host-acceptance.log 2>&1 &
 import importlib
 import importlib.util
