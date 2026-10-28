@@ -1,9 +1,8 @@
 """Fail-closed, reproducible build pipeline for untrusted source ZIPs.
 
-Build tests run only inside a pinned Docker image with no network, a read-only
-root filesystem, a non-root identity, and bounded resources. Dependencies are
-not installed dynamically: dependency manifests block the build until an
-allowlisted, hash-locked resolver is configured.
+Tests run in a pinned Docker image with no network and bounded resources.
+Optional third-party dependencies are limited to trusted, hash-pinned,
+pure-Python wheels from an offline wheelhouse and are vendored into artifacts.
 """
 from __future__ import annotations
 
