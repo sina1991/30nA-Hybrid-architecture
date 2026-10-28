@@ -138,6 +138,7 @@ def create_application(
     data_manager_client_factory,
     identity_provider=None,
     max_request_bytes: int = MAX_REQUEST_BYTES,
+    published_artifact_registry=None,
 ):
     """Create a WSGI application with injected storage and identity adapters.
 
@@ -156,6 +157,10 @@ def create_application(
         raise ValueError("max_request_bytes must be positive")
 
     identity_provider = identity_provider or RemoteUserIdentity()
+    if published_artifact_registry is None:
+        published_artifact_registry = PublishedArtifactRegistry(blob_storage)
+    if not isinstance(published_artifact_registry, PublishedArtifactRegistry):
+        raise TypeError("published_artifact_registry must be a PublishedArtifactRegistry instance")
 
     def application(environ, start_response):
         correlation_id = environ.get("HTTP_X_CORRELATION_ID")
@@ -482,11 +487,27 @@ def create_application(
                     raise APIError(
                         404, "ARTIFACT_NOT_FOUND", "Artifact route not found"
                     )
+                if len(parts) == 3 and parts[2] == "content" and method == "GET":
+                    metadata, artifact_bytes = published_artifact_registry.get(
+                        owner_id, parts[1]
+                    )
+                    headers = [
+                        ("Content-Type", "application/octet-stream"),
+                        ("Content-Length", str(len(artifact_bytes))),
+                        ("Cache-Control", "private, no-store"),
+                        ("X-Content-Type-Options", "nosniff"),
+                        ("ETag", '"' + metadata["artifact_hash"] + '"'),
+                        ("X-Artifact-Hash", metadata["artifact_hash"]),
+                    ]
+                    if correlation_id:
+                        headers.append(("X-Correlation-ID", correlation_id))
+                    start_response("200 OK", headers)
+                    return [artifact_bytes]
                 if method in {"GET", "POST"}:
                     raise APIError(
                         501,
                         "OPERATION_NOT_IMPLEMENTED",
-                        "Artifact operations are reserved and not implemented",
+                        "Artifact publication and build validation remain disabled",
                     )
                 raise APIError(
                     404, "ARTIFACT_NOT_FOUND", "Artifact route not found"
