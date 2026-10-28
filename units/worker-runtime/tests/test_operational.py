@@ -101,6 +101,21 @@ class OperationalTests(unittest.TestCase):
         r = self.manager.request_execution('fast', timeout_seconds=float('nan'))
         self.assertEqual(r.error.code, 'INVALID_INPUT')
 
+    def test_stdout_limit_is_enforced_while_streaming(self):
+        runtime = WorkerRuntime(Provider(self.sources), self.definitions,
+                                max_concurrent=1, max_output_bytes=128)
+        manager = WorkerManager(runtime)
+        manager.register(self.definitions['flood'])
+        manager.enable('flood')
+        started = time.monotonic()
+        result = manager.request_execution('flood', timeout_seconds=5)
+        elapsed = time.monotonic() - started
+        self.assertEqual(result.status, 'failed')
+        self.assertEqual(result.error.code, 'OUTPUT_LIMIT_EXCEEDED')
+        self.assertLess(elapsed, 4)
+        self.assertLessEqual(len(result.error.message), 128)
+
+
     def test_code_manager_requires_https(self):
         with self.assertRaises(ValueError):
             CodeManagerArtifactProvider('http://localhost:8080', 'Bearer token')
