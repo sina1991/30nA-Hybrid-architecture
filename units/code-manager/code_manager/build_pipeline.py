@@ -287,8 +287,8 @@ def _normalize_distribution(name: str) -> str:
     return re.sub(r"[-_.]+", "-", name).lower()
 
 
-def _wheel_metadata(wheel_path: Path, package: str, version: str) -> None:
-    """Accept only small, pure-Python wheels without transitive dependencies."""
+def _wheel_metadata(wheel_path: Path, package: str, version: str) -> list[tuple[str, str]]:
+    """Validate a pure-Python wheel and return exact, unconditional dependency pins."""
     if not wheel_path.name.endswith("-py3-none-any.whl"):
         raise SourceValidationError("Only pure-Python py3-none-any wheels are supported")
     if wheel_path.stat().st_size > 8 * 1024 * 1024:
@@ -298,6 +298,7 @@ def _wheel_metadata(wheel_path: Path, package: str, version: str) -> None:
         if len(infos) > 1000:
             raise SourceValidationError("Dependency wheel contains too many files")
         expanded = 0
+        seen_paths = set()
         metadata_files = []
         wheel_metadata_files = []
         top_level_modules = set()
@@ -305,6 +306,9 @@ def _wheel_metadata(wheel_path: Path, package: str, version: str) -> None:
             name = info.filename.rstrip("/")
             if not _safe_name(name):
                 raise SourceValidationError("Unsafe path in dependency wheel")
+            if name in seen_paths:
+                raise SourceValidationError("Duplicate path in dependency wheel")
+            seen_paths.add(name)
             mode = (info.external_attr >> 16) & 0o170000
             if mode == stat.S_IFLNK:
                 raise SourceValidationError("Symlinks are forbidden in dependency wheels")
@@ -333,8 +337,24 @@ def _wheel_metadata(wheel_path: Path, package: str, version: str) -> None:
         stdlib = set(getattr(sys, "stdlib_module_names", ())) | set(sys.builtin_module_names)
         if top_level_modules & stdlib:
             raise SourceValidationError("Dependency wheel shadows a standard-library module")
-        if metadata.get_all("Requires-Dist"):
-            raise SourceValidationError("Wheels with transitive dependencies are not supported by this profile")
+        requirements = []
+        for raw_requirement in metadata.get_all("Requires-Dist", []):
+            requirement = re.fullmatch(
+                r"\\s*([A-Za-z0-9][A-Za-z0-9._-]*)\\s*\\(==([A-Za-z0-9][A-Za-z0-9.+!-]*)\\)\\s*",
+                raw_requirement,
+            )
+            if requirement is None:
+                raise SourceValidationError(
+                    "Requires-Dist must use unconditional exact-version pins without extras or markers"
+                )
+            dependency_name = _normalize_distribution(requirement.group(1))
+            dependency_version = requirement.group(2)
+            if dependency_name == package:
+                raise SourceValidationError("A wheel cannot depend on itself")
+            requirements.append((dependency_name, dependency_version))
+        if len({name for name, _ in requirements}) != len(requirements):
+            raise SourceValidationError("Wheel contains duplicate Requires-Dist entries")
+        return requirements
 
 
 def resolve_dependency_policy(source_bytes: bytes, import_report: dict, allowlist_config, wheelhouse) -> dict:
@@ -408,7 +428,7 @@ def resolve_dependency_policy(source_bytes: bytes, import_report: dict, allowlis
         if digest != trusted_hash:
             return {"status":"blocked","detail":"Offline wheel SHA-256 mismatch: "+filename,"wheels":[]}
         try:
-            _wheel_metadata(wheel_path, normalized_name, version)
+            required_wheels = _wheel_metadata(wheel_path, normalized_name, version)
         except (SourceValidationError, OSError, zipfile.BadZipFile, UnicodeDecodeError) as exc:
             return {"status":"blocked","detail":"Unsafe or invalid dependency wheel: "+str(exc)[:300],"wheels":[]}
         total_bytes += wheel_path.stat().st_size
@@ -417,11 +437,20 @@ def resolve_dependency_policy(source_bytes: bytes, import_report: dict, allowlis
         if len(selected) >= 64:
             return {"status":"blocked","detail":"More than 64 dependency wheels are not supported","wheels":[]}
         selected.append({"package": normalized_name, "version": version, "filename": filename,
-                         "sha256": digest, "path": str(wheel_path)})
+                         "sha256": digest, "path": str(wheel_path),
+                         "requires": required_wheels})
         selected_modules.update(modules)
     if not selected:
         return {"status":"blocked","detail":"requirements.txt contains no pinned dependencies","wheels":[]}
+    selected_versions = {item["package"]: item["version"] for item in selected}
+    missing_dependencies = sorted({
+        package + "==" + version
+        for item in selected for package, version in item.get("requires", [])
+        if selected_versions.get(package) != version
+    })
     missing_modules = sorted(set(import_report["external"]) - selected_modules)
+    if missing_dependencies:
+        return {"status":"blocked","detail":"Required transitive pins are missing or mismatched: "+", ".join(missing_dependencies),"wheels":[]}
     if import_report["stdlib_shadowing"] or missing_modules or "<dynamic-import>" in import_report["external"]:
         return {"status":"blocked","detail":"External/dynamic imports are not covered by the trusted allowlist: "+", ".join(missing_modules or import_report["stdlib_shadowing"] or ["dynamic import"]),"wheels":[]}
     lock = {"version": 1, "wheels": [
