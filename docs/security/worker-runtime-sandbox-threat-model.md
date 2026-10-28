@@ -39,7 +39,7 @@
 
 هر backend اجرایی باید همه موارد زیر را enforce کند؛ پیکربندی ناقص یا نامعتبر باید پیش از اجرای کد رد شود:
 
-- **هویت و دسترسی:** اجرای non-root با UID/GID مشخص؛ حذف capabilityها؛ فعال بودن `no-new-privileges`؛ عدم دسترسی به Docker socket، host PID/IPC/network namespace یا deviceهای میزبان.
+- **هویت و دسترسی:** اجرای non-root با UID/GID مشخص؛ حذف capabilityها؛ فعال بودن `no-new-privileges`؛ استفاده از پروفایل seccomp پیش‌فرض Docker (بدون `seccomp=unconfined`)؛ عدم دسترسی به Docker socket، host PID/IPC/network namespace یا deviceهای میزبان.
 - **فایل‌سیستم:** root filesystem فقط‌خواندنی؛ workspace موقت و محدود؛ mount فقط‌خواندنی برای ورودی؛ مسیر موقت قابل‌نوشتن با سقف اندازه؛ عدم mount پوشه‌های میزبان یا credentialها.
 - **شبکه:** `network=none` به‌صورت پیش‌فرض؛ هیچ egress یا DNS بدون سیاست allowlist صریح. تنظیمات شبکه باید توسط runtime enforce شوند، نه صرفاً مستند شوند.
 - **منابع:** سقف CPU، RAM، PID، wall-clock، فضای دیسک، اندازه Artifact/ورودی/خروجی و file descriptorها؛ آزمون باید ثابت کند محدودیت از طرف سیستم‌عامل/runtime اعمال شده است.
