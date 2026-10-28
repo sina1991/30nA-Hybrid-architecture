@@ -8,6 +8,7 @@ allowlisted, hash-locked resolver is configured.
 from __future__ import annotations
 
 import hashlib
+from contextlib import contextmanager
 import io
 import json
 import os
@@ -56,7 +57,6 @@ def normalize_source_archive(source_bytes: bytes, *, include_tests: bool) -> byt
     """Return a deterministic ZIP without extracting untrusted paths on the host."""
     if not isinstance(source_bytes, bytes):
         raise TypeError("source_bytes must be bytes")
-    inspect_source_archive(source_bytes, "placeholder:run") if False else None
     output = io.BytesIO()
     with zipfile.ZipFile(io.BytesIO(source_bytes), "r") as source:
         entries = source.infolist()
@@ -206,10 +206,18 @@ class BuildHistoryStore:
                 ON build_history(owner_id, source_id, source_version, created_at)
             """)
 
+    @contextmanager
     def _connect(self):
         db = sqlite3.connect(self.path, timeout=10)
         db.row_factory = sqlite3.Row
-        return db
+        try:
+            yield db
+            db.commit()
+        except Exception:
+            db.rollback()
+            raise
+        finally:
+            db.close()
 
     def save(self, owner_id: str, report: dict) -> None:
         if not isinstance(owner_id, str) or not owner_id.strip():
@@ -435,8 +443,14 @@ class BuildPipeline:
             preflight = validate_build_preflight(source)
             report["source_hash"] = preflight.get("source_hash")
             report["source_archive_size"] = preflight.get("archive_size")
-            report["stages"].extend(preflight.get("stages", []))
+            # Replace preflight placeholders with actual stage outcomes below.
+            report["stages"].extend(
+                stage for stage in preflight.get("stages", [])
+                if stage.get("stage") not in {"normalize_working_copy", "test", "package", "hash"}
+            )
             if preflight.get("status") == "failed":
+                for name in ("normalize_working_copy", "test", "reproducibility", "package", "hash"):
+                    record(name, "not_run", "A mandatory preflight stage failed")
                 report["status"] = "failed"
                 return self._save(owner_id, report)
             dependency_stage = next((s for s in preflight["stages"] if s["stage"] == "dependency_check"), None)
