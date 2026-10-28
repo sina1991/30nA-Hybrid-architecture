@@ -1,3 +1,5 @@
+import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -51,6 +53,67 @@ def test_real_docker_container_enforces_identity_and_read_only_root(tmp_path):
         assert result["result"]["host_secret_visible"] is False
         assert result["result"]["host_write"] is False
         assert result["result"]["network_blocked"] is True
+    finally:
+        if proc is not None:
+            if proc.poll() is None:
+                backend.terminate(proc)
+                proc.wait(timeout=5)
+            backend.cleanup(proc)
+
+
+def test_real_docker_runtime_loads_hash_verified_vendored_wheel(tmp_path):
+    image = os.environ.get("WORKER_RUNTIME_SANDBOX_TEST_IMAGE")
+    if not image or not shutil.which("docker"):
+        pytest.skip("CI Docker sandbox image is not configured")
+    probe = subprocess.run(
+        ["docker", "info", "--format", "{{.ServerVersion}}"],
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        timeout=5, check=False,
+    )
+    if probe.returncode != 0:
+        pytest.skip("Docker daemon is not available")
+    wheel_name = "sampledep-1.0.0-py3-none-any.whl"
+    wheel_buffer = io.BytesIO()
+    with zipfile.ZipFile(wheel_buffer, "w", zipfile.ZIP_DEFLATED) as wheel:
+        wheel.writestr("sampledep/__init__.py", "VALUE = 'runtime-vendor'\n")
+        wheel.writestr(
+            "sampledep-1.0.0.dist-info/METADATA",
+            "Metadata-Version: 2.1\nName: sampledep\nVersion: 1.0.0\n\n",
+        )
+        wheel.writestr(
+            "sampledep-1.0.0.dist-info/WHEEL",
+            "Wheel-Version: 1.0\nGenerator: test\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+        )
+        wheel.writestr("sampledep-1.0.0.dist-info/RECORD", "")
+    wheel_bytes = wheel_buffer.getvalue()
+    digest = hashlib.sha256(wheel_bytes).hexdigest()
+    archive_path = tmp_path / "vendored-runtime.zip"
+    with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(
+            "worker.py",
+            "import sampledep\ndef run(data, config): return {'value': sampledep.VALUE}\n",
+        )
+        archive.writestr("vendor/" + wheel_name, wheel_bytes)
+        archive.writestr(
+            "vendor/dependencies.json",
+            json.dumps({"version": 1, "wheels": [{"filename": wheel_name, "sha256": digest}]}),
+        )
+    runner = Path(__file__).parents[1] / "worker_runtime" / "_runner.py"
+    backend = DockerSandboxBackend(image, startup_timeout=10)
+    proc = None
+    try:
+        proc = backend.launch(
+            archive_path, runner, "worker:run", execution_id="vendored-wheel-probe",
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        stdout, stderr = proc.communicate(
+            json.dumps({"input": {}, "configuration": {}}).encode("utf-8"),
+            timeout=20,
+        )
+        assert proc.returncode == 0, stderr.decode("utf-8", "replace")
+        result = json.loads(stdout)
+        assert result["ok"] is True, result
+        assert result["result"]["value"] == "runtime-vendor"
     finally:
         if proc is not None:
             if proc.poll() is None:
