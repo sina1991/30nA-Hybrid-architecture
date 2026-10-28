@@ -21,7 +21,9 @@ def test_real_docker_container_enforces_identity_and_read_only_root(tmp_path):
     )
     if probe.returncode != 0:
         pytest.skip("Docker daemon is not available")
-    source = b'''import os, socket\ndef run(data, config):\n    readonly = bool(os.statvfs("/").f_flag & os.ST_RDONLY)\n    interfaces = sorted(name for _, name in socket.if_nameindex())\n    def read(path):\n        try:\n            with open(path) as stream: return stream.read().strip()\n        except OSError: return None\n    return {"uid": os.geteuid(), "readonly": readonly, "interfaces": interfaces,\n            "memory_limit": read("/sys/fs/cgroup/memory.max"),\n            "cpu_limit": read("/sys/fs/cgroup/cpu.max"),\n            "pids_limit": read("/sys/fs/cgroup/pids.max")}\n'''
+    secret_file = tmp_path / "host-secret.txt"
+    secret_file.write_text("host-secret-must-not-be-visible", encoding="utf-8")
+    source = ('''import os, socket\ndef run(data, config):\n    readonly = bool(os.statvfs("/").f_flag & os.ST_RDONLY)\n    interfaces = sorted(name for _, name in socket.if_nameindex())\n    def read(path):\n        try:\n            with open(path) as stream: return stream.read().strip()\n        except OSError: return None\n    try:\n        with open(%r, encoding="utf-8") as stream: secret_visible = stream.read() == "host-secret-must-not-be-visible"\n    except OSError:\n        secret_visible = False\n    try:\n        with open("/host-write-probe", "w", encoding="utf-8") as stream: stream.write("bad")\n        host_write = True\n    except OSError:\n        host_write = False\n    return {"uid": os.geteuid(), "readonly": readonly, "interfaces": interfaces,\n            "host_secret_visible": secret_visible, "host_write": host_write,\n            "memory_limit": read("/sys/fs/cgroup/memory.max"),\n            "cpu_limit": read("/sys/fs/cgroup/cpu.max"),\n            "pids_limit": read("/sys/fs/cgroup/pids.max")}\n''' % str(secret_file)).encode("utf-8")
     archive = tmp_path / "artifact.zip"
     with zipfile.ZipFile(archive, "w") as zf:
         zf.writestr("worker.py", source)
@@ -46,6 +48,8 @@ def test_real_docker_container_enforces_identity_and_read_only_root(tmp_path):
         assert result["result"]["memory_limit"] not in (None, "max")
         assert result["result"]["cpu_limit"] not in (None, "max")
         assert result["result"]["pids_limit"] == "64"
+        assert result["result"]["host_secret_visible"] is False
+        assert result["result"]["host_write"] is False
     finally:
         if proc is not None:
             if proc.poll() is None:
