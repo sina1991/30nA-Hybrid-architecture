@@ -8,7 +8,6 @@ from __future__ import annotations
 import json
 import sqlite3
 from pathlib import Path
-from typing import Iterable
 
 from .models import Schedule, WorkerDefinition, WorkerLifecycle, WorkerRecord
 
@@ -20,8 +19,9 @@ class SQLiteWorkerStore:
         if not isinstance(timeout_seconds, (int, float)) or isinstance(timeout_seconds, bool) or timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
         self.database_path = str(database_path)
-        if self.database_path != ":memory:":
-            Path(self.database_path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
+        if not self.database_path.strip() or self.database_path == ":memory:":
+            raise ValueError("database_path must identify a durable SQLite file")
+        Path(self.database_path).expanduser().resolve().parent.mkdir(parents=True, exist_ok=True)
         self.timeout_seconds = float(timeout_seconds)
         self._initialize()
 
