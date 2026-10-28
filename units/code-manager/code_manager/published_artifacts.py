@@ -17,7 +17,7 @@ from pathlib import Path
 from .errors import BlobIntegrityError
 
 _ARTIFACT_ID = re.compile(
-    r"^([A-Za-z0-9][A-Za-z0-9._-]{0,63})@([A-Za-z0-9][A-Za-z0-9._-]{0,63})$"
+    r"^([A-Za-z0-9][A-Za-z0-9._:-]{0,127})@([A-Za-z0-9][A-Za-z0-9._:-]{0,127})$"
 )
 _DIGEST = re.compile(r"^[0-9a-f]{64}$")
 _MAX_ARTIFACT_BYTES = 16 * 1024 * 1024
