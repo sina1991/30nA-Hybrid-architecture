@@ -38,9 +38,8 @@ artifact:
   dependency_lock:
     type: string
     required: true
-    allowed_values:
-      - stdlib-only
-    description: "Current build profile rejects external dependencies and dependency manifests."
+    pattern: "^(stdlib-only|sha256:[0-9a-f]{64})$"
+    description: "stdlib-only, or the SHA-256 of the canonical allowlisted wheel manifest."
   entrypoint:
     type: string
     required: true
