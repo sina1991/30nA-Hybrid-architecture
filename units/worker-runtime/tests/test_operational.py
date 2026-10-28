@@ -117,6 +117,17 @@ class OperationalTests(unittest.TestCase):
         self.assertLessEqual(len(result.error.message), 128)
 
 
+    def test_serialized_input_limit_is_enforced_before_execution(self):
+        runtime = WorkerRuntime(Provider(self.sources), self.definitions,
+                                max_concurrent=1, max_input_bytes=128)
+        manager = WorkerManager(runtime)
+        manager.register(self.definitions['fast'])
+        manager.enable('fast')
+        result = manager.request_execution('fast', input_payload={'payload': 'x' * 1024})
+        self.assertEqual(result.status, 'failed')
+        self.assertFalse(result.accepted)
+        self.assertEqual(result.error.code, 'INVALID_INPUT')
+
     def test_code_manager_requires_https(self):
         with self.assertRaises(ValueError):
             CodeManagerArtifactProvider('http://localhost:8080', 'Bearer token')
