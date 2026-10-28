@@ -89,3 +89,15 @@ Baseline تاریخی بالا عمداً روی SHA ثابت مانده و هم
 - [ ] persistence/API/scheduler واقعی WORKER MANAGER طبق تصمیم معماری.
 - [ ] آزمون E2E کامل از ثبت source تا build/publish/download/execute/result.
 - [ ] تکمیل بررسی امنیتی و استقرار تمیز با dependencyهای تثبیت‌شده.
+
+
+## وضعیت CI پس از افزودن Artifact download
+
+- PR #7 ادغام شد: https://github.com/sina1991/30nA-Hybrid-architecture/pull/7
+- SHA آزموده‌شده در PR: `14d74a00c0d2b98f142b82629b3fd9c14ffd280c`
+- نتیجه: `161 passed, 0 skipped, 1 warning, 55 subtests passed`.
+- سه تست API جدید برای دریافت باینری، پاسخ 404 برای artifact منتشرنشده، و جداسازی مالک موفق شدند.
+- Commit ادغام‌شده: `a8729c6008d5d75c9e98181bd799e761349eeb05`.
+- CI روی main پس از merge: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40774687484 (در زمان ثبت این گزارش هنوز در حال اجرا بود؛ نتیجه نهایی باید جداگانه بررسی شود).
+
+توجه: تست موفق PR شواهد مربوط به همان SHA است؛ وضعیت CI پس از merge نیازمند تأیید مستقل است.

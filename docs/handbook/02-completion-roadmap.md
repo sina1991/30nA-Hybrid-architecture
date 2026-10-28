@@ -75,3 +75,19 @@
 - SHA مبنای این نتیجه: `016e8ad08e2b9c639fff1b0d799159dd14c94201`
 
 اولویت بعدی، تکمیل مسیر Build/Artifact با آزمون و امنیت معتبر است. endpoint دانلود نباید ZIP خام source را به‌عنوان artifact build شده جا بزند؛ تا زمان تکمیل pipeline و وضعیت validation، مسیر اجرا باید fail-closed باقی بماند.
+
+
+## پیشرفت جدید — چرخهٔ Artifact
+
+مرحله «خواندن Artifact منتشرشده» تکمیل و ادغام شد. endpoint عمومی محتوای باینری را از registry immutable می‌خواند و integrity را هنگام خواندن تأیید می‌کند. تست‌های مربوط به bytes/hash/owner isolation در CI سبز شده‌اند.
+
+موارد باقی‌مانده و اولویت‌ها:
+
+1. **P0 — Build pipeline واقعی:** قرارداد build هنوز draft است؛ ساخت artifact، dependency analysis، build isolation و validation pipeline وجود ندارد.
+2. **P0 — Publication gate:** endpoint انتشار HTTP عمداً غیرفعال است؛ انتشار باید به نتیجهٔ موفق مراحل اجباری Build وابسته شود.
+3. **P0 — Runtime E2E:** دانلود artifact از API با هویت سرویس و سپس اجرای واقعی end-to-end هنوز نیازمند تست یکپارچه است.
+4. **P0 — Sandbox:** subprocess به‌تنهایی sandbox نیست؛ اجرای Source غیرقابل‌اعتماد در Production مجاز نیست.
+5. **P1 — Auth integration:** reverse proxy/identity gateway باید Authorization را اعتبارسنجی کند و identity قابل‌اعتماد را در `REMOTE_USER` قرار دهد.
+6. **P1 — Worker Manager persistence/API/scheduler، Dashboard auth/permissions و هشدار deprecation:** هنوز باز هستند.
+
+Definition of Done برای Build: تست مثبت و منفی برای منبع نامعتبر، dependency lock، محدودیت منابع، hash، عدم انتشار بعد از شکست، idempotency/conflict، مالکیت، و round-trip دریافت Artifact. تست‌ها نباید فقط پاسخ HTTP یا ساخت ZIP را تأیید کنند؛ باید اعتبارسنجی و fail-closed بودن pipeline را هم اثبات کنند.

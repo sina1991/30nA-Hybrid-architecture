@@ -162,3 +162,16 @@ Workflow فعلی روی Commit ثابت `3606ea7bac656e9292e57387b3d7ef9969ce4a
 - تست `test_register_and_retrieve_through_real_data_manager_api` در اجرای جدید **PASSED** است، نه skipped.
 
 موارد باقیمانده: warning مربوط به deprecation؛ Build pipeline اجرایی؛ Artifact API برای artifactهای واقعاً ساخته و تأییدشده؛ sandbox تولیدی؛ و E2E کامل تا WORKER RUNTIME. تا رفع این موارد، آمادگی Production تأیید نمی‌شود.
+
+
+## وضعیت به‌روز — 2026-10-29: Artifact download
+
+- PR #7: https://github.com/sina1991/30nA-Hybrid-architecture/pull/7 — ادغام شد.
+- Commit ادغام: `a8729c6008d5d75c9e98181bd799e761349eeb05`.
+- Endpoint اضافه‌شده: `GET /api/v1/artifacts/{artifact_id}/content`.
+- پاسخ باینری `application/octet-stream)، `ETag` و `X-Artifact-Hash` بر اساس SHA-256، `Cache-Control: private, no-store` و `nosniff` دارد.
+- دانلود فقط برای artifact منتشرشده و قابل‌مشاهده برای مالک احراز هویت‌شده مجاز است؛ manifest و blob هنگام خواندن اعتبارسنجی می‌شوند.
+- تست‌های جدید: بایت‌های دقیق، digest header، نبود artifact منتشرشده، و جداسازی مالک.
+- CI روی PR #7: [run 40774622574](https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40774622574), SHA `14d74a00c0d2b98f142b82629b3fd9c14ffd280c`: `161 passed, 0 skipped, 1 warning, 55 subtests passed`.
+
+**مرز مهم:** این endpoint Artifact از قبل منتشرشده را می‌خواند؛ خودش Build انجام نمی‌دهد. HTTP publication و `POST /api/v1/builds` عمداً `501` باقی مانده‌اند تا Build isolation و validation اجباری پیاده‌سازی شوند. ZIP منبع، Build artifact تأییدشده محسوب نمی‌شود.
