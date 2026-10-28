@@ -59,6 +59,46 @@ def test_real_docker_container_enforces_identity_and_read_only_root(tmp_path):
             backend.cleanup(proc)
 
 
+def test_real_docker_cpu_quota_is_applied(tmp_path):
+    image = os.environ.get("WORKER_RUNTIME_SANDBOX_TEST_IMAGE")
+    if not image or not shutil.which("docker"):
+        pytest.skip("CI Docker sandbox image is not configured")
+    probe = subprocess.run(
+        ["docker", "info", "--format", "{{.ServerVersion}}"],
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        timeout=5, check=False,
+    )
+    if probe.returncode != 0:
+        pytest.skip("Docker daemon is not available")
+    source = b'''def run(data, config):\n    with open("/sys/fs/cgroup/cpu.max") as stream: return {"cpu_limit": stream.read().strip()}\n'''
+    archive = tmp_path / "cpu-quota.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("worker.py", source)
+    runner = Path(__file__).parents[1] / "worker_runtime" / "_runner.py"
+    backend = DockerSandboxBackend(image, cpus="0.25", startup_timeout=10)
+    proc = None
+    try:
+        proc = backend.launch(
+            archive, runner, "worker:run", execution_id="cpu-quota-probe",
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        stdout, stderr = proc.communicate(
+            json.dumps({"input": {}, "configuration": {}}).encode("utf-8"),
+            timeout=20,
+        )
+        assert proc.returncode == 0, stderr.decode("utf-8", "replace")
+        result = json.loads(stdout)
+        assert result["ok"] is True, result
+        quota, period = map(int, result["result"]["cpu_limit"].split())
+        assert 0 < quota / period <= 0.30
+    finally:
+        if proc is not None:
+            if proc.poll() is None:
+                backend.terminate(proc)
+                proc.wait(timeout=5)
+            backend.cleanup(proc)
+
+
 def test_real_docker_cancellation_removes_container(tmp_path):
     image = os.environ.get("WORKER_RUNTIME_SANDBOX_TEST_IMAGE")
     if not image or not shutil.which("docker"):
