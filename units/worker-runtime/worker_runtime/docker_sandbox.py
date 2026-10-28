@@ -40,7 +40,7 @@ class DockerSandboxBackend:
             raise ValueError("docker_binary must be nonempty")
         if not isinstance(memory, str) or not re.fullmatch(r"[1-9][0-9]*(m|g)", memory):
             raise ValueError("memory must be a positive value such as 256m or 1g")
-        if not isinstance(cpus, str) or not re.fullmatch(r"[1-9][0-9]*(\\.[0-9]+)?", cpus):
+        if not isinstance(cpus, str) or not re.fullmatch(r"[1-9][0-9]*(\.[0-9]+)?", cpus):
             raise ValueError("cpus must be a positive decimal string")
         if type(pids_limit) is not int or pids_limit <= 0:
             raise ValueError("pids_limit must be a positive integer")
