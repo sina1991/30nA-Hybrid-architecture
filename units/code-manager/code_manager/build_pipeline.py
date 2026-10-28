@@ -105,6 +105,7 @@ def normalize_source_archive(source_bytes: bytes, *, include_tests: bool) -> byt
 
 
 _TEST_RUNNER = r'''import contextlib
+import importlib
 import io
 import json
 import os
@@ -137,6 +138,7 @@ def count_tests(suite):
 
 def main():
     archive_path = Path(sys.argv[1])
+    entrypoint = sys.argv[2]
     root = Path("/tmp/build-source")
     root.mkdir(mode=0o700)
     with zipfile.ZipFile(archive_path) as archive:
@@ -156,6 +158,13 @@ def main():
         return 10
     sys.path.insert(0, str(root))
     os.chdir(root)
+    module_name, separator, function_name = entrypoint.partition(":")
+    if not separator:
+        raise ValueError("invalid entrypoint")
+    module = importlib.import_module(module_name)
+    function = getattr(module, function_name, None)
+    if not callable(function):
+        raise ValueError("entrypoint does not resolve to a callable")
     loader = unittest.TestLoader()
     suite = loader.discover(str(root), pattern="test*.py", top_level_dir=str(root))
     total = count_tests(suite)
@@ -366,7 +375,7 @@ class DockerBuildExecutor:
         self.tmpfs_size = tmpfs_size
         self.max_output_bytes = max_output_bytes
 
-    def run_tests(self, source_archive: bytes) -> dict:
+    def run_tests(self, source_archive: bytes, entrypoint: str) -> dict:
         binary = shutil.which(self.docker_binary)
         if binary is None:
             return {"status": "blocked", "tests": 0, "failures": 0,
@@ -396,7 +405,7 @@ class DockerBuildExecutor:
                 "--log-driver=none",
                 "--mount", f"type=bind,src={archive_path},dst=/source.zip,readonly",
                 "--mount", f"type=bind,src={runner_path},dst=/runner.py,readonly",
-                self.image, "python", "-I", "/runner.py", "/source.zip",
+                self.image, "python", "-I", "/runner.py", "/source.zip", entrypoint,
             ]
             try:
                 proc = subprocess.Popen(
@@ -578,7 +587,7 @@ class BuildPipeline:
                 record("package", "not_run", "Sandbox configuration is invalid")
                 record("hash", "not_run", "No final artifact exists")
                 return self._save(owner_id, report)
-            test_result = executor.run_tests(normalized)
+            test_result = executor.run_tests(normalized, source["entrypoint"])
             test_status = test_result.get("status")
             record("test", "passed" if test_status == "passed" else
                    "blocked" if test_status == "blocked" else "failed",
