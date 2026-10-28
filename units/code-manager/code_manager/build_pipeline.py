@@ -630,6 +630,13 @@ class BuildPipeline:
                 "artifact_hash": "sha256:" + digest,
                 "artifact_digest": digest,
                 "artifact_size": len(artifact_one),
+                "artifact_version": digest,
+                "build_version": _BUILDER_VERSION,
+                "calculation_version": source.get("calculation_version", "1.0.0"),
+                "dependency_lock": "stdlib-only",
+                "input_schema": source["input_schema"],
+                "output_schema": source["output_schema"],
+                "validation_status": "passed",
                 "entrypoint": source["entrypoint"],
                 "provenance": {
                     "builder_version": _BUILDER_VERSION,
@@ -637,7 +644,9 @@ class BuildPipeline:
                     "artifact_hash": "sha256:" + digest,
                     "sandbox_image": self.image,
                     "test_count": int(test_result.get("tests", 0)),
-                    "dependency_policy": "network-disabled; dependency manifests blocked; no dynamic installation",
+                    "dependency_policy": "stdlib-only; external imports and dependency manifests are blocked; no dynamic installation",
+                    "dependency_lock": "stdlib-only",
+                    "dependency_lock_hash": "sha256:" + hashlib.sha256(b"stdlib-only").hexdigest(),
                     "normalized_archive_hash": "sha256:" + hashlib.sha256(normalized).hexdigest(),
                     "archive_entry_count": inspection.entry_count,
                 },
@@ -655,6 +664,13 @@ class BuildPipeline:
             report.pop("artifact_digest", None)
             report.pop("artifact_hash", None)
             report.pop("artifact_size", None)
+            report.pop("artifact_version", None)
+            report.pop("build_version", None)
+            report.pop("calculation_version", None)
+            report.pop("dependency_lock", None)
+            report.pop("input_schema", None)
+            report.pop("output_schema", None)
+            report.pop("validation_status", None)
             report.pop("provenance", None)
         self.history.save(owner_id, report)
         return report
