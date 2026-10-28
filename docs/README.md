@@ -17,6 +17,7 @@
 - [ماتریس تطبیق قابلیت‌ها و APIها](audit/feature-capability-matrix.md)
 - [برنامه اصلاحات و معیارهای پذیرش](audit/remediation-plan.md)
 - [وضعیت شاخه‌ها، CI و خط مبنای تست](audit/ci-and-branch-state.md)
+- [یافته‌های اولیه API در DATA MANAGER و CODE MANAGER](audit/unit-api-findings.md)
 
 ## فصل‌های یونیت‌ها
 
