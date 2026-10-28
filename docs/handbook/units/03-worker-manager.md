@@ -2,28 +2,46 @@
 
 ## مسیرها
 
-- پیاده‌سازی: `units/worker-manager/worker_manager/`
-- تست‌ها: `units/worker-manager/tests/`
-- قرارداد مرتبط: `contracts/worker/` (مالکیت آن باید با فصل Runtime و agents registry هماهنگ بماند).
+- پیاده‌سازی: \`units/worker-manager/worker_manager/\`
+- تست‌ها: \`units/worker-manager/tests/\`
+- قرارداد مرتبط: \`contracts/worker/\` (مالکیت آن باید با فصل Runtime و agents registry هماهنگ بماند).
 
 ## مسئولیت ثبت‌شده
 
 WORKER MANAGER مالک تعریف Worker، تنظیمات Manager، چرخه عمر مدیریتی و سیاست زمان‌بندی است. اجرای کد متعلق به WORKER RUNTIME است.
 
-README فعلی قابلیت‌های زیر را توصیف می‌کند:
-- ثبت Worker با `artifact_id` و `artifact_hash` صریح؛
+قابلیت‌های موجود:
+- ثبت Worker با \`artifact_id\` و \`artifact_hash\` صریح؛
 - جداسازی configuration از تعریف immutable؛
-- وضعیت‌های مدیریتی `configured`, `enabled`, `disabled`;
+- وضعیت‌های مدیریتی \`configured\`, \`enabled\`, \`disabled\`؛
 - زمان‌بندی دستی به‌صورت پیش‌فرض یا interval مثبت؛
 - جلوگیری از شناسه تکراری و rebind کردن شناسه موجود؛
-- ارسال درخواست از طریق `RuntimeGateway` تزریق‌شده.
+- ارسال درخواست از طریق \`RuntimeGateway\` تزریق‌شده؛
+- ذخیره اختیاری اطلاعات Worker در SQLite از طریق \`SQLiteWorkerStore\`.
 
-## محدودیت‌های ثبت‌شده
+## Persistence — پیاده‌سازی‌شده، با محدوده مشخص
 
-- سرویس درون‌حافظه‌ای است.
-- persistence پایدار، scheduler واقعی و HTTP API عمومی ارائه نشده‌اند.
-- Runtime واقعی از طریق Fake Runtime در تست‌ها جایگزین می‌شود؛ سازگاری با Runtime واقعی اثبات نشده است.
-- پاسخ adapter بدون تغییر عبور داده می‌شود، زیرا قرارداد authoritative باید تثبیت و تطبیق داده شود.
+PR شماره 13 در commit ادغام‌شده \`e213c8e88543a519562581200ddbc9952b865b19\` ادغام شد. CI روی revision نهایی PR موفق بود:
+https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40777033970
+
+نمونه استفاده:
+
+\`\`\`python
+from worker_manager import SQLiteWorkerStore, WorkerManager
+
+store = SQLiteWorkerStore("./var/workers.sqlite3")
+manager = WorkerManager(store=store)
+\`\`\`
+
+Store تعریف Worker، artifact identity، lifecycle، configuration سازگار با JSON و schedule را در فایل SQLite ذخیره می‌کند. ثبت، تغییر تنظیمات، فعال/غیرفعال کردن و حذف، پیش از تغییر snapshot حافظه در DB ثبت می‌شوند. با ساخت Manager جدید روی همان DB، اطلاعات Worker بازیابی می‌شوند. تنظیمات غیرقابل تبدیل به JSON رد می‌شوند.
+
+### محدودیت‌های persistence
+
+- حالت پیش‌فرض \`WorkerManager()\` همچنان in-memory است؛ persistence با تزریق Store فعال می‌شود.
+- یک process مالک فایل DB باشد. چند process مستقل می‌توانند snapshot حافظه stale داشته باشند؛ این Store هماهنگ‌سازی توزیع‌شده یا scheduler lease نیست.
+- تاریخچه اجرا، idempotency Runtime، نتایج و وضعیت اجرای Runtime ذخیره نمی‌شوند.
+- DB باید با مجوزهای فایل مناسب محافظت و پشتیبان‌گیری شود.
+- SQLite metadata store، به‌تنهایی API عمومی یا scheduler واقعی ایجاد نمی‌کند.
 
 ## مرز مسئولیت
 
@@ -31,15 +49,15 @@ README فعلی قابلیت‌های زیر را توصیف می‌کند:
 - ثبت/تنظیم و پذیرش درخواست اجرا: WORKER MANAGER.
 - isolation، اجرای فرزندها، اعتبارسنجی I/O و تجمیع نتایج: WORKER RUNTIME.
 
-## موارد ممیزی
+## موارد باز
 
-- invariantهای شناسه و Artifact hash؛
-- انتقال وضعیت و رقابت‌های هم‌زمان؛
-- معنای submit در برابر accepted/running/terminal؛
-- idempotency و رفتار restart؛
-- سیاست scheduling و cancellation؛
-- طراحی API و persistence، اگر در محدوده محصول لازم باشند.
+- قرارداد نسخه‌بندی‌شده Manager/Runtime و تطبیق با Runtime واقعی؛
+- API عمومی و احراز هویت/مالکیت؛
+- scheduler واقعی، lease و جلوگیری از اجرای هم‌زمان ناخواسته؛
+- persistence برای execution state و idempotency در صورت نیاز محصول؛
+- آزمون رقابت‌ها، restart در زمان اجرای task و بازیابی پس از crash؛
+- sandbox واقعی برای اجرای کد غیرقابل‌اعتماد.
 
 ## معیار تکمیل
 
-قرارداد Manager/Runtime صریح و نسخه‌بندی‌شده باشد؛ درخواست‌های Worker غیرفعال رد شوند؛ آزمون‌ها با Runtime واقعی در کنار Fake Gateway اجرا شوند؛ نیاز به persistence/scheduler تصمیم‌گیری و مستند شود.
+قرارداد Manager/Runtime صریح و نسخه‌بندی‌شده باشد؛ درخواست‌های Worker غیرفعال رد شوند؛ آزمون‌ها با Runtime واقعی در کنار Fake Gateway اجرا شوند؛ persistence/scheduler/API مطابق نیاز محصول با تست قراردادی و یکپارچگی اثبات شوند. اجرای کد غیرقابل‌اعتماد تا زمان پیاده‌سازی و ممیزی sandbox واقعی، برای Production مجاز نیست.
