@@ -147,5 +147,39 @@ class BuildPipelineTests(unittest.TestCase):
             self.assertFalse(any(name.startswith("tests/") for name in archive.namelist()))
 
 
+    def test_unresolved_external_import_blocks_build(self):
+        data = make_source({
+            "sample/main.py": "import requests\ndef run(data): return data\n",
+            "tests/__init__.py": "",
+            "tests/test_smoke.py": "import unittest\nclass T(unittest.TestCase):\n def test_ok(self): self.assertTrue(True)\n",
+        })
+        pipeline = BuildPipeline(self.blobs, history_store=self.history, image="")
+        report = pipeline.run(
+            owner_id="alice", source_id="external", source_version="1",
+            source=source_record(data),
+        )
+        self.assertEqual(report["status"], "blocked")
+        stages = {item["stage"]: item["status"] for item in report["stages"]}
+        self.assertEqual(stages["dependency_check"], "blocked")
+        self.assertEqual(stages["test"], "not_run")
+        self.assertNotIn("artifact_digest", report)
+
+    def test_standard_library_shadowing_blocks_build(self):
+        data = make_source({
+            "os.py": "VALUE = 1\n",
+            "sample/main.py": "import os\ndef run(data): return data\n",
+            "tests/__init__.py": "",
+            "tests/test_smoke.py": "import unittest\nclass T(unittest.TestCase):\n def test_ok(self): self.assertTrue(True)\n",
+        })
+        pipeline = BuildPipeline(self.blobs, history_store=self.history, image="")
+        report = pipeline.run(
+            owner_id="alice", source_id="shadow", source_version="1",
+            source=source_record(data),
+        )
+        self.assertEqual(report["status"], "blocked")
+        stages = {item["stage"]: item["status"] for item in report["stages"]}
+        self.assertEqual(stages["dependency_check"], "blocked")
+
+
 if __name__ == "__main__":
     unittest.main()
