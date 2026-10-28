@@ -229,6 +229,24 @@ class PublishedArtifactRegistry:
         if not isinstance(provenance, dict):
             raise ArtifactInvalid("Build provenance must be an object")
         digest = hashlib.sha256(data).hexdigest()
+        if artifact_version is None:
+            artifact_version = digest
+        if artifact_version != digest:
+            raise ArtifactInvalid("Artifact version must match the content digest")
+        if not isinstance(build_version, str) or not build_version:
+            raise ArtifactInvalid("Build version is required")
+        if not isinstance(calculation_version, str) or not calculation_version:
+            raise ArtifactInvalid("Calculation version is required")
+        if dependency_lock != "stdlib-only":
+            raise ArtifactInvalid("Unsupported dependency lock policy")
+        if validation_status != "passed":
+            raise ArtifactInvalid("Only passed build artifacts may be published")
+        input_schema = {} if input_schema is None else input_schema
+        output_schema = {} if output_schema is None else output_schema
+        if not isinstance(input_schema, dict) or not isinstance(output_schema, dict):
+            raise ArtifactInvalid("Artifact schemas must be objects")
+        if len(_canonical(input_schema)) > 16384 or len(_canonical(output_schema)) > 16384:
+            raise ArtifactInvalid("Artifact schema exceeds manifest limits")
         artifact_hash = "sha256:" + digest
         safe_provenance = dict(provenance)
         if safe_provenance.get("source_hash") != source_hash or safe_provenance.get("artifact_hash") != artifact_hash:
