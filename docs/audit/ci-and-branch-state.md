@@ -92,3 +92,26 @@
 - تصمیم/issue مرتبط و مسئول اقدام
 
 تا زمان عبور از این معیارها، وضعیت درست پروژه «ممیزی و اصلاح در جریان» است؛ نه «تکمیل‌شده» یا «آماده Production».
+
+
+## 6. رفع مانع collection و اجرای تأییدی جدید
+
+در تاریخ 2026-10-29، شاخه `fix/pytest-collection-and-ci-head-2026-10-29` با تغییر `--import-mode=importlib` در اجرای یکپارچه pytest ساخته شد. هیچ suite یا تستی حذف نشد.
+
+- Pull Request: https://github.com/sina1991/30nA-Hybrid-architecture/pull/3
+- Workflow run: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40773601440
+- SHA آزموده‌شده: `3ec991aa44c2d7c7daa37c70a64e655d43212949`
+- نتیجه: `157 passed, 1 skipped, 1 warning, 55 subtests passed`
+- جمع‌بندی job: success؛ نصب وابستگی و مرحله اجرای تمام suiteها موفق شدند.
+- هشدار ثبت‌شده: deprecation مربوط به Starlette/httpx و هشدارهای Node runtime در GitHub Actions؛ این‌ها شکست تست نبودند، ولی باید در به‌روزرسانی وابستگی‌ها/Actionها بررسی شوند.
+- تغییر از طریق squash merge وارد `main` شد: `ff43c284c2d4fcd8ee26aa9cb760f4a529c2be50`.
+
+این نتیجه فقط برای مجموعه تست و SHA ذکرشده معتبر است. یک تست skip شده و وضعیت اجرای production، امنیت sandbox، persistence، real adapter و deployment را پوشش نمی‌دهد.
+
+## 7. اقدام فوری بعد از merge
+
+1. اجرای workflow روی `main` پس از merge و تأیید SHA جدید.
+2. اجرای subprocess suites به‌صورت صریح (baseline تاریخی با `run_runtime=false` این پوشش را نمی‌دهد؛ CI جدید اکنون آن‌ها را در مجموعه اجرا کرده است، اما گزارش مستقل runtime نیز مفید است).
+3. بازبینی تست skip شده و هشدار dependency.
+4. ادامه ممیزی route-by-route و تبدیل یافته‌های DATA/CODE به تست‌های نقص/پذیرش.
+5. عدم اعلام Production readiness تا تکمیل artifact download/build و مرز sandbox و real Worker Runtime adapter.
