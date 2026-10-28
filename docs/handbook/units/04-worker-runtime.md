@@ -25,7 +25,7 @@ CODE MANAGER در `main` endpoint زیر را ارائه می‌کند:
 
 این endpoint محتوای باینری یک Artifact منتشرشده را پس از بررسی مالکیت و یکپارچگی manifest/blob برمی‌گرداند. با این حال نوع فعلی ثبت‌شده `source_zip` است؛ این endpoint به معنی وجود Build pipeline یا تأیید Source نیست. PR شماره 9 با CI موفق ادغام شده است، اما فقط پیش‌بررسی ایستای Build را اضافه می‌کند و Artifact قابل انتشار تولید نمی‌کند.
 
-`CodeManagerArtifactProvider` باید با URL و احراز هویت واقعی در تست integration پوشش داده شود. fixture حافظه‌ای به‌تنهایی سازگاری سرویس واقعی را اثبات نمی‌کند.
+`CodeManagerArtifactProvider` به مسیر نسخه‌دار `/api/v1/artifacts/{id}/content` متصل شده و تست‌های واحد URL، Authorization، بایت دقیق، content type و سقف اندازه دارد. تست integration با سرویس واقعی و هویت/مالکیت تولیدی همچنان لازم است؛ fixture حافظه‌ای و تست adapter به‌تنهایی سازگاری سرتاسری را اثبات نمی‌کنند.
 
 ## ریسک امنیتی بحرانی برای طراحی تولید
 
