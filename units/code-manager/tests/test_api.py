@@ -8,6 +8,8 @@ import zipfile
 
 from code_manager.api import create_application
 from code_manager.blob_storage import BlobStorage
+from code_manager.published_artifacts import PublishedArtifactRegistry
+from code_manager.source_registry import SourceRegistry
 from code_manager.data_manager_client import DataManagerAPIError
 
 
@@ -83,6 +85,7 @@ class CodeManagerAPITests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.storage = BlobStorage(self.temp.name)
+        self.artifacts = PublishedArtifactRegistry(self.storage)
         self.state = {
             "models": {},
             "resources": {},
@@ -96,6 +99,7 @@ class CodeManagerAPITests(unittest.TestCase):
             blob_storage=self.storage,
             data_manager_client_factory=client_factory,
             identity_provider=TestIdentity(),
+            published_artifact_registry=self.artifacts,
         )
 
     def tearDown(self):
@@ -119,7 +123,8 @@ class CodeManagerAPITests(unittest.TestCase):
             captured["headers"] = dict(headers)
 
         body = b"".join(self.app(environ, start_response))
-        return captured["status"], captured["headers"], json.loads(body)
+        parsed = body if captured["headers"].get("Content-Type") == "application/octet-stream" else json.loads(body)
+        return captured["status"], captured["headers"], parsed
 
     def source_payload(self, **overrides):
         payload = {
@@ -182,6 +187,41 @@ class CodeManagerAPITests(unittest.TestCase):
         )
         self.assertEqual(status, 404)
         self.assertEqual(response["error"]["code"], "SOURCE_NOT_FOUND")
+
+    def _publish_source(self, owner="alice"):
+        self.request("POST", "/api/v1/sources", self.source_payload(), owner=owner)
+        client = FakeDataManager(owner, self.state)
+        source_registry = SourceRegistry(self.storage, client)
+        return self.artifacts.publish(
+            source_registry, owner, "pricing-model@1.0.0"
+        )
+
+    def test_published_artifact_content_returns_exact_bytes_and_digest(self):
+        metadata, _ = self._publish_source()
+        status, headers, content = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content"
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(headers["Content-Type"], "application/octet-stream")
+        self.assertEqual(content, make_zip())
+        self.assertEqual(headers["X-Artifact-Hash"], metadata["artifact_hash"])
+        self.assertEqual(headers["ETag"], '"' + metadata["artifact_hash"] + '"')
+        self.assertEqual(headers["Cache-Control"], "private, no-store")
+
+    def test_unpublished_artifact_download_returns_404(self):
+        status, _, response = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content"
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(response["error"]["code"], "ARTIFACT_NOT_FOUND")
+
+    def test_artifact_download_is_owner_scoped(self):
+        self._publish_source(owner="alice")
+        status, _, response = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content", owner="bob"
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(response["error"]["code"], "ARTIFACT_NOT_FOUND")
 
     def test_build_is_explicitly_not_implemented(self):
         status, _, response = self.request(
