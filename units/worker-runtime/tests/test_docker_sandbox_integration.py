@@ -31,13 +31,13 @@ def test_real_docker_container_enforces_identity_and_read_only_root(tmp_path):
     try:
         proc = backend.launch(
             archive, runner, "worker:run", execution_id="integration-probe",
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
-        stdout, _ = proc.communicate(
+        stdout, stderr = proc.communicate(
             json.dumps({"input": {}, "configuration": {}}).encode("utf-8"),
             timeout=20,
         )
-        assert proc.returncode == 0, stdout.decode("utf-8", "replace")
+        assert proc.returncode == 0, stderr.decode("utf-8", "replace")
         result = json.loads(stdout)
         assert result["ok"] is True, result
         assert result["result"]["uid"] != 0
@@ -75,12 +75,16 @@ def test_real_docker_cancellation_removes_container(tmp_path):
     try:
         proc = backend.launch(
             archive, runner, "worker:run", execution_id="cancel-probe",
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         )
-        proc.stdin.write(b'{"input":{},"configuration":{}}')
-        proc.stdin.close()
-        proc.wait(timeout=0.5)
-        pytest.fail("sleeping worker unexpectedly exited before cancellation")
+        try:
+            proc.stdin.write(b'{"input":{},"configuration":{}}')
+            proc.stdin.close()
+        except BrokenPipeError:
+            proc.wait(timeout=5)
+            raise AssertionError("Docker failed to start: " + proc.stderr.read().decode("utf-8", "replace"))
+        returncode = proc.wait(timeout=0.5)
+        pytest.fail("sleeping worker unexpectedly exited with " + str(returncode) + ": " + proc.stderr.read().decode("utf-8", "replace"))
     except subprocess.TimeoutExpired:
         assert proc is not None
         with backend._lock:
