@@ -319,8 +319,10 @@ class DockerBuildExecutor:
             runner_path = root / "build_test_runner.py"
             archive_path.write_bytes(source_archive)
             runner_path.write_text(_TEST_RUNNER, encoding="utf-8")
-            archive_path.chmod(0o600)
-            runner_path.chmod(0o600)
+            # The container runs as UID 65532; mounted inputs must be readable.
+            # The parent temp directory remains private to the host process.
+            archive_path.chmod(0o644)
+            runner_path.chmod(0o644)
             command = [
                 binary, "run", "--rm", "--pull=never", "--interactive",
                 "--network=none", "--read-only", "--user", "65532:65532",
