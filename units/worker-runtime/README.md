@@ -34,10 +34,11 @@ endpoint gap.
 **Important distinction:** the current publication registry identifies these
 objects as `source_zip`; the download endpoint does not prove that a build
 pipeline has validated, tested or packaged the source. The build contract remains
-draft, and HTTP publication is intentionally blocked. The WORKER RUNTIME
-`CodeManagerArtifactProvider` still needs a real-service integration test with
-the expected authentication and URL configuration. Existing in-memory provider
-fixtures do not prove that end-to-end path.
+draft, and HTTP publication is intentionally blocked. The WORKER RUNTIME `CodeManagerArtifactProvider` now targets the versioned
+`/api/v1/artifacts/{id}/content` route. Unit tests cover URL construction,
+authorization header, byte-exact content, content type and size caps. A real-service
+integration test with production identity/ownership configuration is still required;
+adapter unit tests do not prove that end-to-end path.
 
 ## Security limitations
 
