@@ -42,7 +42,8 @@ does not, by itself, populate `REMOTE_USER`.
 - `GET /api/v1/sources/{source_id}/versions/{source_version}`: retrieve metadata.
 - `POST /api/v1/sources/{source_id}/versions/{source_version}/inspect`:
   validate archive structure without executing the source.
-- `POST /api/v1/builds`: reserved; returns `501` until a validated build pipeline and build isolation exist.
+- `POST /api/v1/builds`: runs owner-scoped, non-executing static preflight and returns per-stage results. It remains `blocked`/non-publishable until isolated tests, dependency resolution, normalization and packaging are implemented; it does not create an artifact.
+- `GET /api/v1/builds`: returns `501` until durable build-history storage exists.
 - `GET /api/v1/artifacts/{artifact_id}/content`: returns byte-exact content only for an already-published, owner-scoped artifact; verifies manifest/blob integrity and exposes the SHA-256 digest.
 - `POST /api/v1/artifacts/{artifact_id}/publish`: remains reserved and returns `501`; publication is intentionally blocked until build validation exists. Service-level publication of source ZIPs is not equivalent to a validated build.
 

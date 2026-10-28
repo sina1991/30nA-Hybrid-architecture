@@ -223,14 +223,43 @@ class CodeManagerAPITests(unittest.TestCase):
         self.assertEqual(status, 404)
         self.assertEqual(response["error"]["code"], "ARTIFACT_NOT_FOUND")
 
-    def test_build_is_explicitly_not_implemented(self):
+    def test_build_preflight_reports_not_run_stages_and_never_publishes(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
         status, _, response = self.request(
-            "POST", "/api/v1/builds", {}
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
         )
-        self.assertEqual(status, 501)
-        self.assertEqual(
-            response["error"]["code"], "OPERATION_NOT_IMPLEMENTED"
+        self.assertEqual(status, 200)
+        report = response["payload"]["build"]
+        self.assertEqual(report["status"], "blocked")
+        self.assertFalse(report["publishable"])
+        stages = {stage["stage"]: stage["status"] for stage in report["stages"]}
+        self.assertEqual(stages["inspect_archive"], "passed")
+        self.assertEqual(stages["verify_source_hash"], "passed")
+        self.assertEqual(stages["syntax_check"], "passed")
+        self.assertEqual(stages["test"], "not_run")
+        self.assertEqual(stages["package"], "not_run")
+        self.assertEqual(stages["hash"], "not_run")
+        with self.assertRaises(Exception):
+            self.artifacts.get("alice", "pricing-model@1.0.0")
+
+    def test_build_preflight_does_not_disclose_another_owners_source(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        status, _, response = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+            owner="bob",
         )
+        self.assertEqual(status, 404)
+        self.assertEqual(response["error"]["code"], "SOURCE_NOT_FOUND")
+
+    def test_build_preflight_rejects_owner_in_request(self):
+        status, _, response = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0", "owner_id": "victim"},
+        )
+        self.assertEqual(status, 400)
+        self.assertEqual(response["error"]["code"], "SOURCE_INVALID")
 
     def test_unknown_route_is_not_found(self):
         status, _, response = self.request(
