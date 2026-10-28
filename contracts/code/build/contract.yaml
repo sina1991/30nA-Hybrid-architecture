@@ -58,7 +58,7 @@ stage_requirements:
       - "Allow standard-library and archive-local imports without external dependencies."
       - "External imports are permitted only when every imported module is mapped to a trusted package in CODE_MANAGER_DEPENDENCY_ALLOWLIST."
       - "Only root requirements.txt is accepted, with exact package==version --hash=sha256 pins matching the trusted allowlist and wheel bytes in CODE_MANAGER_DEPENDENCY_WHEELHOUSE."
-      - "Only pure-Python py3-none-any wheels without transitive Requires-Dist dependencies are supported; all other manifests, native extensions, .pth files and dynamic imports are blocked."
+      - "Only pure-Python py3-none-any wheels are supported. Transitive Requires-Dist entries must be unconditional exact-version pins and every dependency must be explicitly pinned and allowlisted; native extensions, markers, extras, .pth files and dynamic imports are blocked."
       - "No package manager runs and no network access is available. Verified wheels are mounted read-only for tests and vendored into the final artifact with a hash manifest."
   contract_check:
     required: true
