@@ -79,7 +79,8 @@ def normalize_source_archive(source_bytes: bytes, *, include_tests: bool) -> byt
                 continue
             parts = PurePosixPath(name).parts
             basename = PurePosixPath(name).name.lower()
-            if (basename == ".env" or basename.startswith(".env.")
+            if (any(part.lower() == ".env" or part.lower().startswith(".env.") for part in parts)
+                    or basename == ".env" or basename.startswith(".env.")
                     or basename.endswith(".env")
                     or basename.startswith(("secret.", "credentials."))
                     or basename in _SENSITIVE_BASENAMES
