@@ -73,7 +73,7 @@
 
 CI run #110 با موفقیت تمام مراحل را گذراند. تست‌های Docker اکنون بررسی می‌کنند: عدم دسترسی به فایل محرمانه میزبان، رد نوشتن روی root filesystem، فقط loopback و شکست اتصال outbound، UID غیرممتاز، read-only root، محدودیت‌های memory/cpu/PID از cgroup، شکست تخصیص حافظه بیش از سقف، جلوگیری از fork storm، CPU quota زیر یک هسته و حذف کانتینر پس از لغو. تست timeout/cancellation موجود نیز اجرا می‌شود. این‌ها آزمون‌های واقعی در GitHub-hosted CI هستند، اما fault-injection daemon و تکرار آزمون روی میزبان Production هنوز انجام نشده‌اند؛ موفقیت CI به معنی تأیید Production نیست.
 
-شاخه Build pipeline تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند. dependencyهای خارجی فقط از `requirements.txt` با version/hash دقیق، allowlist مورداعتماد و wheelhouse آفلاین پذیرفته می‌شوند؛ فقط wheelهای pure-Python بدون dependency انتقالی پشتیبانی می‌شوند و در artifact به‌صورت vendored قرار می‌گیرند. Worker Runtime پیش از import دوباره hash wheelها را بررسی می‌کند. manifestهای دیگر، import پویا، native extensions، `.pth` و shadow کردن standard library همچنان fail-closed رد می‌شوند.
+شاخه Build pipeline تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند. dependencyهای خارجی فقط از `requirements.txt` با version/hash دقیق، allowlist مورداعتماد و wheelhouse آفلاین پذیرفته می‌شوند؛ wheelهای pure-Python با dependency انتقالی فقط در صورت pin دقیق و unconditional در metadata و requirements، allowlist و wheelhouse مورداعتماد پشتیبانی می‌شوند و در artifact به‌صورت vendored قرار می‌گیرند؛ native extension همچنان رد می‌شود. Worker Runtime پیش از import دوباره hash wheelها را بررسی می‌کند. manifestهای دیگر، import پویا، native extensions، `.pth` و shadow کردن standard library همچنان fail-closed رد می‌شوند.
 
 ## دروازه انتشار
 
