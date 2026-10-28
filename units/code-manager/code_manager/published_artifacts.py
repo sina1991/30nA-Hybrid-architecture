@@ -118,6 +118,12 @@ class PublishedArtifactRegistry:
                     or not isinstance(metadata.get("provenance"), dict)
                     or metadata["provenance"].get("artifact_hash") != metadata.get("artifact_hash")
                     or metadata["provenance"].get("source_hash") != metadata.get("source_hash")
+                    or metadata["provenance"].get("dependency_lock") != metadata.get("dependency_lock")
+                    or metadata["provenance"].get("dependency_lock_hash") != (
+                        "sha256:" + hashlib.sha256(b"stdlib-only").hexdigest()
+                        if metadata.get("dependency_lock") == "stdlib-only"
+                        else metadata.get("dependency_lock")
+                    )
                     or metadata.get("source_id") != _identity(owner_id, artifact_id)[0]
                     or metadata.get("source_version") != _identity(owner_id, artifact_id)[1]
                     or metadata.get("artifact_version") != metadata.get("blob_digest")
@@ -266,8 +272,17 @@ class PublishedArtifactRegistry:
             raise ArtifactInvalid("Artifact schema exceeds manifest limits")
         artifact_hash = "sha256:" + digest
         safe_provenance = dict(provenance)
-        if safe_provenance.get("source_hash") != source_hash or safe_provenance.get("artifact_hash") != artifact_hash:
-            raise ArtifactInvalid("Build provenance does not match artifact hashes")
+        lock_hash = (
+            "sha256:" + hashlib.sha256(b"stdlib-only").hexdigest()
+            if dependency_lock == "stdlib-only" else dependency_lock
+        )
+        safe_provenance.setdefault("dependency_lock", dependency_lock)
+        safe_provenance.setdefault("dependency_lock_hash", lock_hash)
+        if (safe_provenance.get("source_hash") != source_hash
+                or safe_provenance.get("artifact_hash") != artifact_hash
+                or safe_provenance.get("dependency_lock") != dependency_lock
+                or safe_provenance.get("dependency_lock_hash") != lock_hash):
+            raise ArtifactInvalid("Build provenance does not match artifact hashes or dependency lock")
         try:
             self.blob_storage.put_bytes(data, expected_digest=digest)
         except (BlobIntegrityError, OSError) as exc:
