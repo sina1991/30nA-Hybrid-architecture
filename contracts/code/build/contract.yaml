@@ -95,3 +95,24 @@ rules:
   - "Build execution MUST use resource limits and isolation appropriate to untrusted source."
   - "An implementation MUST NOT report a skipped or unimplemented stage as passed."
   - "The source hash identifies original uploaded ZIP bytes; the artifact hash identifies final packaged bytes."
+
+
+implementation_status:
+  implemented:
+    - inspect_archive
+    - verify_source_hash
+    - validate_archive_paths
+    - syntax_check
+    - partial_contract_check
+  blocked_or_not_implemented:
+    - normalize_working_copy
+    - dependency_resolution
+    - isolated_test_execution
+    - package
+    - hash
+  publication_eligible: false
+  note: >-
+    The current POST /api/v1/builds endpoint is a static preflight only. It must
+    report not_run for mandatory stages that it does not execute and MUST NOT
+    create a publishable artifact. This contract remains draft until all
+    mandatory stages and their isolated execution controls are implemented.
