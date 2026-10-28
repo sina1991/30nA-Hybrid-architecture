@@ -270,5 +270,22 @@ class BuildPipelineTests(unittest.TestCase):
             self.assertEqual(lock["wheels"][0]["sha256"], wheel_hash)
 
 
+    def test_dynamic_import_is_blocked_even_for_standard_library(self):
+        data = make_source({
+            "sample/main.py": "import importlib\ndef run(data): return importlib.import_module('json').dumps(data)\n",
+            "tests/__init__.py": "",
+            "tests/test_smoke.py": "import unittest\nclass T(unittest.TestCase):\n def test_ok(self): self.assertTrue(True)\n",
+        })
+        pipeline = BuildPipeline(self.blobs, history_store=self.history, image="")
+        report = pipeline.run(
+            owner_id="alice", source_id="dynamic", source_version="1",
+            source=source_record(data),
+        )
+        self.assertEqual(report["status"], "blocked")
+        stages = {item["stage"]: item["status"] for item in report["stages"]}
+        self.assertEqual(stages["dependency_check"], "blocked")
+        self.assertEqual(stages["test"], "not_run")
+
+
 if __name__ == "__main__":
     unittest.main()
