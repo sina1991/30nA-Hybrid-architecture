@@ -331,9 +331,9 @@ class DockerBuildExecutor:
                 "--ulimit", "core=0",
                 "--tmpfs", f"/tmp:rw,noexec,nosuid,nodev,size={self.tmpfs_size}",
                 "--log-driver=none",
-                "--mount", f"type=bind,src={archive_path},dst=/build/source.zip,readonly",
-                "--mount", f"type=bind,src={runner_path},dst=/build/runner.py,readonly",
-                self.image, "python", "-I", "/build/runner.py", "/build/source.zip",
+                "--mount", f"type=bind,src={archive_path},dst=/source.zip,readonly",
+                "--mount", f"type=bind,src={runner_path},dst=/runner.py,readonly",
+                self.image, "python", "-I", "/runner.py", "/source.zip",
             ]
             try:
                 proc = subprocess.Popen(
