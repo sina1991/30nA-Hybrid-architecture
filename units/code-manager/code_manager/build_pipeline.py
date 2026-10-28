@@ -198,7 +198,7 @@ def analyze_imports(source_bytes: bytes) -> dict:
                     local_roots.add(path.parts[0])
             else:
                 local_roots.add(path.parts[0].removesuffix(".py"))
-        stdlib = set(getattr(sys, "stdlib_module_names", ()))
+        stdlib = set(getattr(sys, "stdlib_module_names", ())) | set(sys.builtin_module_names)
         shadowed = sorted(local_roots & stdlib)
         external = set()
         for name in names:
@@ -634,7 +634,7 @@ class BuildPipeline:
                 },
             })
             return self._save(owner_id, report)
-        except (SourceValidationError, ValueError, TypeError, OSError, zipfile.BadZipFile) as exc:
+        except (SourceValidationError, ValueError, TypeError, OSError, zipfile.BadZipFile, subprocess.SubprocessError) as exc:
             record("pipeline", "failed", type(exc).__name__ + ": " + str(exc)[:500])
             report["status"] = "failed"
             report["publishable"] = False
