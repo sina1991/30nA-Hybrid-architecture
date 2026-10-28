@@ -98,6 +98,13 @@ class OperationalTests(unittest.TestCase):
         self.assertFalse(thread.is_alive())
         self.assertEqual(results[0].status, 'cancelled')
 
+    def test_runtime_rejects_invalid_resource_limits(self):
+        for kwargs in ({'max_concurrent': 0}, {'max_artifact_bytes': 0},
+                       {'max_output_bytes': -1}, {'max_input_bytes': 0}):
+            with self.subTest(kwargs=kwargs):
+                with self.assertRaises(ValueError):
+                    WorkerRuntime(Provider(self.sources), self.definitions, **kwargs)
+
     def test_input_validation(self):
         r = self.manager.request_execution('fast', timeout_seconds=float('nan'))
         self.assertEqual(r.error.code, 'INVALID_INPUT')

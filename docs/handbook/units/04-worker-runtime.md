@@ -11,7 +11,7 @@ WORKER RUNTIME وظیفه اجرای درخواست Worker، مدیریت وضع
 
 ## رفتار مستندشده
 
-README فعلی `WorkerRuntime.submit` هم‌زمان و دارای `ExecutionResult` را توصیف می‌کند؛ `get` وضعیت accepted/running/terminal را می‌خواند و `cancel` فرایند فعال و درخواست لغو فرزندها را مدیریت می‌کند. idempotency map در حافظه همان process است و بعد از restart پایدار نمی‌ماند. retry خودکار انجام نمی‌شود. محدودیت‌های concurrency، اندازه archive، ورودی سریال‌شده، خروجی، تعداد/depth فرزند و زمان اجرا قابل تنظیم‌اند. حد پیش‌فرض ورودی+تنظیمات سریال‌شده ۱ MiB است؛ payload بزرگ‌تر یا غیرقابل تبدیل به JSON باید پیش از اجرای subprocess با `INVALID_INPUT` رد شود. این سقف از payload بسیار بزرگ جلوگیری می‌کند اما جای محدودیت حافظه/CPU در Sandbox را نمی‌گیرد.
+README فعلی `WorkerRuntime.submit` هم‌زمان و دارای `ExecutionResult` را توصیف می‌کند؛ `get` وضعیت accepted/running/terminal را می‌خواند و `cancel` فرایند فعال و درخواست لغو فرزندها را مدیریت می‌کند. idempotency map در حافظه همان process است و بعد از restart پایدار نمی‌ماند. retry خودکار انجام نمی‌شود. محدودیت‌های concurrency، اندازه archive، ورودی سریال‌شده، خروجی، تعداد/depth فرزند و زمان اجرا قابل تنظیم‌اند. حد پیش‌فرض ورودی+تنظیمات سریال‌شده ۱ MiB است؛ payload بزرگ‌تر یا غیرقابل تبدیل به JSON باید پیش از اجرای subprocess با `INVALID_INPUT` رد شود. این سقف از payload بسیار بزرگ جلوگیری می‌کند اما جای محدودیت حافظه/CPU در Sandbox را نمی‌گیرد. Runtime اکنون مقادیر نامعتبر برای concurrency و سقف‌های بایت Artifact/input/output را در زمان ساخت نمونه رد می‌کند؛ این مقادیر باید integer مثبت باشند.
 
 ## وضعیت وابستگی Artifact
 
