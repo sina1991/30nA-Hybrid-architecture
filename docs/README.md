@@ -12,6 +12,10 @@
 - [تست‌ها و CI](handbook/testing-and-ci.md)
 - [دفتر تصمیم‌های معماری](handbook/decisions/README.md)
 
+## امنیت
+
+- [مدل تهدید و معیارهای پذیرش Sandbox در Worker Runtime](security/worker-runtime-sandbox-threat-model.md)
+
 ## ممیزی و اصلاحات
 
 - [ماتریس تطبیق قابلیت‌ها و APIها](audit/feature-capability-matrix.md)
