@@ -39,7 +39,45 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements-dev.txt
+      - name: Start isolated loopback DATA MANAGER for integration tests
+        env:
+          DATA_MANAGER_ALLOW_INSECURE_HEADER: "1"
+          DATA_MANAGER_DB: /tmp/data-manager-ci.sqlite3
+        shell: bash
+        run: |
+          python - <<'PY' >/tmp/data-manager-ci.log 2>&1 &
+          import importlib
+          import importlib.util
+          import sys
+          from pathlib import Path
+          from wsgiref.simple_server import make_server
+
+          unit = Path("units/data-manager").resolve()
+          sys.path.insert(0, str(unit.parent))
+          spec = importlib.util.spec_from_file_location(
+              "data_manager", unit / "__init__.py",
+              submodule_search_locations=[str(unit)]
+          )
+          package = importlib.util.module_from_spec(spec)
+          sys.modules["data_manager"] = package
+          spec.loader.exec_module(package)
+          app = importlib.import_module("data_manager.api.app")
+          make_server("127.0.0.1", 8080, app.application).serve_forever()
+          PY
+          echo $! >/tmp/data-manager-ci.pid
+          for attempt in $(seq 1 20); do
+            if curl --fail --silent http://127.0.0.1:8080/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/data-manager-ci.log
+          exit 1
       - name: Run all contract and unit suites
+        env:
+          CODE_MANAGER_INTEGRATION: "1"
+          DATA_MANAGER_ALLOW_INSECURE_HEADER: "1"
+          CODE_MANAGER_DATA_MANAGER_URL: "http://127.0.0.1:8080"
         run: |
           python -m pytest \
             contracts/core/tests \
