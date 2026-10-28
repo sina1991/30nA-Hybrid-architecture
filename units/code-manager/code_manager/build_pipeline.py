@@ -548,14 +548,6 @@ class DockerBuildExecutor:
         self.image = image
         self.docker_binary = docker_binary
         self.timeout_seconds = timeout_seconds
-        self.dependency_allowlist = (
-            dependency_allowlist if dependency_allowlist is not None
-            else os.environ.get("CODE_MANAGER_DEPENDENCY_ALLOWLIST")
-        )
-        self.wheelhouse = (
-            wheelhouse if wheelhouse is not None
-            else os.environ.get("CODE_MANAGER_DEPENDENCY_WHEELHOUSE")
-        )
         self.memory = memory
         self.cpus = cpus
         self.pids_limit = pids_limit
@@ -708,6 +700,14 @@ class BuildPipeline:
         )
         self.docker_binary = docker_binary
         self.timeout_seconds = timeout_seconds
+        self.dependency_allowlist = (
+            dependency_allowlist if dependency_allowlist is not None
+            else os.environ.get("CODE_MANAGER_DEPENDENCY_ALLOWLIST")
+        )
+        self.wheelhouse = (
+            wheelhouse if wheelhouse is not None
+            else os.environ.get("CODE_MANAGER_DEPENDENCY_WHEELHOUSE")
+        )
 
     def run(self, *, owner_id: str, source_id: str, source_version: str, source: dict) -> dict:
         now = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
