@@ -117,10 +117,11 @@ class DockerSandboxBackend:
             with self._lock:
                 self._cidfiles[proc.pid] = (cidfile, cid_dir)
             return proc
+        except SandboxUnavailable:
+            shutil.rmtree(cid_dir, ignore_errors=True)
+            raise
         except (OSError, ValueError, subprocess.SubprocessError) as exc:
             shutil.rmtree(cid_dir, ignore_errors=True)
-            if isinstance(exc, SandboxUnavailable):
-                raise
             raise SandboxUnavailable("Could not launch sandbox runtime") from exc
 
     @staticmethod
