@@ -8,6 +8,7 @@ allowlisted, hash-locked resolver is configured.
 from __future__ import annotations
 
 import ast
+from email.parser import Parser
 import hashlib
 from contextlib import contextmanager
 import io
@@ -59,7 +60,10 @@ def _safe_name(name: str) -> bool:
                 and all(part not in ("", ".", "..") for part in path.parts))
 
 
-def normalize_source_archive(source_bytes: bytes, *, include_tests: bool) -> bytes:
+def normalize_source_archive(
+    source_bytes: bytes, *, include_tests: bool,
+    extra_files: dict[str, bytes] | None = None,
+) -> bytes:
     """Return a deterministic ZIP without extracting untrusted paths on the host."""
     if not isinstance(source_bytes, bytes):
         raise TypeError("source_bytes must be bytes")
@@ -103,6 +107,13 @@ def normalize_source_archive(source_bytes: bytes, *, include_tests: bool) -> byt
                     raise SourceValidationError(f"Text file is not UTF-8: {name}") from exc
                 data = text.replace("\r\n", "\n").replace("\r", "\n").encode("utf-8")
             files.append((name, data))
+        for extra_name, extra_data in (extra_files or {}).items():
+            if not _safe_name(extra_name) or not isinstance(extra_data, bytes):
+                raise SourceValidationError("Unsafe or invalid generated package file")
+            if extra_name in seen:
+                raise SourceValidationError("Generated package file conflicts with source: " + extra_name)
+            seen.add(extra_name)
+            files.append((extra_name, extra_data))
         if not files:
             raise SourceValidationError("Normalization produced an empty package")
         with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED,
@@ -259,6 +270,137 @@ def analyze_imports(source_bytes: bytes) -> dict:
                             if root and root not in stdlib and root not in local_roots:
                                 external.add(root)
         return {"external": sorted(external), "stdlib_shadowing": shadowed}
+
+
+def _normalize_distribution(name: str) -> str:
+    return re.sub(r"[-_.]+", "-", name).lower()
+
+
+def _wheel_metadata(wheel_path: Path, package: str, version: str) -> None:
+    """Accept only small, pure-Python wheels without transitive dependencies."""
+    if not wheel_path.name.endswith("-py3-none-any.whl"):
+        raise SourceValidationError("Only pure-Python py3-none-any wheels are supported")
+    if wheel_path.stat().st_size > 8 * 1024 * 1024:
+        raise SourceValidationError("Dependency wheel exceeds the 8 MiB limit")
+    with zipfile.ZipFile(wheel_path, "r") as wheel:
+        infos = wheel.infolist()
+        if len(infos) > 1000:
+            raise SourceValidationError("Dependency wheel contains too many files")
+        expanded = 0
+        metadata_files = []
+        for info in infos:
+            name = info.filename.rstrip("/")
+            if not _safe_name(name):
+                raise SourceValidationError("Unsafe path in dependency wheel")
+            mode = (info.external_attr >> 16) & 0o170000
+            if mode == stat.S_IFLNK:
+                raise SourceValidationError("Symlinks are forbidden in dependency wheels")
+            lower = name.lower()
+            if (lower.endswith((".so", ".pyd", ".dll", ".dylib", ".pth", ".pyc"))
+                    or "__pycache__" in PurePosixPath(name).parts):
+                raise SourceValidationError("Native extensions, .pth files and bytecode are forbidden")
+            expanded += info.file_size
+            if expanded > 16 * 1024 * 1024:
+                raise SourceValidationError("Dependency wheel expands beyond 16 MiB")
+            if lower.endswith(".dist-info/metadata"):
+                metadata_files.append(name)
+        if len(metadata_files) != 1:
+            raise SourceValidationError("Dependency wheel must contain exactly one METADATA file")
+        metadata = Parser().parsestr(wheel.read(metadata_files[0]).decode("utf-8"))
+        if _normalize_distribution(metadata.get("Name", "")) != package or metadata.get("Version") != version:
+            raise SourceValidationError("Wheel metadata does not match the allowlisted package/version")
+        if metadata.get_all("Requires-Dist"):
+            raise SourceValidationError("Wheels with transitive dependencies are not supported by this profile")
+
+
+def resolve_dependency_policy(source_bytes: bytes, import_report: dict, allowlist_config, wheelhouse) -> dict:
+    """Resolve only trusted, hash-pinned, pure-Python wheels from an offline wheelhouse."""
+    try:
+        with zipfile.ZipFile(io.BytesIO(source_bytes), "r") as archive:
+            names = [info.filename for info in archive.infolist() if not info.is_dir()]
+            manifests = [name for name in names if PurePosixPath(name).name.lower() in _DEPENDENCY_FILES]
+            if not manifests:
+                if import_report["external"] or import_report["stdlib_shadowing"]:
+                    return {"status":"blocked","detail":"External imports require an allowlisted requirements.txt","wheels":[]}
+                return {"status":"passed","detail":"Standard-library and archive-local imports only","wheels":[],"lock":{"version":1,"wheels":[]}}
+            if manifests != ["requirements.txt"]:
+                return {"status":"blocked","detail":"Only a root requirements.txt is supported; other dependency manifests are forbidden","wheels":[]}
+            requirements_bytes = archive.read("requirements.txt")
+    except (zipfile.BadZipFile, KeyError, OSError):
+        return {"status":"blocked","detail":"Dependency manifest could not be read","wheels":[]}
+    if not isinstance(allowlist_config, (str, dict)) or not wheelhouse:
+        return {"status":"blocked","detail":"Trusted dependency allowlist and offline wheelhouse are required","wheels":[]}
+    try:
+        allowlist = json.loads(allowlist_config) if isinstance(allowlist_config, str) else allowlist_config
+        if not isinstance(allowlist, dict):
+            raise ValueError("allowlist must be an object")
+        wheelhouse_path = Path(wheelhouse).expanduser().resolve(strict=True)
+        if not wheelhouse_path.is_dir():
+            raise ValueError("wheelhouse must be a directory")
+        requirements_text = requirements_bytes.decode("utf-8")
+    except (ValueError, TypeError, OSError, UnicodeDecodeError) as exc:
+        return {"status":"blocked","detail":"Invalid dependency policy configuration: "+str(exc)[:300],"wheels":[]}
+    policy_by_name = {_normalize_distribution(name): value for name, value in allowlist.items()}
+    wheel_pattern = re.compile(r"^([A-Za-z0-9][A-Za-z0-9._-]*)==([A-Za-z0-9][A-Za-z0-9.+!-]*)\s+--hash=sha256:([0-9a-f]{64})$")
+    selected = []
+    selected_modules = set()
+    seen_packages = set()
+    total_bytes = 0
+    for raw_line in requirements_text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
+            continue
+        match = wheel_pattern.fullmatch(line)
+        if match is None:
+            return {"status":"blocked","detail":"requirements.txt must contain only exact package==version --hash=sha256:<digest> pins","wheels":[]}
+        package_name, version, declared_hash = match.groups()
+        normalized_name = _normalize_distribution(package_name)
+        if normalized_name in seen_packages:
+            return {"status":"blocked","detail":"Duplicate package pin: "+package_name,"wheels":[]}
+        seen_packages.add(normalized_name)
+        policy = policy_by_name.get(normalized_name)
+        if not isinstance(policy, dict):
+            return {"status":"blocked","detail":"Package is not in the trusted allowlist: "+package_name,"wheels":[]}
+        trusted_hash = str(policy.get("sha256", "")).removeprefix("sha256:")
+        filename = policy.get("wheel")
+        modules = policy.get("modules")
+        if (policy.get("version") != version or trusted_hash != declared_hash
+                or not isinstance(filename, str) or Path(filename).name != filename
+                or not filename.endswith("-py3-none-any.whl")
+                or not isinstance(modules, list) or not modules
+                or any(not isinstance(module, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", module) for module in modules)):
+            return {"status":"blocked","detail":"Dependency pin does not exactly match trusted allowlist: "+package_name,"wheels":[]}
+        expected_distribution = filename.split("-", 1)[0].replace("_", "-").lower()
+        if expected_distribution != normalized_name:
+            return {"status":"blocked","detail":"Allowlisted wheel filename does not match package name","wheels":[]}
+        wheel_path = (wheelhouse_path / filename).resolve()
+        if wheel_path.parent != wheelhouse_path or not wheel_path.is_file():
+            return {"status":"blocked","detail":"Allowlisted wheel is missing from the offline wheelhouse: "+filename,"wheels":[]}
+        digest = hashlib.sha256(wheel_path.read_bytes()).hexdigest()
+        if digest != trusted_hash:
+            return {"status":"blocked","detail":"Offline wheel SHA-256 mismatch: "+filename,"wheels":[]}
+        try:
+            _wheel_metadata(wheel_path, normalized_name, version)
+        except (SourceValidationError, OSError, zipfile.BadZipFile, UnicodeDecodeError) as exc:
+            return {"status":"blocked","detail":"Unsafe or invalid dependency wheel: "+str(exc)[:300],"wheels":[]}
+        total_bytes += wheel_path.stat().st_size
+        if total_bytes > 8 * 1024 * 1024:
+            return {"status":"blocked","detail":"Total vendored dependency wheels exceed 8 MiB","wheels":[]}
+        selected.append({"package": normalized_name, "version": version, "filename": filename,
+                         "sha256": digest, "path": str(wheel_path)})
+        selected_modules.update(modules)
+    if not selected:
+        return {"status":"blocked","detail":"requirements.txt contains no pinned dependencies","wheels":[]}
+    missing_modules = sorted(set(import_report["external"]) - selected_modules)
+    if import_report["stdlib_shadowing"] or missing_modules or "<dynamic-import>" in import_report["external"]:
+        return {"status":"blocked","detail":"External/dynamic imports are not covered by the trusted allowlist: "+", ".join(missing_modules or import_report["stdlib_shadowing"] or ["dynamic import"]),"wheels":[]}
+    lock = {"version": 1, "wheels": [
+        {"package": item["package"], "version": item["version"],
+         "filename": item["filename"], "sha256": item["sha256"]}
+        for item in selected
+    ]}
+    return {"status":"passed","detail":"All dependencies match trusted versions/hashes and are pure-Python offline wheels",
+            "wheels": selected,"lock":lock}
 
 
 class BuildHistoryStore:
