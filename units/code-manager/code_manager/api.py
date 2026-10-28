@@ -557,6 +557,13 @@ def create_application(
                         source_hash=source_hash,
                         build_id=build_id,
                         provenance=report["provenance"],
+                        artifact_version=report.get("artifact_version"),
+                        build_version=report.get("build_version", "code-manager-build-v1"),
+                        calculation_version=report.get("calculation_version", "1.0.0"),
+                        dependency_lock=report.get("dependency_lock", "stdlib-only"),
+                        input_schema=report.get("input_schema", {}),
+                        output_schema=report.get("output_schema", {}),
+                        validation_status=report.get("validation_status", "passed"),
                     )
                     return _json_response(
                         start_response, 201 if created else 200,
