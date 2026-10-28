@@ -12,7 +12,11 @@ import zipfile
 def _load_vendored_wheels(archive_path):
     try:
         with zipfile.ZipFile(archive_path, "r") as archive:
-            manifest_bytes = archive.read("vendor/dependencies.json")
+            try:
+                manifest_bytes = archive.read("vendor/dependencies.json")
+            except KeyError:
+                # Legacy/stdlib-only artifacts have no vendored dependency manifest.
+                return []
             manifest = json.loads(manifest_bytes.decode("utf-8"))
             if manifest.get("version") != 1 or not isinstance(manifest.get("wheels"), list):
                 raise ValueError("invalid vendored dependency manifest")
@@ -51,9 +55,8 @@ def _load_vendored_wheels(archive_path):
                 path.chmod(0o600)
                 paths.append(str(path))
             return paths
-    except KeyError:
-        # Legacy/stdlib-only artifacts have no vendored dependency manifest.
-        return []
+    except zipfile.BadZipFile as exc:
+        raise ValueError("invalid built artifact ZIP") from exc
 
 
 def main():
