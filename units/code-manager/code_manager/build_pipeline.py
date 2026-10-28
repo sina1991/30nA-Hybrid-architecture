@@ -188,6 +188,8 @@ class BuildHistoryStore:
     def __init__(self, database_path):
         self.path = Path(database_path).expanduser().resolve()
         self.path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        self.path.touch(mode=0o600, exist_ok=True)
+        os.chmod(self.path, 0o600)
         with self._connect() as db:
             db.execute("""
                 CREATE TABLE IF NOT EXISTS build_history (
@@ -317,14 +319,18 @@ class DockerBuildExecutor:
             root = Path(directory)
             archive_path = root / "source.zip"
             runner_path = root / "build_test_runner.py"
+            cidfile = root / "container.cid"
+            container_name = "cm-build-" + uuid.uuid4().hex
             archive_path.write_bytes(source_archive)
             runner_path.write_text(_TEST_RUNNER, encoding="utf-8")
             # The container runs as UID 65532; mounted inputs must be readable.
             # The parent temp directory remains private to the host process.
             archive_path.chmod(0o644)
             runner_path.chmod(0o644)
+            cidfile.touch(mode=0o600)
             command = [
                 binary, "run", "--rm", "--pull=never", "--interactive",
+                "--name", container_name, "--cidfile", str(cidfile),
                 "--network=none", "--read-only", "--user", "65532:65532",
                 "--memory", self.memory, "--memory-swap", self.memory,
                 "--cpus", self.cpus, "--pids-limit", str(self.pids_limit),
@@ -348,6 +354,26 @@ class DockerBuildExecutor:
             captured = bytearray()
             overflow = threading.Event()
 
+            def stop_container():
+                # Kill the container through the Docker control plane before killing
+                # the CLI; killing only the CLI can leave a hostile test running.
+                try:
+                    subprocess.run(
+                        [binary, "rm", "--force", container_name],
+                        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+                        stderr=subprocess.DEVNULL, timeout=5, check=False,
+                    )
+                except (OSError, subprocess.SubprocessError):
+                    pass
+                try:
+                    if proc.poll() is None:
+                        if os.name == "posix":
+                            os.killpg(proc.pid, 9)
+                        else:
+                            proc.kill()
+                except (ProcessLookupError, OSError):
+                    pass
+
             def drain():
                 try:
                     while True:
@@ -359,13 +385,7 @@ class DockerBuildExecutor:
                             captured.extend(chunk[:room])
                         if len(chunk) > max(room, 0) or len(captured) > self.max_output_bytes:
                             overflow.set()
-                            try:
-                                if os.name == "posix":
-                                    os.killpg(proc.pid, 9)
-                                else:
-                                    proc.kill()
-                            except (ProcessLookupError, OSError):
-                                pass
+                            stop_container()
                 except (OSError, ValueError):
                     pass
 
@@ -377,19 +397,13 @@ class DockerBuildExecutor:
                     proc.wait(timeout=self.timeout_seconds)
                 except subprocess.TimeoutExpired:
                     timed_out = True
-                    try:
-                        if os.name == "posix":
-                            os.killpg(proc.pid, 9)
-                        else:
-                            proc.kill()
-                    except (ProcessLookupError, OSError):
-                        pass
+                    stop_container()
                     proc.wait(timeout=5)
                 reader.join(timeout=2)
             finally:
                 if proc.poll() is None:
-                    proc.kill()
-                    proc.wait()
+                    stop_container()
+                    proc.wait(timeout=5)
                 reader.join(timeout=1)
             if timed_out:
                 return {"status": "failed", "tests": 0, "failures": 1,
