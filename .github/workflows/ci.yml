@@ -51,4 +51,4 @@ jobs:
             units/consumers/dashboard-core/tests \
             units/consumers/dashboard-core/legacy-tests \
             units/integration/agent08/tests \
-            -v --tb=short
+            --import-mode=importlib -v --tb=short
