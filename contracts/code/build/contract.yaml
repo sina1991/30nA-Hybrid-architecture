@@ -102,7 +102,7 @@ rules:
   - "inspect_archive MUST precede verify_source_hash as required by the current contract tests; inspection MUST be metadata-only and MUST NOT extract or execute source before hash verification."
   - "verify_source_hash MUST precede normalize_working_copy."
   - "A successful build MUST include a nonempty test suite executed in the isolated sandbox."
-  - "The current dependency policy is stdlib-only; unsupported external dependencies MUST block the build."
+  - "External dependencies MUST be exact-version and SHA-256 pinned in root requirements.txt, match the trusted deployment allowlist and offline wheelhouse, and pass pure-Python wheel validation. Unsupported native wheels, markers, extras, and non-exact transitive requirements MUST block the build."
   - "A successful build MUST NOT be interpreted as proof that the artifact is safe to execute."
   - "Only artifacts whose mandatory validation stages passed may be eligible for publication."
   - "Build execution MUST use resource limits and isolation appropriate to untrusted source."
@@ -133,6 +133,6 @@ implementation_status:
     POST /api/v1/builds runs the real pipeline. Third-party dependencies are
     accepted only as allowlisted, hash-pinned pure-Python wheels from an offline
     wheelhouse, and are vendored into the artifact with a hash manifest.
-Transitive dependencies are supported only as explicitly pinned pure-Python wheels with exact unconditional Requires-Dist versions. Native dependencies and unsupported manifests fail closed.
+    Transitive dependencies are supported only as explicitly pinned pure-Python wheels with exact unconditional Requires-Dist versions. Native dependencies and unsupported manifests fail closed.
     A build without tests, with an invalid sandbox, or with any non-passed
     mandatory stage is never publishable.
