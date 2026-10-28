@@ -19,13 +19,14 @@
 | 00 | [خط مبنای ممیزی](00-audit-baseline.md) | ثبت اولیه؛ ممیزی کامل نشده |
 | 01 | [قواعد مستندسازی و حاکمیت](01-documentation-governance.md) | خط‌مشی اولیه |
 | 02 | [نقشه راه تکمیل](02-completion-roadmap.md) | برنامه مرحله‌ای اولیه |
-| 03 | [تست‌ها و CI](testing-and-ci.md) | شواهد CI ثبت شده؛ تحلیل همه شکست‌ها در جریان کار |
+| 03 | [گزارش شکست‌های CI و قراردادهای CODE](03-code-contract-findings.md) | تحلیل artifact واقعی؛ اصلاح کد انجام نشده |
+| 04 | [تست‌ها و CI](testing-and-ci.md) | شواهد baseline ثبت شده؛ CI جاری هنوز لازم است |
 | U-00 | [CORE و قراردادها](units/00-core-contracts.md) | بررسی اولیه |
 | U-01 | [DATA MANAGER](units/01-data-manager.md) | بررسی اولیه |
 | U-02 | [CODE MANAGER](units/02-code-manager.md) | بررسی اولیه |
 | U-03 | [WORKER MANAGER](units/03-worker-manager.md) | بررسی اولیه |
 | U-04 | [WORKER RUNTIME](units/04-worker-runtime.md) | بررسی اولیه |
-| U-05 | [DASHBOARD CORE CONSUMER](units/05-dashboard-core.md) | بررسی اولیه |
+| U-05 | [DASHBOARD CORE](units/05-dashboard-core.md) | بررسی اولیه |
 | U-06 | [Integration / Agent 08](units/06-integration-agent08.md) | موجودی اولیه |
 | ADR | [دفتر تصمیم‌های معماری](decisions/README.md) | آماده ثبت تصمیم‌ها |
 
