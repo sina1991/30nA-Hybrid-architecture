@@ -81,7 +81,7 @@ CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/4077518442
 2. **P0 — Publication gate:** انتشار HTTP باید فقط پس از موفقیت تمام مراحل اجباری مجاز شود؛ ZIP خام منبع نباید به‌عنوان Artifact ساخته‌شده معرفی شود.
 3. **P0 — Sandbox:** subprocess با `-I` مرز امنیتی نیست. اجرای Source غیرقابل‌اعتماد در Production مجاز نیست.
 4. **P0 — Runtime E2E:** دانلود Artifact از CODE MANAGER با احراز هویت واقعی و اجرای مسیر کامل تا نتیجه هنوز اثبات نشده است.
-5. **P0 — محدودیت خروجی:** در شاخهٔ فعلی، stdout هنگام stream خوانده می‌شود و با عبور از سقف، subprocess متوقف می‌شود؛ تست چاپ نامحدود اضافه شده است. این تغییر تا پایان CI و ادغام، در `main` تأییدشده محسوب نمی‌شود.
+5. **P0 — محدودیت خروجی:** PR شماره 11 ادغام شده است؛ stdout هنگام stream خوانده می‌شود و با عبور از سقف، subprocess متوقف می‌شود. تست چاپ نامحدود اضافه شده و CI مربوط به PR سبز است: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40776068224. CI روی commit ادغام‌شدهٔ `d9a8afeddc245b24d374eb44209e3f95c24d0199` هنگام ثبت این سند هنوز در حال اجرا بود. این کنترل جای Sandbox واقعی را نمی‌گیرد.
 6. **P1 — Auth integration:** reverse proxy/identity gateway باید Authorization را اعتبارسنجی کند و هویت قابل‌اعتماد را در `REMOTE_USER` قرار دهد.
 7. **P1 — Worker Manager:** persistence، API عمومی، scheduler واقعی و Runtime adapter عملیاتی باز هستند.
 8. **P1 — Dashboard:** اتصال upstream و نگاشت مجوز/هویت نیازمند تکمیل و تست است.
