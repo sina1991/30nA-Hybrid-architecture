@@ -12,7 +12,8 @@ import zipfile
 
 from code_manager.blob_storage import BlobStorage
 from code_manager.build_pipeline import (
-    BuildHistoryStore, BuildPipeline, normalize_source_archive,
+    BuildHistoryStore, BuildPipeline, analyze_imports, normalize_source_archive,
+    resolve_dependency_policy,
 )
 
 
@@ -285,6 +286,88 @@ class BuildPipelineTests(unittest.TestCase):
         stages = {item["stage"]: item["status"] for item in report["stages"]}
         self.assertEqual(stages["dependency_check"], "blocked")
         self.assertEqual(stages["test"], "not_run")
+
+
+    def _make_wheel(self, package, version, module, *, requires=()):
+        output = io.BytesIO()
+        dist = package.replace("-", "_") + "-" + version + ".dist-info"
+        with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as wheel:
+            wheel.writestr(module + "/__init__.py", "VALUE = 1\n")
+            metadata = (
+                "Metadata-Version: 2.1\n"
+                f"Name: {package}\nVersion: {version}\n"
+                + "".join(f"Requires-Dist: {name} (=={pin})\n" for name, pin in requires)
+                + "\n"
+            )
+            wheel.writestr(dist + "/METADATA", metadata)
+            wheel.writestr(
+                dist + "/WHEEL",
+                "Wheel-Version: 1.0\nGenerator: test\nRoot-Is-Purelib: true\nTag: py3-none-any\n",
+            )
+            wheel.writestr(dist + "/RECORD", "")
+        return output.getvalue()
+
+    def test_transitive_pure_python_wheels_require_exact_allowlisted_pins(self):
+        wheelhouse = self.root / "wheelhouse-transitive"
+        wheelhouse.mkdir()
+        leaf = self._make_wheel("leafdep", "1.0.0", "leafdep")
+        parent = self._make_wheel(
+            "parentdep", "2.0.0", "parentdep", requires=(("leafdep", "1.0.0"),)
+        )
+        (wheelhouse / "leafdep-1.0.0-py3-none-any.whl").write_bytes(leaf)
+        (wheelhouse / "parentdep-2.0.0-py3-none-any.whl").write_bytes(parent)
+        leaf_hash = hashlib.sha256(leaf).hexdigest()
+        parent_hash = hashlib.sha256(parent).hexdigest()
+        allowlist = {
+            "leafdep": {
+                "version": "1.0.0", "sha256": leaf_hash,
+                "wheel": "leafdep-1.0.0-py3-none-any.whl", "modules": ["leafdep"],
+            },
+            "parentdep": {
+                "version": "2.0.0", "sha256": parent_hash,
+                "wheel": "parentdep-2.0.0-py3-none-any.whl", "modules": ["parentdep"],
+            },
+        }
+        source = make_source({
+            "sample/main.py": "import parentdep\ndef run(data): return parentdep.VALUE\n",
+            "requirements.txt": (
+                f"parentdep==2.0.0 --hash=sha256:{parent_hash}\n"
+                f"leafdep==1.0.0 --hash=sha256:{leaf_hash}\n"
+            ),
+        })
+        result = resolve_dependency_policy(
+            source, analyze_imports(source), allowlist, str(wheelhouse)
+        )
+        self.assertEqual(result["status"], "passed", result)
+        self.assertEqual(
+            {(item["package"], item["version"]) for item in result["wheels"]},
+            {("parentdep", "2.0.0"), ("leafdep", "1.0.0")},
+        )
+        self.assertEqual(result["wheels"][1]["requires"], []) if result["wheels"][1]["package"] == "leafdep" else None
+
+    def test_transitive_dependency_missing_from_requirements_fails_closed(self):
+        wheelhouse = self.root / "wheelhouse-missing-transitive"
+        wheelhouse.mkdir()
+        parent = self._make_wheel(
+            "parentdep", "2.0.0", "parentdep", requires=(("leafdep", "1.0.0"),)
+        )
+        (wheelhouse / "parentdep-2.0.0-py3-none-any.whl").write_bytes(parent)
+        digest = hashlib.sha256(parent).hexdigest()
+        allowlist = {
+            "parentdep": {
+                "version": "2.0.0", "sha256": digest,
+                "wheel": "parentdep-2.0.0-py3-none-any.whl", "modules": ["parentdep"],
+            },
+        }
+        source = make_source({
+            "sample/main.py": "import parentdep\ndef run(data): return parentdep.VALUE\n",
+            "requirements.txt": f"parentdep==2.0.0 --hash=sha256:{digest}\n",
+        })
+        result = resolve_dependency_policy(
+            source, analyze_imports(source), allowlist, str(wheelhouse)
+        )
+        self.assertEqual(result["status"], "blocked")
+        self.assertIn("leafdep==1.0.0", result["detail"])
 
 
 if __name__ == "__main__":
