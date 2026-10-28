@@ -44,7 +44,8 @@ def test_launch_uses_restrictive_container_options(tmp_path):
     assert "--network=none" in command
     assert "--read-only" in command
     assert "--cap-drop=ALL" in command
-    assert "--security-opt=no-new-privileges" in command
+    assert "--security-opt=no-new-privileges:true" in command
+    assert "--security-opt=seccomp=default" in command
     assert "--memory" in command and "256m" in command
     assert "--cpus" in command and "1.0" in command
     assert "--pids-limit" in command and "64" in command
