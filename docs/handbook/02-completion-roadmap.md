@@ -56,38 +56,44 @@
 - تمام شکست‌های CI باید به یافته، مسئول و معیار پذیرش متصل شوند.
 - هیچ انتشار نهایی پیش از ثبت Commit مبنا، نتایج تست و محدودیت‌های باقیمانده اعلام نشود.
 
-## وضعیت فعلی
+## وضعیت اجرایی — 2026-10-29
 
-مرحله 0 آغاز شده است. این نسخه اولیه از روی مخزن GitHub و مستندات قابل مشاهده تهیه شده؛ بررسی کامل کد و اجرای همه تست‌ها هنوز انجام نشده است.
+مرحله 0 از نظر موجودی اولیه ثبت شده است؛ مراحل 1 تا 6 همچنان باز هستند. این وضعیت‌ها باید به شواهد CI و SHA مربوط به هر تغییر متصل شوند.
 
+### موارد تکمیل‌شده و ادغام‌شده
 
-## وضعیت اجرایی به‌روزشده — 2026-10-29
+- pytest collection: حل با `--import-mode=importlib`، بدون حذف یا تضعیف تست‌ها.
+- تست integration واقعی CODE ↔ DATA MANAGER: در CI فعال شده است.
+- دانلود Artifact: `GET /api/v1/artifacts/{artifact_id}/content` به CODE MANAGER اضافه شده؛ داده باینری دقیق، مالکیت‌محور و با تأیید manifest/blob و SHA-256 ارائه می‌شود.
+- اسناد مرجع: فهرست مرکزی و فصل‌های یونیت‌ها نگهداری می‌شوند.
 
-مرحله 0 هنوز فقط از نظر موجودی و خط مبنا تکمیل‌شده محسوب می‌شود؛ مراحل 1 تا 6 در حال اجرا هستند. دو مانع CI رفع شده‌اند:
+### وضعیت فعلی Build
 
-- pytest collection: حل شد با `--import-mode=importlib`.
-- تست integration واقعی CODE ↔ DATA MANAGER: در CI فعال و موفق شد؛ نتیجه `158 passed, 0 skipped, 55 subtests passed`.
+PR شماره 9 برای `feat/code-manager-static-build-validation` دارای CI موفق است:
+https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40775184421
 
-شواهد:
-- PR اصلاح CI: https://github.com/sina1991/30nA-Hybrid-architecture/pull/3
-- PR فعال‌سازی integration: https://github.com/sina1991/30nA-Hybrid-architecture/pull/4
-- CI روی main: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40774066518
-- SHA مبنای این نتیجه: `016e8ad08e2b9c639fff1b0d799159dd14c94201`
+این PR در زمان ثبت این یادداشت **باز و ادغام‌نشده** است؛ بنابراین تغییر آن هنوز بخشی از `main` نیست. دامنه آن صرفاً پیش‌بررسی ایستای غیر اجرایی است و ساخت Artifact قابل انتشار را پیاده‌سازی نمی‌کند.
 
-اولویت بعدی، تکمیل مسیر Build/Artifact با آزمون و امنیت معتبر است. endpoint دانلود نباید ZIP خام source را به‌عنوان artifact build شده جا بزند؛ تا زمان تکمیل pipeline و وضعیت validation، مسیر اجرا باید fail-closed باقی بماند.
+### موارد باقی‌مانده و اولویت‌ها
 
+1. **P0 — Build pipeline واقعی:** اجرای مراحل اجباری در محیط ایزوله، سیاست وابستگی‌های pinned/allowlisted، تست، بسته‌بندی و hash نهایی هنوز پیاده‌سازی نشده‌اند.
+2. **P0 — Publication gate:** انتشار HTTP باید فقط پس از موفقیت تمام مراحل اجباری مجاز شود؛ ZIP خام منبع نباید به‌عنوان Artifact ساخته‌شده معرفی شود.
+3. **P0 — Sandbox:** subprocess با `-I` مرز امنیتی نیست. اجرای Source غیرقابل‌اعتماد در Production مجاز نیست.
+4. **P0 — Runtime E2E:** دانلود Artifact از CODE MANAGER با احراز هویت واقعی و اجرای مسیر کامل تا نتیجه هنوز اثبات نشده است.
+5. **P0 — محدودیت خروجی:** محدود کردن stdout فقط پس از خروج subprocess برای جلوگیری از مصرف حافظه کافی نیست؛ محدودیت باید هنگام stream اعمال شود.
+6. **P1 — Auth integration:** reverse proxy/identity gateway باید Authorization را اعتبارسنجی کند و هویت قابل‌اعتماد را در `REMOTE_USER` قرار دهد.
+7. **P1 — Worker Manager:** persistence، API عمومی، scheduler واقعی و Runtime adapter عملیاتی باز هستند.
+8. **P1 — Dashboard:** اتصال upstream و نگاشت مجوز/هویت نیازمند تکمیل و تست است.
 
-## پیشرفت جدید — چرخهٔ Artifact
+### معیار پذیرش Build
 
-مرحله «خواندن Artifact منتشرشده» تکمیل و ادغام شد. endpoint عمومی محتوای باینری را از registry immutable می‌خواند و integrity را هنگام خواندن تأیید می‌کند. تست‌های مربوط به bytes/hash/owner isolation در CI سبز شده‌اند.
+- منبع نامعتبر و ZIP مخرب با شکست ایمن رد شوند.
+- dependencyها فقط با سیاست قفل‌شده و allowlist قابل استفاده باشند.
+- محدودیت CPU، حافظه، PID، زمان، شبکه و فایل‌سیستم در sandbox واقعی اعمال شود.
+- hash منبع و Artifact مستقل و قابل بازتولید باشند.
+- هیچ مرحله ردشده یا اجرا‌نشده به‌عنوان موفق ثبت نشود.
+- پس از شکست هیچ Artifact قابل انتشار ایجاد نشود.
+- مالکیت، idempotency، conflict و تاریخچه Build آزموده شوند.
+- دریافت Artifact از API واقعی و اجرای E2E موفق/ناموفق با شواهد ثبت شود.
 
-موارد باقی‌مانده و اولویت‌ها:
-
-1. **P0 — Build pipeline واقعی:** قرارداد build هنوز draft است؛ ساخت artifact، dependency analysis، build isolation و validation pipeline وجود ندارد.
-2. **P0 — Publication gate:** endpoint انتشار HTTP عمداً غیرفعال است؛ انتشار باید به نتیجهٔ موفق مراحل اجباری Build وابسته شود.
-3. **P0 — Runtime E2E:** دانلود artifact از API با هویت سرویس و سپس اجرای واقعی end-to-end هنوز نیازمند تست یکپارچه است.
-4. **P0 — Sandbox:** subprocess به‌تنهایی sandbox نیست؛ اجرای Source غیرقابل‌اعتماد در Production مجاز نیست.
-5. **P1 — Auth integration:** reverse proxy/identity gateway باید Authorization را اعتبارسنجی کند و identity قابل‌اعتماد را در `REMOTE_USER` قرار دهد.
-6. **P1 — Worker Manager persistence/API/scheduler، Dashboard auth/permissions و هشدار deprecation:** هنوز باز هستند.
-
-Definition of Done برای Build: تست مثبت و منفی برای منبع نامعتبر، dependency lock، محدودیت منابع، hash، عدم انتشار بعد از شکست، idempotency/conflict، مالکیت، و round-trip دریافت Artifact. تست‌ها نباید فقط پاسخ HTTP یا ساخت ZIP را تأیید کنند؛ باید اعتبارسنجی و fail-closed بودن pipeline را هم اثبات کنند.
+«تکمیل» یا «آماده تولید» اعلام نمی‌شود مگر معیارهای بالا با تست واقعی و CI روی Commit نهایی اثبات شوند.

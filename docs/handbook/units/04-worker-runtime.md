@@ -13,15 +13,21 @@ WORKER RUNTIME وظیفه اجرای درخواست Worker، مدیریت وضع
 
 README فعلی `WorkerRuntime.submit` هم‌زمان و دارای `ExecutionResult` را توصیف می‌کند؛ `get` وضعیت accepted/running/terminal را می‌خواند و `cancel` فرایند فعال و درخواست لغو فرزندها را مدیریت می‌کند. idempotency map در حافظه همان process است و بعد از restart پایدار نمی‌ماند. retry خودکار انجام نمی‌شود. محدودیت‌های concurrency، اندازه archive/output، تعداد/depth فرزند و زمان اجرا قابل تنظیم‌اند.
 
+## وضعیت وابستگی Artifact
+
+CODE MANAGER در `main` endpoint زیر را ارائه می‌کند:
+
+`GET /api/v1/artifacts/{artifact_id}/content`
+
+این endpoint محتوای باینری یک Artifact منتشرشده را پس از بررسی مالکیت و یکپارچگی manifest/blob برمی‌گرداند. با این حال نوع فعلی ثبت‌شده `source_zip` است؛ این endpoint به معنی وجود Build pipeline یا تأیید Source نیست. PR شماره 9 برای پیش‌بررسی ایستای Build CI سبز دارد، اما هنوز ادغام نشده و هیچ Artifact قابل انتشار تولید نمی‌کند.
+
+`CodeManagerArtifactProvider` باید با URL و احراز هویت واقعی در تست integration پوشش داده شود. fixture حافظه‌ای به‌تنهایی سازگاری سرویس واقعی را اثبات نمی‌کند.
+
 ## ریسک امنیتی بحرانی برای طراحی تولید
 
 README صریحاً اعلام می‌کند که Python subprocess با `-I` Sandbox امنیتی نیست. Worker می‌تواند تحت هویت سرویس به فایل‌سیستم، شبکه، اسرار، فرایندها و منابع میزبان دسترسی داشته باشد. محدودیت ZIP و timeoutها دفاع تکمیلی‌اند، نه مرز امنیتی. همچنین stdout فقط پس از پایان subprocess محدود می‌شود و چاپ بی‌پایان می‌تواند حافظه را مصرف کند.
 
-**نتیجه:** اجرای Artifact غیرقابل اعتماد در این وضعیت نباید مجاز یا آماده تولید اعلام شود. Sandbox واقعی با کاربر غیرممتاز، جداسازی فایل‌سیستم/شبکه، محدودیت منابع، حذف credentialهای ارث‌رسیده و کنترل egress لازم است.
-
-## وابستگی Artifact
-
-`CodeManagerArtifactProvider` انتظار endpoint احراز هویت‌شده `GET /artifacts/{artifact_id}/content` با ZIP خام و content type برابر `application/octet-stream` دارد. README فعلی CODE MANAGER می‌گوید Artifact routeها 501 هستند؛ تست‌های محلی از fixture حافظه‌ای استفاده می‌کنند. بنابراین E2E دریافت Artifact از سرویس واقعی اثبات نشده است.
+**نتیجه:** اجرای Artifact غیرقابل اعتماد در این وضعیت نباید مجاز یا آماده تولید اعلام شود. Sandbox واقعی با کاربر غیرممتاز، جداسازی فایل‌سیستم/شبکه، محدودیت CPU/حافظه/PID، حذف credentialهای ارث‌رسیده و کنترل egress لازم است. محدودیت stdout نیز باید هنگام stream اعمال شود، نه پس از انباشته شدن خروجی.
 
 ## موارد ممیزی
 
@@ -32,7 +38,8 @@ README صریحاً اعلام می‌کند که Python subprocess با `-I` Sa
 - inheritance امن context/credentials؛
 - اجرای فرزندها، عمق و تجمیع نتایج؛
 - رفتار restart و idempotency؛
-- آزمون‌های subprocess فقط در محیط کنترل‌شده.
+- آزمون‌های subprocess فقط در محیط کنترل‌شده؛
+- integration واقعی با CODE MANAGER و آزمون E2E.
 
 ## معیار تکمیل
 
