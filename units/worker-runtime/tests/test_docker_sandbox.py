@@ -57,3 +57,36 @@ def test_from_env_fails_closed_without_image(monkeypatch):
     monkeypatch.delenv("WORKER_RUNTIME_SANDBOX_IMAGE", raising=False)
     with pytest.raises(SandboxUnavailable, match="is required"):
         DockerSandboxBackend.from_env()
+
+
+def test_runtime_fails_closed_without_backend():
+    import hashlib
+    from types import SimpleNamespace
+    from worker_runtime.runtime import WorkerRuntime
+
+    stream = __import__("io").BytesIO()
+    with __import__("zipfile").ZipFile(stream, "w") as zf:
+        zf.writestr("worker.py", "def run(data, config): return {'ok': True}")
+    artifact = stream.getvalue()
+
+    class Provider:
+        def fetch(self, artifact_id):
+            return artifact
+
+    request = SimpleNamespace(
+        execution_id="fail-closed-test",
+        definition=SimpleNamespace(
+            worker_id="trusted-test-worker",
+            artifact_id="test-artifact",
+            artifact_hash="sha256:" + hashlib.sha256(artifact).hexdigest(),
+            entrypoint="worker:run",
+        ),
+        configuration={},
+        input_payload={},
+        depth=0,
+        timeout_seconds=2,
+        idempotency_key=None,
+    )
+    result = WorkerRuntime(Provider()).submit(request)
+    assert result.status == "failed"
+    assert result.error.code == "SANDBOX_UNAVAILABLE"
