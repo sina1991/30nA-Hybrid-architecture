@@ -12,6 +12,12 @@
 - [تست‌ها و CI](handbook/testing-and-ci.md)
 - [دفتر تصمیم‌های معماری](handbook/decisions/README.md)
 
+## ممیزی و اصلاحات
+
+- [ماتریس تطبیق قابلیت‌ها و APIها](audit/feature-capability-matrix.md)
+- [برنامه اصلاحات و معیارهای پذیرش](audit/remediation-plan.md)
+- [وضعیت شاخه‌ها، CI و خط مبنای تست](audit/ci-and-branch-state.md)
+
 ## فصل‌های یونیت‌ها
 
 - [CORE و قراردادهای مشترک](handbook/units/00-core-contracts.md)
