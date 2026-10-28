@@ -126,7 +126,9 @@ class PublishedArtifactRegistry:
                     or not isinstance(metadata.get("calculation_version"), str)
                     or not metadata["calculation_version"]
                     or metadata.get("validation_status") != "passed"
-                    or metadata.get("dependency_lock") != "stdlib-only"
+                    or not (metadata.get("dependency_lock") == "stdlib-only"
+                            or (isinstance(metadata.get("dependency_lock"), str)
+                                and re.fullmatch(r"sha256:[0-9a-f]{64}", metadata["dependency_lock"])))
                     or not isinstance(metadata.get("input_schema"), dict)
                     or not isinstance(metadata.get("output_schema"), dict)
                     or len(_canonical(metadata["input_schema"])) > 16384
@@ -250,7 +252,9 @@ class PublishedArtifactRegistry:
             raise ArtifactInvalid("Build version is required")
         if not isinstance(calculation_version, str) or not calculation_version:
             raise ArtifactInvalid("Calculation version is required")
-        if dependency_lock != "stdlib-only":
+        if not (dependency_lock == "stdlib-only"
+                or (isinstance(dependency_lock, str)
+                    and re.fullmatch(r"sha256:[0-9a-f]{64}", dependency_lock))):
             raise ArtifactInvalid("Unsupported dependency lock policy")
         if validation_status != "passed":
             raise ArtifactInvalid("Only passed build artifacts may be published")
