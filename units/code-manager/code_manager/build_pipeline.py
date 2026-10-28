@@ -340,7 +340,7 @@ def _wheel_metadata(wheel_path: Path, package: str, version: str) -> list[tuple[
         requirements = []
         for raw_requirement in metadata.get_all("Requires-Dist", []):
             requirement = re.fullmatch(
-                r"\\s*([A-Za-z0-9][A-Za-z0-9._-]*)\\s*\\(==([A-Za-z0-9][A-Za-z0-9.+!-]*)\\)\\s*",
+                r"\s*([A-Za-z0-9][A-Za-z0-9._-]*)\s*\(==([A-Za-z0-9][A-Za-z0-9.+!-]*)\)\s*",
                 raw_requirement,
             )
             if requirement is None:
