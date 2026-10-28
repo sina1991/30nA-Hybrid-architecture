@@ -1,6 +1,6 @@
 # مدل تهدید و قرارداد پذیرش Sandbox برای WORKER RUNTIME
 
-- وضعیت: backend اولیه Docker پیاده‌سازی شده و به Runtime متصل است؛ **تأیید امنیتی و عملیاتی هنوز انجام نشده است**.
+- وضعیت: backend Docker به Runtime متصل است و CI run #70 برای commit `5350ff2e199d8e02bc6d581c5c63a35df6551aea` موفق شده است؛ **تأیید امنیتی میزبان هدف و آزمون‌های خصمانه هنوز انجام نشده‌اند**.
 - Issue: [#22](https://github.com/sina1991/30nA-Hybrid-architecture/issues/22)
 - مبنای بررسی: `main` در Commit `a011a7cbfc1d6eddb5fbc5637510c928ef2dabd2` (2026-10-29).
 - محدوده: `units/worker-runtime/worker_runtime/runtime.py` و `_runner.py`، ورودی Artifact، فرایندهای فرزند و مسیرهای Build آینده.
@@ -71,7 +71,9 @@
 
 تست واحد `units/worker-runtime/tests/test_docker_sandbox.py` سیاست فرمان Docker، اعتبارسنجی تنظیمات، الزام digest و رد اجرای بدون backend را بررسی می‌کند. تست یکپارچه `units/worker-runtime/tests/test_docker_sandbox_integration.py` در CI image آزمایشی Docker را اجرا می‌کند و هویت غیرممتاز، read-only بودن root، نبود interface شبکه غیر از loopback، محدودیت‌های cgroup و حذف کانتینر پس از لغو را بررسی می‌کند.
 
-این تست‌ها بخشی از ماتریس پذیرش‌اند، نه پوشش کامل آن. هنوز تست خصمانه مستقل برای خواندن فایل محرمانه میزبان، نوشتن خارج workspace، fork storm، تخصیص حافظه/CPU تا رسیدن به سقف، و fault-injection برای خرابی daemon اضافه/تأیید نشده است. وضعیت CI برای این شاخه در زمان آخرین بررسی قابل مشاهده نبود؛ بنابراین هیچ‌کدام از تست‌ها را نباید اجراشده یا موفق تلقی کرد تا نتیجه واقعی Workflow ثبت شود.
+CI run #70 با موفقیت تمام هفت مرحله را گذراند، از جمله ساخت image و اجرای کل مجموعه قرارداد/واحد. تست‌های خصمانه مستقل برای خواندن فایل محرمانه میزبان، نوشتن بیرون workspace، fork storm، فشار حافظه/CPU تا سقف، و fault-injection برای خرابی daemon هنوز انجام/تأیید نشده‌اند؛ موفقیت CI به معنی تأیید Production نیست.
+
+شاخه Build pipeline نیز اکنون تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند؛ اگر image معتبر وجود نداشته باشد، تست‌ها پیدا نشوند یا dependency manifest وجود داشته باشد، Build قابل انتشار نمی‌شود. resolver وابستگی allowlist/hash-pinned هنوز پیاده‌سازی نشده و به‌صورت fail-closed مسدود می‌ماند.
 
 ## دروازه انتشار
 
@@ -82,4 +84,4 @@
 4. تست‌های integration/security روی CI مناسب اجرا شوند؛
 5. راه‌اندازی، نیازمندی‌های میزبان، threat model و محدودیت‌های شناخته‌شده مستند باشند.
 
-پس از این دروازه، Issue #21 می‌تواند Build واقعی را روی همان مرز ایزوله‌سازی اجرا کند. تا آن زمان Build واقعی از Source غیرقابل‌اعتماد نباید فعال شود.
+Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. این دروازه هنوز جایگزین آزمون خصمانه روی میزبان هدف و تکمیل resolver وابستگی نیست. Issues #21/#23 نباید تا تکمیل این موارد Production-complete تلقی شوند.
