@@ -542,6 +542,14 @@ class DockerBuildExecutor:
         self.image = image
         self.docker_binary = docker_binary
         self.timeout_seconds = timeout_seconds
+        self.dependency_allowlist = (
+            dependency_allowlist if dependency_allowlist is not None
+            else os.environ.get("CODE_MANAGER_DEPENDENCY_ALLOWLIST")
+        )
+        self.wheelhouse = (
+            wheelhouse if wheelhouse is not None
+            else os.environ.get("CODE_MANAGER_DEPENDENCY_WHEELHOUSE")
+        )
         self.memory = memory
         self.cpus = cpus
         self.pids_limit = pids_limit
@@ -684,7 +692,8 @@ class BuildPipeline:
     """Orchestrate preflight, normalization, isolated tests, packaging and hashes."""
 
     def __init__(self, blob_storage, *, history_store=None, image=None,
-                 docker_binary="docker", timeout_seconds=120):
+                 docker_binary="docker", timeout_seconds=120,
+                 dependency_allowlist=None, wheelhouse=None):
         self.blob_storage = blob_storage
         self.history = history_store or BuildHistoryStore(blob_storage.root / "build-history.sqlite3")
         self.image = image if image is not None else os.environ.get(
@@ -733,17 +742,14 @@ class BuildPipeline:
                 return self._save(owner_id, report)
             dependency_stage = next((s for s in report["stages"] if s["stage"] == "dependency_check"), None)
             import_report = analyze_imports(source.get("source_bytes"))
-            if dependency_stage and (import_report["external"] or import_report["stdlib_shadowing"]):
-                dependency_stage["status"] = "blocked"
-                dependency_stage["detail"] = (
-                    "Imports require unavailable dependencies or shadow the standard library: "
-                    + json.dumps(import_report, sort_keys=True)
-                )[:1000]
-            elif dependency_stage:
-                dependency_stage["detail"] = (
-                    "Static imports are standard-library or archive-local; stdlib-only policy enforced"
-                )
-            if dependency_stage and dependency_stage["status"] != "passed":
+            dependency_result = resolve_dependency_policy(
+                source.get("source_bytes"), import_report,
+                self.dependency_allowlist, self.wheelhouse,
+            )
+            if dependency_stage:
+                dependency_stage["status"] = dependency_result["status"]
+                dependency_stage["detail"] = dependency_result["detail"][:1000]
+            if dependency_result["status"] != "passed":
                 record("normalize_working_copy", "not_run", "Dependency policy blocked the build")
                 record("test", "not_run", "Dependency policy blocked the build")
                 record("reproducibility", "not_run", "No package produced")
@@ -797,7 +803,9 @@ class BuildPipeline:
                 record("package", "not_run", "Sandbox configuration is invalid")
                 record("hash", "not_run", "No final artifact exists")
                 return self._save(owner_id, report)
-            test_result = executor.run_tests(normalized, source["entrypoint"])
+            test_result = executor.run_tests(
+                normalized, source["entrypoint"], dependency_result.get("wheels", [])
+            )
             test_status = test_result.get("status")
             record("test", "passed" if test_status == "passed" else
                    "blocked" if test_status == "blocked" else "failed",
@@ -811,8 +819,33 @@ class BuildPipeline:
                 report["status"] = "failed" if test_status == "failed" else "blocked"
                 return self._save(owner_id, report)
 
-            artifact_one = normalize_source_archive(source_bytes, include_tests=False)
-            artifact_two = normalize_source_archive(source_bytes, include_tests=False)
+            extra_files = {}
+            lock_manifest = dependency_result.get("lock", {"version": 1, "wheels": []})
+            if dependency_result.get("wheels"):
+                for wheel in dependency_result["wheels"]:
+                    wheel_bytes = Path(wheel["path"]).read_bytes()
+                    if hashlib.sha256(wheel_bytes).hexdigest() != wheel["sha256"]:
+                        record("reproducibility", "failed", "Allowlisted wheel changed during the build")
+                        record("package", "not_run", "Dependency wheel integrity changed")
+                        record("hash", "not_run", "No final artifact exists")
+                        report["status"] = "failed"
+                        return self._save(owner_id, report)
+                    extra_files["vendor/" + wheel["filename"]] = wheel_bytes
+                extra_files["vendor/dependencies.json"] = json.dumps(
+                    lock_manifest, sort_keys=True, separators=(",", ":")
+                ).encode("utf-8")
+            dependency_lock = (
+                "stdlib-only" if not dependency_result.get("wheels")
+                else "sha256:" + hashlib.sha256(
+                    json.dumps(lock_manifest, sort_keys=True, separators=(",", ":")).encode("utf-8")
+                ).hexdigest()
+            )
+            artifact_one = normalize_source_archive(
+                source_bytes, include_tests=False, extra_files=extra_files
+            )
+            artifact_two = normalize_source_archive(
+                source_bytes, include_tests=False, extra_files=extra_files
+            )
             if artifact_one != artifact_two:
                 record("reproducibility", "failed", "Repeated deterministic packaging produced different bytes")
                 record("package", "not_run", "Reproducibility check failed")
@@ -843,7 +876,7 @@ class BuildPipeline:
                 "artifact_version": digest,
                 "build_version": _BUILDER_VERSION,
                 "calculation_version": source.get("calculation_version", "1.0.0"),
-                "dependency_lock": "stdlib-only",
+                "dependency_lock": dependency_lock,
                 "input_schema": source["input_schema"],
                 "output_schema": source["output_schema"],
                 "validation_status": "passed",
@@ -854,9 +887,15 @@ class BuildPipeline:
                     "artifact_hash": "sha256:" + digest,
                     "sandbox_image": self.image,
                     "test_count": int(test_result.get("tests", 0)),
-                    "dependency_policy": "stdlib-only; external imports and dependency manifests are blocked; no dynamic installation",
-                    "dependency_lock": "stdlib-only",
-                    "dependency_lock_hash": "sha256:" + hashlib.sha256(b"stdlib-only").hexdigest(),
+                    "dependency_policy": (
+                        "stdlib-only" if not dependency_result.get("wheels")
+                        else "allowlisted SHA-256-pinned pure-Python wheels from an offline wheelhouse"
+                    ),
+                    "dependency_lock": dependency_lock,
+                    "dependency_lock_hash": (
+                        "sha256:" + hashlib.sha256(b"stdlib-only").hexdigest()
+                        if dependency_lock == "stdlib-only" else dependency_lock
+                    ),
                     "normalized_archive_hash": "sha256:" + hashlib.sha256(normalized).hexdigest(),
                     "archive_entry_count": inspection.entry_count,
                 },
