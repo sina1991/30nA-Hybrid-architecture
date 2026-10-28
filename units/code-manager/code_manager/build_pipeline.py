@@ -327,7 +327,6 @@ class DockerBuildExecutor:
             # The parent temp directory remains private to the host process.
             archive_path.chmod(0o644)
             runner_path.chmod(0o644)
-            cidfile.touch(mode=0o600)
             command = [
                 binary, "run", "--rm", "--pull=never", "--interactive",
                 "--name", container_name, "--cidfile", str(cidfile),
@@ -414,8 +413,9 @@ class DockerBuildExecutor:
             try:
                 result = json.loads(bytes(captured).decode("utf-8").strip().splitlines()[-1])
             except (UnicodeDecodeError, ValueError, IndexError):
+                diagnostic = bytes(captured).decode("utf-8", "replace")[-1000:]
                 return {"status": "failed", "tests": 0, "failures": 1,
-                        "summary": "Build test runner returned an invalid result"}
+                        "summary": "Build test runner returned an invalid result: " + diagnostic}
             if proc.returncode != 0 and result.get("status") == "passed":
                 result["status"] = "failed"
                 result["summary"] = "Build test runner exited unsuccessfully"
