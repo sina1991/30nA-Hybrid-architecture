@@ -38,7 +38,8 @@ class ExecutionResult:
 class WorkerRuntime:
     def __init__(self, artifact_provider, definitions=None, max_depth=3, max_children=8,
                  max_concurrent=16, max_artifact_bytes=16 * 1024 * 1024,
-                 max_output_bytes=1024 * 1024, max_input_bytes=1024 * 1024):
+                 max_output_bytes=1024 * 1024, max_input_bytes=1024 * 1024,
+                 execution_store=None):
         if any(type(n) is not int or n < 0 for n in (max_depth, max_children)):
             raise ValueError('max_depth and max_children must be nonnegative integers')
         if type(max_concurrent) is not int or max_concurrent <= 0:
@@ -53,8 +54,27 @@ class WorkerRuntime:
         self.max_input_bytes = max_input_bytes
         self._capacity = threading.BoundedSemaphore(max_concurrent)
         self._lock = threading.RLock()
-        self._history = {}
-        self._keys = {}  # key -> (canonical request fingerprint, execution id)
+        self._execution_store = execution_store
+        if execution_store is None:
+            self._history, self._keys = {}, {}
+        else:
+            self._history, self._keys = execution_store.load()
+            # A live subprocess cannot be resumed after a process restart. Mark
+            # persisted nonterminal snapshots explicitly rather than claiming they ran.
+            for execution_id, prior in tuple(self._history.items()):
+                if prior.status in {'accepted', 'running'}:
+                    interrupted = ExecutionResult(
+                        prior.execution_id, prior.worker_id, prior.accepted, 'failed',
+                        error=ExecutionError(
+                            'RUNTIME_RESTARTED',
+                            'Runtime restarted before execution reached a terminal state',
+                            True,
+                        ),
+                        children=prior.children,
+                    )
+                    execution_store.save_result(interrupted)
+                    self._history[execution_id] = interrupted
+        # key -> (canonical request fingerprint, execution id)
         self._active = {}  # execution id -> Popen
         self._cancelled = set()
         self._parents = {}  # execution id -> parent execution id
@@ -102,6 +122,8 @@ class WorkerRuntime:
             if eid in self._cancelled:
                 status, result, error = 'cancelled', None, ExecutionError('CANCELLED', 'Execution cancelled')
             response = ExecutionResult(eid, wid, accepted, status, result, error, tuple(children))
+            if self._execution_store is not None:
+                self._execution_store.save_result(response)
             self._history[eid] = response
             return response
 
@@ -152,7 +174,12 @@ class WorkerRuntime:
                 return self._history[prior_id]
             if eid in self._history:
                 return ExecutionResult(eid, wid, False, 'failed', error=ExecutionError('EXECUTION_CONFLICT', 'Execution ID already used'))
-            self._history[eid] = ExecutionResult(eid, wid, True, 'accepted')
+            accepted_result = ExecutionResult(eid, wid, True, 'accepted')
+            if self._execution_store is not None:
+                self._execution_store.accept(
+                    accepted_result, idempotency_key=key, fingerprint=fingerprint
+                )
+            self._history[eid] = accepted_result
             if key is not None:
                 self._keys[key] = (fingerprint, eid)
         return self._execute(request, finish)
