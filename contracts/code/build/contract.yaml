@@ -55,9 +55,11 @@ stage_requirements:
   dependency_check:
     required: true
     rules:
-      - "Allow only standard-library and archive-local imports in the current stdlib-only build profile."
-      - "Reject unresolved external imports, dynamic imports, standard-library shadowing, and dependency manifests."
-      - "Do not install packages or access the network; dependency manifests remain blocked until an allowlisted hash-pinned offline resolver and runtime dependency packaging are available."
+      - "Allow standard-library and archive-local imports without external dependencies."
+      - "External imports are permitted only when every imported module is mapped to a trusted package in CODE_MANAGER_DEPENDENCY_ALLOWLIST."
+      - "Only root requirements.txt is accepted, with exact package==version --hash=sha256 pins matching the trusted allowlist and wheel bytes in CODE_MANAGER_DEPENDENCY_WHEELHOUSE."
+      - "Only pure-Python py3-none-any wheels without transitive Requires-Dist dependencies are supported; all other manifests, native extensions, .pth files and dynamic imports are blocked."
+      - "No package manager runs and no network access is available. Verified wheels are mounted read-only for tests and vendored into the final artifact with a hash manifest."
   contract_check:
     required: true
     rules:
@@ -114,7 +116,7 @@ implementation_status:
     - verify_source_hash
     - validate_archive_paths
     - syntax_check
-    - stdlib_only_dependency_gate
+    - stdlib_only_and_allowlisted_offline_wheel_gate
     - contract_check_with_schema_size_limit
     - normalize_working_copy
     - isolated_test_execution
@@ -124,9 +126,8 @@ implementation_status:
     - durable_owner_scoped_build_history
     - publication_gate
   blocked_or_not_implemented:
-    - allowlisted_hash_pinned_external_dependency_resolution
-    - runtime_vendoring_of_external_dependencies
-    - adversarial_host_acceptance_tests
+    - transitive_or_native_dependency_support
+    - production_host_acceptance_and_daemon_fault_injection
   publication_eligible: conditional_on_all_stages_passed
   note: >-
     POST /api/v1/builds runs the real pipeline, but only the stdlib-only profile
