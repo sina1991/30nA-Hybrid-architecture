@@ -50,6 +50,7 @@ def test_real_docker_container_enforces_identity_and_read_only_root(tmp_path):
         assert result["result"]["pids_limit"] == "64"
         assert result["result"]["host_secret_visible"] is False
         assert result["result"]["host_write"] is False
+        assert result["result"]["network_blocked"] is True
     finally:
         if proc is not None:
             if proc.poll() is None:
@@ -109,3 +110,84 @@ def test_real_docker_cancellation_removes_container(tmp_path):
                 backend.terminate(proc)
                 proc.wait(timeout=5)
             backend.cleanup(proc)
+
+
+def test_real_docker_pids_limit_blocks_fork_storm(tmp_path):
+    image = os.environ.get("WORKER_RUNTIME_SANDBOX_TEST_IMAGE")
+    if not image or not shutil.which("docker"):
+        pytest.skip("CI Docker sandbox image is not configured")
+    probe = subprocess.run(
+        ["docker", "info", "--format", "{{.ServerVersion}}"],
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        timeout=5, check=False,
+    )
+    if probe.returncode != 0:
+        pytest.skip("Docker daemon is not available")
+    source = b'''import subprocess, sys\ndef run(data, config):\n    children = []\n    blocked = False\n    try:\n        for _ in range(128):\n            try:\n                children.append(subprocess.Popen([sys.executable, "-c", "import time; time.sleep(5)"], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL))\n            except OSError:\n                blocked = True\n                break\n    finally:\n        for child in children:\n            try: child.terminate()\n            except OSError: pass\n        for child in children:\n            try: child.wait(timeout=2)\n            except Exception: pass\n    return {"fork_blocked": blocked, "children": len(children)}\n'''
+    archive = tmp_path / "fork-storm.zip"
+    with zipfile.ZipFile(archive, "w") as zf:
+        zf.writestr("worker.py", source)
+    runner = Path(__file__).parents[1] / "worker_runtime" / "_runner.py"
+    backend = DockerSandboxBackend(image, startup_timeout=10)
+    proc = None
+    try:
+        proc = backend.launch(
+            archive, runner, "worker:run", execution_id="fork-storm-probe",
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        )
+        stdout, stderr = proc.communicate(
+            json.dumps({"input": {}, "configuration": {}}).encode("utf-8"),
+            timeout=20,
+        )
+        assert proc.returncode == 0, stderr.decode("utf-8", "replace")
+        result = json.loads(stdout)
+        assert result["ok"] is True, result
+        assert result["result"]["fork_blocked"] is True, result
+        assert result["result"]["children"] < 64, result
+    finally:
+        if proc is not None:
+            if proc.poll() is None:
+                backend.terminate(proc)
+                proc.wait(timeout=5)
+            backend.cleanup(proc)
+
+
+def test_real_docker_memory_cgroup_kills_over_limit_process():
+    image = os.environ.get("WORKER_RUNTIME_SANDBOX_TEST_IMAGE")
+    if not image or not shutil.which("docker"):
+        pytest.skip("CI Docker sandbox image is not configured")
+    probe = subprocess.run(
+        ["docker", "info", "--format", "{{.ServerVersion}}"],
+        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+        timeout=5, check=False,
+    )
+    if probe.returncode != 0:
+        pytest.skip("Docker daemon is not available")
+    name = "sandbox-memory-probe-" + __import__("uuid").uuid4().hex
+    command = [
+        "docker", "run", "--pull=never", "--name", name,
+        "--network=none", "--read-only", "--user", "65532:65532",
+        "--memory=64m", "--memory-swap=64m", "--cpus=1.0", "--pids-limit=16",
+        "--cap-drop=ALL", "--security-opt=no-new-privileges:true",
+        "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=8m",
+        image, "python", "-I", "-c",
+        "x=bytearray(256*1024*1024); x[::4096]=b'X'*(len(x)//4096); import time; time.sleep(1)",
+    ]
+    try:
+        run = subprocess.run(
+            command, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, timeout=15, check=False,
+        )
+        assert run.returncode != 0, "memory allocation unexpectedly exceeded the configured cgroup limit"
+        inspect = subprocess.run(
+            ["docker", "inspect", "--format", "{{.State.OOMKilled}}", name],
+            stdin=subprocess.DEVNULL, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+            timeout=5, check=False,
+        )
+        assert inspect.returncode == 0, "memory-test container disappeared before inspection"
+        assert inspect.stdout.decode("ascii", "replace").strip() == "true"
+    finally:
+        subprocess.run(
+            ["docker", "rm", "--force", name], stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5, check=False,
+        )
