@@ -15,13 +15,19 @@ time budget and cancellation. No automatic retry is performed.
 
 ## CODE MANAGER dependency
 
-`CodeManagerArtifactProvider` expects an authenticated public
-`GET /artifacts/{artifact_id}/content` returning raw ZIP bytes with content type
-`application/octet-stream`. The current CODE MANAGER API returns HTTP 501 for
-artifact routes. Production end-to-end artifact retrieval is therefore **blocked**
-until CODE MANAGER implements and publishes a compatible endpoint. This module
-never reaches into CODE MANAGER private storage or registries. The provider used
-in local integration tests is an explicit in-memory fixture, not CODE MANAGER.
+The current CODE MANAGER API implements
+`GET /api/v1/artifacts/{artifact_id}/content`, returning byte-exact content for
+an already-published, owner-scoped artifact. It verifies the immutable manifest
+and blob and returns a SHA-256 digest. This closes the earlier missing-download
+endpoint gap.
+
+**Important distinction:** the current publication registry identifies these
+objects as `source_zip`; the download endpoint does not prove that a build
+pipeline has validated, tested or packaged the source. The build contract remains
+draft, and HTTP publication is intentionally blocked. The WORKER RUNTIME
+`CodeManagerArtifactProvider` still needs a real-service integration test with
+the expected authentication and URL configuration. Existing in-memory provider
+fixtures do not prove that end-to-end path.
 
 ## Security limitations
 
@@ -33,5 +39,9 @@ artifacts in a development environment. Production requires a dedicated sandbox
 CPU/memory/PID limits, no inherited credentials, and audited egress), plus
 external scheduling and persistent state. ZIP path/symlink checks, hash checks,
 size limits and subprocess timeouts are defense-in-depth, not a substitute.
+
 Captured stdout is bounded only *after* the subprocess exits: a malicious worker
-can still exhaust memory by printing indefinitely. Run only trusted artifacts.
+can still exhaust memory by printing indefinitely. Output limits must be enforced
+while streaming, before the data is accumulated in memory. Run only trusted
+artifacts until the sandbox and streaming output controls are independently
+implemented and tested.
