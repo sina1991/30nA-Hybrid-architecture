@@ -1,6 +1,7 @@
 import hashlib
 import io
 import sys
+import tempfile
 import threading
 import time
 import unittest
@@ -8,7 +9,7 @@ import zipfile
 from pathlib import Path
 sys.path[:0] = [str(Path(__file__).resolve().parents[2] / 'worker-manager'), str(Path(__file__).resolve().parents[1])]
 from worker_manager import WorkerManager, WorkerDefinition
-from worker_runtime import WorkerRuntime, CodeManagerArtifactProvider
+from worker_runtime import WorkerRuntime, CodeManagerArtifactProvider, SQLiteExecutionStore, ExecutionResult
 
 
 def artifact(code):
@@ -134,6 +135,55 @@ class OperationalTests(unittest.TestCase):
         self.assertEqual(result.status, 'failed')
         self.assertFalse(result.accepted)
         self.assertEqual(result.error.code, 'INVALID_INPUT')
+
+    def test_execution_history_and_idempotency_survive_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            database = Path(tmp) / "runtime.sqlite3"
+            first_runtime = WorkerRuntime(
+                Provider(self.sources), self.definitions,
+                execution_store=SQLiteExecutionStore(database),
+            )
+            first_manager = WorkerManager(first_runtime)
+            first_manager.register(self.definitions['fast'])
+            first_manager.enable('fast')
+            first = first_manager.request_execution(
+                'fast', input_payload={'value': 7}, idempotency_key='durable-key',
+                timeout_seconds=30,
+            )
+            self.assertEqual(first.status, 'succeeded')
+
+            second_runtime = WorkerRuntime(
+                Provider(self.sources), self.definitions,
+                execution_store=SQLiteExecutionStore(database),
+            )
+            second_manager = WorkerManager(second_runtime)
+            second_manager.register(self.definitions['fast'])
+            second_manager.enable('fast')
+            replay = second_manager.request_execution(
+                'fast', input_payload={'value': 7}, idempotency_key='durable-key',
+                timeout_seconds=30,
+            )
+            self.assertEqual(replay.execution_id, first.execution_id)
+            self.assertEqual(replay.result, {'value': 7})
+            self.assertEqual(second_manager.get_execution(first.execution_id).status, 'succeeded')
+
+    def test_nonterminal_snapshot_is_marked_interrupted_on_restart(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            database = Path(tmp) / "runtime.sqlite3"
+            store = SQLiteExecutionStore(database)
+            store.accept(
+                ExecutionResult("inflight-id", "fast", True, "accepted"),
+                idempotency_key="inflight-key",
+                fingerprint="request-fingerprint",
+            )
+            runtime = WorkerRuntime(
+                Provider(self.sources), self.definitions,
+                execution_store=SQLiteExecutionStore(database),
+            )
+            result = runtime.get("inflight-id")
+            self.assertEqual(result.status, 'failed')
+            self.assertEqual(result.error.code, 'RUNTIME_RESTARTED')
+            self.assertTrue(result.error.retryable)
 
     def test_code_manager_requires_https(self):
         with self.assertRaises(ValueError):

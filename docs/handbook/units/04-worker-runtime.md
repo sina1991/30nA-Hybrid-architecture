@@ -11,7 +11,11 @@ WORKER RUNTIME وظیفه اجرای درخواست Worker، مدیریت وضع
 
 ## رفتار مستندشده
 
-README فعلی `WorkerRuntime.submit` هم‌زمان و دارای `ExecutionResult` را توصیف می‌کند؛ `get` وضعیت accepted/running/terminal را می‌خواند و `cancel` فرایند فعال و درخواست لغو فرزندها را مدیریت می‌کند. idempotency map در حافظه همان process است و بعد از restart پایدار نمی‌ماند. retry خودکار انجام نمی‌شود. محدودیت‌های concurrency، اندازه archive، ورودی سریال‌شده، خروجی، تعداد/depth فرزند و زمان اجرا قابل تنظیم‌اند. حد پیش‌فرض ورودی+تنظیمات سریال‌شده ۱ MiB است؛ payload بزرگ‌تر یا غیرقابل تبدیل به JSON باید پیش از اجرای subprocess با `INVALID_INPUT` رد شود. این سقف از payload بسیار بزرگ جلوگیری می‌کند اما جای محدودیت حافظه/CPU در Sandbox را نمی‌گیرد. Runtime اکنون مقادیر نامعتبر برای concurrency و سقف‌های بایت Artifact/input/output را در زمان ساخت نمونه رد می‌کند؛ این مقادیر باید integer مثبت باشند.
+README فعلی `WorkerRuntime.submit` هم‌زمان و دارای `ExecutionResult` را توصیف می‌کند؛ `get` وضعیت accepted/running/terminal را می‌خواند و `cancel` فرایند فعال و درخواست لغو فرزندها را مدیریت می‌کند. در حالت پیش‌فرض، تاریخچه و idempotency در حافظه همان process هستند. `SQLiteExecutionStore` اختیاری snapshotهای JSON-compatible و نگاشت idempotency را پایدار می‌کند. در startup، رکوردهای غیرنهایی `accepted`/`running` به `failed` با کد `RUNTIME_RESTARTED` و `retryable=true` تبدیل می‌شوند؛ process زنده بازیابی یا ادامه داده نمی‌شود. این قابلیت history پایدار است، نه exactly-once یا scheduler توزیع‌شده، و برای یک process به‌ازای هر DB طراحی شده است. retry خودکار انجام نمی‌شود. محدودیت‌های concurrency، اندازه archive، ورودی سریال‌شده، خروجی، تعداد/depth فرزند و زمان اجرا قابل تنظیم‌اند. حد پیش‌فرض ورودی+تنظیمات سریال‌شده ۱ MiB است؛ payload بزرگ‌تر یا غیرقابل تبدیل به JSON باید پیش از اجرای subprocess با `INVALID_INPUT` رد شود. این سقف از payload بسیار بزرگ جلوگیری می‌کند اما جای محدودیت حافظه/CPU در Sandbox را نمی‌گیرد. Runtime اکنون مقادیر نامعتبر برای concurrency و سقف‌های بایت Artifact/input/output را در زمان ساخت نمونه رد می‌کند؛ این مقادیر باید integer مثبت باشند.
+
+## تاریخچه اجرای پایدار
+
+با تزریق `SQLiteExecutionStore` به `WorkerRuntime`، snapshot اجرا و کلیدهای idempotency در SQLite ثبت می‌شوند. این کار برای بررسی نتیجه پس از restart مفید است، اما اجرای در حال انجام را resume نمی‌کند و جای ذخیره‌سازی scheduler/lease را نمی‌گیرد. تست عملیاتی باید نتیجه terminal پس از restart، replay کلید idempotency و تبدیل رکورد غیرنهایی به `RUNTIME_RESTARTED` را پوشش دهد.
 
 ## وضعیت وابستگی Artifact
 
