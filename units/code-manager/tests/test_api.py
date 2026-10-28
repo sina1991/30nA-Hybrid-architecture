@@ -359,11 +359,46 @@ class CodeManagerAPITests(unittest.TestCase):
         )
         self.assertEqual(status, 201)
         self.assertEqual(response["payload"]["artifact"]["artifact_type"], "built_artifact")
+        status, _, repeated = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish", {"build_id": build_id}
+        )
+        self.assertEqual(status, 200)
+        self.assertFalse(repeated["payload"]["created"])
         status, _, downloaded = self.request(
             "GET", "/api/v1/artifacts/pricing-model@1.0.0/content"
         )
         self.assertEqual(status, 200)
         self.assertEqual(downloaded, artifact_bytes)
+
+
+    def test_publish_rejects_blocked_build(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        status, _, response = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        self.assertEqual(status, 200)
+        build_id = response["payload"]["build"]["build_id"]
+        status, _, blocked = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": build_id},
+        )
+        self.assertEqual(status, 409)
+        self.assertEqual(blocked["error"]["code"], "BUILD_NOT_PUBLISHABLE")
+
+    def test_build_cannot_be_published_by_another_owner(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        _, _, response = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        build_id = response["payload"]["build"]["build_id"]
+        status, _, hidden = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": build_id}, owner="bob",
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(hidden["error"]["code"], "BUILD_NOT_FOUND")
 
 
 if __name__ == "__main__":
