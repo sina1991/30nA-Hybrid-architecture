@@ -341,6 +341,8 @@ def resolve_dependency_policy(source_bytes: bytes, import_report: dict, allowlis
             if manifests != ["requirements.txt"]:
                 return {"status":"blocked","detail":"Only a root requirements.txt is supported; other dependency manifests are forbidden","wheels":[]}
             requirements_bytes = archive.read("requirements.txt")
+            if len(requirements_bytes) > 65536:
+                return {"status":"blocked","detail":"requirements.txt exceeds 64 KiB","wheels":[]}
     except (zipfile.BadZipFile, KeyError, OSError):
         return {"status":"blocked","detail":"Dependency manifest could not be read","wheels":[]}
     if not isinstance(allowlist_config, (str, dict)) or not wheelhouse:
@@ -385,12 +387,14 @@ def resolve_dependency_policy(source_bytes: bytes, import_report: dict, allowlis
                 or not isinstance(modules, list) or not modules
                 or any(not isinstance(module, str) or not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", module) for module in modules)):
             return {"status":"blocked","detail":"Dependency pin does not exactly match trusted allowlist: "+package_name,"wheels":[]}
-        expected_distribution = filename.split("-", 1)[0].replace("_", "-").lower()
-        if expected_distribution != normalized_name:
-            return {"status":"blocked","detail":"Allowlisted wheel filename does not match package name","wheels":[]}
+        expected_filename = normalized_name.replace("-", "_") + "-" + version + "-py3-none-any.whl"
+        if filename != expected_filename:
+            return {"status":"blocked","detail":"Allowlisted wheel filename does not match package/version","wheels":[]}
         wheel_path = (wheelhouse_path / filename).resolve()
         if wheel_path.parent != wheelhouse_path or not wheel_path.is_file():
             return {"status":"blocked","detail":"Allowlisted wheel is missing from the offline wheelhouse: "+filename,"wheels":[]}
+        if wheel_path.stat().st_size > 8 * 1024 * 1024:
+            return {"status":"blocked","detail":"Dependency wheel exceeds the 8 MiB limit","wheels":[]}
         digest = hashlib.sha256(wheel_path.read_bytes()).hexdigest()
         if digest != trusted_hash:
             return {"status":"blocked","detail":"Offline wheel SHA-256 mismatch: "+filename,"wheels":[]}
@@ -401,6 +405,8 @@ def resolve_dependency_policy(source_bytes: bytes, import_report: dict, allowlis
         total_bytes += wheel_path.stat().st_size
         if total_bytes > 8 * 1024 * 1024:
             return {"status":"blocked","detail":"Total vendored dependency wheels exceed 8 MiB","wheels":[]}
+        if len(selected) >= 64:
+            return {"status":"blocked","detail":"More than 64 dependency wheels are not supported","wheels":[]}
         selected.append({"package": normalized_name, "version": version, "filename": filename,
                          "sha256": digest, "path": str(wheel_path)})
         selected_modules.update(modules)
