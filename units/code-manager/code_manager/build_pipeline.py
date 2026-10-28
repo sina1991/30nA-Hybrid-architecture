@@ -175,7 +175,7 @@ def main():
     for item in reversed(wheels):
         filename = item.get("filename") if isinstance(item, dict) else None
         digest = item.get("sha256") if isinstance(item, dict) else None
-        if not isinstance(filename, str) or re.fullmatch(r"[A-Za-z0-9_.+-]+-py3-none-any\\.whl", filename) is None:
+        if not isinstance(filename, str) or re.fullmatch(r"[A-Za-z0-9_.+-]+-py3-none-any\.whl", filename) is None:
             raise ValueError("invalid vendored wheel name")
         wheel_path = Path("/") / filename
         if not wheel_path.is_file() or hashlib.sha256(wheel_path.read_bytes()).hexdigest() != digest:
