@@ -726,6 +726,9 @@ class DockerBuildExecutor:
                 if proc.poll() is None:
                     stop_container()
                     proc.wait(timeout=5)
+                # A natural Docker CLI exit also needs a control-plane removal
+                # check; the CLI can disconnect while the container keeps running.
+                stop_container()
                 reader.join(timeout=1)
             if cleanup_unconfirmed.is_set():
                 # TemporaryDirectory will be removed on return, so copy the
