@@ -51,7 +51,7 @@ class APITests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "bearer tokens require HTTPS"):
             PublicAPI("http://api.example", token="secret")
         with self.assertRaisesRegex(ValueError, "single-line"):
-            PublicAPI("https://api.example", token="secret\\r\\nX-Injected: yes")
+            PublicAPI("https://api.example", token="secret\r\nX-Injected: yes")
         # Loopback HTTP remains available for local development only.
         PublicAPI("http://localhost:8080", token="local-test-token")
 
