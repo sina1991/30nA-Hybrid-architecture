@@ -6,11 +6,12 @@ Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORK
 
 ## شروع توسعه
 
-Python 3.11 یا 3.12، Docker و OpenSSL لازم‌اند. از checkout موجود استفاده کنید؛ Git worktree تازه لازم نیست.
+Python 3.11 یا 3.12، Docker و OpenSSL لازم‌اند. برای تست کامل UI، Node و Chrome/Chromium نیز لازم است. از checkout موجود استفاده کنید؛ Git worktree تازه لازم نیست.
 
 ```bash
 bash scripts/deployment/prepare.sh
 source .venv/bin/activate
+npm ci --prefix units/consumers/dashboard-core/browser-tests --ignore-scripts --no-audit --no-fund
 docker build -t 30na-sandbox -f units/worker-runtime/tests/sandbox-image/Dockerfile .
 python scripts/testing/run_ci.py --image "$(docker image inspect --format '{{.Id}}' 30na-sandbox)"
 ```
