@@ -16,6 +16,8 @@ import time
 import uuid
 import zipfile
 
+from .docker_sandbox import DockerSandboxBackend, SandboxUnavailable
+
 
 @dataclass(frozen=True)
 class ExecutionError:
@@ -39,7 +41,7 @@ class WorkerRuntime:
     def __init__(self, artifact_provider, definitions=None, max_depth=3, max_children=8,
                  max_concurrent=16, max_artifact_bytes=16 * 1024 * 1024,
                  max_output_bytes=1024 * 1024, max_input_bytes=1024 * 1024,
-                 execution_store=None):
+                 execution_store=None, sandbox_backend=None, require_sandbox=True):
         if any(type(n) is not int or n < 0 for n in (max_depth, max_children)):
             raise ValueError('max_depth and max_children must be nonnegative integers')
         if type(max_concurrent) is not int or max_concurrent <= 0:
@@ -47,6 +49,10 @@ class WorkerRuntime:
         if any(type(n) is not int or n <= 0 for n in
                (max_artifact_bytes, max_output_bytes, max_input_bytes)):
             raise ValueError('artifact, output and input byte limits must be positive integers')
+        if type(require_sandbox) is not bool:
+            raise ValueError("require_sandbox must be a bool")
+        self.sandbox_backend = sandbox_backend
+        self.require_sandbox = require_sandbox
         self.provider = artifact_provider
         self.definitions = {} if definitions is None else dict(definitions)
         self.max_depth, self.max_children = max_depth, max_children
@@ -83,8 +89,10 @@ class WorkerRuntime:
         with self._lock:
             return self._history.get(execution_id)
 
-    @staticmethod
-    def _terminate(proc):
+    def _terminate(self, proc):
+        if self.sandbox_backend is not None:
+            self.sandbox_backend.terminate(proc)
+            return
         try:
             if os.name == 'posix':
                 os.killpg(proc.pid, signal.SIGKILL)
@@ -216,6 +224,9 @@ class WorkerRuntime:
             return finish('failed', error=ExecutionError('ARTIFACT_INVALID', 'Invalid artifact archive'))
         if not self._capacity.acquire(blocking=False):
             return finish('failed', accepted=False, error=ExecutionError('CAPACITY_EXCEEDED', 'Runtime capacity exceeded', True))
+        if self.require_sandbox and self.sandbox_backend is None:
+            self._capacity.release()
+            return finish('failed', error=ExecutionError('SANDBOX_UNAVAILABLE', 'A configured sandbox backend is required'))
         return self._run_subprocess(request, finish, source, deadline)
 
     def _run_subprocess(self, request, finish, source, deadline):
@@ -226,12 +237,20 @@ class WorkerRuntime:
             archive.write_bytes(source)
             runner = Path(__file__).with_name('_runner.py')
             try:
-                proc = subprocess.Popen([sys.executable, '-I', str(runner), str(archive),
-                    request.definition.entrypoint], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                    stderr=subprocess.DEVNULL, start_new_session=True)
-            except OSError:
+                if self.sandbox_backend is not None:
+                    proc = self.sandbox_backend.launch(
+                        archive, runner, request.definition.entrypoint,
+                        execution_id=eid, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL,
+                    )
+                else:
+                    # Explicitly unsafe compatibility mode; never use for untrusted artifacts.
+                    proc = subprocess.Popen([sys.executable, '-I', str(runner), str(archive),
+                        request.definition.entrypoint], stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                        stderr=subprocess.DEVNULL, start_new_session=True)
+            except (OSError, SandboxUnavailable):
                 self._capacity.release()
-                return finish('failed', error=ExecutionError('EXECUTION_ERROR', 'Cannot start worker'))
+                return finish('failed', error=ExecutionError('SANDBOX_UNAVAILABLE' if self.require_sandbox else 'EXECUTION_ERROR', 'Cannot start worker execution backend'))
             with self._lock:
                 self._active[eid] = proc
                 self._history[eid] = ExecutionResult(eid, wid, True, 'running')
@@ -291,6 +310,8 @@ class WorkerRuntime:
                 with self._lock:
                     self._active.pop(eid, None)
                 self._capacity.release()
+                if self.sandbox_backend is not None:
+                    self.sandbox_backend.cleanup(proc)
             with self._lock:
                 if eid in self._cancelled:
                     return finish('cancelled')

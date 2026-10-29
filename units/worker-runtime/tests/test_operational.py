@@ -33,7 +33,7 @@ class OperationalTests(unittest.TestCase):
                         'parent': artifact('def run(input, configuration):\n return {"value":1,"children":[{"worker_id":"slow"}]}\n'),
                         'flood': artifact('def run(input, configuration):\n while True: print("x" * 4096, flush=True)\n')}
         self.definitions = {k: WorkerDefinition(k, k, 'sha256:' + hashlib.sha256(v).hexdigest(), 'task:run') for k, v in self.sources.items()}
-        self.runtime = WorkerRuntime(Provider(self.sources), self.definitions, max_concurrent=1)
+        self.runtime = WorkerRuntime(Provider(self.sources), self.definitions, max_concurrent=1, require_sandbox=False)
         self.manager = WorkerManager(self.runtime)
         for definition in self.definitions.values():
             self.manager.register(definition)
@@ -112,7 +112,7 @@ class OperationalTests(unittest.TestCase):
 
     def test_stdout_limit_is_enforced_while_streaming(self):
         runtime = WorkerRuntime(Provider(self.sources), self.definitions,
-                                max_concurrent=1, max_output_bytes=128)
+                                max_concurrent=1, max_output_bytes=128, require_sandbox=False)
         manager = WorkerManager(runtime)
         manager.register(self.definitions['flood'])
         manager.enable('flood')
@@ -127,7 +127,7 @@ class OperationalTests(unittest.TestCase):
 
     def test_serialized_input_limit_is_enforced_before_execution(self):
         runtime = WorkerRuntime(Provider(self.sources), self.definitions,
-                                max_concurrent=1, max_input_bytes=128)
+                                max_concurrent=1, max_input_bytes=128, require_sandbox=False)
         manager = WorkerManager(runtime)
         manager.register(self.definitions['fast'])
         manager.enable('fast')
@@ -141,7 +141,7 @@ class OperationalTests(unittest.TestCase):
             database = Path(tmp) / "runtime.sqlite3"
             first_runtime = WorkerRuntime(
                 Provider(self.sources), self.definitions,
-                execution_store=SQLiteExecutionStore(database),
+                execution_store=SQLiteExecutionStore(database), require_sandbox=False,
             )
             first_manager = WorkerManager(first_runtime)
             first_manager.register(self.definitions['fast'])
