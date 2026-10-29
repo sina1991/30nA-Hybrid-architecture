@@ -15,6 +15,7 @@ SUPPORTED_TYPES = {
     "health",
     "theme-summary",
     "slot-note",
+    "dice-roller",
 }
 
 
