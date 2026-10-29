@@ -12,8 +12,9 @@
 - [تست‌ها و CI](handbook/testing-and-ci.md)
 - [دفتر تصمیم‌های معماری](handbook/decisions/README.md)
 
-## امنیت
+## امنیت و استقرار
 
+- [پذیرش مرحله راه‌اندازی Rootless Docker](security/rootless-docker-stage-acceptance.md) — این مرحله تأیید شده است؛ تأیید کلی امنیت تولید همچنان باز است.
 - [مدل تهدید و معیارهای پذیرش Sandbox در Worker Runtime](security/worker-runtime-sandbox-threat-model.md)
 
 ## ممیزی و اصلاحات
