@@ -12,6 +12,10 @@
 - [تست‌ها و CI](handbook/testing-and-ci.md)
 - [دفتر تصمیم‌های معماری](handbook/decisions/README.md)
 
+## امنیت و استقرار
+
+- [پذیرش مرحله راه‌اندازی Rootless Docker](security/rootless-docker-stage-acceptance.md) — این مرحله تأیید شده است؛ تأیید کلی امنیت تولید همچنان باز است.
+
 ## ممیزی و اصلاحات
 
 - [ماتریس تطبیق قابلیت‌ها و APIها](audit/feature-capability-matrix.md)
