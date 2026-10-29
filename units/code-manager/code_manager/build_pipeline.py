@@ -725,7 +725,12 @@ class DockerBuildExecutor:
             finally:
                 if proc.poll() is None:
                     stop_container()
-                    proc.wait(timeout=5)
+                    try:
+                        proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        # The CLI itself is still not known to have exited. Keep
+                        # the build failed even if container removal was confirmed.
+                        cleanup_unconfirmed.set()
                 # A natural Docker CLI exit also needs a control-plane removal
                 # check; the CLI can disconnect while the container keeps running.
                 stop_container()
