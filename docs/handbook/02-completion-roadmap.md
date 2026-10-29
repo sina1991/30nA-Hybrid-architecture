@@ -104,6 +104,7 @@ CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/4077518442
 | P1 | API و scheduler پایدار WORKER MANAGER | [#25](https://github.com/sina1991/30nA-Hybrid-architecture/issues/25) |
 | P1 | اتصال Dashboard و نگاشت مجوزها | [#26](https://github.com/sina1991/30nA-Hybrid-architecture/issues/26) |
 | P1 | hardening، CI و Release Gate | [#27](https://github.com/sina1991/30nA-Hybrid-architecture/issues/27) |
+| P0 | پذیرش Sandbox روی میزبان هدف و ثبت شواهد | [#34](https://github.com/sina1991/30nA-Hybrid-architecture/issues/34) |
 
 #### ترتیب پیشنهادی اجرا
 
@@ -112,7 +113,8 @@ CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/4077518442
 3. **Issue #23 — Publication gate:** فقط خروجی موفق و قابل‌اثبات Build اجازه انتشار داشته باشد.
 4. **Issue #24 — E2E:** سرویس‌های واقعی آزمایشی را اجرا کن و مسیر Artifact تا نتیجه را با هویت و مالکیت واقعی اثبات کن.
 5. **Issue #25 و #26 — Worker Manager و Dashboard:** API/scheduler و اتصال upstream/permission را مستقل، با قرارداد و integration test کامل کن.
-6. **Issue #27 — Release gate:** پس از ادغام موارد بالا، clean install، security scans، کل تست‌ها و مستندات انتشار را روی یک SHA نهایی اجرا کن.
+6. **Issue #34 — پذیرش میزبان هدف:** acceptance suite و آزمون‌های شکست daemon را فقط روی میزبان هدف یا staging کنترل‌شده اجرا کن؛ شواهد را به SHA و digest تصویر دقیق پیوند بده.
+7. **Issue #27 — Release gate:** پس از ادغام موارد بالا، clean install، security scans، کل تست‌ها و مستندات انتشار را روی یک SHA نهایی اجرا کن.
 
 #### قانون ادغام و خاتمه
 
