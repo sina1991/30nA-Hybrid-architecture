@@ -21,7 +21,12 @@ docker info --format 'version={{.ServerVersion}} security={{json .SecurityOption
 echo "Pinned image:"
 docker image inspect --format 'id={{.Id}} os={{.Os}} arch={{.Architecture}}' "$IMAGE"
 if ! docker info --format '{{json .SecurityOptions}}' | grep -qi rootless; then
-  echo "WARNING: daemon does not advertise rootless mode; verify this is a dedicated, appropriately hardened daemon." >&2
+  if [[ "${WORKER_RUNTIME_ACCEPT_ROOTFUL_DOCKER:-0}" == "1" ]]; then
+    echo "WARNING: explicit WORKER_RUNTIME_ACCEPT_ROOTFUL_DOCKER=1 override; rootful daemon risk accepted by operator." >&2
+  else
+    echo "ERROR: sandbox acceptance requires a rootless Docker daemon. For a reviewed exception only, set WORKER_RUNTIME_ACCEPT_ROOTFUL_DOCKER=1 and document compensating controls." >&2
+    exit 2
+  fi
 fi
 
 export PYTHONPATH="units/code-manager:units/worker-manager:units/worker-runtime:units/consumers/dashboard-core${PYTHONPATH:+:$PYTHONPATH}"
