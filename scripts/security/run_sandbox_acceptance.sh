@@ -21,7 +21,12 @@ docker info --format 'version={{.ServerVersion}} security={{json .SecurityOption
 echo "Pinned image:"
 docker image inspect --format 'id={{.Id}} os={{.Os}} arch={{.Architecture}}' "$IMAGE"
 if ! docker info --format '{{json .SecurityOptions}}' | grep -qi rootless; then
-  echo "WARNING: daemon does not advertise rootless mode; verify this is a dedicated, appropriately hardened daemon." >&2
+  if [[ "${WORKER_RUNTIME_ACCEPT_ROOTFUL_DOCKER:-0}" == "1" ]]; then
+    echo "WARNING: explicit WORKER_RUNTIME_ACCEPT_ROOTFUL_DOCKER=1 override; rootful daemon risk accepted by operator." >&2
+  else
+    echo "ERROR: sandbox acceptance requires a rootless Docker daemon. For a reviewed exception only, set WORKER_RUNTIME_ACCEPT_ROOTFUL_DOCKER=1 and document compensating controls." >&2
+    exit 2
+  fi
 fi
 
 export PYTHONPATH="units/code-manager:units/worker-manager:units/worker-runtime:units/consumers/dashboard-core${PYTHONPATH:+:$PYTHONPATH}"
@@ -36,7 +41,10 @@ export CODE_MANAGER_DATA_MANAGER_URL="http://127.0.0.1:8080"
 
 python -c 'import pytest' || { echo "Install requirements-dev.txt in a trusted virtual environment before running acceptance" >&2; exit 2; }
 command -v curl >/dev/null || { echo "curl is required" >&2; exit 2; }
-python - <<'PY' >/tmp/data-manager-host-acceptance.log 2>&1 &
+# Use a private, unique log path so stale files from earlier root/ubuntu runs
+# cannot block startup or cause the health-check diagnostics to read the wrong run.
+DATA_MANAGER_LOG="$(mktemp "${TMPDIR:-/tmp}/data-manager-host-acceptance.XXXXXX.log")"
+python - <<'PY' >"$DATA_MANAGER_LOG" 2>&1 &
 import importlib
 import importlib.util
 import sys
@@ -58,7 +66,7 @@ DATA_MANAGER_PID=$!
 cleanup() {
   kill "$DATA_MANAGER_PID" 2>/dev/null || true
   wait "$DATA_MANAGER_PID" 2>/dev/null || true
-  rm -f "$DATA_MANAGER_DB" "$DATA_MANAGER_DB-wal" "$DATA_MANAGER_DB-shm"
+  rm -f "$DATA_MANAGER_DB" "$DATA_MANAGER_DB-wal" "$DATA_MANAGER_DB-shm" "$DATA_MANAGER_LOG"
 }
 trap cleanup EXIT
 for attempt in $(seq 1 20); do
@@ -66,7 +74,7 @@ for attempt in $(seq 1 20); do
   sleep 1
 done
 curl --fail --silent http://127.0.0.1:8080/health >/dev/null || {
-  cat /tmp/data-manager-host-acceptance.log >&2
+  cat "$DATA_MANAGER_LOG" >&2
   echo "Loopback DATA MANAGER did not become healthy" >&2
   exit 1
 }
