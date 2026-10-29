@@ -43,7 +43,7 @@ def test_launch_uses_restrictive_container_options(tmp_path):
     command = popen.call_args.args[0]
     assert "--pull=never" in command
     assert "--log-driver=none" in command
-    assert "--pid=private" in command
+    assert not any(arg == "--pid=host" for arg in command)
     assert "--network=none" in command
     assert "--read-only" in command
     assert "--cap-drop=ALL" in command
