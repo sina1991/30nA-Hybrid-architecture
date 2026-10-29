@@ -24,7 +24,7 @@ export DOCKER_HOST=unix:///run/user/1000/docker.sock
 
 for f in /tmp/worker-runtime-cid-*/container.cid /tmp/code-manager-cleanup-evidence-*/container.ref; do
   [ -f "$f" ] || continue
-  printf '\\nEvidence: %s\\nReference: ' "$f"
+  printf '\nEvidence: %s\nReference: '
   cat "$f"
 done
 EOF
