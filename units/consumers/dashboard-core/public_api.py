@@ -38,7 +38,7 @@ class PublicAPI:
         if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not 0 < timeout <= 120:
             raise ValueError("timeout must be between 0 and 120 seconds")
         if token is not None:
-            if not isinstance(token, str) or not token.strip() or "\\r" in token or "\\n" in token:
+            if not isinstance(token, str) or not token.strip() or "\r" in token or "\n" in token:
                 raise ValueError("token must be a non-empty single-line string")
             if parts.scheme != "https" and parts.hostname not in ("localhost", "127.0.0.1", "::1"):
                 raise ValueError("bearer tokens require HTTPS except on loopback")
@@ -46,7 +46,7 @@ class PublicAPI:
             raise ValueError("unsupported development identity header")
         if bool(identity_header) != bool(identity):
             raise ValueError("identity and identity_header must be supplied together")
-        if identity is not None and (not isinstance(identity, str) or "\\r" in identity or "\\n" in identity):
+        if identity is not None and (not isinstance(identity, str) or "\r" in identity or "\n" in identity):
             raise ValueError("identity must be a single-line string")
         if identity_header and parts.hostname not in ("localhost", "127.0.0.1", "::1"):
             raise ValueError("development identity headers require loopback")
