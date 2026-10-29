@@ -10,7 +10,6 @@ import tempfile
 import threading
 import unittest
 import zipfile
-from http.server import BaseHTTPRequestHandler
 from types import SimpleNamespace
 from unittest.mock import patch
 from wsgiref.simple_server import WSGIRequestHandler, make_server
@@ -61,8 +60,12 @@ class CodeManagerRuntimeE2ETests(unittest.TestCase):
     def test_authenticated_https_download_executes_exact_published_artifact(self):
         image = os.environ.get("WORKER_RUNTIME_SANDBOX_TEST_IMAGE")
         if not image:
+            if os.environ.get("CI", "").lower() == "true":
+                self.fail("CI must provide the immutable Docker test image ID")
             self.skipTest("CI/staging must provide the immutable Docker test image ID")
         if shutil.which("docker") is None:
+            if os.environ.get("CI", "").lower() == "true":
+                self.fail("CI must provide the Docker CLI")
             self.skipTest("Docker CLI is unavailable")
         probe = subprocess.run(
             ["docker", "info", "--format", "{{.ServerVersion}}"],
@@ -73,6 +76,8 @@ class CodeManagerRuntimeE2ETests(unittest.TestCase):
             check=False,
         )
         if probe.returncode != 0:
+            if os.environ.get("CI", "").lower() == "true":
+                self.fail("CI Docker daemon is unavailable")
             self.skipTest("Docker daemon is unavailable")
 
         with tempfile.TemporaryDirectory(prefix="code-runtime-e2e-") as directory:
