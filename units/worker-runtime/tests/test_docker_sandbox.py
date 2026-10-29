@@ -190,3 +190,19 @@ def test_runtime_reports_cleanup_unconfirmed_instead_of_cancelled():
     result = runtime._finish("cleanup-test", "worker", "cancelled")
     assert result.status == "failed"
     assert result.error.code == "SANDBOX_CLEANUP_UNCONFIRMED"
+
+
+
+def test_reconcile_retries_cleanup_and_removes_retained_evidence(tmp_path):
+    backend, proc, cidfile, cid_dir = _backend_with_cidfile(tmp_path)
+    with patch("worker_runtime.docker_sandbox.subprocess.run", side_effect=subprocess.TimeoutExpired(["docker", "rm"], 5)):
+        with patch.object(backend, "_kill_cli"):
+            assert backend.terminate(proc) is False
+    assert cidfile.exists()
+
+    with patch("worker_runtime.docker_sandbox.subprocess.run", return_value=Mock(returncode=0, stderr="")):
+        result = backend.reconcile_unconfirmed_cleanup()
+
+    assert result == {"confirmed_pids": (proc.pid,), "pending_pids": ()}
+    assert not cid_dir.exists()
+    assert backend.cleanup_unconfirmed(proc) is False
