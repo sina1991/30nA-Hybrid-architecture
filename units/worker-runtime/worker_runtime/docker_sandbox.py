@@ -238,12 +238,20 @@ class DockerSandboxBackend:
         return {"confirmed_pids": tuple(confirmed_pids), "pending_pids": tuple(remaining)}
 
     def cleanup(self, proc):
+        # A Docker CLI exit is not evidence that the container was removed.
+        # Verify removal on every completion path, including a natural CLI exit.
         with self._lock:
-            # Preserve the cidfile and directory for later operator recovery.
-            if proc.pid in self._cleanup_unconfirmed:
+            paths = self._cidfiles.get(proc.pid)
+            if paths is None:
+                return proc.pid not in self._cleanup_unconfirmed
+        if not self.terminate(proc):
+            return False
+        with self._lock:
+            current = self._cidfiles.get(proc.pid)
+            if current != paths:
                 return False
-            paths = self._cidfiles.pop(proc.pid, None)
-        if paths is not None:
-            _, cid_dir = paths
-            shutil.rmtree(cid_dir, ignore_errors=True)
+            self._cidfiles.pop(proc.pid, None)
+            self._cleanup_unconfirmed.discard(proc.pid)
+        _, cid_dir = paths
+        shutil.rmtree(cid_dir, ignore_errors=True)
         return True
