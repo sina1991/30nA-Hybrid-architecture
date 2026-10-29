@@ -753,7 +753,7 @@ class DockerBuildExecutor:
                 except (OSError, UnicodeError):
                     pass
                 return {"status": "failed", "tests": 0, "failures": 1,
-                        "summary": "Docker could not confirm build sandbox removal; recovery reference retained if available"}
+                        "summary": "Could not confirm complete sandbox teardown or Docker CLI exit; recovery reference retained if available"}
             if timed_out:
                 return {"status": "failed", "tests": 0, "failures": 1,
                         "summary": "Build tests exceeded the wall-clock timeout"}
