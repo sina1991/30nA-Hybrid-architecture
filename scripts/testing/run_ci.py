@@ -68,6 +68,14 @@ def main():
                     result=subprocess.run(command,env=env,stdout=tests_log,stderr=subprocess.STDOUT)
                 print((evidence/'tests.log').read_text())
                 cases=list(ET.parse(evidence/'tests.xml').getroot().iter('testcase'))
+                if os.environ.get('GITHUB_ACTIONS') == 'true':
+                    for case in cases:
+                        failure=case.find('failure')
+                        if failure is None:failure=case.find('error')
+                        if failure is not None:
+                            detail=(case.get('classname','')+'.'+case.get('name','')+': '+failure.get('message',''))[:1000]
+                            detail=detail.replace('%','%25').replace('\r','%0D').replace('\n','%0A')
+                            print('::error title=Failed test::'+detail)
                 skipped=sum(case.find('skipped') is not None for case in cases)
                 code=result.returncode
                 if not cases or (skipped and not args.unit_only):
