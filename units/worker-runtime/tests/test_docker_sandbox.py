@@ -91,3 +91,28 @@ def test_runtime_fails_closed_without_backend():
     result = WorkerRuntime(Provider()).submit(request)
     assert result.status == "failed"
     assert result.error.code == "SANDBOX_UNAVAILABLE"
+
+
+def test_docker_launch_fails_closed_when_cli_cannot_start(tmp_path):
+    backend = DockerSandboxBackend(
+        "registry.example/worker@sha256:" + "a" * 64
+    )
+    archive = tmp_path / "artifact.zip"
+    runner = tmp_path / "runner.py"
+    archive.write_bytes(b"zip")
+    runner.write_text("# trusted runner", encoding="utf-8")
+
+    with patch(
+        "worker_runtime.docker_sandbox.subprocess.Popen",
+        side_effect=FileNotFoundError("simulated Docker CLI unavailable"),
+    ):
+        with pytest.raises(SandboxUnavailable, match="Could not launch sandbox runtime"):
+            backend.launch(
+                archive,
+                runner,
+                "worker:run",
+                execution_id="docker-unavailable-test",
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.DEVNULL,
+            )
