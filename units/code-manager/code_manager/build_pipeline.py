@@ -663,6 +663,7 @@ class DockerBuildExecutor:
             captured = bytearray()
             overflow = threading.Event()
             cleanup_unconfirmed = threading.Event()
+            cli_unconfirmed = threading.Event()
 
             def stop_container():
                 # Killing the CLI is not proof the container stopped. Preserve a
@@ -723,7 +724,7 @@ class DockerBuildExecutor:
                     try:
                         proc.wait(timeout=5)
                     except subprocess.TimeoutExpired:
-                        cleanup_unconfirmed.set()
+                        cli_unconfirmed.set()
                 reader.join(timeout=2)
             finally:
                 if proc.poll() is None:
@@ -733,12 +734,12 @@ class DockerBuildExecutor:
                     except subprocess.TimeoutExpired:
                         # The CLI itself is still not known to have exited. Keep
                         # the build failed even if container removal was confirmed.
-                        cleanup_unconfirmed.set()
+                        cli_unconfirmed.set()
                 # A natural Docker CLI exit also needs a control-plane removal
                 # check; the CLI can disconnect while the container keeps running.
                 stop_container()
                 reader.join(timeout=1)
-            if cleanup_unconfirmed.is_set():
+            if cleanup_unconfirmed.is_set() or cli_unconfirmed.is_set():
                 # TemporaryDirectory will be removed on return, so copy the
                 # reference into a fresh private directory for later recovery.
                 try:
