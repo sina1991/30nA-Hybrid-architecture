@@ -50,14 +50,14 @@ an already-published, owner-scoped artifact. It verifies the immutable manifest
 and blob and returns a SHA-256 digest. This closes the earlier missing-download
 endpoint gap.
 
-**Important distinction:** the current publication registry identifies these
-objects as `source_zip`; the download endpoint does not prove that a build
-pipeline has validated, tested or packaged the source. The build contract remains
-draft, and HTTP publication is intentionally blocked. The WORKER RUNTIME `CodeManagerArtifactProvider` now targets the versioned
-`/api/v1/artifacts/{id}/content` route. Unit tests cover URL construction,
-authorization header, byte-exact content, content type and size caps. A real-service
-integration test with production identity/ownership configuration is still required;
-adapter unit tests do not prove that end-to-end path.
+The Build Pipeline / Publication Gate implementation now creates a
+`built_artifact` only after all mandatory stages pass, with immutable hashes and
+provenance. The content endpoint serves only published `built_artifact` objects,
+never a registered `source_zip`. The WORKER RUNTIME `CodeManagerArtifactProvider`
+targets the versioned `/api/v1/artifacts/{id}/content` route. Unit tests cover URL
+construction, authorization header, byte-exact content, content type and size caps.
+A real-service end-to-end test with production identity/ownership configuration is
+still required; adapter unit tests do not prove that deployed integration path.
 
 ## Security limitations
 
