@@ -41,6 +41,9 @@ def test_launch_uses_restrictive_container_options(tmp_path):
 
     assert proc is fake_proc
     command = popen.call_args.args[0]
+    assert "--pull=never" in command
+    assert "--log-driver=none" in command
+    assert "--pid=private" in command
     assert "--network=none" in command
     assert "--read-only" in command
     assert "--cap-drop=ALL" in command
