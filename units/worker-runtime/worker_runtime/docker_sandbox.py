@@ -98,7 +98,7 @@ class DockerSandboxBackend:
                 "--memory", self.memory, "--memory-swap", self.memory,
                 "--cpus", self.cpus, "--pids-limit", str(self.pids_limit),
                 "--cap-drop=ALL", "--security-opt=no-new-privileges:true",
-                "--ipc=private", "--pid=private", "--ulimit", "nofile=64:64", "--ulimit", "core=0",
+                "--ipc=private", "--ulimit", "nofile=64:64", "--ulimit", "core=0",
                 "--tmpfs", f"/tmp:rw,noexec,nosuid,nodev,size={self.tmpfs_size}",
                 "--mount", f"type=bind,src={Path(archive).resolve()},dst=/artifact.zip,readonly",
                 "--mount", f"type=bind,src={Path(runner).resolve()},dst=/runner.py,readonly",
