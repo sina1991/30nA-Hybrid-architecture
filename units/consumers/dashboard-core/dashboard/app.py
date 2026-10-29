@@ -173,6 +173,18 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
   color: var(--text); background: #0b1120; border: 1px solid var(--border);
   border-radius: 8px; font: inherit;
 }
+.dice-controls { display: flex; align-items: end; gap: 8px; flex-wrap: wrap; }
+.dice-field { display: grid; gap: 4px; font-size: 12px; }
+.dice-input {
+  width: 92px; padding: 8px; color: var(--text); background: #0b1120;
+  border: 1px solid var(--border); border-radius: 8px; font: inherit;
+}
+.dice-roll-button {
+  padding: 8px 12px; color: var(--text); background: #1d4ed8;
+  border: 1px solid #3b82f6; border-radius: 8px; font: inherit; cursor: pointer;
+}
+.dice-result { color: var(--text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.dice-error { color: #fca5a5; }
 .empty { color: var(--muted); }
 footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--border); }
 @media (max-width: 900px) {
@@ -321,6 +333,59 @@ function renderModuleContent(body, slot, moduleId) {
       saveSettings();
     });
     body.append(textarea);
+    return;
+  }
+
+  if (module.type === "dice-roller") {
+    body.append(makeElement("div", "module-title", module.name));
+    body.append(makeElement("div", "module-detail", module.description));
+
+    const controls = makeElement("div", "dice-controls");
+    const countLabel = makeElement("label", "dice-field", "Dice count");
+    const countInput = makeElement("input", "dice-input");
+    countInput.type = "number";
+    countInput.min = "1";
+    countInput.max = "100";
+    countInput.step = "1";
+    countInput.value = "1";
+    countInput.setAttribute("aria-label", "Dice count");
+    countLabel.append(countInput);
+
+    const sidesLabel = makeElement("label", "dice-field", "Sides per die");
+    const sidesInput = makeElement("input", "dice-input");
+    sidesInput.type = "number";
+    sidesInput.min = "2";
+    sidesInput.max = "1000";
+    sidesInput.step = "1";
+    sidesInput.value = "6";
+    sidesInput.setAttribute("aria-label", "Sides per die");
+    sidesLabel.append(sidesInput);
+
+    const rollButton = makeElement("button", "dice-roll-button", "Roll dice");
+    rollButton.type = "button";
+    const result = makeElement("div", "dice-result", "Ready to roll.");
+    result.setAttribute("aria-live", "polite");
+
+    rollButton.addEventListener("click", () => {
+      const count = Number(countInput.value);
+      const sides = Number(sidesInput.value);
+      if (!Number.isInteger(count) || count < 1 || count > 100 ||
+          !Number.isInteger(sides) || sides < 2 || sides > 1000) {
+        result.textContent = "Choose 1–100 dice and 2–1000 sides.";
+        result.className = "dice-result dice-error";
+        return;
+      }
+      const rolls = Array.from(
+        { length: count },
+        () => Math.floor(Math.random() * sides) + 1
+      );
+      const total = rolls.reduce((sum, value) => sum + value, 0);
+      result.className = "dice-result";
+      result.textContent = rolls.join(" + ") + " = " + total;
+    });
+
+    controls.append(countLabel, sidesLabel, rollButton);
+    body.append(controls, result);
   }
 }
 

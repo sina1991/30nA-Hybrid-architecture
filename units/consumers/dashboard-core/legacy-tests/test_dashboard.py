@@ -44,9 +44,10 @@ def test_unknown_theme_is_not_found():
 
 def test_module_catalog():
     modules = list_modules()
-    assert len(modules) == 4
-    assert len({item["id"] for item in modules}) == 4
+    assert len(modules) == 5
+    assert len({item["id"] for item in modules}) == 5
     assert get_module("slot-note")["type"] == "slot-note"
+    assert get_module("dice-roller")["type"] == "dice-roller"
     assert get_module("missing-module") is None
 
 
@@ -54,7 +55,8 @@ def test_module_catalog_endpoint():
     response = client.get("/api/modules")
     assert response.status_code == 200
     payload = response.json()
-    assert payload["count"] == 4
+    assert payload["count"] == 5
+    assert {item["id"] for item in payload["modules"]} >= {"dice-roller"}
     assert all("type" in item for item in payload["modules"])
 
 
