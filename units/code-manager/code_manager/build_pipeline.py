@@ -737,7 +737,7 @@ class DockerBuildExecutor:
                     )
                     evidence_dir = Path(tempfile.mkdtemp(prefix="code-manager-cleanup-evidence-"))
                     evidence_file = evidence_dir / "container.ref"
-                    evidence_file.write_text(reference + "\\n", encoding="ascii")
+                    evidence_file.write_text(reference + "\n", encoding="ascii")
                     evidence_file.chmod(0o600)
                 except (OSError, UnicodeError):
                     pass
