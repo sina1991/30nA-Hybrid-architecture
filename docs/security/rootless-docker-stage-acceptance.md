@@ -44,3 +44,18 @@ Use this wording in status reports:
 > Rootless Docker setup checkpoint: **ACCEPTED** (rootless daemon active; hello-world smoke test passed; rootless/seccomp/cgroup namespace options reported). Overall production sandbox and application deployment: **NOT YET APPROVED**; target-host acceptance and integration evidence remain outstanding.
 
 This document records the available evidence and its limits. It does not claim tests were run when no output was captured.
+
+## Follow-up acceptance-suite run — 2026-10-29
+
+The operator subsequently ran `scripts/security/run_sandbox_acceptance.sh` from the activated Python 3.12.3 virtual environment as user `ubuntu`, against rootless Docker 29.9.2 and local immutable image ID:
+
+`sha256:d9657c3ac2b9203798a7804abc141bb9eb0ebac87effa0588025555985544168`
+
+Captured output:
+
+- Pytest: **217 passed, 1 warning, 20.49 seconds**.
+- Docker security options included `seccomp,profile=builtin`, `rootless`, and `cgroupns`.
+- Host reported no cpuset support and no `io.weight`/`io.max` support (including per-device I/O controls).
+
+This records a successful run of the acceptance script's configured test suite. It does **not** close the live-security acceptance gate. The captured output does not independently prove the daemon-failure fault-injection cases, cleanup confirmation when Docker's control plane is unavailable, or every live isolation property. The unsupported CPU-set and I/O cgroup controls must be treated as host limitations; do not claim those controls are enforced. Keep Issues [#34](https://github.com/sina1991/30nA-Hybrid-architecture/issues/34) and [#35](https://github.com/sina1991/30nA-Hybrid-architecture/issues/35) open until their remaining criteria have auditable evidence.
+
