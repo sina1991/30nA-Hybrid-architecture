@@ -1,0 +1,8 @@
+{
+  "id": "dice-roller",
+  "name": "Dice Roller",
+  "description": "Roll one or more dice with a configurable number of sides.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "dice-roller"
+}
