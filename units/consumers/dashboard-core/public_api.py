@@ -5,7 +5,16 @@ import os
 import re
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlsplit
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+
+class _RejectRedirectHandler(HTTPRedirectHandler):
+    """Prevent authenticated API requests from following redirects."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise HTTPError(
+            req.full_url, code, "API redirects are not allowed", headers, fp
+        )
 
 _ID = re.compile(r"^[A-Za-z0-9_.:-]+$")
 
@@ -28,17 +37,24 @@ class PublicAPI:
             raise ValueError("base_url must be an HTTP(S) origin without credentials/query/fragment")
         if not isinstance(timeout, (int, float)) or isinstance(timeout, bool) or not 0 < timeout <= 120:
             raise ValueError("timeout must be between 0 and 120 seconds")
+        if token is not None:
+            if not isinstance(token, str) or not token.strip() or "\\r" in token or "\\n" in token:
+                raise ValueError("token must be a non-empty single-line string")
+            if parts.scheme != "https" and parts.hostname not in ("localhost", "127.0.0.1", "::1"):
+                raise ValueError("bearer tokens require HTTPS except on loopback")
         if identity_header and identity_header not in ("X-Manager-ID", "X-Code-Manager-ID"):
             raise ValueError("unsupported development identity header")
         if bool(identity_header) != bool(identity):
             raise ValueError("identity and identity_header must be supplied together")
+        if identity is not None and (not isinstance(identity, str) or "\\r" in identity or "\\n" in identity):
+            raise ValueError("identity must be a single-line string")
         if identity_header and parts.hostname not in ("localhost", "127.0.0.1", "::1"):
             raise ValueError("development identity headers require loopback")
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
         self.token = token
         self.identity_header, self.identity = identity_header, identity
-        self.transport = transport or urlopen
+        self.transport = transport
 
     def get(self, path: str) -> dict:
         if not path.startswith("/api/v1/") or ".." in path or "?" in path or "#" in path:
@@ -50,7 +66,11 @@ class PublicAPI:
             headers[self.identity_header] = self.identity
         request = Request(self.base_url + path, headers=headers, method="GET")
         try:
-            response = self.transport(request, timeout=self.timeout)
+            if self.transport is None:
+                opener = build_opener(_RejectRedirectHandler)
+                response = opener.open(request, timeout=self.timeout)
+            else:
+                response = self.transport(request, timeout=self.timeout)
             with response:
                 body = response.read(2_000_001)
                 if len(body) > 2_000_000:
