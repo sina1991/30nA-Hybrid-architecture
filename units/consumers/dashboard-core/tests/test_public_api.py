@@ -3,10 +3,13 @@ import json
 import sys
 import unittest
 from pathlib import Path
+from email.message import Message
 from urllib.error import HTTPError, URLError
+from urllib.request import Request
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from public_api import PublicAPI, ConsumerAPIError
+from public_api import PublicAPI, ConsumerAPIError, _RejectRedirectHandler
 
 class Response:
     def __init__(self, value): self.value = value
@@ -43,6 +46,43 @@ class APITests(unittest.TestCase):
         def transport(req, timeout): raise URLError("offline")
         with self.assertRaises(ConsumerAPIError) as cm: PublicAPI("http://localhost", transport=transport).list_sources()
         self.assertEqual(cm.exception.code, "SERVICE_UNAVAILABLE")
+
+    def test_bearer_tokens_require_tls_outside_loopback(self):
+        with self.assertRaisesRegex(ValueError, "bearer tokens require HTTPS"):
+            PublicAPI("http://api.example", token="secret")
+        with self.assertRaisesRegex(ValueError, "single-line"):
+            PublicAPI("https://api.example", token="secret\\r\\nX-Injected: yes")
+        # Loopback HTTP remains available for local development only.
+        PublicAPI("http://localhost:8080", token="local-test-token")
+
+    def test_redirect_handler_rejects_redirect_target(self):
+        handler = _RejectRedirectHandler()
+        request = Request(
+            "https://api.example/api/v1/sources",
+            headers={"Authorization": "Bearer secret"},
+        )
+        with self.assertRaises(HTTPError) as raised:
+            handler.redirect_request(
+                request, None, 302, "Found", Message(),
+                "https://attacker.example/collect",
+            )
+        self.assertEqual(raised.exception.code, 302)
+        self.assertIn("redirects are not allowed", str(raised.exception).lower())
+
+    def test_default_transport_uses_redirect_blocker_and_keeps_auth_header(self):
+        payload = json.dumps(
+            {"contract_version": "1.0.0", "payload": {"sources": []}}
+        ).encode()
+        opener = Mock()
+        opener.open.return_value = Response(payload)
+        with patch("public_api.build_opener", return_value=opener) as build:
+            api = PublicAPI("https://api.example", token="secret")
+            self.assertEqual(api.list_sources(), {"sources": []})
+
+        build.assert_called_once_with(_RejectRedirectHandler)
+        request = opener.open.call_args.args[0]
+        self.assertEqual(request.get_header("Authorization"), "Bearer secret")
+        self.assertEqual(opener.open.call_args.kwargs["timeout"], 5.0)
 
     def test_invalid_identifiers_and_config(self):
         api = PublicAPI("http://localhost", transport=lambda *a, **k: Response(b"{}"))
