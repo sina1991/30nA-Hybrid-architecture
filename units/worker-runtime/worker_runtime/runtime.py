@@ -330,7 +330,12 @@ class WorkerRuntime:
                     self._active.pop(eid, None)
                 self._capacity.release()
                 if self.sandbox_backend is not None:
-                    self.sandbox_backend.cleanup(proc)
+                    cleanup_confirmed = self.sandbox_backend.cleanup(proc)
+                    with self._lock:
+                        if cleanup_confirmed is False:
+                            self._cleanup_unconfirmed.add(eid)
+                        else:
+                            self._cleanup_unconfirmed.discard(eid)
             with self._lock:
                 if eid in self._cancelled:
                     return finish('cancelled')
