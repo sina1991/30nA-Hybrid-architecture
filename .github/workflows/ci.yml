@@ -63,4 +63,4 @@ jobs:
       - name: Install checksum-verified Gitleaks
         run: python scripts/security/install_gitleaks.py --output "$RUNNER_TEMP/gitleaks"
       - name: Scan repository history without exposing findings
-        run: '"$RUNNER_TEMP/gitleaks" git --redact --no-banner'
+        run: '"$RUNNER_TEMP/gitleaks" git --log-opts="--all --diff-merges=first-parent" --redact --no-banner'
