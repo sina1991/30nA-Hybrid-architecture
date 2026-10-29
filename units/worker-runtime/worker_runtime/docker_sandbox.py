@@ -191,6 +191,52 @@ class DockerSandboxBackend:
         with self._lock:
             return proc.pid in self._cleanup_unconfirmed
 
+    def reconcile_unconfirmed_cleanup(self):
+        """Retry removal for retained cidfiles after Docker becomes reachable again.
+
+        Returns the PIDs whose cleanup was confirmed and those still requiring
+        operator attention. A daemon error never clears the retained evidence.
+        """
+        with self._lock:
+            pending = [
+                (pid, paths) for pid, paths in self._cidfiles.items()
+                if pid in self._cleanup_unconfirmed
+            ]
+
+        confirmed_pids = []
+        for pid, (cidfile, cid_dir) in pending:
+            try:
+                container_id = cidfile.read_text(encoding="ascii").strip()
+                if not re.fullmatch(r"[0-9a-f]{12,64}", container_id):
+                    continue
+                result = subprocess.run(
+                    [self.docker_binary, "rm", "--force", container_id],
+                    stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE, text=True, timeout=5, check=False,
+                )
+                detail = (result.stderr or "").lower()
+                confirmed = result.returncode == 0 or (
+                    result.returncode != 0 and (
+                        "no such container" in detail or "no such object" in detail
+                    )
+                )
+            except (OSError, UnicodeError, subprocess.SubprocessError):
+                confirmed = False
+            if not confirmed:
+                continue
+            with self._lock:
+                current = self._cidfiles.get(pid)
+                if current == (cidfile, cid_dir):
+                    self._cidfiles.pop(pid, None)
+                    self._cleanup_unconfirmed.discard(pid)
+                    confirmed_pids.append(pid)
+            if pid in confirmed_pids:
+                shutil.rmtree(cid_dir, ignore_errors=True)
+
+        with self._lock:
+            remaining = sorted(self._cleanup_unconfirmed)
+        return {"confirmed_pids": tuple(confirmed_pids), "pending_pids": tuple(remaining)}
+
     def cleanup(self, proc):
         with self._lock:
             # Preserve the cidfile and directory for later operator recovery.
