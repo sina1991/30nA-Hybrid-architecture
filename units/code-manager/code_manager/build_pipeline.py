@@ -662,18 +662,31 @@ class DockerBuildExecutor:
                         "summary": "Could not start Docker build sandbox"}
             captured = bytearray()
             overflow = threading.Event()
+            cleanup_unconfirmed = threading.Event()
+            cli_unconfirmed = threading.Event()
 
             def stop_container():
-                # Kill the container through the Docker control plane before killing
-                # the CLI; killing only the CLI can leave a hostile test running.
+                # Killing the CLI is not proof the container stopped. Preserve a
+                # recovery reference and fail the build if Docker cannot confirm rm.
+                confirmed = False
                 try:
-                    subprocess.run(
+                    removal = subprocess.run(
                         [binary, "rm", "--force", container_name],
-                        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL, timeout=5, check=False,
+                        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE, text=True, timeout=5, check=False,
+                    )
+                    detail = (removal.stderr or "").lower()
+                    confirmed = removal.returncode == 0 or (
+                        removal.returncode != 0 and (
+                            "no such container" in detail or "no such object" in detail
+                        )
                     )
                 except (OSError, subprocess.SubprocessError):
-                    pass
+                    confirmed = False
+                if confirmed:
+                    cleanup_unconfirmed.clear()
+                else:
+                    cleanup_unconfirmed.set()
                 try:
                     if proc.poll() is None:
                         if os.name == "posix":
@@ -682,6 +695,7 @@ class DockerBuildExecutor:
                             proc.kill()
                 except (ProcessLookupError, OSError):
                     pass
+                return confirmed
 
             def drain():
                 try:
@@ -707,13 +721,40 @@ class DockerBuildExecutor:
                 except subprocess.TimeoutExpired:
                     timed_out = True
                     stop_container()
-                    proc.wait(timeout=5)
+                    try:
+                        proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        cli_unconfirmed.set()
                 reader.join(timeout=2)
             finally:
                 if proc.poll() is None:
                     stop_container()
-                    proc.wait(timeout=5)
+                    try:
+                        proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        # The CLI itself is still not known to have exited. Keep
+                        # the build failed even if container removal was confirmed.
+                        cli_unconfirmed.set()
+                # A natural Docker CLI exit also needs a control-plane removal
+                # check; the CLI can disconnect while the container keeps running.
+                stop_container()
                 reader.join(timeout=1)
+            if cleanup_unconfirmed.is_set() or cli_unconfirmed.is_set():
+                # TemporaryDirectory will be removed on return, so copy the
+                # reference into a fresh private directory for later recovery.
+                try:
+                    reference = (
+                        cidfile.read_text(encoding="ascii").strip()
+                        if cidfile.is_file() else "name:" + container_name
+                    )
+                    evidence_dir = Path(tempfile.mkdtemp(prefix="code-manager-cleanup-evidence-"))
+                    evidence_file = evidence_dir / "container.ref"
+                    evidence_file.write_text(reference + "\n", encoding="ascii")
+                    evidence_file.chmod(0o600)
+                except (OSError, UnicodeError):
+                    pass
+                return {"status": "failed", "tests": 0, "failures": 1,
+                        "summary": "Could not confirm complete sandbox teardown or Docker CLI exit; recovery reference retained if available"}
             if timed_out:
                 return {"status": "failed", "tests": 0, "failures": 1,
                         "summary": "Build tests exceeded the wall-clock timeout"}

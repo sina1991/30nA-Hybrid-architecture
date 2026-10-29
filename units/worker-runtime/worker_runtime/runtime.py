@@ -82,6 +82,8 @@ class WorkerRuntime:
                     self._history[execution_id] = interrupted
         # key -> (canonical request fingerprint, execution id)
         self._active = {}  # execution id -> Popen
+        # Executions for which Docker could not confirm container removal.
+        self._cleanup_unconfirmed = set()
         self._cancelled = set()
         self._parents = {}  # execution id -> parent execution id
 
@@ -91,8 +93,14 @@ class WorkerRuntime:
 
     def _terminate(self, proc):
         if self.sandbox_backend is not None:
-            self.sandbox_backend.terminate(proc)
-            return
+            confirmed = self.sandbox_backend.terminate(proc)
+            if not confirmed:
+                with self._lock:
+                    for execution_id, active_proc in self._active.items():
+                        if active_proc is proc:
+                            self._cleanup_unconfirmed.add(execution_id)
+                            break
+            return confirmed
         try:
             if os.name == 'posix':
                 os.killpg(proc.pid, signal.SIGKILL)
@@ -100,6 +108,7 @@ class WorkerRuntime:
                 proc.kill()
         except ProcessLookupError:
             pass
+        return True
 
     def cancel(self, execution_id):
         """Request cancellation of a known nonterminal execution and its descendants."""
@@ -121,13 +130,23 @@ class WorkerRuntime:
                 if current in self._active:
                     processes.append(self._active[current])
                 pending.extend(k for k, p in self._parents.items() if p == current)
+        cleanup_confirmed = True
         for proc in processes:
-            self._terminate(proc)
-        return affected
+            if not self._terminate(proc):
+                cleanup_confirmed = False
+        # False means cancellation was requested but container removal could not
+        # be confirmed. The execution result will carry an explicit failure code.
+        return affected and cleanup_confirmed
 
     def _finish(self, eid, wid, status, *, result=None, error=None, accepted=True, children=()):
         with self._lock:
-            if eid in self._cancelled:
+            if eid in self._cleanup_unconfirmed:
+                status, result, error = 'failed', None, ExecutionError(
+                    'SANDBOX_CLEANUP_UNCONFIRMED',
+                    'Docker could not confirm sandbox removal; container ID evidence was retained for recovery',
+                    True,
+                )
+            elif eid in self._cancelled:
                 status, result, error = 'cancelled', None, ExecutionError('CANCELLED', 'Execution cancelled')
             response = ExecutionResult(eid, wid, accepted, status, result, error, tuple(children))
             if self._execution_store is not None:
@@ -311,7 +330,12 @@ class WorkerRuntime:
                     self._active.pop(eid, None)
                 self._capacity.release()
                 if self.sandbox_backend is not None:
-                    self.sandbox_backend.cleanup(proc)
+                    cleanup_confirmed = self.sandbox_backend.cleanup(proc)
+                    with self._lock:
+                        if cleanup_confirmed is False:
+                            self._cleanup_unconfirmed.add(eid)
+                        else:
+                            self._cleanup_unconfirmed.discard(eid)
             with self._lock:
                 if eid in self._cancelled:
                     return finish('cancelled')

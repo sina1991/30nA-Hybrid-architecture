@@ -7,13 +7,13 @@ import shutil
 import subprocess
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 import zipfile
 
 from code_manager.blob_storage import BlobStorage
 from code_manager.build_pipeline import (
-    BuildHistoryStore, BuildPipeline, analyze_imports, normalize_source_archive,
-    resolve_dependency_policy,
+    BuildHistoryStore, BuildPipeline, DockerBuildExecutor, analyze_imports,
+    normalize_source_archive, resolve_dependency_policy,
 )
 
 
@@ -368,6 +368,150 @@ class BuildPipelineTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "blocked")
         self.assertIn("leafdep==1.0.0", result["detail"])
+
+
+    def test_natural_docker_cli_exit_still_verifies_container_removal(self):
+        class FakeProcess:
+            pid = 54322
+            stdout = io.BytesIO(b"")
+            returncode = 0
+
+            def poll(self):
+                return self.returncode
+
+            def wait(self, timeout=None):
+                return self.returncode
+
+        old_tempdir = tempfile.tempdir
+        tempfile.tempdir = str(self.root)
+        self.addCleanup(setattr, tempfile, "tempdir", old_tempdir)
+        process = FakeProcess()
+        executor = DockerBuildExecutor(
+            "registry.example/build@sha256:" + "a" * 64,
+            timeout_seconds=1,
+        )
+        with patch("code_manager.build_pipeline.shutil.which", return_value="docker"), \
+             patch("code_manager.build_pipeline.subprocess.Popen", return_value=process), \
+             patch("code_manager.build_pipeline.subprocess.run",
+                   return_value=Mock(returncode=1, stderr="Cannot connect to the Docker daemon")), \
+             patch("code_manager.build_pipeline.os.killpg"):
+            result = executor.run_tests(b"archive", "sample.main:run")
+
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("could not confirm", result["summary"].lower())
+        evidence_dirs = list(self.root.glob("code-manager-cleanup-evidence-*"))
+        self.assertEqual(len(evidence_dirs), 1)
+        reference = (evidence_dirs[0] / "container.ref").read_text(encoding="ascii")
+        self.assertTrue(reference.startswith("name:cm-build-"))
+
+
+    def test_docker_cli_that_will_not_exit_keeps_cleanup_unconfirmed(self):
+        class StuckProcess:
+            pid = 54323
+            stdout = io.BytesIO(b"")
+            returncode = None
+
+            def poll(self):
+                return None
+
+            def wait(self, timeout=None):
+                raise subprocess.TimeoutExpired(["docker", "run"], timeout)
+
+        old_tempdir = tempfile.tempdir
+        tempfile.tempdir = str(self.root)
+        self.addCleanup(setattr, tempfile, "tempdir", old_tempdir)
+        process = StuckProcess()
+        executor = DockerBuildExecutor(
+            "registry.example/build@sha256:" + "a" * 64,
+            timeout_seconds=1,
+        )
+        with patch("code_manager.build_pipeline.shutil.which", return_value="docker"), \
+             patch("code_manager.build_pipeline.subprocess.Popen", return_value=process), \
+             patch("code_manager.build_pipeline.subprocess.run",
+                   return_value=Mock(returncode=1, stderr="Cannot connect to the Docker daemon")), \
+             patch("code_manager.build_pipeline.os.killpg"):
+            result = executor.run_tests(b"archive", "sample.main:run")
+
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("could not confirm", result["summary"].lower())
+        evidence_dirs = list(self.root.glob("code-manager-cleanup-evidence-*"))
+        self.assertEqual(len(evidence_dirs), 1)
+        reference = (evidence_dirs[0] / "container.ref").read_text(encoding="ascii")
+        self.assertTrue(reference.startswith("name:cm-build-"))
+
+
+    def test_confirmed_container_removal_does_not_hide_stuck_docker_cli(self):
+        class StuckProcess:
+            pid = 54324
+            stdout = io.BytesIO(b"")
+            returncode = None
+
+            def poll(self):
+                return None
+
+            def wait(self, timeout=None):
+                raise subprocess.TimeoutExpired(["docker", "run"], timeout)
+
+        old_tempdir = tempfile.tempdir
+        tempfile.tempdir = str(self.root)
+        self.addCleanup(setattr, tempfile, "tempdir", old_tempdir)
+        process = StuckProcess()
+        executor = DockerBuildExecutor(
+            "registry.example/build@sha256:" + "a" * 64,
+            timeout_seconds=1,
+        )
+        with patch("code_manager.build_pipeline.shutil.which", return_value="docker"), \
+             patch("code_manager.build_pipeline.subprocess.Popen", return_value=process), \
+             patch("code_manager.build_pipeline.subprocess.run",
+                   return_value=Mock(returncode=0, stderr="")), \
+             patch("code_manager.build_pipeline.os.killpg"):
+            result = executor.run_tests(b"archive", "sample.main:run")
+
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("could not confirm", result["summary"].lower())
+        evidence_dirs = list(self.root.glob("code-manager-cleanup-evidence-*"))
+        self.assertEqual(len(evidence_dirs), 1)
+        reference = (evidence_dirs[0] / "container.ref").read_text(encoding="ascii")
+        self.assertTrue(reference.startswith("name:cm-build-"))
+
+
+    def test_docker_daemon_failure_fails_build_and_retains_recovery_reference(self):
+        class FakeProcess:
+            pid = 54321
+            stdout = io.BytesIO(b"")
+            returncode = None
+
+            def poll(self):
+                return self.returncode
+
+            def wait(self, timeout=None):
+                if self.returncode is None:
+                    self.returncode = 137
+                    if timeout != 5:
+                        raise subprocess.TimeoutExpired(["docker", "run"], timeout)
+                return self.returncode
+
+        old_tempdir = tempfile.tempdir
+        tempfile.tempdir = str(self.root)
+        self.addCleanup(setattr, tempfile, "tempdir", old_tempdir)
+        process = FakeProcess()
+        executor = DockerBuildExecutor(
+            "registry.example/build@sha256:" + "a" * 64,
+            timeout_seconds=1,
+        )
+        with patch("code_manager.build_pipeline.shutil.which", return_value="docker"), \
+             patch("code_manager.build_pipeline.subprocess.Popen", return_value=process), \
+             patch("code_manager.build_pipeline.subprocess.run",
+                   return_value=Mock(returncode=1, stderr="Cannot connect to the Docker daemon")), \
+             patch("code_manager.build_pipeline.os.killpg"):
+            result = executor.run_tests(b"archive", "sample.main:run")
+
+        self.assertEqual(result["status"], "failed")
+        self.assertIn("could not confirm", result["summary"].lower())
+        evidence_dirs = list(self.root.glob("code-manager-cleanup-evidence-*"))
+        self.assertEqual(len(evidence_dirs), 1)
+        reference = (evidence_dirs[0] / "container.ref").read_text(encoding="ascii")
+        self.assertTrue(reference.startswith("name:cm-build-"))
 
 
 if __name__ == "__main__":
