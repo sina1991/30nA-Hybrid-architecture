@@ -119,3 +119,74 @@ def test_docker_launch_fails_closed_when_cli_cannot_start(tmp_path):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL,
             )
+
+
+
+def _backend_with_cidfile(tmp_path):
+    backend = DockerSandboxBackend("registry.example/worker@sha256:" + "a" * 64)
+    cid_dir = tmp_path / "cid-evidence"
+    cid_dir.mkdir(mode=0o700)
+    cidfile = cid_dir / "container.cid"
+    cidfile.write_text("a" * 64, encoding="ascii")
+    proc = Mock()
+    proc.pid = 8123
+    backend._cidfiles[proc.pid] = (cidfile, cid_dir)
+    return backend, proc, cidfile, cid_dir
+
+
+def test_terminate_confirms_successful_container_removal(tmp_path):
+    backend, proc, cidfile, cid_dir = _backend_with_cidfile(tmp_path)
+    with patch("worker_runtime.docker_sandbox.subprocess.run", return_value=Mock(returncode=0, stderr="")) as run:
+        with patch.object(backend, "_kill_cli"):
+            assert backend.terminate(proc) is True
+    assert run.call_args.args[0][:3] == ["docker", "rm", "--force"]
+    assert backend.cleanup_unconfirmed(proc) is False
+    assert backend.cleanup(proc) is True
+    assert not cid_dir.exists()
+
+
+def test_terminate_accepts_explicit_no_such_container_response(tmp_path):
+    backend, proc, cidfile, cid_dir = _backend_with_cidfile(tmp_path)
+    result = Mock(returncode=1, stderr="Error response from daemon: No such container: " + "a" * 64)
+    with patch("worker_runtime.docker_sandbox.subprocess.run", return_value=result):
+        with patch.object(backend, "_kill_cli"):
+            assert backend.terminate(proc) is True
+    assert backend.cleanup(proc) is True
+    assert not cid_dir.exists()
+
+
+@pytest.mark.parametrize("failure", [
+    subprocess.TimeoutExpired(["docker", "rm"], 5),
+    FileNotFoundError("Docker CLI unavailable"),
+    Mock(returncode=1, stderr="Cannot connect to the Docker daemon"),
+])
+def test_terminate_failure_is_unconfirmed_and_preserves_cid_evidence(tmp_path, failure):
+    backend, proc, cidfile, cid_dir = _backend_with_cidfile(tmp_path)
+    with patch("worker_runtime.docker_sandbox.subprocess.run", side_effect=failure) if isinstance(failure, BaseException) else patch("worker_runtime.docker_sandbox.subprocess.run", return_value=failure):
+        with patch.object(backend, "_kill_cli"):
+            assert backend.terminate(proc) is False
+    assert backend.cleanup_unconfirmed(proc) is True
+    assert backend.cleanup(proc) is False
+    assert cidfile.is_file()
+    assert cidfile.read_text(encoding="ascii") == "a" * 64
+    assert cid_dir.is_dir()
+
+
+def test_runtime_reports_cleanup_unconfirmed_instead_of_cancelled():
+    from worker_runtime.runtime import ExecutionResult, WorkerRuntime
+
+    backend = Mock()
+    backend.terminate.return_value = False
+    runtime = WorkerRuntime(artifact_provider=Mock(), sandbox_backend=backend)
+    proc = Mock()
+    proc.pid = 8124
+    with runtime._lock:
+        runtime._history["cleanup-test"] = ExecutionResult(
+            "cleanup-test", "worker", True, "running"
+        )
+        runtime._active["cleanup-test"] = proc
+
+    assert runtime.cancel("cleanup-test") is False
+    result = runtime._finish("cleanup-test", "worker", "cancelled")
+    assert result.status == "failed"
+    assert result.error.code == "SANDBOX_CLEANUP_UNCONFIRMED"
