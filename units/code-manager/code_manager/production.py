@@ -17,7 +17,7 @@ class QuietHandler(WSGIRequestHandler):
         pass
 
 
-def main():
+def create_app():
     unit = Path(__file__).resolve().parents[2] / 'data-manager'
     sys.path.insert(0, str(unit.parent))
     spec = importlib.util.spec_from_file_location(
@@ -33,7 +33,11 @@ def main():
     storage = BlobStorage(os.environ['CODE_MANAGER_BLOB_ROOT'])
     app = create_application(blob_storage=storage,
                              data_manager_client_factory=client_factory(data_app))
-    gateway = authenticated_wsgi(app, credential_path)
+    return authenticated_wsgi(app, credential_path)
+
+
+def main():
+    gateway = create_app()
     with make_server('127.0.0.1', 8099, gateway, handler_class=QuietHandler) as server:
         server.serve_forever()
 

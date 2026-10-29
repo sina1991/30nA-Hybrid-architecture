@@ -15,7 +15,7 @@ class Integration(unittest.TestCase):
  def setUp(self):
   self.d={'ok':zipcode('def run(input, configuration):\n return {"sum":sum(input["items"])}\n'),'bad':zipcode('def run(input, configuration):\n raise ValueError("broken")\n'),'slow':zipcode('import time\ndef run(input, configuration):\n time.sleep(2)\n return 1\n'),'parent':zipcode('def run(input, configuration):\n return {"value":7,"children":[{"worker_id":"ok","input":{"items":[2,3]}}]}\n')}
   self.defs={k:WorkerDefinition(k,k,'sha256:'+hashlib.sha256(v).hexdigest(),'task:run') for k,v in self.d.items()}
-  self.runtime=WorkerRuntime(Provider(self.d),self.defs)
+  self.runtime=WorkerRuntime(Provider(self.d),self.defs,require_sandbox=False)
   self.manager=WorkerManager(self.runtime)
   for d in self.defs.values():self.manager.register(d);self.manager.enable(d.worker_id)
  def test_success(self):

@@ -1,0 +1,23 @@
+[Unit]
+Description=30nA owner-isolated Worker Runtime
+After=network.target
+[Service]
+Type=simple
+User=30na-sandbox
+Group=30na-sandbox
+WorkingDirectory=/opt/30na/current
+Environment=PYTHONPATH=/opt/30na/current/units/worker-manager:/opt/30na/current/units/worker-runtime
+EnvironmentFile=/etc/30na/worker-runtime.env
+ExecStart=/opt/30na/current/.venv/bin/python -m uvicorn worker_runtime.production:create_app --factory --workers 1 --host 127.0.0.1 --port 8102 --no-access-log --no-proxy-headers --limit-concurrency 64 --timeout-keep-alive 5
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=360
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/30na/runtime /tmp
+RestrictAddressFamilies=AF_INET AF_UNIX
+UMask=0077
+# Do not use PrivateTmp: Docker bind mounts must see the same staging paths.
+# Configure DOCKER_HOST for this account's dedicated rootless user daemon.
+[Install]
+WantedBy=multi-user.target

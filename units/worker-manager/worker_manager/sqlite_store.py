@@ -16,7 +16,10 @@ from .models import Schedule, WorkerDefinition, WorkerLifecycle, WorkerRecord
 class SQLiteWorkerStore:
     """Small SQLite repository for worker definitions and manager configuration."""
 
-    def __init__(self, database_path: str | Path, *, timeout_seconds: float = 5.0):
+    def __init__(self, database_path: str | Path, *, timeout_seconds: float = 5.0, owner_id: str = "__legacy__"):
+        if not isinstance(owner_id, str) or not owner_id.strip():
+            raise ValueError("owner_id must be nonempty")
+        self.owner_id = owner_id
         if not isinstance(timeout_seconds, (int, float)) or isinstance(timeout_seconds, bool) or not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be positive")
         if not str(database_path).strip() or str(database_path) == ":memory:":
@@ -36,10 +39,12 @@ class SQLiteWorkerStore:
         with self._connect() as connection:
             connection.execute("PRAGMA foreign_keys = ON")
             connection.execute("PRAGMA journal_mode = WAL")
+            connection.execute("BEGIN IMMEDIATE")
             connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS workers (
-                    worker_id TEXT PRIMARY KEY,
+                    owner_id TEXT NOT NULL,
+                    worker_id TEXT NOT NULL,
                     artifact_id TEXT NOT NULL,
                     artifact_hash TEXT NOT NULL,
                     entrypoint TEXT NOT NULL,
@@ -48,10 +53,26 @@ class SQLiteWorkerStore:
                     schedule_kind TEXT NOT NULL CHECK (schedule_kind IN ('manual', 'interval')),
                     interval_seconds INTEGER NULL,
                     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (owner_id, worker_id)
                 )
                 """
             )
+
+            # Existing single-tenant rows remain inaccessible to authenticated owners.
+            # Assignment of legacy rows requires an explicit, backed-up operator migration.
+            columns = {row["name"] for row in connection.execute("PRAGMA table_info(workers)")}
+            if "owner_id" not in columns:
+                connection.execute("ALTER TABLE workers RENAME TO workers_legacy")
+                connection.execute("""CREATE TABLE workers (
+                    owner_id TEXT NOT NULL, worker_id TEXT NOT NULL,
+                    artifact_id TEXT NOT NULL, artifact_hash TEXT NOT NULL,
+                    entrypoint TEXT NOT NULL, lifecycle TEXT NOT NULL,
+                    configuration_json TEXT NOT NULL, schedule_kind TEXT NOT NULL,
+                    interval_seconds INTEGER, created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL, PRIMARY KEY (owner_id, worker_id))""")
+                connection.execute("INSERT INTO workers SELECT '__legacy__', * FROM workers_legacy")
+                connection.execute("DROP TABLE workers_legacy")
 
     @staticmethod
     def _encode(record: WorkerRecord) -> tuple:
@@ -98,13 +119,13 @@ class SQLiteWorkerStore:
 
     def list(self) -> tuple[WorkerRecord, ...]:
         with self._connect() as connection:
-            rows = connection.execute("SELECT * FROM workers ORDER BY worker_id").fetchall()
+            rows = connection.execute("SELECT * FROM workers WHERE owner_id = ? ORDER BY worker_id", (self.owner_id,)).fetchall()
         return tuple(self._decode(row) for row in rows)
 
     def get(self, worker_id: str) -> WorkerRecord | None:
         with self._connect() as connection:
             row = connection.execute(
-                "SELECT * FROM workers WHERE worker_id = ?", (worker_id,)
+                "SELECT * FROM workers WHERE owner_id = ? AND worker_id = ?", (self.owner_id, worker_id)
             ).fetchone()
         return None if row is None else self._decode(row)
 
@@ -113,10 +134,10 @@ class SQLiteWorkerStore:
         with self._connect() as connection:
             connection.execute(
                 """INSERT INTO workers
-                (worker_id, artifact_id, artifact_hash, entrypoint, lifecycle,
+                (owner_id, worker_id, artifact_id, artifact_hash, entrypoint, lifecycle,
                  configuration_json, schedule_kind, interval_seconds)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                values,
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+                (self.owner_id,) + values,
             )
 
     def save(self, record: WorkerRecord) -> None:
@@ -125,14 +146,14 @@ class SQLiteWorkerStore:
             cursor = connection.execute(
                 """UPDATE workers SET artifact_id=?, artifact_hash=?, entrypoint=?,
                    lifecycle=?, configuration_json=?, schedule_kind=?, interval_seconds=?,
-                   updated_at=CURRENT_TIMESTAMP WHERE worker_id=?""",
-                values[1:] + (values[0],),
+                   updated_at=CURRENT_TIMESTAMP WHERE owner_id=? AND worker_id=?""",
+                values[1:] + (self.owner_id, values[0],),
             )
             if cursor.rowcount != 1:
                 raise KeyError(record.definition.worker_id)
 
     def delete(self, worker_id: str) -> None:
         with self._connect() as connection:
-            cursor = connection.execute("DELETE FROM workers WHERE worker_id = ?", (worker_id,))
+            cursor = connection.execute("DELETE FROM workers WHERE owner_id = ? AND worker_id = ?", (self.owner_id, worker_id))
             if cursor.rowcount != 1:
                 raise KeyError(worker_id)

@@ -36,3 +36,11 @@
 ## معیار تکمیل
 
 قرارداد public API و هویت Dashboard مشخص شود؛ هیچ token سرویسی به مرورگر نرسد؛ تست‌های API، خطا و سازگاری اجرا شوند؛ هر اتصال واقعی به سرویس با E2E قابل تکرار اثبات شود.
+
+## به‌روزرسانی Release candidate
+
+بخش‌های قبلی baseline تاریخی هستند. اکنون dice-roller در Registry/UI فعال است،
+Worker Manager API نسخه‌بندی‌شده دارد و factory `dashboard.production:create_app`
+اتصال read-only owner-scoped را ارائه می‌کند. تست واقعی HTTPS/Docker، مشاهده
+Worker و history در Dashboard را پوشش می‌دهد. راهنمای فعلی در
+[استقرار Ubuntu](../../deployment/ubuntu.md) است؛ پذیرش روی VPS هنوز جداگانه لازم است.

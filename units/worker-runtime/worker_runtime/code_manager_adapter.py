@@ -1,8 +1,17 @@
 """Authenticated adapter for CODE MANAGER's public artifact-content API."""
 import math
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote
-from urllib.request import Request, urlopen
+from urllib.parse import quote, urlsplit
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+
+class _RejectRedirectHandler(HTTPRedirectHandler):
+    """Never forward artifact authorization to a redirect target."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise HTTPError(
+            req.full_url, code, "CODE MANAGER redirects are not allowed", headers, fp
+        )
 
 
 class ArtifactAPIUnavailable(RuntimeError):
@@ -18,9 +27,15 @@ class CodeManagerArtifactProvider:
     """
 
     def __init__(self, base_url, authorization_header, timeout=10, max_bytes=16 * 1024 * 1024):
-        if not isinstance(base_url, str) or not base_url.startswith("https://"):
+        if not isinstance(base_url, str):
             raise ValueError("CODE MANAGER URL must use HTTPS")
-        if not isinstance(authorization_header, str) or not authorization_header.strip():
+        parsed = urlsplit(base_url)
+        if (parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password
+                or parsed.query or parsed.fragment or parsed.path not in ('','/')):
+            raise ValueError("CODE MANAGER URL must use HTTPS")
+        if (not isinstance(authorization_header, str) or not authorization_header.strip()
+                or len(authorization_header) > 512 or not authorization_header.isascii()
+                or any(c in authorization_header for c in '\r\n')):
             raise ValueError("Authorization header is required")
         if (
             isinstance(timeout, bool)
@@ -53,7 +68,10 @@ class CodeManagerArtifactProvider:
             },
         )
         try:
-            with urlopen(request, timeout=self.timeout) as response:
+            # Build a private opener for each fetch so the redirect policy cannot
+            # be bypassed by a process-global urllib opener or another caller.
+            opener = build_opener(_RejectRedirectHandler)
+            with opener.open(request, timeout=self.timeout) as response:
                 if response.status != 200 or response.headers.get_content_type() != "application/octet-stream":
                     raise ArtifactAPIUnavailable("Artifact endpoint returned unexpected response")
                 content = response.read(self.max_bytes + 1)

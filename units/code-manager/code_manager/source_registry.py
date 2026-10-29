@@ -85,8 +85,11 @@ class SourceRegistry:
         return metadata
 
     def list_sources(self, *, owner_id: str) -> list[dict]:
-        """Return registered source versions owned by the supplied identity."""
-        resource_id, records = self._owner_records(owner_id)
+        """Return registered source versions, including an owner's empty registry."""
+        try:
+            resource_id, records = self._owner_records(owner_id)
+        except SourceNotFound:
+            return []
         result = []
 
         for record in records:

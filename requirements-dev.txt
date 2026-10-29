@@ -3,3 +3,6 @@ pytest>=8,<10
 PyYAML>=6,<7
 httpx>=0.24,<1
 -r units/consumers/dashboard-core/requirements.txt
+
+# Current Starlette TestClient transport
+httpx2>=2,<3

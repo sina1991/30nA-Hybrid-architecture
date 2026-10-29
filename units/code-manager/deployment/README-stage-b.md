@@ -1,3 +1,7 @@
+> Historical Stage B checklist. For the current multi-service Release candidate,
+> use [Ubuntu deployment](../../../docs/deployment/ubuntu.md) and the templates in
+> `deployment/systemd/`. The old wsgiref unit is not the production HTTP entrypoint.
+
 # Agent 09 Stage B — controlled deployment
 
 This patch does not provision or activate operational credentials. Do not start the service until provisioning is completed securely. Do not use development identity flags.

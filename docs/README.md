@@ -14,7 +14,10 @@
 
 ## امنیت و استقرار
 
-- [پذیرش مرحله راه‌اندازی Rootless Docker](security/rootless-docker-stage-acceptance.md) — این مرحله تأیید شده است؛ تأیید کلی امنیت تولید همچنان باز است.
+- [پذیرش مرحله راه‌اندازی Rootless Docker](security/rootless-docker-stage-acceptance.md) — تأیید این مرحله به معنی تأیید Production نیست.
+- [مدل تهدید و معیارهای پذیرش Sandbox در Worker Runtime](security/worker-runtime-sandbox-threat-model.md)
+- [بازیابی cleanup نامطمئن](security/sandbox-cleanup-recovery.md)
+
 
 ## ممیزی و اصلاحات
 
@@ -36,3 +39,8 @@
 ## وضعیت تکمیل مستندات
 
 این فهرست و فصل‌های اولیه، خط مبنای مستندسازی هستند؛ به معنی پایان ممیزی یا تأیید عملیاتی پروژه نیستند. هر فصل باید در طول ممیزی با شواهد کد، قراردادها، فرمان‌های اجرا و نتایج واقعی تست به‌روزرسانی شود.
+
+## آماده‌سازی نسخه و استقرار
+
+- [وضعیت آماده‌سازی انتشار و Release checklist](PROJECT_FINALIZATION_STATUS.md)
+- [استقرار روی Ubuntu VPS، credentialها، backup و recovery](deployment/ubuntu.md)

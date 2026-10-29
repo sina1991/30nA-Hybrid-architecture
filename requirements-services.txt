@@ -1,0 +1,4 @@
+# Shared HTTP services (Manager, Runtime, Dashboard and CODE WSGI gateway)
+-r units/consumers/dashboard-core/requirements.txt
+httpx>=0.24,<1
+gunicorn>=23,<24

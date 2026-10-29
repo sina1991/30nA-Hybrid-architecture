@@ -56,3 +56,26 @@ python3 -m unittest discover -s units/worker-manager/tests -v
 \`\`\`
 
 The SQLite persistence regression suite is \`units/worker-manager/tests/test_sqlite_store.py\`. The repository-wide CI also runs the unit and contract suites.
+
+## HTTP control plane and durable scheduler
+
+`worker_manager.api.create_app(service, credential_path)` exposes the owner-scoped
+`/api/v1/workers` CRUD/configure/enable/disable/run endpoints and
+`/api/v1/executions` history/detail/cancel endpoints. Request contracts are exported
+in `contracts/worker/manager.openapi.json`. Use
+`worker_manager.production:create_app --factory --workers 1` with the environment
+in `docs/deployment/ubuntu.md`; never run multiple workers against one database.
+
+`ControlService` persists accepted jobs and owner-scoped idempotency keys before
+submission. Interval schedules and transactional lease/claim state survive restart.
+Missed intervals are skipped rather than replayed in a burst. Only a terminal
+successful Runtime response records success. Restarted/expired or ambiguous remote
+executions fail explicitly and are not automatically rerun: they can still require
+remote cancellation/reconciliation. Inspect the retained ID before an explicit retry
+with a fresh key. This is not exactly-once or a distributed scheduler.
+
+SQLiteWorkerStore now accepts `owner_id`. Existing rows are migrated into the
+private `__legacy__` namespace without assigning them to any authenticated user.
+Back up SQLite before migration; legacy owner assignment is an explicit operator
+operation. Runtime HTTP gateways use per-owner credentials over verified HTTPS,
+reject redirects and bound response size.

@@ -11,7 +11,7 @@ OWNER = re.compile(r'^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$')
 def load_credentials(path):
     """Credential file: {sha256(token): owner_id}; read afresh for revocation."""
     raw = json.loads(Path(path).read_text(encoding='utf-8'))
-    if not isinstance(raw, dict) or not raw or any(
+    if not isinstance(raw, dict) or any(
         not isinstance(k, str) or not re.fullmatch('[0-9a-f]{64}', k)
         or not isinstance(v, str) or not OWNER.fullmatch(v)
         for k, v in raw.items()
@@ -29,7 +29,13 @@ def authenticated_wsgi(app, credential_path):
             if token and token.isascii() and not any(c.isspace() for c in token):
                 digest = hashlib.sha256(token.encode('ascii')).hexdigest()
                 # Compare all keys with constant-time primitive.
-                for stored_hash, mapped_owner in load_credentials(credential_path).items():
+                try:
+                    credentials = load_credentials(credential_path)
+                except (OSError, ValueError, TypeError):
+                    body = b'{"error":{"code":"IDENTITY_UNAVAILABLE","message":"Identity configuration unavailable"}}'
+                    start_response('503 Service Unavailable', [('Content-Type','application/json'),('Content-Length',str(len(body)))])
+                    return [body]
+                for stored_hash, mapped_owner in credentials.items():
                     if hmac.compare_digest(digest, stored_hash):
                         owner = mapped_owner
         if owner is None:

@@ -1,0 +1,2 @@
+# Isolated CI tooling; not installed into application services.
+pip-audit==2.10.1

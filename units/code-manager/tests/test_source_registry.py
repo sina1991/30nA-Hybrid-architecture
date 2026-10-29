@@ -85,3 +85,17 @@ class SourceRegistryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+def test_new_owner_source_list_is_empty_without_hiding_detail_not_found(tmp_path):
+    from unittest.mock import Mock
+    import pytest
+    from code_manager.data_manager_client import DataManagerAPIError
+    from code_manager.source_registry import SourceRegistry, SourceNotFound
+    from code_manager.blob_storage import BlobStorage
+    client=Mock()
+    client.get_resource.side_effect=DataManagerAPIError(404,'RESOURCE_NOT_FOUND','Not found')
+    registry=SourceRegistry(BlobStorage(tmp_path),client)
+    assert registry.list_sources(owner_id='new-owner') == []
+    with pytest.raises(SourceNotFound):
+        registry.get_source(owner_id='new-owner',source_id='missing',source_version='1.0.0')

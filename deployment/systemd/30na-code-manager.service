@@ -1,0 +1,22 @@
+[Unit]
+Description=30nA authenticated CODE MANAGER
+After=network.target
+[Service]
+Type=simple
+User=30na-sandbox
+Group=30na-sandbox
+WorkingDirectory=/opt/30na/current
+Environment=PYTHONPATH=/opt/30na/current/units/code-manager
+EnvironmentFile=/etc/30na/code-manager.env
+ExecStart=/opt/30na/current/.venv/bin/gunicorn --workers 1 --threads 8 --worker-class gthread --bind 127.0.0.1:8099 --timeout 360 --limit-request-line 4096 --limit-request-fields 64 --limit-request-field_size 8190 code_manager.production:create_app()
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=360
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/30na/code /var/lib/30na/data /tmp
+RestrictAddressFamilies=AF_INET AF_UNIX
+UMask=0077
+# Rootless Docker must be configured for this account. PrivateTmp breaks mounts.
+[Install]
+WantedBy=multi-user.target

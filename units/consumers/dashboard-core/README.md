@@ -17,17 +17,17 @@ Themeها: `compact-6`، `standard-8`، `wide-12`. ماژول‌ها: `empty`، 
 
 ## Public API Adapter
 
-`public_api.py` عملیات read-only مستند DATA MANAGER و CODE MANAGER را با کنترل نسخه، Timeout و خطاها ارائه می‌کند. این Adapter عمداً به Routeهای Dashboard متصل نشده است: احراز هویت کاربر Dashboard و نگاشت امن مجوزها به upstream هنوز قرارداد/زیرساخت تأییدشده ندارد. قرار دادن Token سرویس در Endpoint عمومی ممنوع است.
+`public_api.py` عملیات read-only مستند DATA MANAGER و CODE MANAGER را با کنترل نسخه، Timeout و خطاها ارائه می‌کند. در حالت پیش‌فرض فقط Adapter مستقل است؛ factory احراز هویت‌شده پایین آن را به Routeهای read-only وصل می‌کند. قرار دادن Token عمومی سرویس در Endpoint عمومی ممنوع است.
 
 متغیرهای اختیاری: `DATA_MANAGER_URL`, `DATA_MANAGER_TOKEN`, `DATA_MANAGER_TIMEOUT` و مشابه آن‌ها برای `CODE_MANAGER`. از Development identity header فقط روی loopback و با تأیید محیط استفاده شود.
 
-## محدودیت‌های واقعی
+## وضعیت Release candidate
 
-- WORKER MANAGER فاقد HTTP API عمومی تأییدشده برای list/submit/status/result است؛ هیچ Endpoint فرضی ساخته نشده است.
-- CODE MANAGER build/artifact API هنوز `reserved_not_implemented` است.
-- WORKER RUNTIME برای اجرای کد غیرقابل اعتماد production sandbox نیست.
-- `dice-roller` در handbook آمده ولی در Registry واقعی پشتیبانی نمی‌شود.
-- هیچ اتصال real-service یا end-to-end در این بسته اثبات نشده است.
+- Worker Manager اکنون HTTP API برای CRUD/run/status/history/cancel دارد؛ قرارداد آن در `contracts/worker/manager.openapi.json` است.
+- CODE MANAGER در branch یکپارچه Build و Publication gate واقعی دارد؛ source ZIP جای built artifact منتشر نمی‌شود.
+- ماژول `dice-roller` در Registry و UI پشتیبانی می‌شود.
+- اتصال سرویس‌های واقعی HTTPS/Docker در تست E2E بررسی می‌شود. این به معنی تأیید تنظیمات Production روی VPS نیست.
+- حالت پیش‌فرض Dashboard بدون credential و upstream، فقط UI محلی است. برای BFF متصل، factory پایین را استفاده کنید.
 
 ## تست
 
@@ -41,3 +41,18 @@ PYTHONPATH=. python3 -m pytest legacy-tests -q
 ## نصب امن
 
 ZIP را ابتدا با `unzip -l` بررسی کنید؛ نصب باید فقط در `units/consumers/` انجام شود. سه فایل Adapter قبلی اگر یکسان هستند بدون تغییر حفظ شوند. هر Conflict را پیش از جایگزینی بررسی کنید.
+
+## Authenticated upstream service
+
+Use `dashboard.production:create_app --factory` with the explicit credential file
+and upstream URLs in `docs/deployment/ubuntu.md`. This enables read-only
+`/api/upstreams/workers`, `/api/upstreams/executions` and `/api/upstreams/sources`.
+The account panel loads the authenticated owner's workers and recent executions.
+No upstream request occurs before local authentication; no universal service token
+is substituted. Account tokens are not persisted in browser storage or rendered
+into HTML. Errors/degradation are explicit; successful account responses use
+`Cache-Control: no-store`. Browser account access requires HTTPS outside loopback.
+
+The old static Dashboard entrypoint remains available without upstream bindings.
+Full rootless target-host acceptance and live production-identity configuration
+still require deployment evidence.

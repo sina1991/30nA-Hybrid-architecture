@@ -1,8 +1,8 @@
-"""Owner-scoped, immutable publication of registered source ZIP artifacts.
+"""Owner-scoped, immutable publication of validated built artifacts.
 
-Publication is explicit: registering a source never publishes an artifact.
-Manifests are atomically linked into place and never overwritten by this module.
-This component does not execute source code or change DATA MANAGER persistence.
+Registering a source never publishes an artifact. Manifests are atomically
+linked and never overwritten. Source ZIPs are not downloadable through the
+built-artifact API. This component never executes submitted source code.
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 from .errors import BlobIntegrityError
 
 _ARTIFACT_ID = re.compile(
-    r"^([A-Za-z0-9][A-Za-z0-9._-]{0,63})@([A-Za-z0-9][A-Za-z0-9._-]{0,63})$"
+    r"^([A-Za-z0-9][A-Za-z0-9._:-]{0,127})@([A-Za-z0-9][A-Za-z0-9._:-]{0,127})$"
 )
 _DIGEST = re.compile(r"^[0-9a-f]{64}$")
 _MAX_ARTIFACT_BYTES = 16 * 1024 * 1024
@@ -90,7 +90,7 @@ class PublishedArtifactRegistry:
             raise ArtifactNotFound("Artifact has not been published") from exc
         except OSError as exc:
             raise ArtifactIntegrityError("Manifest cannot be read") from exc
-        if len(raw) > 4096:
+        if len(raw) > 65536:
             raise ArtifactIntegrityError("Manifest exceeds maximum size")
         try:
             metadata = json.loads(raw.decode("ascii"))
@@ -100,7 +100,7 @@ class PublishedArtifactRegistry:
             raise ArtifactIntegrityError("Manifest is not canonical")
         if (metadata.get("owner_id") != owner_id or
                 metadata.get("artifact_id") != artifact_id or
-                metadata.get("artifact_type") != "source_zip" or
+                metadata.get("artifact_type") not in {"source_zip", "built_artifact"} or
                 metadata.get("manifest_version") != 1 or
                 not isinstance(metadata.get("entrypoint"), str) or
                 not metadata["entrypoint"] or
@@ -110,6 +110,36 @@ class PublishedArtifactRegistry:
                 _DIGEST.fullmatch(metadata["blob_digest"]) is None or
                 metadata.get("artifact_hash") != "sha256:" + metadata["blob_digest"]):
             raise ArtifactIntegrityError("Manifest identity or metadata mismatch")
+        if metadata["artifact_type"] == "built_artifact":
+            if (not isinstance(metadata.get("source_hash"), str)
+                    or re.fullmatch(r"sha256:[0-9a-f]{64}", metadata["source_hash"]) is None
+                    or not isinstance(metadata.get("build_id"), str)
+                    or re.fullmatch(r"[0-9a-f]{32}", metadata["build_id"]) is None
+                    or not isinstance(metadata.get("provenance"), dict)
+                    or metadata["provenance"].get("artifact_hash") != metadata.get("artifact_hash")
+                    or metadata["provenance"].get("source_hash") != metadata.get("source_hash")
+                    or metadata["provenance"].get("dependency_lock") != metadata.get("dependency_lock")
+                    or metadata["provenance"].get("dependency_lock_hash") != (
+                        "sha256:" + hashlib.sha256(b"stdlib-only").hexdigest()
+                        if metadata.get("dependency_lock") == "stdlib-only"
+                        else metadata.get("dependency_lock")
+                    )
+                    or metadata.get("source_id") != _identity(owner_id, artifact_id)[0]
+                    or metadata.get("source_version") != _identity(owner_id, artifact_id)[1]
+                    or metadata.get("artifact_version") != metadata.get("blob_digest")
+                    or not isinstance(metadata.get("build_version"), str)
+                    or not metadata["build_version"]
+                    or not isinstance(metadata.get("calculation_version"), str)
+                    or not metadata["calculation_version"]
+                    or metadata.get("validation_status") != "passed"
+                    or not (metadata.get("dependency_lock") == "stdlib-only"
+                            or (isinstance(metadata.get("dependency_lock"), str)
+                                and re.fullmatch(r"sha256:[0-9a-f]{64}", metadata["dependency_lock"])))
+                    or not isinstance(metadata.get("input_schema"), dict)
+                    or not isinstance(metadata.get("output_schema"), dict)
+                    or len(_canonical(metadata["input_schema"])) > 16384
+                    or len(_canonical(metadata["output_schema"])) > 16384):
+                raise ArtifactIntegrityError("Built artifact provenance is missing or inconsistent")
         return metadata
 
     def get(self, owner_id: str, artifact_id: str) -> tuple[dict, bytes]:
@@ -187,4 +217,140 @@ class PublishedArtifactRegistry:
         if existing != metadata:
             raise ArtifactConflict("Artifact identity already published differently")
         public, _ = self.get(owner_id, artifact_id)
+        return public, created
+
+    def get_built(self, owner_id: str, artifact_id: str) -> tuple[dict, bytes]:
+        """Return only a built artifact; registered/source ZIPs are never downloadable here."""
+        metadata, data = self.get(owner_id, artifact_id)
+        if metadata.get("artifact_type") != "built_artifact":
+            raise ArtifactNotFound("A validated built artifact has not been published")
+        return metadata, data
+
+    def publish_built(
+        self, owner_id: str, artifact_id: str, data: bytes, *,
+        entrypoint: str, source_hash: str, build_id: str, provenance: dict,
+        artifact_version: str | None = None,
+        build_version: str = "code-manager-build-v1",
+        calculation_version: str = "1.0.0",
+        dependency_lock: str = "stdlib-only",
+        input_schema: dict | None = None,
+        output_schema: dict | None = None,
+        validation_status: str = "passed",
+    ) -> tuple[dict, bool]:
+        """Publish only a pipeline-produced artifact with a verified immutable digest."""
+        source_id, source_version = _identity(owner_id, artifact_id)
+        if not isinstance(data, bytes) or not 0 < len(data) <= self.max_bytes:
+            raise ArtifactInvalid("Built artifact exceeds the configured size limit")
+        if not isinstance(source_hash, str) or re.fullmatch(r"sha256:[0-9a-f]{64}", source_hash) is None:
+            raise ArtifactInvalid("Invalid source SHA-256")
+        if not isinstance(build_id, str) or re.fullmatch(r"[0-9a-f]{32}", build_id) is None:
+            raise ArtifactInvalid("Invalid build ID")
+        if not isinstance(entrypoint, str) or not entrypoint:
+            raise ArtifactInvalid("Invalid built artifact entrypoint")
+        if not isinstance(provenance, dict):
+            raise ArtifactInvalid("Build provenance must be an object")
+        digest = hashlib.sha256(data).hexdigest()
+        if artifact_version is None:
+            artifact_version = digest
+        if artifact_version != digest:
+            raise ArtifactInvalid("Artifact version must match the content digest")
+        if not isinstance(build_version, str) or not build_version:
+            raise ArtifactInvalid("Build version is required")
+        if not isinstance(calculation_version, str) or not calculation_version:
+            raise ArtifactInvalid("Calculation version is required")
+        if not (dependency_lock == "stdlib-only"
+                or (isinstance(dependency_lock, str)
+                    and re.fullmatch(r"sha256:[0-9a-f]{64}", dependency_lock))):
+            raise ArtifactInvalid("Unsupported dependency lock policy")
+        if validation_status != "passed":
+            raise ArtifactInvalid("Only passed build artifacts may be published")
+        input_schema = {} if input_schema is None else input_schema
+        output_schema = {} if output_schema is None else output_schema
+        if not isinstance(input_schema, dict) or not isinstance(output_schema, dict):
+            raise ArtifactInvalid("Artifact schemas must be objects")
+        if len(_canonical(input_schema)) > 16384 or len(_canonical(output_schema)) > 16384:
+            raise ArtifactInvalid("Artifact schema exceeds manifest limits")
+        artifact_hash = "sha256:" + digest
+        safe_provenance = dict(provenance)
+        lock_hash = (
+            "sha256:" + hashlib.sha256(b"stdlib-only").hexdigest()
+            if dependency_lock == "stdlib-only" else dependency_lock
+        )
+        safe_provenance.setdefault("dependency_lock", dependency_lock)
+        safe_provenance.setdefault("dependency_lock_hash", lock_hash)
+        if (safe_provenance.get("source_hash") != source_hash
+                or safe_provenance.get("artifact_hash") != artifact_hash
+                or safe_provenance.get("dependency_lock") != dependency_lock
+                or safe_provenance.get("dependency_lock_hash") != lock_hash):
+            raise ArtifactInvalid("Build provenance does not match artifact hashes or dependency lock")
+        try:
+            self.blob_storage.put_bytes(data, expected_digest=digest)
+        except (BlobIntegrityError, OSError) as exc:
+            raise ArtifactIntegrityError("Built artifact blob could not be stored") from exc
+        metadata = {
+            "manifest_version": 1, "owner_id": owner_id, "artifact_id": artifact_id,
+            "artifact_type": "built_artifact", "artifact_hash": artifact_hash,
+            "blob_digest": digest, "entrypoint": entrypoint, "size_bytes": len(data),
+            "source_id": source_id, "source_version": source_version,
+            "artifact_version": artifact_version, "build_version": build_version,
+            "calculation_version": calculation_version, "dependency_lock": dependency_lock,
+            "input_schema": input_schema, "output_schema": output_schema,
+            "validation_status": validation_status,
+            "source_hash": source_hash, "build_id": build_id, "provenance": safe_provenance,
+        }
+        path = self._path(owner_id, artifact_id)
+        path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+        if path.exists():
+            existing = self._read(owner_id, artifact_id)
+            if (existing.get("artifact_type") == "built_artifact"
+                    and existing.get("artifact_hash") == artifact_hash
+                    and existing.get("source_hash") == source_hash
+                    and existing.get("entrypoint") == entrypoint
+                    and existing.get("size_bytes") == len(data)
+                    and existing.get("build_version") == build_version
+                    and existing.get("calculation_version") == calculation_version
+                    and existing.get("dependency_lock") == dependency_lock
+                    and existing.get("input_schema") == input_schema
+                    and existing.get("output_schema") == output_schema
+                    and existing.get("provenance") == safe_provenance):
+                public, _ = self.get_built(owner_id, artifact_id)
+                return public, False
+            raise ArtifactConflict("Artifact identity already has a different publication")
+        encoded = _canonical(metadata)
+        temporary_path = None
+        created = False
+        try:
+            with tempfile.NamedTemporaryFile(mode="wb", dir=path.parent,
+                                             prefix=".manifest-", delete=False) as temp:
+                temporary_path = Path(temp.name)
+                os.chmod(temporary_path, 0o600)
+                temp.write(encoded)
+                temp.flush()
+                os.fsync(temp.fileno())
+            try:
+                os.link(temporary_path, path)
+                created = True
+                directory_fd = os.open(path.parent, os.O_RDONLY)
+                try:
+                    os.fsync(directory_fd)
+                finally:
+                    os.close(directory_fd)
+            except FileExistsError:
+                existing = self._read(owner_id, artifact_id)
+                if (existing.get("artifact_type") != "built_artifact"
+                        or existing.get("artifact_hash") != artifact_hash
+                        or existing.get("source_hash") != source_hash
+                        or existing.get("entrypoint") != entrypoint
+                        or existing.get("size_bytes") != len(data)
+                        or existing.get("build_version") != build_version
+                        or existing.get("calculation_version") != calculation_version
+                        or existing.get("dependency_lock") != dependency_lock
+                        or existing.get("input_schema") != input_schema
+                        or existing.get("output_schema") != output_schema
+                        or existing.get("provenance") != safe_provenance):
+                    raise ArtifactConflict("Artifact identity already has a different publication")
+        finally:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)
+        public, _ = self.get_built(owner_id, artifact_id)
         return public, created

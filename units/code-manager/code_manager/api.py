@@ -9,10 +9,11 @@ from __future__ import annotations
 
 import base64
 import binascii
+import hashlib
 import json
 import os
 import re
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote
 
 from .data_manager_client import (
     DataManagerAPIError,
@@ -22,7 +23,7 @@ from .data_manager_client import (
 )
 from .errors import CodeManagerError, SourceValidationError
 from .source_archive import inspect_source_archive
-from .build_validation import validate_build_preflight
+from .build_pipeline import BuildPipeline
 from .published_artifacts import (
     PublishedArtifactRegistry, ArtifactInvalid, ArtifactNotFound,
     ArtifactConflict, ArtifactIntegrityError,
@@ -140,6 +141,7 @@ def create_application(
     identity_provider=None,
     max_request_bytes: int = MAX_REQUEST_BYTES,
     published_artifact_registry=None,
+    build_pipeline=None,
 ):
     """Create a WSGI application with injected storage and identity adapters.
 
@@ -162,6 +164,10 @@ def create_application(
         published_artifact_registry = PublishedArtifactRegistry(blob_storage)
     if not isinstance(published_artifact_registry, PublishedArtifactRegistry):
         raise TypeError("published_artifact_registry must be a PublishedArtifactRegistry instance")
+    if build_pipeline is None:
+        build_pipeline = BuildPipeline(blob_storage)
+    if not hasattr(build_pipeline, "run") or not hasattr(build_pipeline, "history"):
+        raise TypeError("build_pipeline must provide run() and durable history")
 
     def application(environ, start_response):
         correlation_id = environ.get("HTTP_X_CORRELATION_ID")
@@ -394,6 +400,7 @@ def create_application(
                     or len(source_version) > 128
                     or "/" in source_version
                     or "\\" in source_version
+                    or "@" in source_version
                 ):
                     raise APIError(
                         400, "SOURCE_INVALID", "Invalid source identity"
@@ -489,7 +496,7 @@ def create_application(
                         404, "ARTIFACT_NOT_FOUND", "Artifact route not found"
                     )
                 if len(parts) == 3 and parts[2] == "content" and method == "GET":
-                    metadata, artifact_bytes = published_artifact_registry.get(
+                    metadata, artifact_bytes = published_artifact_registry.get_built(
                         owner_id, parts[1]
                     )
                     headers = [
@@ -504,11 +511,83 @@ def create_application(
                         headers.append(("X-Correlation-ID", correlation_id))
                     start_response("200 OK", headers)
                     return [artifact_bytes]
+                if len(parts) == 3 and parts[2] == "publish" and method == "POST":
+                    body = read_json_body()
+                    if "owner_id" in body:
+                        raise APIError(400, "SOURCE_INVALID",
+                                       "owner_id must not be supplied in request JSON")
+                    build_id = body.get("build_id")
+                    if not isinstance(build_id, str) or re.fullmatch(r"[0-9a-f]{32}", build_id) is None:
+                        raise APIError(400, "BUILD_INVALID", "A valid build_id is required")
+                    report = build_pipeline.history.get(owner_id, build_id)
+                    if report is None:
+                        raise APIError(404, "BUILD_NOT_FOUND", "Build was not found")
+                    expected_artifact_id = report.get("source_id", "") + "@" + report.get("source_version", "")
+                    if expected_artifact_id != parts[1]:
+                        raise APIError(404, "BUILD_NOT_FOUND", "Build does not belong to this artifact identity")
+                    stages = report.get("stages")
+                    required_stages = {
+                        "inspect_archive", "verify_source_hash", "validate_archive_paths",
+                        "syntax_check", "dependency_check", "contract_check",
+                        "normalize_working_copy", "test", "reproducibility", "package", "hash",
+                    }
+                    stage_names = {
+                        stage.get("stage") for stage in stages
+                        if isinstance(stage, dict)
+                    } if isinstance(stages, list) else set()
+                    if (report.get("status") != "succeeded"
+                            or report.get("publishable") is not True
+                            or not isinstance(stages, list)
+                            or len(stage_names) != len(stages)
+                            or not required_stages.issubset(stage_names)
+                            or any(not isinstance(stage, dict) or stage.get("status") != "passed"
+                                   for stage in stages)):
+                        raise APIError(409, "BUILD_NOT_PUBLISHABLE",
+                                       "Every mandatory build stage must pass before publication")
+                    digest = report.get("artifact_digest")
+                    artifact_hash = report.get("artifact_hash")
+                    source_hash = report.get("source_hash")
+                    if (not isinstance(digest, str)
+                            or not re.fullmatch(r"[0-9a-f]{64}", digest)
+                            or artifact_hash != "sha256:" + digest
+                            or not isinstance(source_hash, str)
+                            or not isinstance(report.get("provenance"), dict)):
+                        raise APIError(409, "BUILD_NOT_PUBLISHABLE",
+                                       "Build artifact hashes or provenance are incomplete")
+                    try:
+                        artifact_bytes = blob_storage.get_bytes(digest)
+                    except (OSError, ValueError):
+                        raise APIError(409, "BUILD_NOT_PUBLISHABLE",
+                                       "Built artifact blob is unavailable")
+                    if hashlib.sha256(artifact_bytes).hexdigest() != digest:
+                        raise APIError(409, "BUILD_NOT_PUBLISHABLE",
+                                       "Built artifact digest verification failed")
+                    metadata, created = published_artifact_registry.publish_built(
+                        owner_id, parts[1], artifact_bytes,
+                        entrypoint=report.get("entrypoint"),
+                        source_hash=source_hash,
+                        build_id=build_id,
+                        provenance=report["provenance"],
+                        artifact_version=report.get("artifact_version"),
+                        build_version=report.get("build_version", "code-manager-build-v1"),
+                        calculation_version=report.get("calculation_version", "1.0.0"),
+                        dependency_lock=report.get("dependency_lock", "stdlib-only"),
+                        input_schema=report.get("input_schema", {}),
+                        output_schema=report.get("output_schema", {}),
+                        validation_status=report.get("validation_status", "passed"),
+                    )
+                    return _json_response(
+                        start_response, 201 if created else 200,
+                        {"contract_version": CONTRACT_VERSION,
+                         **({"correlation_id": correlation_id} if correlation_id else {}),
+                         "payload": {"artifact": metadata, "created": created}},
+                        correlation_id,
+                    )
                 if method in {"GET", "POST"}:
                     raise APIError(
                         501,
                         "OPERATION_NOT_IMPLEMENTED",
-                        "Artifact publication and build validation remain disabled",
+                        "Artifact metadata operation is not implemented",
                     )
                 raise APIError(
                     404, "ARTIFACT_NOT_FOUND", "Artifact route not found"
@@ -530,7 +609,8 @@ def create_application(
                     or not source_version
                     or len(source_version) > 128
                     or "/" in source_version
-                    or "\\\\" in source_version
+                    or "\\" in source_version
+                    or "@" in source_version
                 ):
                     raise APIError(
                         400, "SOURCE_INVALID",
@@ -542,7 +622,10 @@ def create_application(
                     source_id=source_id,
                     source_version=source_version,
                 )
-                report = validate_build_preflight(source)
+                report = build_pipeline.run(
+                    owner_id=owner_id, source_id=source_id,
+                    source_version=source_version, source=source,
+                )
                 return _json_response(
                     start_response, 200,
                     {
@@ -557,12 +640,38 @@ def create_application(
                     correlation_id,
                 )
 
-            if route == "/builds":
-                if method == "GET":
-                    raise APIError(
-                        501, "OPERATION_NOT_IMPLEMENTED",
-                        "Build history storage is not implemented",
-                    )
+            if route == "/builds" and method == "GET":
+                query = parse_qs(environ.get("QUERY_STRING", ""))
+                raw_limit = query.get("limit", ["50"])[0]
+                try:
+                    limit = int(raw_limit)
+                except (TypeError, ValueError):
+                    raise APIError(400, "BUILD_INVALID", "limit must be an integer")
+                if not 1 <= limit <= 100:
+                    raise APIError(400, "BUILD_INVALID", "limit must be between 1 and 100")
+                builds = build_pipeline.history.list(owner_id, limit=limit)
+                return _json_response(
+                    start_response, 200,
+                    {"contract_version": CONTRACT_VERSION,
+                     **({"correlation_id": correlation_id} if correlation_id else {}),
+                     "payload": {"builds": builds}},
+                    correlation_id,
+                )
+
+            if route.startswith("/builds/") and method == "GET":
+                build_id = route[len("/builds/"):]
+                if re.fullmatch(r"[0-9a-f]{32}", build_id) is None:
+                    raise APIError(404, "BUILD_NOT_FOUND", "Build was not found")
+                report = build_pipeline.history.get(owner_id, build_id)
+                if report is None:
+                    raise APIError(404, "BUILD_NOT_FOUND", "Build was not found")
+                return _json_response(
+                    start_response, 200,
+                    {"contract_version": CONTRACT_VERSION,
+                     **({"correlation_id": correlation_id} if correlation_id else {}),
+                     "payload": {"build": report}},
+                    correlation_id,
+                )
 
             raise APIError(404, "SOURCE_NOT_FOUND", "Route not found")
 

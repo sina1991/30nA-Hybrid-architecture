@@ -137,3 +137,12 @@ CI: https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/4077518442
 - دریافت Artifact از API واقعی و اجرای E2E موفق/ناموفق با شواهد ثبت شود.
 
 «تکمیل» یا «آماده تولید» اعلام نمی‌شود مگر معیارهای بالا با تست واقعی و CI روی Commit نهایی اثبات شوند.
+
+## آماده‌سازی Release candidate در branch یکپارچه
+
+وضعیت historical بخش‌های قبلی، وضعیت main پیش از ادغام این branch است. وضعیت جاری
+برای بررسی تغییرات در [گزارش آماده‌سازی انتشار](../PROJECT_FINALIZATION_STATUS.md)
+ثبت می‌شود. پیاده‌سازی Sandbox/Build/Publication از PR stack ترکیب شده، API و
+scheduler پایدار owner-scoped و Runtime HTTP اضافه و Dashboard متصل شده است.
+بستن Issueها به پذیرش staging و شواهد دقیق SHA نهایی وابسته است؛ وجود این کد
+به‌تنهایی مجوز اعلام Production-ready نیست.

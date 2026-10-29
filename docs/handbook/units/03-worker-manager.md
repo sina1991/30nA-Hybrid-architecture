@@ -61,3 +61,13 @@ Store تعریف Worker، artifact identity، lifecycle، configuration سازگ
 ## معیار تکمیل
 
 قرارداد Manager/Runtime صریح و نسخه‌بندی‌شده باشد؛ درخواست‌های Worker غیرفعال رد شوند؛ آزمون‌ها با Runtime واقعی در کنار Fake Gateway اجرا شوند؛ persistence/scheduler/API مطابق نیاز محصول با تست قراردادی و یکپارچگی اثبات شوند. اجرای کد غیرقابل‌اعتماد تا زمان پیاده‌سازی و ممیزی sandbox واقعی، برای Production مجاز نیست.
+
+## به‌روزرسانی Release candidate
+
+در branch آماده‌سازی انتشار، APIهای HTTP، owner-scoped migration، صف پایدار،
+interval scheduler و lease/claim تراکنشی پیاده‌سازی شده‌اند. رفتار restart نتیجه
+نامعلوم را شکست‌خورده و نیازمند بررسی می‌داند؛ retry خودکار یا exactly-once
+ادعا نمی‌شود. قرارداد در `contracts/worker/manager.openapi.json` و تصمیم‌ها در
+[ADR 0001](../decisions/0001-owner-scoped-control-plane.md) قرار دارند.
+تست سرتاسری HTTPS با Runtime واقعی Docker اجرا می‌شود؛ پذیرش deployment هدف
+همچنان باید جداگانه ثبت شود. موارد باز قدیمی بالا وضعیت baseline هستند.

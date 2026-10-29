@@ -1,32 +1,36 @@
-# 30nA-Hybrid-architecture
+# 30nA Hybrid Architecture
 
-مرجع اصلی معماری پروژه و سازمان‌دهی واحدهای نرم‌افزاری در قالب Monorepo.
+Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORKER RUNTIME و Dashboard.
 
-## مستندات فنی
+**وضعیت: Release candidate؛ پذیرش نهایی Production هنوز باز است.**
 
-**[فهرست مرکزی مستندات و کتابچه فنی](docs/README.md)**
+## شروع توسعه
 
-کتابچه فنی شامل خط مبنای ممیزی، نقشه راه تکمیل، قواعد مستندسازی، فصل مستقل هر یونیت، وضعیت تست‌ها و دفتر تصمیم‌های معماری است. مستندات، وضعیت تأییدشده را از فرضیه‌ها و کارهای انجام‌نشده جدا می‌کنند.
+Python 3.11 یا 3.12، Docker و OpenSSL لازم‌اند. از checkout موجود استفاده کنید؛ Git worktree تازه لازم نیست.
 
-## اهداف
+```bash
+bash scripts/deployment/prepare.sh
+source .venv/bin/activate
+docker build -t 30na-sandbox -f units/worker-runtime/tests/sandbox-image/Dockerfile .
+python scripts/testing/run_ci.py --image "$(docker image inspect --format '{{.Id}}' 30na-sandbox)"
+```
 
-- تعریف معماری و مرز مسئولیت واحدها
-- ثبت قراردادها و استانداردهای مشترک
-- فراهم‌کردن محل مشخص برای واحدهای پروژه
-- پشتیبانی از توسعه مستقل هر واحد توسط ایجنت تخصصی
-- یکپارچه‌سازی تدریجی مخازن موجود، پس از بررسی
+runner یک DATA MANAGER موقت و DB جداگانه ایجاد و پس از تست متوقف می‌کند. suite کامل شامل تست‌های واقعی Docker/HTTPS است و تست skipped را برای Release نمی‌پذیرد. برای بررسی محدود بدون Docker، `--unit-only` صریح است و پذیرش انتشار محسوب نمی‌شود.
 
-## واحدها
+## قابلیت‌ها
 
-- CORE
-- DATA MANAGER
-- CODE MANAGER
-- WORKER MANAGER
-- WORKER RUNTIME
-- DASHBOARD CORE CONSUMER
+- ثبت source، تست Build ایزوله، بسته‌بندی deterministic، hash/provenance و Publication gate.
+- HTTP API با bearer identity، ownership و SQLite persistence برای مدیریت Worker و اجراها.
+- interval scheduler با claim/lease تراکنشی و رفتار صریح restart؛ فقط یک process مالک هر state است.
+- Runtime با Sandbox اجباری در HTTP، تاریخچه جداگانه هر owner و transport HTTPS.
+- Dashboard با themeها، ماژول‌ها و اتصال read-only به Workerها و history کاربر.
 
-## وضعیت فعلی
+## استقرار و محدودیت‌ها
 
-مرحله اول: ایجاد اسکلت معماری.
+- [راهنمای Ubuntu VPS و systemd](docs/deployment/ubuntu.md)
+- [وضعیت آماده‌سازی و Release checklist](docs/PROJECT_FINALIZATION_STATUS.md)
+- [فهرست مستندات](docs/README.md)
+- [قرارداد Manager HTTP](contracts/worker/manager.openapi.json)
+- [قرارداد Runtime HTTP](contracts/worker/runtime.openapi.json)
 
-در این مرحله، کد مخازن موجود منتقل یا بازنویسی نمی‌شود.
+Native dependency wheel، scheduler توزیع‌شده، exactly-once و replay خودکار اجرای نامعلوم پشتیبانی نمی‌شوند. Rootless host acceptance، live daemon fault-injection و تنظیمات واقعی TLS/identity باید پیش از انتشار نهایی روی staging بررسی شوند. هیچ token یا private key را در مخزن ثبت نکنید.
