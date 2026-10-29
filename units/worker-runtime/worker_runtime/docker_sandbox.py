@@ -64,6 +64,9 @@ class DockerSandboxBackend:
         # PIDs whose Docker container removal could not be confirmed. Keep the
         # cidfile directory as recovery evidence instead of silently discarding it.
         self._cleanup_unconfirmed = set()
+        # PIDs whose container removal was positively confirmed; consume this
+        # confirmation once during cleanup instead of issuing a second rm.
+        self._cleanup_confirmed = set()
         self._lock = threading.Lock()
 
     @classmethod
@@ -182,7 +185,9 @@ class DockerSandboxBackend:
         with self._lock:
             if confirmed:
                 self._cleanup_unconfirmed.discard(proc.pid)
+                self._cleanup_confirmed.add(proc.pid)
             else:
+                self._cleanup_confirmed.discard(proc.pid)
                 self._cleanup_unconfirmed.add(proc.pid)
         return confirmed
 
@@ -229,6 +234,7 @@ class DockerSandboxBackend:
                 if current == (cidfile, cid_dir):
                     self._cidfiles.pop(pid, None)
                     self._cleanup_unconfirmed.discard(pid)
+                    self._cleanup_confirmed.discard(pid)
                     confirmed_pids.append(pid)
             if pid in confirmed_pids:
                 shutil.rmtree(cid_dir, ignore_errors=True)
@@ -244,6 +250,15 @@ class DockerSandboxBackend:
             paths = self._cidfiles.get(proc.pid)
             if paths is None:
                 return proc.pid not in self._cleanup_unconfirmed
+            already_confirmed = proc.pid in self._cleanup_confirmed
+            if already_confirmed:
+                self._cidfiles.pop(proc.pid, None)
+                self._cleanup_confirmed.discard(proc.pid)
+                self._cleanup_unconfirmed.discard(proc.pid)
+        if already_confirmed:
+            _, cid_dir = paths
+            shutil.rmtree(cid_dir, ignore_errors=True)
+            return True
         if not self.terminate(proc):
             return False
         with self._lock:
@@ -251,6 +266,7 @@ class DockerSandboxBackend:
             if current != paths:
                 return False
             self._cidfiles.pop(proc.pid, None)
+            self._cleanup_confirmed.discard(proc.pid)
             self._cleanup_unconfirmed.discard(proc.pid)
         _, cid_dir = paths
         shutil.rmtree(cid_dir, ignore_errors=True)
