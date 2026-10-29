@@ -23,6 +23,25 @@ limit must be positive integers; invalid resource-limit configuration is rejecte
 at Runtime initialization. Children inherit the parent's remaining
 time budget and cancellation. No automatic retry is performed.
 
+## Docker sandbox backend
+
+Worker execution now fails closed by default: `WorkerRuntime(...)` requires an explicitly configured sandbox backend. The Docker backend requires an immutable image reference pinned by SHA-256 digest and launches workers with no network, a read-only root filesystem, numeric unprivileged UID/GID, dropped Linux capabilities, `no-new-privileges`, private IPC, CPU/memory/PID limits, bounded tmpfs, file-descriptor limits, and read-only mounts for the archive and runner. It uses Docker's default seccomp profile; do not set seccomp to unconfined. Prefer a dedicated rootless daemon and never expose a Docker socket to untrusted callers.
+
+Build and publish a trusted worker-runtime image with Python installed and compatible with the artifact ABI, then configure:
+
+```python
+from worker_runtime import DockerSandboxBackend, WorkerRuntime
+
+sandbox = DockerSandboxBackend.from_env()
+runtime = WorkerRuntime(artifact_provider, sandbox_backend=sandbox)
+```
+
+Required: `WORKER_RUNTIME_SANDBOX_IMAGE=registry.example/worker-runtime@sha256:<64 lowercase hex characters>`. Optional settings: `WORKER_RUNTIME_DOCKER_BINARY`, `WORKER_RUNTIME_SANDBOX_MEMORY` (default `256m`), `WORKER_RUNTIME_SANDBOX_CPUS` (default `1.0`), `WORKER_RUNTIME_SANDBOX_PIDS` (default `64`), and `WORKER_RUNTIME_SANDBOX_TMPFS` (default `64m`). The backend validates resource settings and fails instead of falling back to host execution. Missing Docker daemon, invalid image or launch errors return a terminal execution error.
+
+This container boundary is a first implementation, not proof of production-grade isolation. Validate cgroup enforcement (especially memory/CPU/PID limits), Docker daemon trust, filesystem permissions, egress isolation, cancellation cleanup, and host-kernel/runtime patching on the actual deployment host. For hostile multi-tenant workloads, evaluate a microVM or hardened runtime such as gVisor/Kata. Never mount credentials or host paths into worker containers.
+
+For tests that intentionally exercise the legacy direct-subprocess path with trusted fixtures only, explicitly pass `require_sandbox=False`. That compatibility mode is unsafe for untrusted artifacts and must not be used in production.
+
 ## CODE MANAGER dependency
 
 The current CODE MANAGER API implements
@@ -42,19 +61,11 @@ adapter unit tests do not prove that end-to-end path.
 
 ## Security limitations
 
-**NOT A PRODUCTION SANDBOX.** Python subprocess isolation (`-I`) is not a
-security boundary. Worker code may access the host filesystem, network, secrets,
-processes and resources under the service identity. Deploy only trusted worker
-artifacts in a development environment. Production requires a dedicated sandbox
-(container/microVM with unprivileged UID, filesystem and network isolation,
-CPU/memory/PID limits, no inherited credentials, and audited egress), plus
-external scheduling and persistent state. ZIP path/symlink checks, hash checks,
-size limits and subprocess timeouts are defense-in-depth, not a substitute.
+**The default direct-subprocess path is disabled.** Python subprocess isolation (`-I`) is not a security boundary. A Docker sandbox backend is now available and the Runtime fails closed unless a backend is explicitly configured. The backend adds OS/runtime-enforced network, filesystem, identity and resource restrictions, but it is not yet independently security-tested on the target deployment host. ZIP path/symlink checks, hash checks, size limits and subprocess timeouts are defense-in-depth, not a substitute for deployment validation.
 
 Captured stdout is now drained by a reader thread and retained only up to
 `max_output_bytes + 1`. Crossing the cap triggers process termination and
 returns `OUTPUT_LIMIT_EXCEEDED`; this prevents unbounded stdout accumulation in
 the parent process. The regression test uses a worker that prints indefinitely.
 This is a memory-protection improvement, **not a sandbox**: a worker can still
-consume CPU, memory outside stdout, filesystem or network resources. Run only
-trusted artifacts until a real sandbox is implemented and independently tested.
+consume CPU, memory outside stdout, filesystem or network resources. Run only trusted artifacts until the Docker backend has passed the real-runtime security and integration acceptance tests in the threat-model document.

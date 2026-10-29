@@ -78,7 +78,7 @@ class Integration:
         else:
             raise ValueError('mode must be demo or code-manager')
         self.mode = mode
-        self.runtime = WorkerRuntime(provider)
+        self.runtime = WorkerRuntime(provider, require_sandbox=(mode != 'demo'))
         self.manager = WorkerManager(runtime_gateway=self.runtime)
         definition = WorkerDefinition(WORKER_ID, ARTIFACT_ID,
                                       'sha256:' + sha256(data).hexdigest(), 'modules_ok:main')
