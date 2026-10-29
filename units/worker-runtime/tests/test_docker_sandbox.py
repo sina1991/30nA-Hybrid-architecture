@@ -172,7 +172,12 @@ def test_terminate_failure_is_unconfirmed_and_preserves_cid_evidence(tmp_path, f
         with patch.object(backend, "_kill_cli"):
             assert backend.terminate(proc) is False
     assert backend.cleanup_unconfirmed(proc) is True
-    with patch("worker_runtime.docker_sandbox.subprocess.run", side_effect=failure):
+    cleanup_patch = (
+        patch("worker_runtime.docker_sandbox.subprocess.run", side_effect=failure)
+        if isinstance(failure, BaseException)
+        else patch("worker_runtime.docker_sandbox.subprocess.run", return_value=failure)
+    )
+    with cleanup_patch:
         with patch.object(backend, "_kill_cli"):
             assert backend.cleanup(proc) is False
     assert cidfile.is_file()
