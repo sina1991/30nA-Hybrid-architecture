@@ -268,7 +268,7 @@ def test_real_docker_memory_cgroup_kills_over_limit_process():
         pytest.skip("Docker daemon is not available")
     name = "sandbox-memory-probe-" + __import__("uuid").uuid4().hex
     command = [
-        "docker", "run", "--pull=never", "--name", name,
+        "docker", "run", "--pull=never", "--log-driver=none", "--name", name,
         "--network=none", "--read-only", "--user", "65532:65532",
         "--memory=64m", "--memory-swap=64m", "--cpus=1.0", "--pids-limit=16",
         "--cap-drop=ALL", "--security-opt=no-new-privileges:true",
