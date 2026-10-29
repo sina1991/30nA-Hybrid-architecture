@@ -720,7 +720,10 @@ class DockerBuildExecutor:
                 except subprocess.TimeoutExpired:
                     timed_out = True
                     stop_container()
-                    proc.wait(timeout=5)
+                    try:
+                        proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:
+                        cleanup_unconfirmed.set()
                 reader.join(timeout=2)
             finally:
                 if proc.poll() is None:
