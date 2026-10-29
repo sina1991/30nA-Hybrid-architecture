@@ -91,3 +91,26 @@ class APITests(unittest.TestCase):
         with self.assertRaises(ValueError): PublicAPI("http://example.com", identity_header="X-Manager-ID", identity="alice")
 
 if __name__ == "__main__": unittest.main()
+
+
+class SubmissionTests(unittest.TestCase):
+    def test_post_uses_json_and_retains_idempotency_key(self):
+        captured=[]
+        def transport(req,timeout):
+            captured.append(req)
+            return Response(b'{"contract_version":"1.0.0","payload":{"execution_id":"accepted"}}')
+        api=PublicAPI('https://manager.example',token='test-token',transport=transport)
+        body={'input_payload':{'values':[10]},'idempotency_key':'same-request','timeout_seconds':30}
+        self.assertEqual(api.post('/api/v1/workers/demo/executions',body)['execution_id'],'accepted')
+        request=captured[0]
+        self.assertEqual(request.get_method(),'POST')
+        self.assertEqual(json.loads(request.data),body)
+        self.assertEqual(request.get_header('Content-type'),'application/json')
+        self.assertEqual(request.get_header('Authorization'),'Bearer test-token')
+
+    def test_post_rejects_invalid_json_values_before_transport(self):
+        transport=Mock()
+        api=PublicAPI('https://manager.example',transport=transport)
+        for value in ({'x':float('nan')},{'x':'a'*1000001}):
+            with self.assertRaises(ValueError):api.post('/api/v1/workers/demo/executions',value)
+        transport.assert_not_called()

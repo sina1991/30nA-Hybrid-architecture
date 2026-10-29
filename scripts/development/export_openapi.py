@@ -6,11 +6,12 @@ import sys
 import tempfile
 
 ROOT=Path(__file__).resolve().parents[2]
-for unit in ('worker-manager','worker-runtime'):
+for unit in ('worker-manager','worker-runtime','consumers/dashboard-core'):
     sys.path.insert(0,str(ROOT/'units'/unit))
 from worker_manager.api import create_app as manager_app
 from worker_manager.control_service import ControlService
 from worker_runtime.api import create_app as runtime_app
+from dashboard.app import create_app as dashboard_app
 
 with tempfile.TemporaryDirectory() as directory:
     service=ControlService(Path(directory)/'db',lambda owner:None)
@@ -19,5 +20,9 @@ with tempfile.TemporaryDirectory() as directory:
                          ('runtime',runtime_app(Path(directory)/'unused-credentials',lambda owner:None))]:
             path=ROOT/'contracts'/'worker'/f'{name}.openapi.json'
             path.write_text(json.dumps(app.openapi(),indent=2,sort_keys=True)+'\n')
+        app=dashboard_app(credential_path=Path(directory)/'unused-credentials',upstream_factory=lambda owner,token:{})
+        path=ROOT/'contracts/dashboard/openapi.json'
+        path.parent.mkdir(parents=True,exist_ok=True)
+        path.write_text(json.dumps(app.openapi(),indent=2,sort_keys=True)+'\n')
     finally:
         service.close()

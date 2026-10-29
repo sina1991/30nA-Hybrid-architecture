@@ -45,12 +45,16 @@ ZIP را ابتدا با `unzip -l` بررسی کنید؛ نصب باید فقط
 ## Authenticated upstream service
 
 Use `dashboard.production:create_app --factory` with the explicit credential file
-and upstream URLs in `docs/deployment/ubuntu.md`. This enables read-only
+and upstream URLs in `docs/deployment/ubuntu.md`. This enables authenticated
 `/api/upstreams/workers`, `/api/upstreams/executions` and `/api/upstreams/sources`.
-The account panel loads the authenticated owner's workers and recent executions.
+The account panel supports choosing an enabled pre-registered Worker, JSON input,
+submission, status polling, result/history lookup and best-effort cancellation.
+Execution routes are `/api/upstreams/workers/{worker_id}/executions`,
+`/api/upstreams/executions/{execution_id}` and the `/cancel` subroute.
+See `contracts/dashboard/openapi.json` and `docs/deployment/first-delivery.md`.
 No upstream request occurs before local authentication; no universal service token
-is substituted. Account tokens are not persisted in browser storage or rendered
-into HTML. Errors/degradation are explicit; successful account responses use
+is substituted. Account tokens stay only in page memory until logout/reload, and are never
+persisted in browser storage or rendered into HTML. Errors/degradation are explicit; successful account responses use
 `Cache-Control: no-store`. Browser account access requires HTTPS outside loopback.
 
 The old static Dashboard entrypoint remains available without upstream bindings.

@@ -515,11 +515,14 @@ def create_app(*, credential_path=None, upstream_factory=None):
             continue
         instance.router.routes.append(route)
     if configured:
+        from worker_manager.http_common import BodyLimitMiddleware, register_error_handlers
+        instance.add_middleware(BodyLimitMiddleware)
+        register_error_handlers(instance)
         from .upstreams import create_router
         from .upstream_panel import PANEL
         instance.include_router(create_router(credential_path, upstream_factory))
 
         @instance.get('/', response_class=HTMLResponse)
         def connected_dashboard():
-            return dashboard().replace('</body>', PANEL + '</body>')
+            return dashboard().replace('<main>', PANEL + '<main>', 1)
     return instance

@@ -1,0 +1,17 @@
+#!/bin/sh
+# Install as root-owned 0755; customer access is read-only and arguments are fixed.
+if [ "$#" -ne 1 ]; then
+    echo 'Usage: 30na-review status|logs-manager|logs-runtime|logs-code|logs-dashboard' >&2
+    exit 2
+fi
+case "$1" in
+    status)
+        exec /usr/bin/systemctl --no-pager --full status 30na-worker-manager 30na-worker-runtime 30na-code-manager 30na-dashboard
+        ;;
+    logs-manager) unit=30na-worker-manager ;;
+    logs-runtime) unit=30na-worker-runtime ;;
+    logs-code) unit=30na-code-manager ;;
+    logs-dashboard) unit=30na-dashboard ;;
+    *) echo 'Unsupported read-only operation' >&2; exit 2 ;;
+esac
+exec /usr/bin/journalctl --no-pager --output=short-iso -n 100 --unit="$unit"

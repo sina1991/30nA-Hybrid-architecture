@@ -1,4 +1,4 @@
-"""Read-only public API adapter for Dashboard Core (stdlib only)."""
+"""Bounded authenticated JSON API adapter for Dashboard Core (stdlib only)."""
 from __future__ import annotations
 import json
 import os
@@ -57,6 +57,14 @@ class PublicAPI:
         self.transport = transport
 
     def get(self, path: str) -> dict:
+        return self._request("GET", path)
+
+    def post(self, path: str, payload: dict) -> dict:
+        if not isinstance(payload, dict):
+            raise ValueError("request payload must be an object")
+        return self._request("POST", path, payload)
+
+    def _request(self, method: str, path: str, payload=None) -> dict:
         if not path.startswith("/api/v1/") or ".." in path or "?" in path or "#" in path:
             raise ValueError("unsupported API path")
         headers = {"Accept": "application/json"}
@@ -64,7 +72,13 @@ class PublicAPI:
             headers["Authorization"] = f"Bearer {self.token}"
         if self.identity_header:
             headers[self.identity_header] = self.identity
-        request = Request(self.base_url + path, headers=headers, method="GET")
+        data = None
+        if payload is not None:
+            data = json.dumps(payload, allow_nan=False).encode("utf-8")
+            if len(data) > 1_000_000:
+                raise ValueError("request payload too large")
+            headers["Content-Type"] = "application/json"
+        request = Request(self.base_url + path, headers=headers, method=method, data=data)
         try:
             if self.transport is None:
                 opener = build_opener(_RejectRedirectHandler)

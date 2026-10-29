@@ -10,6 +10,6 @@
 - هویت از bearer credential hash‌شده و فایل قابل revoke به دست می‌آید؛ header یا owner ارسال‌شده در body مرجع نیست. credentials مقصد به همان owner محدودند.
 - Runtime هر owner، history و idempotency جداگانه دارد. HTTP execution همیشه Sandbox الزامی دارد؛ حالت unsafe تست‌های کتابخانه از HTTP قابل فعال‌سازی نیست.
 - source ZIP با built artifact یکسان نیست؛ Publication Gate فقط Build موفق با همه مراحل اجباری و cleanup تأییدشده را می‌پذیرد.
-- Dashboard یک BFF read-only است و credential کاربر را پس از احراز هویت به upstream مشخص می‌فرستد؛ token عمومی سرویس جایگزین هویت کاربر نمی‌شود.
+- Dashboard یک BFF با عملیات صریح مشاهده، اجرای Worker ازپیش‌ثبت‌شده و cancel است و credential کاربر را پس از احراز هویت به upstream مشخص می‌فرستد؛ token عمومی سرویس جایگزین هویت کاربر نمی‌شود.
 
 پیامد: این طراحی برای یک VPS و SQLite قابل بهره‌برداری و ممیزی است. HA، scheduler توزیع‌شده، automatic retry نتیجه نامعلوم، OAuth/OIDC و native dependency wheel خارج از دامنه این Release candidate هستند.

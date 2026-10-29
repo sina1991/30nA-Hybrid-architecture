@@ -1,6 +1,11 @@
 """Real HTTPS Manager -> Runtime -> CODE and Dashboard read integration."""
 from contextlib import contextmanager
 import socket
+import json
+import os
+import subprocess
+import importlib.util
+from pathlib import Path
 import ssl
 import threading
 import time
@@ -69,20 +74,36 @@ def exercise_control_plane(root,cert,key,credentials,code_url,image,artifact_has
                     assert dashboard.status_code==200,dashboard.text
                     assert dashboard.json()['payload']['workers'][0]['definition']['worker_id']=='managed-worker'
                     assert client.get(dashboard_url+'/api/upstreams/workers',headers=other).json()['payload']['workers']==[]
-                    payload={'input_payload':{'value':40},'idempotency_key':'test-job'}
-                    response=client.post(manager_url+'/api/v1/workers/managed-worker/executions',headers=auth,json=payload)
+                    repository=Path(__file__).resolve().parents[3]
+                    spec=importlib.util.spec_from_file_location('seed_demo',repository/'scripts/deployment/seed_demo.py')
+                    seeder=importlib.util.module_from_spec(spec);spec.loader.exec_module(seeder)
+                    code_api=PublicAPI(code_url,token='alice-integration-token',timeout=60)
+                    manager_api=PublicAPI(manager_url,token='alice-integration-token')
+                    demo=seeder.seed(code_api,manager_api)
+                    repeated=seeder.seed(code_api,manager_api)
+                    assert demo==repeated
+                    assert demo['lifecycle']=='enabled'
+                    payload={'input_payload' :{'value':40},'idempotency_key':'test-job'}
+                    response=client.post(dashboard_url+'/api/upstreams/workers/managed-worker/executions',headers=auth,json=payload)
                     assert response.status_code==202,response.text
                     eid=response.json()['payload']['execution_id']
                     deadline=time.monotonic()+30
                     while time.monotonic()<deadline:
-                        result=client.get(manager_url+'/api/v1/executions/'+eid,headers=auth).json()['payload']
+                        result=client.get(dashboard_url+'/api/upstreams/executions/'+eid,headers=auth).json()['payload']
                         if result['status'] in ('succeeded','failed','cancelled'):break
                         time.sleep(0.1)
                     assert result['status']=='succeeded',result
                     assert result['result']['result']=={'value':42}
                     assert client.get(runtime_url+'/api/v1/executions/'+eid,headers=other).status_code==404
-                    assert client.post(manager_url+'/api/v1/executions/'+eid+'/cancel',headers=other).status_code==404
-                    assert client.post(manager_url+'/api/v1/workers/managed-worker/executions',headers=auth,json=payload).json()['payload']['execution_id']==eid
+                    assert client.post(dashboard_url+'/api/upstreams/executions/'+eid+'/cancel',headers=other).status_code==404
+                    assert client.post(dashboard_url+'/api/upstreams/workers/managed-worker/executions',headers=auth,json=payload).json()['payload']['execution_id']==eid
+                    if os.environ.get('DASHBOARD_SKIP_BROWSER')!='1':
+                        script=repository/'units/consumers/dashboard-core/browser-tests/check.cjs'
+                        browser=subprocess.run(['node',str(script)],text=True,input=json.dumps({
+                            'url':dashboard_url,'token':'alice-integration-token'}),
+                            stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=75)
+                        assert browser.returncode==0,browser.stdout+'\n'+browser.stderr
+                        assert 'PASS: Chromium real Dashboard' in browser.stdout
         restarted=ControlService(root/'manager.db',gateway)
         try:
             assert restarted.get('alice',eid)['result']['result']=={'value':42}

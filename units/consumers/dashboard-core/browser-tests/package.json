@@ -1,0 +1,7 @@
+{
+  "name": "30na-dashboard-browser-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chromium regression checks using the host's installed browser",
+  "devDependencies": {"playwright": "1.62.1"}
+}

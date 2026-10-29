@@ -2,7 +2,7 @@
 
 وضعیت: **Release candidate؛ Production هنوز تأیید نشده است.**
 
-این branch، PRهای #29، #30، #40 و #42 را با main ترکیب می‌کند؛ قابلیت‌های جدید Dashboard در main حفظ شده‌اند. علاوه بر آن، HTTP API و scheduler پایدار Worker Manager، HTTP Runtime با جداسازی owner و اتصال read-only Dashboard اضافه شده‌اند.
+این branch، PRهای #29، #30، #40 و #42 را با main ترکیب می‌کند؛ قابلیت‌های جدید Dashboard در main حفظ شده‌اند. علاوه بر آن، HTTP API و scheduler پایدار Worker Manager، HTTP Runtime با جداسازی owner و اتصال Dashboard اضافه شده‌اند. نسخه اولیه اکنون اجرای Worker، نتیجه و history را نیز در UI ارائه می‌کند.
 
 ## قابلیت‌های آماده بررسی
 
@@ -11,7 +11,7 @@
 - CRUD/enable/disable/run/history/cancel با bearer authentication و OpenAPI.
 - صف و idempotency پایدار، interval scheduler، lease/claim تراکنشی، جلوگیری از چند process و رفتار صریح پس از restart.
 - Runtime HTTP با provider و history جداگانه هر owner و Sandbox اجباری.
-- Dashboard read-only و مسیر واقعی HTTPS از ثبت source تا نتیجه اجرا و نمایش Workerها.
+- Dashboard اجرایی با کنترل هویت و مسیر واقعی HTTPS از ثبت source تا نتیجه اجرا و نمایش Workerها.
 - dependencyهای hash-locked، actionهای SHA-pinned، CI روی Python 3.11 و 3.12، dependency audit و secret scan.
 - [راهنمای Ubuntu](deployment/ubuntu.md)، systemd templateها و [ADR کنترل اجرا](handbook/decisions/0001-owner-scoped-control-plane.md).
 

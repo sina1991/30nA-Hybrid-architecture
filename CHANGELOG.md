@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased — Release candidate preparation
+## Unreleased — Initial customer demo
+
+- Dashboard executes enabled pre-registered trusted Workers with JSON input, result polling, history and cancellation.
+- Uncertain submission retries reuse the original idempotency key; credentials remain in memory and logout clears visible account data.
+- Add a deterministic trusted summary Worker, a repeatable Build/publication/setup command and a read-only Terminal review helper.
+- Add Chromium regression and real HTTPS/Docker UI integration tests, plus an initial customer handoff guide.
+
+## Release candidate preparation
 
 - Integrate the existing Sandbox, Build/Publication, cleanup and HTTPS E2E PR stack while preserving main's Dashboard updates.
 - Add owner-scoped Worker Manager HTTP CRUD/run/history/cancel APIs, SQLite migration, durable queue, interval scheduler, transactional claims and a single-process guard.

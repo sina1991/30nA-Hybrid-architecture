@@ -37,6 +37,7 @@ def main():
     env=os.environ.copy()
     env.update(PYTHONPATH=':'.join(str(ROOT/path) for path in ['units/code-manager','units/worker-manager','units/worker-runtime','units/consumers/dashboard-core']),
         PYTHONDONTWRITEBYTECODE='1',CODE_MANAGER_INTEGRATION='1',DATA_MANAGER_ALLOW_INSECURE_HEADER='1',CODE_MANAGER_ALLOW_INSECURE_HEADER='0')
+    if args.unit_only:env['DASHBOARD_SKIP_BROWSER']='1'
     for name in ['WORKER_RUNTIME_SANDBOX_TEST_IMAGE','CODE_MANAGER_BUILD_SANDBOX_IMAGE']:
         if args.unit_only:env.pop(name,None)
         else:env[name]=args.image

@@ -32,6 +32,10 @@ jobs:
           cache-dependency-path: requirements.lock
       - name: Install hash-locked dependencies
         run: python -m pip install --require-hashes -r requirements.lock
+      - name: Install locked browser test dependency
+        run: npm ci --prefix units/consumers/dashboard-core/browser-tests --ignore-scripts --no-audit --no-fund
+      - name: Verify host Chrome availability
+        run: command -v google-chrome || command -v chromium
       - name: Build immutable Sandbox test image
         run: |
           docker build -t worker-runtime-sandbox-test -f units/worker-runtime/tests/sandbox-image/Dockerfile .
@@ -59,6 +63,8 @@ jobs:
           python-version: '3.11'
       - name: Install hash-locked audit tooling
         run: python -m pip install --require-hashes -r requirements-security.lock
+      - name: Audit browser dependency lockfile
+        run: npm audit --prefix units/consumers/dashboard-core/browser-tests --audit-level=low
       - name: Audit application and development lockfile
         run: python -m pip_audit -r requirements.lock --no-deps --disable-pip --strict
       - name: Install checksum-verified Gitleaks

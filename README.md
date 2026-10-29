@@ -23,7 +23,7 @@ runner یک DATA MANAGER موقت و DB جداگانه ایجاد و پس از �
 - HTTP API با bearer identity، ownership و SQLite persistence برای مدیریت Worker و اجراها.
 - interval scheduler با claim/lease تراکنشی و رفتار صریح restart؛ فقط یک process مالک هر state است.
 - Runtime با Sandbox اجباری در HTTP، تاریخچه جداگانه هر owner و transport HTTPS.
-- Dashboard با themeها، ماژول‌ها و اتصال read-only به Workerها و history کاربر.
+- Dashboard با themeها، ماژول‌ها، اجرای Worker و مشاهده نتیجه و history کاربر.
 
 ## استقرار و محدودیت‌ها
 
@@ -34,3 +34,12 @@ runner یک DATA MANAGER موقت و DB جداگانه ایجاد و پس از �
 - [قرارداد Runtime HTTP](contracts/worker/runtime.openapi.json)
 
 Native dependency wheel، scheduler توزیع‌شده، exactly-once و replay خودکار اجرای نامعلوم پشتیبانی نمی‌شوند. Rootless host acceptance، live daemon fault-injection و تنظیمات واقعی TLS/identity باید پیش از انتشار نهایی روی staging بررسی شوند. هیچ token یا private key را در مخزن ثبت نکنید.
+
+## تحویل نسخه اولیه
+
+[راهنمای تحویل اولیه به کارفرما](docs/deployment/first-delivery.md) شامل آماده‌سازی Worker نمونه، اجرای آن از Dashboard، نتیجه مورد انتظار و Terminal محدود به مشاهده است.
+برای تست کامل UI، Node و Chrome/Chromium لازم‌اند؛ ابتدا اجرا کنید:
+
+```bash
+npm ci --prefix units/consumers/dashboard-core/browser-tests --ignore-scripts --no-audit --no-fund
+```

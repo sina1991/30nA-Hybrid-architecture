@@ -137,3 +137,13 @@ runner یک DATA MANAGER موقت روی port تصادفی می‌سازد و پ
 - در restart، job در حال اجرا با `MANAGER_RESTARTED` شکست می‌خورد؛ ممکن است workload دوردست هنوز زنده باشد. execution ID را بررسی و در صورت نیاز cancel کنید. کار مبهم خودکار replay نمی‌شود.
 - زمان‌بندی interval پایدار است؛ دوره‌های ازدست‌رفته به‌صورت burst تکرار نمی‌شوند. retry خودکار برای نتیجه نامعلوم وجود ندارد. پس از تأیید توقف قبلی، برای اجرای دوباره idempotency key تازه بدهید.
 - برای rollback، سرویس‌ها را متوقف، snapshot سازگار DB/blob و نسخه کد متناظر را بازیابی و سپس smoke test اجرا کنید. نسخه قدیمیِ بدون owner isolation را مستقیماً روی DB مهاجرت‌کرده اجرا نکنید.
+
+## Dashboard اجرایی نسخه اولیه
+
+Dashboard اکنون علاوه بر مشاهده، اجرای Worker فعالِ ازپیش‌ثبت‌شده، polling وضعیت، نمایش نتیجه و درخواست cancel را ارائه می‌کند. Access token فقط تا خروج/بستن صفحه در حافظه می‌ماند. در retry ارسال نامطمئن، همان idempotency key استفاده می‌شود. مسیر کامل تحویل در [راهنمای تحویل اولیه](first-delivery.md) آمده است.
+
+تست کامل این نسخه شامل Chromium واقعی است؛ روی staging تست، Node و Chrome/Chromium و dependency قفل‌شده زیر لازم‌اند. این دو ابزار برای اجرای خود سرویس‌ها الزامی نیستند.
+
+```bash
+npm ci --prefix units/consumers/dashboard-core/browser-tests --ignore-scripts --no-audit --no-fund
+```
