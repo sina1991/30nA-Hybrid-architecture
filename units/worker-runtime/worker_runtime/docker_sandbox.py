@@ -61,6 +61,9 @@ class DockerSandboxBackend:
         self.user = user
         self.startup_timeout = float(startup_timeout)
         self._cidfiles = {}
+        # PIDs whose Docker container removal could not be confirmed. Keep the
+        # cidfile directory as recovery evidence instead of silently discarding it.
+        self._cleanup_unconfirmed = set()
         self._lock = threading.Lock()
 
     @classmethod
@@ -139,25 +142,62 @@ class DockerSandboxBackend:
             pass
 
     def terminate(self, proc):
+        """Stop the container and report whether Docker confirmed its removal.
+
+        Killing the attached Docker CLI is not proof that the container stopped.
+        On any ambiguous daemon/CLI result, return False and retain the cidfile
+        for recovery. A nonzero rm is accepted as confirmed only when Docker
+        explicitly reports that the container does not exist.
+        """
         with self._lock:
             paths = self._cidfiles.get(proc.pid)
+
+        confirmed = False
         if paths is not None:
             cidfile, _ = paths
             try:
                 container_id = cidfile.read_text(encoding="ascii").strip()
                 if re.fullmatch(r"[0-9a-f]{12,64}", container_id):
-                    subprocess.run(
+                    result = subprocess.run(
                         [self.docker_binary, "rm", "--force", container_id],
-                        stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL, timeout=5, check=False,
+                        stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE, text=True, timeout=5, check=False,
                     )
-            except (OSError, subprocess.SubprocessError):
-                pass
+                    if result.returncode == 0:
+                        confirmed = True
+                    else:
+                        # Do not interpret generic inspect/rm failures as absence:
+                        # a disconnected daemon can produce the same nonzero code.
+                        detail = (result.stderr or "").lower()
+                        confirmed = (
+                            "no such container" in detail
+                            or "no such object" in detail
+                        )
+            except (OSError, UnicodeError, subprocess.SubprocessError):
+                confirmed = False
+
+        # Close the local attached CLI even when the daemon is unavailable, but
+        # explicitly report that this does not prove the container was stopped.
         self._kill_cli(proc)
+        with self._lock:
+            if confirmed:
+                self._cleanup_unconfirmed.discard(proc.pid)
+            else:
+                self._cleanup_unconfirmed.add(proc.pid)
+        return confirmed
+
+    def cleanup_unconfirmed(self, proc):
+        """Whether container removal failed or could not be verified."""
+        with self._lock:
+            return proc.pid in self._cleanup_unconfirmed
 
     def cleanup(self, proc):
         with self._lock:
+            # Preserve the cidfile and directory for later operator recovery.
+            if proc.pid in self._cleanup_unconfirmed:
+                return False
             paths = self._cidfiles.pop(proc.pid, None)
         if paths is not None:
             _, cid_dir = paths
             shutil.rmtree(cid_dir, ignore_errors=True)
+        return True
