@@ -166,10 +166,71 @@ def test_terminate_failure_is_unconfirmed_and_preserves_cid_evidence(tmp_path, f
         with patch.object(backend, "_kill_cli"):
             assert backend.terminate(proc) is False
     assert backend.cleanup_unconfirmed(proc) is True
-    assert backend.cleanup(proc) is False
+    with patch("worker_runtime.docker_sandbox.subprocess.run", side_effect=failure):
+        assert backend.cleanup(proc) is False
     assert cidfile.is_file()
     assert cidfile.read_text(encoding="ascii") == "a" * 64
     assert cid_dir.is_dir()
+
+
+def test_cleanup_rechecks_removal_after_natural_cli_exit(tmp_path):
+    backend, proc, cidfile, cid_dir = _backend_with_cidfile(tmp_path)
+    unavailable = Mock(returncode=1, stderr="Cannot connect to the Docker daemon")
+    with patch("worker_runtime.docker_sandbox.subprocess.run", return_value=unavailable) as run:
+        with patch.object(backend, "_kill_cli"):
+            assert backend.cleanup(proc) is False
+    assert run.call_args.args[0][:3] == ["docker", "rm", "--force"]
+    assert backend.cleanup_unconfirmed(proc) is True
+    assert cidfile.is_file()
+    assert cid_dir.is_dir()
+
+
+def test_runtime_fails_closed_when_cleanup_unconfirmed_after_normal_exit():
+    import hashlib
+    import io
+    import zipfile
+    from types import SimpleNamespace
+    from worker_runtime.runtime import WorkerRuntime
+
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w") as archive:
+        archive.writestr("worker.py", "def run(data, config): return {'ok': True}")
+    artifact = stream.getvalue()
+
+    class Provider:
+        def fetch(self, artifact_id):
+            return artifact
+
+    backend = Mock()
+    proc = Mock()
+    proc.pid = 8125
+    proc.args = ["docker", "run"]
+    proc.stdin = io.BytesIO()
+    proc.stdout = io.BytesIO(b'{"ok":true,"result":{"ok":true}}')
+    proc.returncode = 0
+    proc.poll.return_value = 0
+    proc.wait.return_value = 0
+    backend.launch.return_value = proc
+    backend.cleanup.return_value = False
+    runtime = WorkerRuntime(Provider(), sandbox_backend=backend)
+    request = SimpleNamespace(
+        execution_id="cleanup-after-exit",
+        definition=SimpleNamespace(
+            worker_id="trusted-test-worker",
+            artifact_id="test-artifact",
+            artifact_hash="sha256:" + hashlib.sha256(artifact).hexdigest(),
+            entrypoint="worker:run",
+        ),
+        configuration={},
+        input_payload={},
+        depth=0,
+        timeout_seconds=2,
+        idempotency_key=None,
+    )
+
+    result = runtime.submit(request)
+    assert result.status == "failed"
+    assert result.error.code == "SANDBOX_CLEANUP_UNCONFIRMED"
 
 
 def test_runtime_reports_cleanup_unconfirmed_instead_of_cancelled():
