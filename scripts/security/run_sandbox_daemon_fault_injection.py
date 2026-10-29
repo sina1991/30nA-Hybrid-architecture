@@ -21,6 +21,7 @@ import zipfile
 
 
 ACK_VALUE = "freeze-rootless-dockerd-on-disposable-vm"
+DOCKER_BINARY = os.environ.get("WORKER_RUNTIME_DOCKER_BINARY", "docker")
 
 
 def _run(command, *, timeout=5):
@@ -48,10 +49,10 @@ def _preflight(image):
         raise RuntimeError(f"DOCKER_HOST must be exactly {expected_host}")
     if not re.fullmatch(r"sha256:[0-9a-f]{64}", image):
         raise RuntimeError("Pass the exact local immutable image ID: sha256:<64 lowercase hex>")
-    info = _run(["docker", "info", "--format", "{{json .SecurityOptions}}"])
+    info = _run([DOCKER_BINARY, "info", "--format", "{{json .SecurityOptions}}"])
     if info.returncode != 0 or "rootless" not in info.stdout.lower():
         raise RuntimeError("Docker endpoint did not positively identify itself as rootless")
-    image_check = _run(["docker", "image", "inspect", image])
+    image_check = _run([DOCKER_BINARY, "image", "inspect", image])
     if image_check.returncode != 0:
         raise RuntimeError("The exact sandbox image ID is not available locally")
     pids = _run(["pgrep", "-u", str(os.getuid()), "-x", "dockerd"])
@@ -69,7 +70,7 @@ def _wait_for_docker():
     last_error = "not yet available"
     for _ in range(30):
         try:
-            result = _run(["docker", "info", "--format", "{{.ServerVersion}}"], timeout=2)
+            result = _run([DOCKER_BINARY, "info", "--format", "{{.ServerVersion}}"], timeout=2)
         except subprocess.TimeoutExpired:
             result = None
         if result is not None and result.returncode == 0:
@@ -82,7 +83,7 @@ def _wait_for_docker():
 
 def _container_running(container_id):
     result = _run(
-        ["docker", "inspect", "--format", "{{.State.Running}}", container_id],
+        [DOCKER_BINARY, "inspect", "--format", "{{.State.Running}}", container_id],
         timeout=3,
     )
     return result.returncode == 0 and result.stdout.strip() == "true"
@@ -94,7 +95,7 @@ def run_fault_injection(image):
     sys.path.insert(0, str(repository_root / "units" / "worker-runtime"))
     from worker_runtime.docker_sandbox import DockerSandboxBackend
 
-    backend = DockerSandboxBackend(image)
+    backend = DockerSandboxBackend(image, docker_binary=DOCKER_BINARY)
     proc = None
     cidfile = None
     cid_dir = None
@@ -166,7 +167,7 @@ def run_fault_injection(image):
                 raise RuntimeError("Unconfirmed-cleanup state was not cleared after recovery")
             if cid_dir.exists():
                 raise RuntimeError("CID evidence directory was not removed after confirmed cleanup")
-            if _run(["docker", "inspect", container_id], timeout=3).returncode == 0:
+            if _run([DOCKER_BINARY, "inspect", container_id], timeout=3).returncode == 0:
                 raise RuntimeError("Container still exists after recovery reconciliation")
             backend._kill_cli(proc)
             proc.wait(timeout=5)
