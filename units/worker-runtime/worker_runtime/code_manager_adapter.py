@@ -2,7 +2,16 @@
 import math
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
+
+
+class _RejectRedirectHandler(HTTPRedirectHandler):
+    """Never forward artifact authorization to a redirect target."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise HTTPError(
+            req.full_url, code, "CODE MANAGER redirects are not allowed", headers, fp
+        )
 
 
 class ArtifactAPIUnavailable(RuntimeError):
@@ -53,7 +62,10 @@ class CodeManagerArtifactProvider:
             },
         )
         try:
-            with urlopen(request, timeout=self.timeout) as response:
+            # Build a private opener for each fetch so the redirect policy cannot
+            # be bypassed by a process-global urllib opener or another caller.
+            opener = build_opener(_RejectRedirectHandler)
+            with opener.open(request, timeout=self.timeout) as response:
                 if response.status != 200 or response.headers.get_content_type() != "application/octet-stream":
                     raise ArtifactAPIUnavailable("Artifact endpoint returned unexpected response")
                 content = response.read(self.max_bytes + 1)

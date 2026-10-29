@@ -47,3 +47,37 @@ Only remove the corresponding evidence file/directory after a successful `docker
 ## Host acceptance boundary
 
 These recovery paths do not prove all production security properties. Run daemon-failure fault injection only in isolated CI/staging. Verify secret isolation, network isolation, cancellation/orphan cleanup, and deployed service wiring separately. Rootless Docker may not support every cgroup controller on every host; the target host's reported lack of `cpuset`, `io.weight`, and `io.max` must be documented and resolved or explicitly accepted by the deployment's security owner before production acceptance.
+
+
+## Live daemon-outage fault injection (disposable staging VM only)
+
+The live fault-injection helper pauses the current non-root user's **rootless**
+`dockerd` process with `SIGSTOP` for one cleanup attempt, resumes it with
+`SIGCONT`, and verifies that the retained CID evidence can reconcile and remove
+the still-running container. It does not stop or restart Docker services.
+
+**Never run this on a shared host, production host, or a rootful Docker daemon.**
+The script refuses UID 0, requires the exact rootless socket for the current UID,
+checks Docker's `rootless` security option, requires exactly one `dockerd`
+owned by the current user, and requires an explicit opt-in variable.
+
+On a disposable Ubuntu staging VM, as the non-root account that owns rootless Docker:
+
+```bash
+clear
+set -euo pipefail
+export DOCKER_HOST="unix:///run/user/$(id -u)/docker.sock"
+export SANDBOX_FAULT_INJECTION_ACK=freeze-rootless-dockerd-on-disposable-vm
+docker info --format '{{json .SecurityOptions}}'
+docker build -t worker-runtime-sandbox-test -f units/worker-runtime/tests/sandbox-image/Dockerfile .
+IMAGE="$(docker image inspect --format '{{.Id}}' worker-runtime-sandbox-test)"
+printf 'Image ID: %s\n' "$IMAGE"
+python scripts/security/run_sandbox_daemon_fault_injection.py "$IMAGE"
+```
+
+A successful run emits one JSON object with `"status":"passed"`,
+`"cleanup_unconfirmed_before_recovery":true`, and
+`"reconciliation_confirmed":true`. Preserve that output together with the
+Git commit SHA, Docker version, image ID, and VM details. If the command fails,
+do not kill or restart a rootful daemon; inspect the retained CID evidence and
+restore the rootless daemon process with `SIGCONT` before attempting cleanup.
