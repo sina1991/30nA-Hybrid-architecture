@@ -43,6 +43,7 @@ jobs:
         run: |
           docker build -t worker-runtime-sandbox-test -f units/worker-runtime/tests/sandbox-image/Dockerfile .
           echo "WORKER_RUNTIME_SANDBOX_TEST_IMAGE=$(docker image inspect --format '{{.Id}}' worker-runtime-sandbox-test)" >> "$GITHUB_ENV"
+          echo "CODE_MANAGER_BUILD_SANDBOX_IMAGE=$(docker image inspect --format '{{.Id}}' worker-runtime-sandbox-test)" >> "$GITHUB_ENV"
           docker info --format 'Docker server: {{.ServerVersion}}'
       - name: Start isolated loopback DATA MANAGER for integration tests
         env:

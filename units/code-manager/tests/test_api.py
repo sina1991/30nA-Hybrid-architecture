@@ -188,16 +188,23 @@ class CodeManagerAPITests(unittest.TestCase):
         self.assertEqual(status, 404)
         self.assertEqual(response["error"]["code"], "SOURCE_NOT_FOUND")
 
-    def _publish_source(self, owner="alice"):
-        self.request("POST", "/api/v1/sources", self.source_payload(), owner=owner)
-        client = FakeDataManager(owner, self.state)
-        source_registry = SourceRegistry(self.storage, client)
-        return self.artifacts.publish(
-            source_registry, owner, "pricing-model@1.0.0"
+    def _publish_built(self, owner="alice"):
+        payload = self.source_payload()
+        data = base64.b64decode(payload["source_content_base64"])
+        self.request("POST", "/api/v1/sources", payload, owner=owner)
+        import hashlib
+        source_hash = "sha256:" + hashlib.sha256(data).hexdigest()
+        artifact_hash = "sha256:" + hashlib.sha256(data).hexdigest()
+        return self.artifacts.publish_built(
+            owner, "pricing-model@1.0.0", data,
+            entrypoint="sample.main:run", source_hash=source_hash,
+            build_id="a" * 32,
+            provenance={"builder_version": "test", "source_hash": source_hash,
+                        "artifact_hash": artifact_hash},
         )
 
     def test_published_artifact_content_returns_exact_bytes_and_digest(self):
-        metadata, _ = self._publish_source()
+        metadata, _ = self._publish_built()
         status, headers, content = self.request(
             "GET", "/api/v1/artifacts/pricing-model@1.0.0/content"
         )
@@ -216,7 +223,7 @@ class CodeManagerAPITests(unittest.TestCase):
         self.assertEqual(response["error"]["code"], "ARTIFACT_NOT_FOUND")
 
     def test_artifact_download_is_owner_scoped(self):
-        self._publish_source(owner="alice")
+        self._publish_built(owner="alice")
         status, _, response = self.request(
             "GET", "/api/v1/artifacts/pricing-model@1.0.0/content", owner="bob"
         )
@@ -267,6 +274,203 @@ class CodeManagerAPITests(unittest.TestCase):
         )
         self.assertEqual(status, 404)
         self.assertEqual(response["error"]["code"], "SOURCE_NOT_FOUND")
+
+
+    def test_source_zip_is_never_downloadable_from_artifact_endpoint(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        client = FakeDataManager("alice", self.state)
+        source_registry = SourceRegistry(self.storage, client)
+        self.artifacts.publish(source_registry, "alice", "pricing-model@1.0.0")
+        status, _, response = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content"
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(response["error"]["code"], "ARTIFACT_NOT_FOUND")
+
+    def test_build_history_is_durable_and_owner_scoped(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        status, _, created = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        self.assertEqual(status, 200)
+        build = created["payload"]["build"]
+        self.assertTrue(build["build_id"])
+        status, _, history = self.request("GET", "/api/v1/builds")
+        self.assertEqual(status, 200)
+        self.assertEqual(history["payload"]["builds"][0]["build_id"], build["build_id"])
+        status, _, detail = self.request("GET", "/api/v1/builds/" + build["build_id"])
+        self.assertEqual(status, 200)
+        self.assertEqual(detail["payload"]["build"]["build_id"], build["build_id"])
+        status, _, hidden = self.request(
+            "GET", "/api/v1/builds/" + build["build_id"], owner="bob"
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(hidden["error"]["code"], "BUILD_NOT_FOUND")
+
+    def test_publish_endpoint_rejects_missing_build(self):
+        status, _, response = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": "a" * 32},
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(response["error"]["code"], "BUILD_NOT_FOUND")
+
+    def test_publish_endpoint_rejects_source_zip_even_if_registered(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        status, _, response = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": "a" * 32},
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(response["error"]["code"], "BUILD_NOT_FOUND")
+
+
+    def test_publish_endpoint_requires_successful_build_and_downloads_built_artifact(self):
+        import hashlib
+        from code_manager.build_pipeline import BuildHistoryStore
+
+        payload = self.source_payload()
+        source_bytes = base64.b64decode(payload["source_content_base64"])
+        self.request("POST", "/api/v1/sources", payload)
+        artifact_bytes = make_zip()
+        artifact_digest = self.storage.put_bytes(artifact_bytes)
+        build_id = "b" * 32
+        source_hash = "sha256:" + hashlib.sha256(source_bytes).hexdigest()
+        artifact_hash = "sha256:" + artifact_digest
+        stages = [
+            {"stage": name, "status": "passed", "detail": "test fixture"}
+            for name in ("inspect_archive", "verify_source_hash", "validate_archive_paths",
+                         "syntax_check", "dependency_check", "contract_check",
+                         "normalize_working_copy", "test", "reproducibility", "package", "hash")
+        ]
+        report = {
+            "build_id": build_id, "source_id": "pricing-model", "source_version": "1.0.0",
+            "created_at": "2026-10-29T00:00:00Z", "status": "succeeded", "publishable": True,
+            "stages": stages, "source_hash": source_hash, "artifact_hash": artifact_hash,
+            "artifact_digest": artifact_digest, "artifact_size": len(artifact_bytes),
+            "entrypoint": "sample.main:run",
+            "provenance": {"builder_version": "test", "source_hash": source_hash,
+                           "artifact_hash": artifact_hash},
+        }
+        BuildHistoryStore(self.storage.root / "build-history.sqlite3").save("alice", report)
+        status, _, response = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish", {"build_id": build_id}
+        )
+        self.assertEqual(status, 201)
+        self.assertEqual(response["payload"]["artifact"]["artifact_type"], "built_artifact")
+        status, _, repeated = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish", {"build_id": build_id}
+        )
+        self.assertEqual(status, 200)
+        self.assertFalse(repeated["payload"]["created"])
+        status, _, downloaded = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content"
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(downloaded, artifact_bytes)
+
+
+    def test_publish_rejects_blocked_build(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        status, _, response = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        self.assertEqual(status, 200)
+        build_id = response["payload"]["build"]["build_id"]
+        status, _, blocked = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": build_id},
+        )
+        self.assertEqual(status, 409)
+        self.assertEqual(blocked["error"]["code"], "BUILD_NOT_PUBLISHABLE")
+
+    def test_build_cannot_be_published_by_another_owner(self):
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        _, _, response = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        build_id = response["payload"]["build"]["build_id"]
+        status, _, hidden = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": build_id}, owner="bob",
+        )
+        self.assertEqual(status, 404)
+        self.assertEqual(hidden["error"]["code"], "BUILD_NOT_FOUND")
+
+
+    def test_build_publish_download_end_to_end_in_docker(self):
+        if not os.environ.get("CODE_MANAGER_BUILD_SANDBOX_IMAGE"):
+            self.skipTest("CI Docker build image is not configured")
+        build_source = io.BytesIO()
+        with zipfile.ZipFile(build_source, "w", zipfile.ZIP_DEFLATED) as archive:
+            archive.writestr("sample/__init__.py", "")
+            archive.writestr("sample/main.py", "def run(data): return {'ok': True}\n")
+            archive.writestr("tests/__init__.py", "")
+            archive.writestr(
+                "tests/test_smoke.py",
+                "import unittest\nfrom sample.main import run\n"
+                "class Smoke(unittest.TestCase):\n"
+                " def test_entrypoint(self): self.assertEqual(run({}), {'ok': True})\n",
+            )
+        source_bytes = build_source.getvalue()
+        payload = self.source_payload(
+            source_content_base64=base64.b64encode(source_bytes).decode("ascii")
+        )
+        status, _, registered = self.request("POST", "/api/v1/sources", payload)
+        self.assertEqual(status, 201)
+        status, _, built = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        self.assertEqual(status, 200)
+        report = built["payload"]["build"]
+        self.assertEqual(report["status"], "succeeded", report["stages"])
+        self.assertTrue(report["publishable"])
+        status, _, published = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": report["build_id"]},
+        )
+        self.assertEqual(status, 201)
+        self.assertEqual(published["payload"]["artifact"]["artifact_type"], "built_artifact")
+        status, _, downloaded = self.request(
+            "GET", "/api/v1/artifacts/pricing-model@1.0.0/content",
+        )
+        self.assertEqual(status, 200)
+        self.assertNotEqual(downloaded, source_bytes)
+        with zipfile.ZipFile(io.BytesIO(downloaded)) as artifact:
+            self.assertIn("sample/main.py", artifact.namelist())
+            self.assertFalse(any(name.startswith("tests/") for name in artifact.namelist()))
+
+
+    def test_publish_rejects_success_flag_when_mandatory_stage_is_missing(self):
+        from code_manager.build_pipeline import BuildHistoryStore
+
+        self.request("POST", "/api/v1/sources", self.source_payload())
+        _, _, created = self.request(
+            "POST", "/api/v1/builds",
+            {"source_id": "pricing-model", "source_version": "1.0.0"},
+        )
+        blocked = created["payload"]["build"]
+        forged = dict(blocked)
+        forged["build_id"] = "c" * 32
+        forged["status"] = "succeeded"
+        forged["publishable"] = True
+        forged["stages"] = [
+            {"stage": name, "status": "passed", "detail": "fixture"}
+            for name in ("inspect_archive", "verify_source_hash", "validate_archive_paths",
+                         "syntax_check", "dependency_check", "contract_check",
+                         "normalize_working_copy", "test", "reproducibility", "package")
+        ]
+        BuildHistoryStore(self.storage.root / "build-history.sqlite3").save("alice", forged)
+        status, _, response = self.request(
+            "POST", "/api/v1/artifacts/pricing-model@1.0.0/publish",
+            {"build_id": forged["build_id"]},
+        )
+        self.assertEqual(status, 409)
+        self.assertEqual(response["error"]["code"], "BUILD_NOT_PUBLISHABLE")
 
 
 if __name__ == "__main__":

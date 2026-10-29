@@ -1,6 +1,6 @@
 # مدل تهدید و قرارداد پذیرش Sandbox برای WORKER RUNTIME
 
-- وضعیت: backend اولیه Docker پیاده‌سازی شده و به Runtime متصل است؛ **تأیید امنیتی و عملیاتی هنوز انجام نشده است**.
+- وضعیت: backend Docker به Runtime متصل است. CI run #110 برای commit `2facb0dcaceaebeaf0435d882278d756f0ae6483` موفق شد: ۲۱۱ تست، ۶۵ subtest و ساخت image آزمایشی Docker؛ **تأیید روی میزبان Production هنوز انجام نشده است**.
 - Issue: [#22](https://github.com/sina1991/30nA-Hybrid-architecture/issues/22)
 - مبنای بررسی: `main` در Commit `a011a7cbfc1d6eddb5fbc5637510c928ef2dabd2` (2026-10-29).
 - محدوده: `units/worker-runtime/worker_runtime/runtime.py` و `_runner.py`، ورودی Artifact، فرایندهای فرزند و مسیرهای Build آینده.
@@ -71,7 +71,9 @@
 
 تست واحد `units/worker-runtime/tests/test_docker_sandbox.py` سیاست فرمان Docker، اعتبارسنجی تنظیمات، الزام digest و رد اجرای بدون backend را بررسی می‌کند. تست یکپارچه `units/worker-runtime/tests/test_docker_sandbox_integration.py` در CI image آزمایشی Docker را اجرا می‌کند و هویت غیرممتاز، read-only بودن root، نبود interface شبکه غیر از loopback، محدودیت‌های cgroup و حذف کانتینر پس از لغو را بررسی می‌کند.
 
-این تست‌ها بخشی از ماتریس پذیرش‌اند، نه پوشش کامل آن. هنوز تست خصمانه مستقل برای خواندن فایل محرمانه میزبان، نوشتن خارج workspace، fork storm، تخصیص حافظه/CPU تا رسیدن به سقف، و fault-injection برای خرابی daemon اضافه/تأیید نشده است. وضعیت CI برای این شاخه در زمان آخرین بررسی قابل مشاهده نبود؛ بنابراین هیچ‌کدام از تست‌ها را نباید اجراشده یا موفق تلقی کرد تا نتیجه واقعی Workflow ثبت شود.
+CI run #110 با موفقیت تمام مراحل را گذراند. تست‌های Docker اکنون بررسی می‌کنند: عدم دسترسی به فایل محرمانه میزبان، رد نوشتن روی root filesystem، فقط loopback و شکست اتصال outbound، UID غیرممتاز، read-only root، محدودیت‌های memory/cpu/PID از cgroup، شکست تخصیص حافظه بیش از سقف، جلوگیری از fork storm، CPU quota زیر یک هسته و حذف کانتینر پس از لغو. تست timeout/cancellation موجود نیز اجرا می‌شود. این‌ها آزمون‌های واقعی در GitHub-hosted CI هستند، اما fault-injection daemon و تکرار آزمون روی میزبان Production هنوز انجام نشده‌اند؛ موفقیت CI به معنی تأیید Production نیست.
+
+شاخه Build pipeline تست‌ها را در Docker جداگانه و بدون شبکه اجرا می‌کند. dependencyهای خارجی فقط از `requirements.txt` با version/hash دقیق، allowlist مورداعتماد و wheelhouse آفلاین پذیرفته می‌شوند؛ wheelهای pure-Python با dependency انتقالی فقط در صورت pin دقیق و unconditional در metadata و requirements، allowlist و wheelhouse مورداعتماد پشتیبانی می‌شوند و در artifact به‌صورت vendored قرار می‌گیرند؛ native extension همچنان رد می‌شود. Worker Runtime پیش از import دوباره hash wheelها را بررسی می‌کند. manifestهای دیگر، import پویا، native extensions، `.pth` و shadow کردن standard library همچنان fail-closed رد می‌شوند.
 
 ## دروازه انتشار
 
@@ -82,4 +84,4 @@
 4. تست‌های integration/security روی CI مناسب اجرا شوند؛
 5. راه‌اندازی، نیازمندی‌های میزبان، threat model و محدودیت‌های شناخته‌شده مستند باشند.
 
-پس از این دروازه، Issue #21 می‌تواند Build واقعی را روی همان مرز ایزوله‌سازی اجرا کند. تا آن زمان Build واقعی از Source غیرقابل‌اعتماد نباید فعال شود.
+Build اولیه اکنون روی مرز Docker اجرا می‌شود و خروجی ZIP بازتولیدپذیر می‌سازد؛ Publication Gate فقط گزارش Build موفق با تمام مراحل `passed` و hash/provenance معتبر را می‌پذیرد. Issue #22 تا اجرای پذیرش روی میزبان هدف و fault-injection daemon باز می‌ماند. Issue #21 تا پذیرش روی میزبان Production و تصمیم/پیاده‌سازی پشتیبانی native wheelها باز می‌ماند. Issue #23 پیاده‌سازی و CI شده، اما تا review/merge نهایی باز است.
