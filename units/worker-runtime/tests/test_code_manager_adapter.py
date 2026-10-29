@@ -1,14 +1,17 @@
 import sys
 import unittest
 from email.message import Message
+from urllib.error import HTTPError
+from urllib.request import Request
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from worker_runtime.code_manager_adapter import (
     ArtifactAPIUnavailable,
     CodeManagerArtifactProvider,
+    _RejectRedirectHandler,
 )
 
 
@@ -35,38 +38,39 @@ class CodeManagerArtifactProviderTests(unittest.TestCase):
         provider = CodeManagerArtifactProvider(
             "https://code.example/", "Bearer test-token", timeout=2, max_bytes=100
         )
+        opener = Mock()
+        opener.open.return_value = FakeResponse(body)
         with patch(
-            "worker_runtime.code_manager_adapter.urlopen",
-            return_value=FakeResponse(body),
-        ) as open_url:
+            "worker_runtime.code_manager_adapter.build_opener",
+            return_value=opener,
+        ) as build:
             self.assertEqual(provider.fetch("artifact-1"), body)
 
-        request = open_url.call_args.args[0]
+        build.assert_called_once_with(_RejectRedirectHandler)
+        request = opener.open.call_args.args[0]
         self.assertEqual(
             request.full_url,
             "https://code.example/api/v1/artifacts/artifact-1/content",
         )
         self.assertEqual(request.headers["Authorization"], "Bearer test-token")
         self.assertEqual(request.headers["Accept"], "application/octet-stream")
-        self.assertEqual(open_url.call_args.kwargs["timeout"], 2.0)
+        self.assertEqual(opener.open.call_args.kwargs["timeout"], 2.0)
 
     def test_rejects_oversized_artifact(self):
         provider = CodeManagerArtifactProvider(
             "https://code.example", "Bearer token", max_bytes=4
         )
-        with patch(
-            "worker_runtime.code_manager_adapter.urlopen",
-            return_value=FakeResponse(b"12345"),
-        ):
+        opener = Mock()
+        opener.open.return_value = FakeResponse(b"12345")
+        with patch("worker_runtime.code_manager_adapter.build_opener", return_value=opener):
             with self.assertRaises(ArtifactAPIUnavailable):
                 provider.fetch("artifact-1")
 
     def test_rejects_unexpected_content_type(self):
         provider = CodeManagerArtifactProvider("https://code.example", "Bearer token")
-        with patch(
-            "worker_runtime.code_manager_adapter.urlopen",
-            return_value=FakeResponse(b"{}", content_type="application/json"),
-        ):
+        opener = Mock()
+        opener.open.return_value = FakeResponse(b"{}", content_type="application/json")
+        with patch("worker_runtime.code_manager_adapter.build_opener", return_value=opener):
             with self.assertRaises(ArtifactAPIUnavailable):
                 provider.fetch("artifact-1")
 
@@ -82,14 +86,37 @@ class CodeManagerArtifactProviderTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             CodeManagerArtifactProvider("https://code.example", "")
 
+    def test_redirect_handler_rejects_cross_origin_redirects(self):
+        handler = _RejectRedirectHandler()
+        request = Request("https://code.example/api/v1/artifacts/id/content")
+        with self.assertRaises(HTTPError) as raised:
+            handler.redirect_request(
+                request, None, 302, "Found", Message(),
+                "https://attacker.example/collect",
+            )
+        self.assertEqual(raised.exception.code, 302)
+        self.assertIn("redirects are not allowed", str(raised.exception).lower())
+
+    def test_provider_does_not_follow_redirect_responses(self):
+        provider = CodeManagerArtifactProvider("https://code.example", "Bearer token")
+        opener = Mock()
+        opener.open.side_effect = HTTPError(
+            "https://code.example/api/v1/artifacts/id/content",
+            302, "Redirect", Message(), None,
+        )
+        with patch("worker_runtime.code_manager_adapter.build_opener", return_value=opener):
+            with self.assertRaises(ArtifactAPIUnavailable):
+                provider.fetch("id")
+        opener.open.assert_called_once()
+
     def test_rejects_invalid_artifact_id_before_network_access(self):
         provider = CodeManagerArtifactProvider("https://code.example", "Bearer token")
         for artifact_id in ("", "../escape", "folder/item"):
             with self.subTest(artifact_id=artifact_id):
-                with patch("worker_runtime.code_manager_adapter.urlopen") as open_url:
+                with patch("worker_runtime.code_manager_adapter.build_opener") as build:
                     with self.assertRaises(ValueError):
                         provider.fetch(artifact_id)
-                    open_url.assert_not_called()
+                    build.assert_not_called()
 
 
 if __name__ == "__main__":
