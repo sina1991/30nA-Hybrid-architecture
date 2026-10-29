@@ -141,7 +141,10 @@ def test_terminate_confirms_successful_container_removal(tmp_path):
             assert backend.terminate(proc) is True
     assert run.call_args.args[0][:3] == ["docker", "rm", "--force"]
     assert backend.cleanup_unconfirmed(proc) is False
-    assert backend.cleanup(proc) is True
+    absent = Mock(returncode=1, stderr="No such container: " + "a" * 64)
+    with patch("worker_runtime.docker_sandbox.subprocess.run", return_value=absent):
+        with patch.object(backend, "_kill_cli"):
+            assert backend.cleanup(proc) is True
     assert not cid_dir.exists()
 
 
@@ -151,7 +154,10 @@ def test_terminate_accepts_explicit_no_such_container_response(tmp_path):
     with patch("worker_runtime.docker_sandbox.subprocess.run", return_value=result):
         with patch.object(backend, "_kill_cli"):
             assert backend.terminate(proc) is True
-    assert backend.cleanup(proc) is True
+    absent = Mock(returncode=1, stderr="No such container: " + "a" * 64)
+    with patch("worker_runtime.docker_sandbox.subprocess.run", return_value=absent):
+        with patch.object(backend, "_kill_cli"):
+            assert backend.cleanup(proc) is True
     assert not cid_dir.exists()
 
 
@@ -167,7 +173,8 @@ def test_terminate_failure_is_unconfirmed_and_preserves_cid_evidence(tmp_path, f
             assert backend.terminate(proc) is False
     assert backend.cleanup_unconfirmed(proc) is True
     with patch("worker_runtime.docker_sandbox.subprocess.run", side_effect=failure):
-        assert backend.cleanup(proc) is False
+        with patch.object(backend, "_kill_cli"):
+            assert backend.cleanup(proc) is False
     assert cidfile.is_file()
     assert cidfile.read_text(encoding="ascii") == "a" * 64
     assert cid_dir.is_dir()
