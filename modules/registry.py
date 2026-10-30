@@ -20,6 +20,8 @@ SUPPORTED_TYPES = {
     "counter",
     "calculator",
     "host-monitor",
+    "gold-chart",
+    "moving-average",
 }
 
 

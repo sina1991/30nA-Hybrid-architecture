@@ -1,0 +1,8 @@
+{
+  "id": "moving-average",
+  "name": "Moving Average",
+  "description": "Simple moving average of XAUUSD 1-minute prices.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "moving-average"
+}

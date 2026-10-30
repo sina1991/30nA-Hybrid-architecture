@@ -6,7 +6,7 @@ import re
 import sqlite3
 from uuid import uuid4
 from .module_state import change
-from .execution import MODULE_FILES, HOST_MONITORS, run_module
+from .execution import MODULE_FILES, HOST_MONITORS, MARKET_MODULES, run_module
 
 
 def _authorize_host_monitor(owner, module_id):
@@ -83,7 +83,9 @@ def list_active(owner):
             meta = json.loads(raw_meta)
             result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
                            'layout': meta.get('layout'), 'frame_color': meta.get('frame_color'),
-                           'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker')})
+                           'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker'),
+                           'chart_period': meta.get('chart_period', 20), 'chart_overlay': meta.get('chart_overlay', True),
+                           'chart_live': meta.get('chart_live', True)})
         return result
     finally:
         db.close()
@@ -144,8 +146,12 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live'}:
         raise ValueError('invalid slot appearance')
+    if 'chart_period' in updates and (type(updates['chart_period']) is not int or not 1 <= updates['chart_period'] <= 500):
+        raise ValueError('invalid chart period')
+    if any(type(updates[key]) is not bool for key in ('chart_overlay', 'chart_live') if key in updates):
+        raise ValueError('invalid chart option')
     if 'display_theme' in updates and updates['display_theme'] not in ('visual', 'compact', 'json'):
         raise ValueError('invalid display theme')
     if 'frame_color' in updates:
@@ -182,6 +188,11 @@ def delete(owner, slot):
         db.close()
 
 
+def _market_preferences(owner, slot):
+    meta = change(owner, 'slot-meta', slot, None, lambda old: (old, False)) or {}
+    return {'period': meta.get('chart_period', 20), 'include_open': meta.get('chart_live', True)}
+
+
 def execute(owner, slot, data, expected_module=None, expected_revision=None):
     config = binding(owner, slot)
     if config is None:
@@ -194,7 +205,8 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None):
         raise ValueError('slot binding changed')
     if not isinstance(data, dict) or any(str(key).startswith('_') or key in ('owner', 'slot') for key in data):
         raise ValueError('invalid module input')
-    payload = {**config.get('context', {}), **data}
+    defaults = _market_preferences(owner, slot) if module_id in MARKET_MODULES else {}
+    payload = {**defaults, **config.get('context', {}), **data}
     if module_id in ('counter', 'slot-note'):
         payload.update(_state_owner=owner, _state_slot=slot)
     result = run_module(module_id, payload)
@@ -209,10 +221,11 @@ def read(owner, slot):
         raise LookupError('slot is not configured')
     module_id = config['module_id']
     _authorize_host_monitor(owner, module_id)
-    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health'):
+    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES:
         data = {'action':'get'} if module_id in ('counter','slot-note') else {}
         # Reads never change the saved output or execute arbitrary code.
-        payload = {**config.get('context', {}), **data}
+        defaults = _market_preferences(owner, slot) if module_id in MARKET_MODULES else {}
+        payload = {**defaults, **config.get('context', {}), **data}
         if module_id in ('counter','slot-note'):
             payload.update(_state_owner=owner, _state_slot=slot)
         result = run_module(module_id, payload)

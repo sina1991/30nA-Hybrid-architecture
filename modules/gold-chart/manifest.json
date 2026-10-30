@@ -1,0 +1,8 @@
+{
+  "id": "gold-chart",
+  "name": "Gold Price Chart",
+  "description": "XAUUSD 1-minute candles with a moving-average overlay.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "gold-chart"
+}

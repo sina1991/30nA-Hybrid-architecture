@@ -125,8 +125,8 @@ def clock_time(timezone: str | None = None) -> dict:
 @app.post("/api/modules/{module_id}/run")
 def execute_module(module_id: str, data: dict) -> dict:
     try:
-        from modules.execution import HOST_MONITORS
-        if module_id in HOST_MONITORS:
+        from modules.execution import HOST_MONITORS, MARKET_MODULES
+        if module_id in HOST_MONITORS or module_id in MARKET_MODULES:
             raise HTTPException(status_code=403, detail="Sign in to use this module")
         if any(str(key).startswith('_') for key in data):
             raise ValueError('reserved input field')
@@ -222,6 +222,12 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .metrics-compact .metric-card {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 6px;border:0;background:transparent}
 .metrics-compact .metric-value {font-size:13px}.metrics-compact .metric-bar {display:none}
 .module-json {white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
+.market-toolbar {display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px}
+.market-toolbar label {display:inline-flex;align-items:center;gap:4px}.market-toolbar select {padding:4px;font-size:11px}
+.market-price {font-size:20px;font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.market-status {font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.market-chart {width:100%;height:220px;min-height:120px;display:block;background:var(--field);border:1px solid var(--border);border-radius:8px}
+.market-legend {font-size:11px;color:var(--muted)}
 .layout-help {color:var(--muted);font-size:12px}
 .slot {
   min-width: 0; min-height: 190px; background: var(--panel);
@@ -242,7 +248,8 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .slot-head-actions .slot-pin {width:34px;height:34px;font-size:16px;border-radius:10px}
 .slot-icon {display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--field);color:var(--text);font:inherit;cursor:pointer}
 .slot-icon:hover,.slot-icon[aria-expanded="true"] {border-color:var(--accent);color:var(--accent)}
-.slot-icon.worker-active {border-color:var(--accent);color:var(--accent)}
+.slot-icon.worker-active {border-color:#16a34a;color:#16a34a;background:#16a34a1a}
+.slot-icon.worker-inactive {border-color:#dc2626;color:#dc2626;background:#dc26261a}
 .slot-icon:disabled {opacity:.5;cursor:wait}.slot-run {background:var(--button);color:#fff}
 .slot-drawer {padding:9px;background:var(--field);border:1px solid var(--border);border-radius:9px;min-width:0}
 .slot-drawer h4 {margin:0 0 6px;font-size:12px;color:var(--text)}
@@ -606,12 +613,107 @@ function renderModuleOutput(container, value, theme) {
   renderObject(value, container, 0);
 }
 
+function renderMarketModule(body, slot, module) {
+  let period = Number.isInteger(slot.chart_period) ? slot.chart_period : 20;
+  let overlay = slot.chart_overlay !== false, includeOpen = slot.chart_live !== false, busy = false;
+  const toolbar = makeElement('div', 'market-toolbar');
+  const periodLabel = makeElement('label', '', 'SMA');
+  const periodSelect = makeElement('select', ''); periodSelect.setAttribute('aria-label', 'Moving average period');
+  [10, 20, 50, 100, 200].forEach(value => { const option = makeElement('option', '', String(value)); option.value = String(value); periodSelect.append(option); });
+  if (![10,20,50,100,200].includes(period)) { const option = makeElement('option', '', String(period)); option.value = String(period); periodSelect.append(option); }
+  periodSelect.value = String(period); periodLabel.append(periodSelect);
+  const overlayLabel = makeElement('label', '', 'Overlay');
+  const overlayInput = makeElement('input', ''); overlayInput.type = 'checkbox'; overlayInput.checked = overlay; overlayLabel.prepend(overlayInput);
+  const liveLabel = makeElement('label', '', 'Live candle');
+  const liveInput = makeElement('input', ''); liveInput.type = 'checkbox'; liveInput.checked = includeOpen; liveLabel.prepend(liveInput);
+  toolbar.append(periodLabel);
+  if (module.type === 'gold-chart') toolbar.append(overlayLabel);
+  toolbar.append(liveLabel);
+  const price = makeElement('div', 'market-price', 'Waiting for market data');
+  const status = makeElement('div', 'market-status', 'Loading…');
+  const graph = makeElement('div', 'market-graph');
+  const legend = makeElement('div', 'market-legend');
+  body.append(toolbar, price, status, graph, legend);
+  async function saveOptions(updates) {
+    toolbar.querySelectorAll('input,select').forEach(element => { element.disabled = true; });
+    try { await window.dashboardModuleState.setSlotAppearance(slot.id, updates); slotGeneration++; await refreshActiveSlots(); }
+    catch (_) {
+      periodSelect.value = String(period); overlayInput.checked = overlay; liveInput.checked = includeOpen;
+      status.textContent = 'Could not save chart settings. Refresh and check the slot.';
+    } finally { toolbar.querySelectorAll('input,select').forEach(element => { element.disabled = false; }); }
+  }
+  periodSelect.addEventListener('change', () => saveOptions({chart_period:Number(periodSelect.value)}));
+  overlayInput.addEventListener('change', () => saveOptions({chart_overlay:overlayInput.checked}));
+  liveInput.addEventListener('change', () => saveOptions({chart_live:liveInput.checked}));
+  function plot(data) {
+    graph.replaceChildren();
+    const candles = data.candles.filter(item => ['time','open','high','low','close'].every(key => typeof item[key] === 'number' && Number.isFinite(item[key])));
+    if (!candles.length) {
+      price.textContent = 'No candles available';
+      status.textContent = data.collector_error ? 'Source unavailable.' : 'Waiting for market data.';
+      legend.textContent = '';
+      return;
+    }
+    const points = data.moving_average?.points || [];
+    const last = candles[candles.length - 1];
+    const lastSma = points.length ? points[points.length - 1] : null;
+    const stale = !data.last_success || Date.now() / 1000 - data.last_success > 30;
+    const latest = module.type === 'moving-average' ? lastSma : last;
+    price.textContent = latest ? (module.type === 'moving-average' ? `SMA ${period}: ` : 'XAUUSD: ') + Number(module.type === 'moving-average' ? latest.value : latest.close).toFixed(2) : `SMA ${period}: insufficient candles`;
+    status.textContent = `${latest?.is_open ? 'Live candle · provisional' : 'Closed candle'}${stale ? ' · data may be stale' : ''}${data.collector_error ? ' · source unavailable' : ''}`;
+    if (module.type === 'moving-average') { legend.textContent = `${candles.length} candles · ${points.length} SMA values`; return; }
+    const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 800 240'); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('class', 'market-chart'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'XAUUSD one-minute candlestick chart');
+    let low = Math.min(...candles.map(item => item.low)), high = Math.max(...candles.map(item => item.high));
+    const actualLow = low, actualHigh = high;
+    if (high === low) { high += 1; low -= 1; }
+    const padding = (high - low) * .06; high += padding; low -= padding;
+    const x = index => 8 + (index + .5) * (784 / candles.length), y = value => 8 + (high - value) / (high - low) * 224;
+    const step = 784 / candles.length, bodyWidth = Math.max(1, Math.min(8, step * .65));
+    candles.forEach((candle, index) => {
+      const color = candle.close >= candle.open ? '#22c55e' : '#ef4444';
+      const wick = document.createElementNS(ns, 'line');
+      wick.setAttribute('x1', x(index)); wick.setAttribute('x2', x(index)); wick.setAttribute('y1', y(candle.high)); wick.setAttribute('y2', y(candle.low)); wick.setAttribute('stroke', color);
+      const rect = document.createElementNS(ns, 'rect');
+      rect.setAttribute('x', x(index) - bodyWidth / 2); rect.setAttribute('y', Math.min(y(candle.open), y(candle.close)));
+      rect.setAttribute('width', bodyWidth); rect.setAttribute('height', Math.max(1, Math.abs(y(candle.open) - y(candle.close))));
+      rect.setAttribute('fill', color); if (candle.is_open) { rect.setAttribute('stroke', '#f59e0b'); rect.setAttribute('stroke-width', '2'); }
+      const title = document.createElementNS(ns, 'title'); title.textContent = `${new Date(candle.time * 1000).toISOString()} O ${candle.open} H ${candle.high} L ${candle.low} C ${candle.close}${candle.is_open ? ' (live)' : ''}`;
+      rect.append(title); svg.append(wick, rect);
+    });
+    if (overlay && points.length) {
+      const positions = new Map(candles.map((candle, index) => [candle.time, index]));
+      const coords = points.filter(point => positions.has(point.time) && Number.isFinite(point.value)).map(point => `${x(positions.get(point.time))},${y(point.value)}`).join(' ');
+      const line = document.createElementNS(ns, 'polyline'); line.setAttribute('points', coords); line.setAttribute('fill', 'none'); line.setAttribute('stroke', '#f59e0b'); line.setAttribute('stroke-width', '2'); svg.append(line);
+    }
+    graph.append(svg);
+    legend.textContent = `1m · ${candles.length} candles · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${overlay ? ` · SMA ${period} (orange)` : ''} · Live candle outlined`;
+  }
+  async function refresh() {
+    const bridge = window.dashboardModuleState;
+    if (!bridge?.ready() || busy) return;
+    busy = true;
+    try { const data = await bridge.marketData(Math.max(200, period), period, includeOpen); if (body.isConnected && bridge.ready()) plot(data); }
+    catch (_) { if (body.isConnected) status.textContent = 'Market data is unavailable.'; }
+    finally { busy = false; }
+  }
+  body.addEventListener('slot-refresh', refresh);
+  function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 10000); }
+  tick();
+}
+
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
   const module = availableModules.find(item => item.id === moduleId);
 
   if (!module) {
     body.append(makeElement("div", "module-title", "Unknown module"));
+    return;
+  }
+
+  if (module.type === 'gold-chart' || module.type === 'moving-average') {
+    renderMarketModule(body, slot, module);
     return;
   }
 
@@ -995,7 +1097,8 @@ function attachSavedResult(body, slot, moduleId) {
 }
 
 function makeSlot(row, area) {
-  const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual'};
+  const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
+    chart_period:row.chart_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
   const card = makeElement('article', 'slot');
   card.dataset.slotId = slot.id;
   card.dataset.area = area;
@@ -1137,7 +1240,7 @@ function makeSlot(row, area) {
   const workerForm = makeElement('div', 'slot-worker-form');
   const kindLabel = makeElement('label', '', 'Worker type');
   const kind = makeElement('select', ''); kind.setAttribute('aria-label', `Worker type for ${slot.id}`);
-  const monitorModules = ['clock','dashboard-health','system-monitor','service-monitor','disk-usage','network-monitor','process-monitor','log-viewer','docker-monitor','alerts'];
+  const monitorModules = ['clock','dashboard-health','system-monitor','service-monitor','disk-usage','network-monitor','process-monitor','log-viewer','docker-monitor','alerts','gold-chart','moving-average'];
   [['monitor', 'Monitor · read-only modules'], ['task', 'Task · run module']].forEach(([value, title]) => {
     const option = makeElement('option', '', title); option.value = value;
     if (value === 'monitor' && !monitorModules.includes(row.module_id)) option.disabled = true;
@@ -1190,7 +1293,8 @@ function makeSlot(row, area) {
   workerDrawer.append(workerTitle, workerHelp, workerForm);
   const workerButton = drawerButton('Slot worker settings', '⚒', workerDrawer);
   workerButton.dataset.slotWorker = slot.id;
-  if (row.worker?.enabled) workerButton.classList.add('worker-active');
+  workerButton.classList.add(row.worker?.enabled ? 'worker-active' : 'worker-inactive');
+  workerButton.title = row.worker?.enabled ? 'Slot worker active' : 'Slot worker inactive';
   const run = makeElement('button', 'slot-icon slot-run', '▶'); run.type = 'button';
   run.title = 'Run module'; run.setAttribute('aria-label', `Run ${row.module_id} in ${slot.id}`);
   run.addEventListener('click', async () => {
@@ -1204,7 +1308,7 @@ function makeSlot(row, area) {
       const result = await bridge.execute(slot.id, row.module_id, data);
       if (!card.isConnected || !bridge.ready()) return;
       notice.textContent = '';
-      if (moduleInfo?.type === 'host-monitor' || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
+      if (['host-monitor','gold-chart','moving-average'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
       else if (!['clock', 'counter', 'slot-note', 'empty', 'dashboard-health', 'theme-summary'].includes(row.module_id)) {
         let resultView = body.querySelector('.slot-quick-result');
         if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
@@ -1233,7 +1337,7 @@ function makeSlot(row, area) {
   card.append(head, name, actions, inputDrawer, terminalDrawer, workerDrawer, notice, body, resize);
   attachLayoutControls(card, name, resize, row, notice);
   renderModuleContent(body, slot, selectedModule);
-  if (moduleInfo?.type !== 'host-monitor') attachSavedResult(body, slot, selectedModule);
+  if (!['host-monitor','gold-chart','moving-average'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 
@@ -1425,15 +1529,19 @@ def create_app(*, credential_path=None, upstream_factory=None):
         from .upstreams import create_router
         from .upstream_panel import ACCESS, PANEL
         from modules.slot_workers import SlotWorkerScheduler
+        from market_data.collector import GoldCollector
         scheduler = SlotWorkerScheduler()
+        gold_collector = GoldCollector()
 
         @instance.on_event('startup')
         def start_slot_workers():
             scheduler.start()
+            gold_collector.start()
 
         @instance.on_event('shutdown')
         def stop_slot_workers():
             scheduler.stop()
+            gold_collector.stop()
 
         instance.include_router(create_router(credential_path, upstream_factory))
 

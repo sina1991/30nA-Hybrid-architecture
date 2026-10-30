@@ -18,7 +18,7 @@ from . import slots
 LOG = logging.getLogger(__name__)
 MONITORS = frozenset(('clock', 'dashboard-health', 'system-monitor', 'service-monitor',
                       'disk-usage', 'network-monitor', 'process-monitor', 'log-viewer',
-                      'docker-monitor', 'alerts'))
+                      'docker-monitor', 'alerts', 'gold-chart', 'moving-average'))
 
 
 def configure(owner, slot, payload):

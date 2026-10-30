@@ -1,7 +1,8 @@
 """Authenticated Dashboard BFF for explicit owner-scoped Manager operations."""
 from uuid import UUID
+import sqlite3
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from worker_manager.api import RegisterBody, ConfigureBody
@@ -10,6 +11,7 @@ from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
 from modules import slots
 from modules import slot_workers
+from market_data.data import chart as gold_chart
 
 
 class RunRequest(BaseModel):
@@ -65,6 +67,34 @@ def create_router(credential_path, upstream_factory):
         except ValueError:
             raise HTTPException(422, 'Invalid worker identifier') from None
         return '/api/v1/workers/' + _identifier(worker_id)
+
+    @router.get('/market/candles')
+    def market_candles(limit: int = Query(default=200, ge=1, le=1000),
+                       period: int = Query(default=20, ge=1, le=500),
+                       include_open: bool = True, identity=Depends(owner)):
+        try:
+            result = gold_chart(limit=limit, period=period, include_open=include_open)
+        except (ValueError, OSError, sqlite3.Error):
+            raise HTTPException(503, 'Market data is unavailable') from None
+        response = JSONResponse(envelope(result))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.get('/market/indicators/sma')
+    def market_sma(limit: int = Query(default=200, ge=1, le=1000),
+                   period: int = Query(default=20, ge=1, le=500),
+                   include_open: bool = True, identity=Depends(owner)):
+        try:
+            result = gold_chart(limit=max(limit, period), period=period, include_open=include_open)
+        except (ValueError, OSError, sqlite3.Error):
+            raise HTTPException(503, 'Market data is unavailable') from None
+        response = JSONResponse(envelope({'symbol':result['symbol'], 'interval':result['interval'],
+            'indicator':result['moving_average'], 'last_success':result['last_success'],
+            'collector_error':result['collector_error']}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
 
     @router.post('/modules/{module_id}/state')
     def module_state(module_id: str, body: dict, request: Request, identity=Depends(owner)):

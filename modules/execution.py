@@ -13,9 +13,11 @@ MODULE_FILES = {
     'disk-usage': 'disk-usage/module.py', 'network-monitor': 'network-monitor/module.py',
     'process-monitor': 'process-monitor/module.py', 'alerts': 'alerts/module.py',
     'log-viewer': 'log-viewer/module.py', 'docker-monitor': 'docker-monitor/module.py',
+    'gold-chart': 'gold-chart/module.py', 'moving-average': 'moving-average/module.py',
 }
 
 HOST_MONITORS = frozenset(('system-monitor', 'service-monitor', 'disk-usage', 'network-monitor', 'process-monitor', 'alerts', 'log-viewer', 'docker-monitor'))
+MARKET_MODULES = frozenset(('gold-chart', 'moving-average'))
 
 
 class UnknownModule(LookupError):
