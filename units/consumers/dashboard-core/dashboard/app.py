@@ -186,6 +186,11 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
 .slot-controls { display: grid; gap: 5px; }
 .slot-controls label { font-size: 12px; }
 .module-select { width: 100%; }
+.module-search {
+  width: 100%; padding: 9px 10px; margin-top: 4px; color: var(--text);
+  background: #0b1120; border: 1px solid var(--border); border-radius: 8px; font: inherit;
+}
+.module-search-hint { color: var(--muted); font-size: 12px; }
 .module-body {
   flex: 1; min-width: 0; display: flex; flex-direction: column;
   gap: 8px; color: var(--muted);
@@ -596,18 +601,38 @@ function makeSlot(slot) {
   );
 
   const controls = makeElement("div", "slot-controls");
+  const searchLabel = makeElement("label", "", "Find module");
+  const search = makeElement("input", "module-search");
+  search.type = "search";
+  search.placeholder = "Search name or ID";
+  search.autocomplete = "off";
+  search.setAttribute("aria-label", `Find module for ${slot.name || slot.id}`);
+  const searchHint = makeElement("div", "module-search-hint");
+  searchHint.setAttribute("aria-live", "polite");
   const label = makeElement("label", "", "Module");
   const select = makeElement("select", "module-select");
   select.setAttribute("aria-label", `Module for ${slot.name || slot.id}`);
 
-  availableModules.forEach(module => {
-    const option = makeElement("option", "", module.name);
-    option.value = module.id;
-    select.append(option);
-  });
-
   const setting = settingsFor(slot.id);
-  select.value = setting.module;
+  function filterModules(selected) {
+    const query = search.value.trim().toLowerCase();
+    const matches = availableModules.filter(module =>
+      module.name.toLowerCase().includes(query) || module.id.toLowerCase().includes(query));
+    const current = availableModules.find(module => module.id === selected);
+    select.replaceChildren();
+    if (current && !matches.some(module => module.id === current.id)) {
+      const option = makeElement("option", "", `${current.name} (current)`);
+      option.value = current.id; select.append(option);
+    }
+    matches.forEach(module => {
+      const option = makeElement("option", "", module.name);
+      option.value = module.id; select.append(option);
+    });
+    select.value = selected;
+    searchHint.textContent = query ? (matches.length ? `${matches.length} matching modules` : "No matching modules") : "";
+  }
+  filterModules(setting.module);
+  search.addEventListener("input", () => filterModules(settingsFor(slot.id).module));
 
   const body = makeElement("div", "module-body");
   let revision = 0, initialized = false;
@@ -633,7 +658,7 @@ function makeSlot(slot) {
       const contextChanged = JSON.stringify(serverSlotContext[slot.id] || {}) !== JSON.stringify(binding.context || {});
       serverSlotContext[slot.id] = binding.context || {};
       if (!initialized || settingsFor(slot.id).module !== binding.module_id || contextChanged) {
-        initialized = true; settingsFor(slot.id).module = binding.module_id; select.value = binding.module_id;
+        initialized = true; settingsFor(slot.id).module = binding.module_id; filterModules(binding.module_id);
         saveSettings(); renderModuleContent(body, slot, binding.module_id);
       }
     } catch (_) { if (current === revision && card.isConnected && bridge.ready()) statusText.textContent = "Could not load slot settings from the server."; }
@@ -642,17 +667,18 @@ function makeSlot(slot) {
     const selected = select.value, previous = settingsFor(slot.id).module, bridge = window.dashboardModuleState;
     ++revision;
     if (bridge && bridge.ready()) {
-      select.disabled = true;
+      select.disabled = true; search.disabled = true;
       try {
         const saved = await bridge.bind(slot.id, selected, contextFor(selected), false);
         if (!card.isConnected || !bridge.ready()) return;
         serverSlotContext[slot.id] = saved.context || {}; initialized = true;
       } catch (_) {
-        select.value = previous; statusText.textContent = "Slot save failed or has an unknown outcome; check the server state.";
+        filterModules(previous); statusText.textContent = "Slot save failed or has an unknown outcome; check the server state.";
         return;
-      } finally { select.disabled = false; }
+      } finally { select.disabled = false; search.disabled = false; }
     } else { delete serverSlotContext[slot.id]; initialized = false; }
     settingsFor(slot.id).module = selected;
+    filterModules(selected);
     saveSettings(); renderModuleContent(body, slot, selected);
   });
   function accountChanged() {
@@ -662,8 +688,9 @@ function makeSlot(slot) {
     } else syncBinding();
   }
   document.addEventListener('dashboard-account-state', accountChanged);
+  searchLabel.append(search);
   label.append(select);
-  controls.append(label);
+  controls.append(searchLabel, searchHint, label);
   card.append(head, controls, body);
   renderModuleContent(body, slot, select.value);
   function tick() {
