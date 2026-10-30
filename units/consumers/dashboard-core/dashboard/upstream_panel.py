@@ -17,7 +17,7 @@ ACCESS = r'''
 
 PANEL = r'''
 <style>
-.account-panel {width:calc(100% - 48px);max-width:1752px;margin:0 auto 24px;padding:24px;border:1px solid var(--border);border-radius:12px;direction:ltr}
+.account-panel {width:100%;max-width:none;margin:0;padding:0;border:0;direction:ltr}
 .account-panel form,.account-panel fieldset {display:grid;gap:12px}
 .account-panel fieldset {border:0;padding:0;margin:0;min-width:0}
 .account-panel input,.account-panel textarea,.account-panel select,.account-panel button {
@@ -36,7 +36,7 @@ PANEL = r'''
 .account-panel #worker-search {width:min(100%,380px);margin:8px 0 14px}
 .account-panel #worker-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;list-style:none;padding:0;margin:0}
 .account-panel #worker-list li {padding:0;min-width:0}
-.account-panel .worker-card {width:100%;text-align:left;min-height:90px;background:var(--panel);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:6px;transition:border-color .15s}
+.account-panel .worker-card {width:100%;text-align:left;min-height:110px;background:var(--panel);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:6px;transition:border-color .15s}
 .account-panel .worker-card:hover {border-color:var(--accent)}
 .account-panel .worker-card strong {overflow-wrap:anywhere}.account-panel .worker-card small {color:var(--muted)}
 .account-panel .worker-badge {align-self:flex-start;border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--accent);font-size:11px}
@@ -45,6 +45,14 @@ PANEL = r'''
 .account-panel .worker-meta summary {cursor:pointer;color:var(--accent);font-size:13px}
 .account-panel .worker-meta label {font-size:12px}.account-panel .worker-meta input {font-size:12px}
 .account-panel .worker-primary {background:var(--button);color:#fff;border-color:var(--button)}
+.account-panel .worker-layout {display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.8fr);gap:16px;align-items:start}
+.account-panel .worker-layout > * {min-width:0}.account-panel .worker-run-panel {margin:0;position:sticky;top:12px}
+.account-panel .worker-run-panel label,.account-panel .worker-section-card label {font-size:12px;font-weight:600;color:var(--muted);margin:8px 0 3px}
+.account-panel .worker-run-panel select,.account-panel .worker-run-panel input,.account-panel .worker-run-panel textarea {width:100%;box-sizing:border-box}
+.account-panel .worker-guided {border-left:2px solid var(--accent);padding:2px 0 2px 12px;margin:4px 0}
+.account-panel .worker-help {font-size:12px;color:var(--muted);margin:4px 0}
+.account-panel .worker-details-row {display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+@media(max-width:1000px){.account-panel .worker-layout {grid-template-columns:1fr}.account-panel .worker-run-panel {position:static}}
 .account-panel dialog input,.account-panel dialog textarea,.account-panel dialog select {box-sizing:border-box;width:100%}
 .account-panel input[readonly] {opacity:.65}.account-panel button:focus-visible {outline:3px solid #38bdf8;outline-offset:3px}
 .account-access {flex:0 1 360px;max-width:100%;min-width:0}
@@ -62,28 +70,58 @@ PANEL = r'''
 <section id="worker-workspace" class="account-panel" hidden aria-label="Run Worker">
   <div id="worker-notices"></div>
   <div data-workspace-pane="workers">
+  <div class="worker-layout">
   <section id="worker-management" hidden aria-label="Manage Workers">
     <div class="worker-header"><div><h3>Worker library</h3><p class="worker-subtitle">Configure and run published Workers.</p></div>
     <button class="worker-primary" id="worker-create" type="button">+ Register Worker</button></div>
     <input id="worker-search" type="search" placeholder="Search Worker ID" aria-label="Search Workers">
     <ul id="worker-list"></ul>
-    <p class="account-note">Execution requires a published Artifact. Its existence is not checked at registration. Configuration changes do not affect accepted executions.</p>
+    <p class="account-note">Choose a Worker card to view its settings, schedule and status.</p>
   </section>
+  <form id="worker-run-form" hidden>
+    <div class="worker-section-card worker-run-panel"><h4>Run a Worker</h4><p>Choose an active Worker and set its input.</p>
+    <fieldset id="worker-run-fields" disabled>
+      <label for="account-worker">Active Worker</label>
+      <select id="account-worker" required></select>
+      <p class="worker-help" id="worker-run-description"></p>
+      <label for="run-input-mode">Input method</label><select id="run-input-mode"><option value="guided">Guided fields</option><option value="json">Advanced JSON</option></select>
+      <div id="run-guided" class="worker-guided" hidden>
+        <div id="run-numbers-group" hidden><label for="run-numbers">Numbers, separated by commas</label><input id="run-numbers" placeholder="10, 20, 30" value="10, 20, 30"></div>
+        <div id="run-text-group" hidden><label for="run-text">Text</label><input id="run-text" value="Hello, 30nA!" maxlength="10000"></div>
+        <p class="worker-help" id="run-no-input" hidden>This Worker does not require input.</p>
+      </div>
+      <div id="run-json-group"><label for="worker-input">Input JSON object</label><textarea id="worker-input" rows="5" maxlength="500000" spellcheck="false">{"values":[10,20,30]}</textarea></div>
+      <button id="worker-example" type="button">Load example input</button>
+      <label for="worker-timeout">Timeout</label>
+      <select id="worker-timeout"><option value="15">15 seconds</option><option value="30" selected>30 seconds</option><option value="60">1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select>
+      <button class="worker-primary" id="worker-run" type="submit">Run Worker</button>
+    </fieldset>
+    </div>
+  </form>
+  </div>
   <dialog id="worker-editor" aria-labelledby="worker-editor-title">
     <form id="worker-edit-form">
       <h3 id="worker-editor-title">Worker</h3>
       <fieldset id="worker-edit-fields">
         <label for="edit-worker-id">Worker ID</label><input id="edit-worker-id" required maxlength="128" dir="ltr">
+        <div id="artifact-template-group"><label for="artifact-template">Artifact reference</label><select id="artifact-template"></select><p class="worker-help">Select the Artifact used by an existing Worker, or enter one manually. Publication is checked when executing.</p></div>
         <details class="worker-section-card worker-meta" id="worker-artifact-details"><summary>Artifact details</summary>
         <label for="edit-artifact-id">Published Artifact ID</label><input id="edit-artifact-id" required maxlength="256" dir="ltr">
         <label for="edit-artifact-hash">Artifact SHA-256</label><input id="edit-artifact-hash" required pattern="sha256:[0-9a-f]{64}" dir="ltr">
         <label for="edit-entrypoint">Entrypoint (module:function)</label><input id="edit-entrypoint" required maxlength="256" dir="ltr">
         </details>
         <div class="worker-section-card"><h4>Configuration</h4><p>Saved settings passed to each Worker execution.</p>
-        <label for="edit-configuration">Configuration (JSON object)</label><textarea id="edit-configuration" rows="5" maxlength="500000" spellcheck="false"></textarea>
+        <label for="edit-config-mode">Configuration method</label><select id="edit-config-mode"><option value="guided">Guided fields</option><option value="json">Advanced JSON</option></select>
+        <div id="config-guided" class="worker-guided" hidden>
+          <div id="config-math" hidden><label for="config-multiplier">Multiplier</label><input id="config-multiplier" type="number" step="any" min="-1000000" max="1000000" value="1"></div>
+          <div id="config-text" hidden><label for="config-prefix">Prefix</label><input id="config-prefix" maxlength="200" placeholder="Optional prefix"><label for="config-uppercase">Uppercase text</label><select id="config-uppercase"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <p id="config-none" class="worker-help" hidden>No configuration is required for this Worker.</p>
+        </div>
+        <div id="config-json-group"><label for="edit-configuration">Configuration JSON object</label><textarea id="edit-configuration" rows="5" maxlength="500000" spellcheck="false"></textarea></div>
         </div><div class="worker-section-card"><h4>Schedule</h4><p>Choose manual execution or a recurring interval.</p>
         <label for="edit-schedule">Schedule</label><select id="edit-schedule"><option value="manual">Manual</option><option value="interval">interval</option></select>
-        <label for="edit-interval">Interval in seconds</label><input id="edit-interval" type="number" min="1" step="1" value="60">
+        <label for="edit-interval-preset">Interval</label><select id="edit-interval-preset"><option value="30">30 seconds</option><option value="60">1 minute</option><option value="300">5 minutes</option><option value="900">15 minutes</option><option value="3600">1 hour</option><option value="custom">Custom seconds</option></select>
+        <div id="interval-custom" hidden><label for="edit-interval">Custom interval in seconds</label><input id="edit-interval" type="number" min="1" step="1" value="60"></div>
         <p class="account-note">An enabled interval runs with empty input; the Worker must support it.</p>
         </div>
         <p id="edit-lifecycle"></p>
@@ -102,20 +140,6 @@ PANEL = r'''
       <button id="worker-confirm-submit" type="submit">Confirm</button><button id="worker-confirm-close" type="button">Cancel</button>
     </form>
   </dialog>
-  <form id="worker-run-form" hidden>
-    <div class="worker-section-card"><h4>Run a Worker</h4><p>Enter a JSON object and inspect the execution result.</p>
-    <fieldset id="worker-run-fields" disabled>
-      <label for="account-worker">Active Worker</label>
-      <select id="account-worker" required></select>
-      <button id="worker-example" type="button">Use example input</button>
-      <label for="worker-input">Input as a JSON object</label>
-      <textarea id="worker-input" rows="6" maxlength="500000" spellcheck="false">{"values":[10,20,30]}</textarea>
-      <label for="worker-timeout">Execution timeout in seconds</label>
-      <input id="worker-timeout" type="number" min="1" max="300" step="1" value="30" required>
-      <button class="worker-primary" id="worker-run" type="submit">Run Worker</button>
-    </fieldset>
-    </div>
-  </form>
   <button id="worker-retry" type="button" hidden>Retry the same request</button>
   </div>
   <section id="execution-detail" hidden aria-label="Execution result">
@@ -142,7 +166,7 @@ PANEL = r'''
   const terminal = job => ['succeeded','failed','cancelled'].includes(job.status);
   let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false, slotOwner = '';
   let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0, authenticated = false, previousReady = false;
-  let active = null, enabledWorkers = [], session = new AbortController();
+  let active = null, enabledWorkers = [], session = new AbortController(), previousTemplateValue = '', previousTemplateKind = null;
 
   function status(message) { el('account-status').textContent = message; }
   function controls() {
@@ -178,6 +202,7 @@ PANEL = r'''
     document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:false}}));
     el('account-token').value = '';
     el('account-worker').replaceChildren(); el('account-executions').replaceChildren();
+    el('worker-input').value = '{}'; el('run-text').value = ''; el('run-numbers').value = '';
     el('execution-output').textContent = ''; el('execution-id').textContent = '';
     el('execution-detail').hidden = true; el('worker-retry').hidden = true;
     controls(); status(message);
@@ -311,6 +336,123 @@ PANEL = r'''
       item.append(button); list.append(item);
     });
   }
+  function sampleKind(row) {
+    if (!row || !row.definition) return null;
+    const artifact = row.definition.artifact_id, entry = row.definition.entrypoint;
+    if (artifact === 'demo-summary@1.0.0' && entry === 'demo_worker:run') return 'numbers';
+    if (artifact === 'sample-math@1.0.0' && entry === 'worker:run') return 'math';
+    if (artifact === 'sample-text@1.0.0' && entry === 'worker:run') return 'text';
+    if (artifact === 'sample-clock@1.0.0' && entry === 'worker:run') return 'clock';
+    return null;
+  }
+  const sampleDescriptions = {numbers:'Summarizes a list of numbers.', math:'Calculates sum and average; configuration can scale the sum.',
+    text:'Transforms text using the saved prefix and uppercase setting.', clock:'Returns the current UTC time inside the Worker sandbox.'};
+  function selectedRunWorker() { return enabledWorkers.find(row => row.definition.worker_id === el('account-worker').value); }
+  function setRunInputMode(reset) {
+    const kind = sampleKind(selectedRunWorker()), mode = el('run-input-mode');
+    mode.querySelector('option[value="guided"]').disabled = !kind;
+    if (!kind) mode.value = 'json';
+    else if (reset) mode.value = 'guided';
+    el('worker-run-description').textContent = sampleDescriptions[kind] || 'This Worker defines its own input. Supply a JSON object.';
+    const guided = Boolean(kind && mode.value === 'guided');
+    el('run-guided').hidden = !guided;
+    el('run-json-group').hidden = guided;
+    el('run-numbers-group').hidden = !guided || !['numbers','math'].includes(kind);
+    el('run-text-group').hidden = !guided || kind !== 'text';
+    el('run-no-input').hidden = !guided || kind !== 'clock';
+  }
+  function guidedInput() {
+    const kind = sampleKind(selectedRunWorker());
+    if (kind === 'clock') return {};
+    if (kind === 'text') return {text:el('run-text').value};
+    if (kind === 'numbers' || kind === 'math') {
+      const raw = el('run-numbers').value.split(',').map(item => item.trim());
+      if (!raw.length || raw.length > 1000 || raw.some(item => !item || !Number.isFinite(Number(item))))
+        throw new Error('Enter 1 to 1000 valid numbers separated by commas.');
+      return {values:raw.map(Number)};
+    }
+    throw new Error('Guided input is not available for this Worker.');
+  }
+  function loadRunExample() {
+    const kind = sampleKind(selectedRunWorker());
+    if (!kind) return false;
+    const example = kind === 'clock' ? {} : kind === 'text' ? {text:'Hello, 30nA!'} : {values:[10,20,30]};
+    el('worker-input').value = JSON.stringify(example, null, 2);
+    el('run-numbers').value = '10, 20, 30'; el('run-text').value = 'Hello, 30nA!';
+    return true;
+  }
+  function loadGuidedInputFromJSON() {
+    const data = JSON.parse(el('worker-input').value), kind = sampleKind(selectedRunWorker());
+    if (!data || Array.isArray(data) || typeof data !== 'object') throw new Error('Enter a valid JSON object first.');
+    const keys = Object.keys(data);
+    if (kind === 'clock' && keys.length) throw new Error('Guided mode supports empty input only for this Worker.');
+    if (kind === 'text') {
+      if (keys.some(key => key !== 'text') || ('text' in data && typeof data.text !== 'string')) throw new Error('Guided mode supports only a text field.');
+      el('run-text').value = data.text ?? 'Hello, 30nA!';
+    }
+    if (kind === 'math' || kind === 'numbers') {
+      if (keys.some(key => key !== 'values') || ('values' in data && (!Array.isArray(data.values) || data.values.some(value => typeof value !== 'number' || !Number.isFinite(value))))) throw new Error('Guided mode supports only an array of numbers.');
+      el('run-numbers').value = (data.values ?? [10,20,30]).join(', ');
+    }
+  }
+  function guidedConfiguration(kind = configKind()) {
+    const config = JSON.parse(el('edit-configuration').value);
+    if (!config || Array.isArray(config) || typeof config !== 'object') throw new Error('Configuration must be a JSON object.');
+    if (kind === 'math') {
+      const raw = el('config-multiplier').value, number = Number(raw);
+      if (!raw || !Number.isFinite(number) || Math.abs(number) > 1000000) throw new Error('Multiplier must be between -1000000 and 1000000.');
+      config.multiplier = number;
+    }
+    if (kind === 'text') { config.prefix = el('config-prefix').value; config.uppercase = el('config-uppercase').value === 'true'; }
+    return config;
+  }
+  function loadGuidedConfigFromJSON() {
+    const config = JSON.parse(el('edit-configuration').value);
+    if (!config || Array.isArray(config) || typeof config !== 'object') throw new Error('Configuration must be a JSON object.');
+    const kind = configKind();
+    if (kind === 'math' && 'multiplier' in config && (typeof config.multiplier !== 'number' || !Number.isFinite(config.multiplier))) throw new Error('Multiplier must be a number for guided mode.');
+    if (kind === 'text' && (('prefix' in config && typeof config.prefix !== 'string') || ('uppercase' in config && typeof config.uppercase !== 'boolean'))) throw new Error('Prefix and uppercase must have valid types for guided mode.');
+    el('config-multiplier').value = config.multiplier ?? 1;
+    el('config-prefix').value = config.prefix ?? '';
+    el('config-uppercase').value = config.uppercase === true ? 'true' : 'false';
+  }
+  function configureTemplateOptions(row) {
+    const select = el('artifact-template'); select.replaceChildren();
+    const manual = document.createElement('option'); manual.value = ''; manual.textContent = 'Enter Artifact details manually'; select.append(manual);
+    allWorkers.forEach((worker, index) => {
+      const option = document.createElement('option'); option.value = String(index + 1);
+      option.textContent = `${worker.definition.worker_id} · ${worker.definition.artifact_id}`; select.append(option);
+    });
+    el('artifact-template-group').hidden = Boolean(row);
+    if (!row && allWorkers.length) { select.value = '1'; applyArtifactTemplate(); }
+    else select.value = '';
+  }
+  function applyArtifactTemplate() {
+    const index = Number(el('artifact-template').value) - 1;
+    const template = Number.isInteger(index) && index >= 0 ? allWorkers[index] : null;
+    ['artifact_id','artifact_hash','entrypoint'].forEach(key => {
+      const field = el({'artifact_id':'edit-artifact-id','artifact_hash':'edit-artifact-hash','entrypoint':'edit-entrypoint'}[key]);
+      field.value = template ? template.definition[key] : ''; field.readOnly = Boolean(template);
+    });
+    el('worker-artifact-details').open = !template;
+  }
+  function configKind() { return sampleKind(editing || (Number(el('artifact-template').value) > 0 ? allWorkers[Number(el('artifact-template').value) - 1] : null)); }
+  function updateConfigMode(reset) {
+    const kind = configKind(), mode = el('edit-config-mode');
+    mode.querySelector('option[value="guided"]').disabled = !kind;
+    if (!kind) mode.value = 'json'; else if (reset) mode.value = 'guided';
+    const guided = Boolean(kind && mode.value === 'guided');
+    el('config-guided').hidden = !guided; el('config-json-group').hidden = guided;
+    el('config-math').hidden = !guided || kind !== 'math';
+    el('config-text').hidden = !guided || kind !== 'text';
+    el('config-none').hidden = !guided || !['clock','numbers'].includes(kind);
+  }
+  function updateInterval() {
+    const enabled = el('edit-schedule').value === 'interval';
+    el('edit-interval-preset').disabled = !enabled;
+    el('interval-custom').hidden = !enabled || el('edit-interval-preset').value !== 'custom';
+    el('edit-interval').disabled = !enabled || el('edit-interval-preset').value !== 'custom';
+  }
   async function refresh() {
     const current = generation, ticket = ++refreshTicket;
     try {
@@ -322,10 +464,15 @@ PANEL = r'''
       el('account-worker').replaceChildren();
       enabledWorkers.forEach(row => {
         const option = document.createElement('option');
-        option.value = row.definition.worker_id; option.textContent = row.definition.worker_id;
+        option.value = row.definition.worker_id;
+        option.textContent = row.definition.worker_id + (row.schedule.kind === 'interval' ? ` · every ${row.schedule.interval_seconds}s` : ' · manual');
         el('account-worker').append(option);
       });
       if (enabledWorkers.some(row => row.definition.worker_id === previous)) el('account-worker').value = previous;
+      if (previous !== el('account-worker').value) {
+        if (!loadRunExample()) el('worker-input').value = '{}';
+        setRunInputMode(true);
+      } else setRunInputMode(false);
       renderHistory(history.executions); controls();
       document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:true,workers:allWorkers.length,enabled:enabledWorkers.length,executions:history.executions.length}}));
       status(enabledWorkers.length ? 'Account ready. Select a Worker and input.' : 'No active Worker. Register and enable a published Worker.');
@@ -343,7 +490,7 @@ PANEL = r'''
       button.className = 'worker-card';
       const name = document.createElement('strong'), badge = document.createElement('span'), detail = document.createElement('small');
       name.textContent = row.definition.worker_id; badge.className = 'worker-badge'; badge.textContent = lifecycle[row.lifecycle] || row.lifecycle;
-      detail.textContent = row.schedule.kind === 'interval' ? `Every ${row.schedule.interval_seconds}s` : 'Manual execution';
+      detail.textContent = (row.schedule.kind === 'interval' ? `Every ${row.schedule.interval_seconds}s` : 'Manual execution') + ' · ' + (sampleDescriptions[sampleKind(row)] || 'Published Artifact');
       button.append(name, badge, detail);
       button.disabled = managing || Boolean(pending);
       button.addEventListener('click', () => editWorker(row));
@@ -358,9 +505,23 @@ PANEL = r'''
     const fields = {'edit-worker-id':'worker_id','edit-artifact-id':'artifact_id','edit-artifact-hash':'artifact_hash','edit-entrypoint':'entrypoint'};
     Object.entries(fields).forEach(([id,key]) => {el(id).value = row ? row.definition[key] : ''; el(id).readOnly = Boolean(row);});
     el('edit-configuration').value = JSON.stringify(row ? row.configuration : {},null,2);
+    configureTemplateOptions(row);
+    const config = row ? row.configuration : {};
+    el('config-multiplier').value = typeof config.multiplier === 'number' && Number.isFinite(config.multiplier) ? config.multiplier : 1;
+    el('config-prefix').value = typeof config.prefix === 'string' ? config.prefix : '';
+    el('config-uppercase').value = config.uppercase === true ? 'true' : 'false';
+    updateConfigMode(true);
+    previousTemplateValue = el('artifact-template').value; previousTemplateKind = configKind();
+    const kind = configKind();
+    if ((kind === 'math' && 'multiplier' in config && (typeof config.multiplier !== 'number' || !Number.isFinite(config.multiplier))) ||
+        (kind === 'text' && (('prefix' in config && typeof config.prefix !== 'string') || ('uppercase' in config && typeof config.uppercase !== 'boolean')))) {
+      el('edit-config-mode').value = 'json'; updateConfigMode(false);
+    }
     el('edit-schedule').value = row ? row.schedule.kind : 'manual';
     el('edit-interval').value = row && row.schedule.interval_seconds || 60;
-    el('edit-interval').disabled = el('edit-schedule').value !== 'interval';
+    const seconds = String(row?.schedule.interval_seconds || 60);
+    el('edit-interval-preset').value = ['30','60','300','900','3600'].includes(seconds) ? seconds : 'custom';
+    updateInterval();
     el('edit-lifecycle').textContent = row ? 'Status: ' + lifecycle[row.lifecycle] : 'A registered Worker is not automatically enabled.';
     el('worker-toggle').hidden = !row; el('worker-delete').hidden = !row;
     el('worker-toggle').textContent = row && row.lifecycle === 'enabled' ? 'Disable' : 'Enable';
@@ -395,17 +556,46 @@ PANEL = r'''
   }
   el('worker-create').addEventListener('click', () => editWorker());
   el('worker-example').addEventListener('click', () => {
-    const examples = {'demo-summary':{values:[10,20,30]}, 'sample-clock':{},
-      'sample-math':{values:[10,20,30]}, 'sample-text':{text:'Hello, 30nA!'}};
-    const worker = el('account-worker').value;
-    if (!Object.prototype.hasOwnProperty.call(examples, worker)) { status('No example input is available for this Worker.'); return; }
-    el('worker-input').value = JSON.stringify(examples[worker], null, 2);
-    status('Example input loaded. Review it before running the Worker.');
+    if (sampleKind(selectedRunWorker())) { loadRunExample(); status('Example input loaded. Review it before running the Worker.'); }
+    else status('No example input is available for this Worker.');
+  });
+  el('account-worker').addEventListener('change', () => { if (!loadRunExample()) el('worker-input').value = '{}'; setRunInputMode(true); });
+  el('run-input-mode').addEventListener('change', () => {
+    try {
+      if (el('run-input-mode').value === 'json') el('worker-input').value = JSON.stringify(guidedInput(), null, 2);
+      else loadGuidedInputFromJSON();
+      setRunInputMode(false);
+    } catch (error) {
+      el('run-input-mode').value = el('run-input-mode').value === 'json' ? 'guided' : 'json';
+      setRunInputMode(false); status(error.message || 'Invalid input.');
+    }
+  });
+  el('artifact-template').addEventListener('change', () => {
+    try {
+      if (el('edit-config-mode').value === 'guided') el('edit-configuration').value = JSON.stringify(guidedConfiguration(previousTemplateKind), null, 2);
+      applyArtifactTemplate(); updateConfigMode(true);
+      if (el('edit-config-mode').value === 'guided') loadGuidedConfigFromJSON();
+      previousTemplateValue = el('artifact-template').value; previousTemplateKind = configKind();
+    } catch (error) {
+      el('artifact-template').value = previousTemplateValue; applyArtifactTemplate(); updateConfigMode(true);
+      el('worker-edit-status').textContent = error.message || 'Invalid configuration.';
+    }
+  });
+  el('edit-config-mode').addEventListener('change', () => {
+    try {
+      if (el('edit-config-mode').value === 'json') el('edit-configuration').value = JSON.stringify(guidedConfiguration(), null, 2);
+      else loadGuidedConfigFromJSON();
+      updateConfigMode(false);
+    } catch (error) {
+      el('edit-config-mode').value = el('edit-config-mode').value === 'json' ? 'guided' : 'json';
+      updateConfigMode(false); el('worker-edit-status').textContent = error.message || 'Invalid configuration.';
+    }
   });
   el('worker-search').addEventListener('input',renderWorkers);
   el('history-worker').addEventListener('input', () => renderHistory(historyRows));
   el('history-status').addEventListener('change', () => renderHistory(historyRows));
-  el('edit-schedule').addEventListener('change', () => {el('edit-interval').disabled = el('edit-schedule').value !== 'interval';});
+  el('edit-schedule').addEventListener('change', updateInterval);
+  el('edit-interval-preset').addEventListener('change', updateInterval);
   el('worker-editor-close').addEventListener('click', () => el('worker-editor').close());
   el('worker-confirm-close').addEventListener('click', () => el('worker-confirm').close());
   ['worker-editor','worker-confirm'].forEach(id => el(id).addEventListener('cancel', event => {if (managing) event.preventDefault();}));
@@ -423,11 +613,11 @@ PANEL = r'''
   el('worker-edit-form').addEventListener('submit', async event => {
     event.preventDefault(); if (managing || pending) return;
     try {
-      const configuration = JSON.parse(el('edit-configuration').value);
+      const configuration = el('edit-config-mode').value === 'guided' ? guidedConfiguration() : JSON.parse(el('edit-configuration').value);
       if (!configuration || Array.isArray(configuration) || typeof configuration !== 'object') throw new Error('Configuration must be a JSON object.');
       const schedule = {kind:el('edit-schedule').value,interval_seconds:null};
       if (schedule.kind === 'interval') {
-        schedule.interval_seconds = Number(el('edit-interval').value);
+        schedule.interval_seconds = Number(el('edit-interval-preset').value === 'custom' ? el('edit-interval').value : el('edit-interval-preset').value);
         if (!Number.isSafeInteger(schedule.interval_seconds) || schedule.interval_seconds < 1) throw new Error('Interval must be a positive integer.');
       }
       const body = {configuration,schedule};
@@ -492,7 +682,7 @@ PANEL = r'''
   el('worker-run-form').addEventListener('submit', async event => {
     event.preventDefault(); if (pending || sending || (active && !terminal(active))) return;
     try {
-      const input = JSON.parse(el('worker-input').value);
+      const input = el('run-input-mode').value === 'guided' ? guidedInput() : JSON.parse(el('worker-input').value);
       if (input === null || Array.isArray(input) || typeof input !== 'object') throw new Error('Input must be a JSON object.');
       const seconds = Number(el('worker-timeout').value);
       if (!Number.isFinite(seconds) || seconds < 1 || seconds > 300) throw new Error('Execution timeout must be between 1 and 300 seconds.');
