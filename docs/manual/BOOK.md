@@ -1117,11 +1117,11 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
 | [30na](../../30na) | 20177 | `273a9019ec0a2dd1b8ecb555604ef892cab994c0705692217885368f526e29dd` |
 | [AGENTS.md](../../AGENTS.md) | 2124 | `abff7ec1d833f288225af6ad93ec95436b0187fd05c0a1f953d7e53e5ddbea2c` |
-| [CHANGELOG.md](../../CHANGELOG.md) | 4956 | `a96af343d5e228ccaf07d1e7c425f8e362b8941ec6a55a0901aa7c743690ca88` |
+| [CHANGELOG.md](../../CHANGELOG.md) | 5504 | `bedb47a35a693f0fd92e01588ddcdfc53e7c684a3e7b9cff9e6e09c069ef405d` |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
-| [README.md](../../README.md) | 7363 | `1e5461f0565f1a5cf1c46d61c39d5f0cfc42df35bb3f800670dd59dcf9da8628` |
+| [README.md](../../README.md) | 7508 | `1b7f68a8a03babf23ffafec46debd676456d75b7cb557354282315f334e5680e` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
-| [VERSION](../../VERSION) | 10 | `7525ba28ee62a019271ebef84a089438f0487030bcba611022f6bed9dee1b40e` |
+| [VERSION](../../VERSION) | 6 | `1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8` |
 | [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
 | [agents/base-prompt.md](../../agents/base-prompt.md) | 5002 | `967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a` |
 | [agents/tasks/01-core.md](../../agents/tasks/01-core.md) | 2178 | `246f884a492333b17d4cbcebb0435776f0eb4546f6e887cbafd57a294438692e` |

@@ -1084,9 +1084,9 @@
       "sha256": "abff7ec1d833f288225af6ad93ec95436b0187fd05c0a1f953d7e53e5ddbea2c"
     },
     {
-      "bytes": 4956,
+      "bytes": 5504,
       "path": "CHANGELOG.md",
-      "sha256": "a96af343d5e228ccaf07d1e7c425f8e362b8941ec6a55a0901aa7c743690ca88"
+      "sha256": "bedb47a35a693f0fd92e01588ddcdfc53e7c684a3e7b9cff9e6e09c069ef405d"
     },
     {
       "bytes": 2817,
@@ -1094,9 +1094,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 7363,
+      "bytes": 7508,
       "path": "README.md",
-      "sha256": "1e5461f0565f1a5cf1c46d61c39d5f0cfc42df35bb3f800670dd59dcf9da8628"
+      "sha256": "1b7f68a8a03babf23ffafec46debd676456d75b7cb557354282315f334e5680e"
     },
     {
       "bytes": 1866,
@@ -1104,9 +1104,9 @@
       "sha256": "341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655"
     },
     {
-      "bytes": 10,
+      "bytes": 6,
       "path": "VERSION",
-      "sha256": "7525ba28ee62a019271ebef84a089438f0487030bcba611022f6bed9dee1b40e"
+      "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8"
     },
     {
       "bytes": 4234,

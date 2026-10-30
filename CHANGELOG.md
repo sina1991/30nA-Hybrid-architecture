@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.1.0 — 2026-10-30
+
+- اضافه‌شدن حساب‌های Admin/User، ورود با Password، Session قابل ابطال و Workspace مستقل.
+- اضافه‌شدن Chat عمومی و خصوصی با درخواست، پذیرش و بررسی عضویت در Dashboard و CLI.
+- ایجاد Credential مستقل برای هر owner و لغو دسترسی حساب غیرفعال توسط timer مدیریت‌شده.
+- جزئیات ارتقا، محدودیت‌ها و اعتبارسنجی: [Release notes](docs/releases/v1.1.0.md).
+
 ## v0.1.2
 
 - Add an English interactive CLI with refreshed status, numbered menus, navigation path and terminal colors.

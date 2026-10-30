@@ -2,7 +2,9 @@
 
 Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORKER RUNTIME و Dashboard.
 
-**وضعیت: نسخه v0.1.2؛ پذیرش نهایی Production روی VPS همچنان نیازمند بررسی مستقل است.**
+[قابلیت‌های تازه v1.1.0](docs/releases/v1.1.0.md) · [راهنمای حساب‌ها و Chat](docs/deployment/multiuser-chat.md)
+
+**وضعیت: نسخه v1.1.0؛ پذیرش نهایی Production روی VPS همچنان نیازمند بررسی مستقل است.**
 
 ## نصب کامل روی Ubuntu VPS
 

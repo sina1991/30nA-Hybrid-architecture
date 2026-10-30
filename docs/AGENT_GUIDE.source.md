@@ -14,6 +14,9 @@
 
 | درخواست | فایل‌های شروع و نماد کلیدی | تست مرتبط |
 |---|---|---|
+| حساب، Session و نقش Admin/User | `modules/accounts.py`؛ `dashboard/upstreams.py`؛ UI در `upstream_panel.py` | `tests/test_accounts_chat.py` و `tests/test_account_chat_api.py` |
+| Chat عمومی/خصوصی، Slot و CLI | `modules/chat_store.py`؛ `modules/chat-box/module.py`؛ `modules/slots.py`؛ `30na`؛ `dashboard/app.py` | `tests/test_account_chat_api.py` و `tests/test_account_chat_browser.py` |
+| Credential چندکاربره و ابطال owner | `scripts/deployment/sync_account_credentials.py`؛ `deployment/systemd/30na-account-sync.*`؛ `install.sh` و `scripts/deployment/update_dashboard.sh` | `tests/test_account_provisioning.py`؛ پذیرش واقعی systemd جداست |
 | validation داده یا record CRUD | `units/data-manager/validation.py`؛ `services.py`؛ `api/__init__.py` | `units/data-manager/tests/` |
 | مدل، ownership یا migration DATA | `units/data-manager/storage.py`، `SQLiteStorage` | `test_data_manager.py` و `test_api.py` در suite DATA |
 | source register/inspect | `units/code-manager/code_manager/source_registration.py`، `SourceRegistrationService`؛ `source_registry.py`، `SourceRegistry`؛ `source_archive.py` | `units/code-manager/tests/test_source_registration.py`، `test_source_registry.py`، `test_source_archive.py` |
@@ -140,13 +143,16 @@ node scripts/documentation/render_pdf.cjs
 
 این نسخه Release candidate برای Worker trusted ازپیش‌ثبت‌شده است. rootless acceptance، live daemon fault injection، identity/TLS واقعی، restore rehearsal و Release approval روی VPS هنوز مستقل‌اند. Agent08 proof legacy است؛ حالت code-manager آن sandbox را provision نمی‌کند و hash آن از fixture محلی است؛ جای مسیر MVP استفاده نشود.
 
-DATA direct envelope، provisioning children در HTTP و propagation سرتاسری correlation هنوز کامل نیستند. OIDC/RBAC/MFA، quota مستقل owner، HA/distributed scheduling، automatic ambiguous retry، full pagination/retention/GC و native dependency در scope فعلی نیستند. نیاز تازه را قبل از implementation به معیار پذیرش روشن تبدیل کنید؛ در اصلاح کوچک، این مرزها را بی‌دلیل بازطراحی نکنید.
+DATA direct envelope، provisioning children در HTTP و propagation سرتاسری correlation هنوز کامل نیستند. OIDC، RBAC تفصیلی و MFA، quota مستقل owner، HA/distributed scheduling، automatic ambiguous retry، full pagination/retention/GC و native dependency در scope فعلی نیستند. نیاز تازه را قبل از implementation به معیار پذیرش روشن تبدیل کنید؛ در اصلاح کوچک، این مرزها را بی‌دلیل بازطراحی نکنید.
 
-## حساب‌های چندکاربره و Chat در شاخه توسعه
+## حساب‌های چندکاربره و Chat — v1.1.0
 
 - `modules/accounts.py` مالک account، Hash رمز با `scrypt`، محدودسازی ورود، Session و ابطال آن است. عملیات مدیریتی این لایه مجوز را خودش از HTTP استخراج نمی‌کند؛ `dashboard/upstreams.py` باید هویت و نقش Admin را اعمال کند. Token حساب `customer` موجود به همان owner قبلی متصل می‌ماند.
 - `modules/chat_store.py` گفت‌وگوی عمومی، درخواست خصوصی، پذیرش و کنترل عضویت را مستقل از مرورگر نگه می‌دارد. `modules/chat-box/module.py` و APIهای `/api/upstreams/chat/...` از همین منطق استفاده می‌کنند. صاحب پیام هرگز از body HTTP دریافت نمی‌شود.
 - `scripts/deployment/sync_account_credentials.py`، به‌وسیله `30na-account-sync.timer` با دسترسی root، برای هر owner Credential جدا در فایل‌های Manager/Runtime/CODE ایجاد می‌کند. Dashboard فقط Credential همان owner را به upstream می‌فرستد. غیرفعال‌کردن Session فوری است؛ ابطال Credential داخلی تا نوبت بعدی timer تأخیر دارد و اجرای در حال انجام ممکن است ادامه یابد.
+- `customer` حساب نصب اولیه است؛ Bootstrap فقط یک‌بار با Token نصب مجاز است و داده‌های آن حفظ می‌شوند. Username جدید شناسه owner را عوض نمی‌کند. Session با Hash ذخیره و در Logout/Disable باطل می‌شود؛ آخرین Admin فعال غیرفعال نمی‌شود. حساب جدید تا تکمیل sync ممکن است برای Worker پاسخ 503 دریافت کند.
+- Sync باید root-only، قفل‌شده در برابر Installer، atomic و بدون چاپ secret بماند. `customer-service-bindings.json` مسیرهای نصب را برای Disable/Enable حفظ می‌کند. مسیر محلی Module تحت حساب OS مورد اعتماد است؛ آن را API عمومی بدون احراز هویت نکنید.
+- اعتبارسنجی v1.1.0: مجموعه Unit شامل 308 passed و 11 skipped؛ مجموعه هدفمند API/Chromium شامل 76 passed است (دارای همپوشانی با Unit). Docker و نصب واقعی systemd/VPS تأیید نشده‌اند.
 - تأیید محلی: `tests/test_accounts_chat.py`، `tests/test_account_chat_api.py`، `tests/test_account_provisioning.py` و `tests/test_account_chat_browser.py`. پذیرش واقعی Installer، timer و Sandbox روی VPS آزمایشی جداگانه لازم است. [راهنمای راه‌اندازی](deployment/multiuser-chat.md).
 
 ## پیوست تولیدشده: قراردادها و مرجع کامل کد

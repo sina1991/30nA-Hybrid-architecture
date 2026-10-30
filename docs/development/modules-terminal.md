@@ -103,9 +103,9 @@ Replace `system-monitor` in the direct path with any module ID listed above. Net
 
 Dashboard slot execution runs under the Dashboard service account. Its host monitor owners are restricted by `THIRTYNA_MONITOR_OWNERS` (comma-separated, default `customer`). `THIRTYNA_MONITOR_DISK_PATHS` is a colon-separated exact-path allowlist (default `/`); `THIRTYNA_MONITOR_SERVICES` is a comma-separated list (default `nginx.service,docker.service`). Log Viewer requires an administrator-controlled colon-separated `THIRTYNA_MONITOR_LOG_PATHS` allowlist and ordinary read permission; it reads at most the last 256 KiB. Docker Monitor is disabled unless `THIRTYNA_MONITOR_DOCKER=1` is set for the executing environment, and it uses only that user's existing Docker access. Docker socket access can grant broad control of the daemon; do not grant it merely to make monitoring work. These variables must be configured separately for the Dashboard service and terminal process if both need the same access. Use trusted, administrator-controlled paths; never add credential or secret files to the log allowlist.
 
-## Chat Box و حساب کاربری (شاخه توسعه)
+## Chat Box و حساب کاربری
 
-این بخش در شاخه `feat/multiuser-chat` در حال توسعه است و هنوز برای انتشار روی VPS تأیید نشده است. پس از راه‌اندازی حساب، ورود Terminal بدون قرار دادن Password در command history انجام می‌شود:
+قابلیت حساب و Chat از نسخه `v1.1.0` در دسترس است. پذیرش عملیاتی VPS باید جداگانه انجام شود. پس از راه‌اندازی حساب، ورود Terminal بدون قرار دادن Password در command history انجام می‌شود:
 
 ```bash
 30na account login --username alice
