@@ -4,6 +4,7 @@ from . import sma, rsi, macd
 REGISTRY = {'sma': sma, 'rsi': rsi, 'macd': macd}
 DEFAULTS = {'sma': {'period': 20}, 'rsi': {'period': 14},
             'macd': {'fast': 12, 'slow': 26, 'signal': 9}}
+CHART_DEFAULTS = {name: DEFAULTS[name] for name in ('rsi', 'macd')}
 
 
 def normalize(name, options):

@@ -5,6 +5,7 @@ import os
 import re
 import sqlite3
 from uuid import uuid4
+from market_data.indicators import CHART_DEFAULTS
 from .module_state import change
 from .execution import MODULE_FILES, HOST_MONITORS, MARKET_MODULES, run_module
 
@@ -86,7 +87,7 @@ def list_active(owner):
                            'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker'),
                            'slot_type': meta.get('slot_type', 'standard'),
                            'chart_period': meta.get('chart_period', 20), 'chart_interval': meta.get('chart_interval', '1m'), 'indicator_period': meta.get('indicator_period', 14), 'chart_overlay': meta.get('chart_overlay', True),
-                           'chart_live': meta.get('chart_live', True)})
+                           'chart_live': meta.get('chart_live', True), 'chart_indicators': meta.get('chart_indicators', [])})
         return result
     finally:
         db.close()
@@ -148,10 +149,12 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators'}:
         raise ValueError('invalid slot appearance')
     if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'chart', 'fix-chart'):
         raise ValueError('invalid slot type')
+    if 'chart_indicators' in updates and (not isinstance(updates['chart_indicators'], list) or len(updates['chart_indicators']) > len(CHART_DEFAULTS) or any(not isinstance(item, str) or item not in CHART_DEFAULTS for item in updates['chart_indicators']) or len(set(updates['chart_indicators'])) != len(updates['chart_indicators'])):
+        raise ValueError('invalid chart indicators')
     if 'chart_interval' in updates and updates['chart_interval'] not in ('1m', '5m', '15m'):
         raise ValueError('invalid chart interval')
     if 'indicator_period' in updates and (type(updates['indicator_period']) is not int or not 1 <= updates['indicator_period'] <= 500):

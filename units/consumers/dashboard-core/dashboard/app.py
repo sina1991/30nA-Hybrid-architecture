@@ -202,7 +202,7 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 #overview-grid {grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:56px;grid-auto-flow:row;}
 #overview-grid .slot {grid-column:span 4;grid-row:span 5;overflow:auto;position:relative;}
 #overview-grid .slot[data-slot-type="chart"],#overview-grid .slot[data-slot-type="fix-chart"] {grid-column:span 8;grid-row:span 8}
-#grid .slot[data-slot-type="fix-chart"] {grid-column:1 / -1}
+#grid .slot[data-slot-type="fix-chart"],#grid .slot[data-slot-type="chart"] {grid-column:1 / -1}
 .slot[data-slot-type="chart"] .market-chart {height:clamp(240px,45vh,520px)}
 .slot[data-slot-type="fix-chart"] .module-body {min-height:0;gap:4px}
 .slot[data-slot-type="fix-chart"] .market-graph {flex:1;min-height:200px}
@@ -238,6 +238,17 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .market-status {font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 .market-chart {width:100%;height:220px;min-height:120px;display:block;background:var(--field);border:1px solid var(--border);border-radius:8px}
 .market-legend {font-size:11px;color:var(--muted)}
+.market-candle-info {font-size:11px;line-height:1.4;font-variant-numeric:tabular-nums;color:var(--text);overflow-wrap:anywhere}
+.market-indicators {display:grid;gap:3px}.market-indicators:empty {display:none}
+.market-indicator-pane {position:relative;background:var(--field);border:1px solid var(--border);border-radius:5px;min-height:66px}
+.market-indicator-pane svg {display:block;width:100%;height:68px}.market-indicator-label {position:absolute;top:3px;left:8px;font-size:10px;color:var(--muted)}
+.market-indicator-empty {display:block;font-size:11px;color:var(--muted);padding:24px 8px 8px}
+.chart-slot {position:relative;min-height:400px;overflow:visible}
+.chart-slot .module-body {min-height:0}.chart-slot .market-graph {flex:1;min-height:180px}.chart-slot .market-chart {height:100%;min-height:180px}
+.chart-context {position:absolute;top:8px;right:8px;z-index:6;display:grid;gap:4px;min-width:165px;padding:6px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 5px 20px #0007}
+.chart-context button {padding:7px 9px;background:var(--field);border:1px solid var(--border);border-radius:5px;color:var(--text);text-align:left;cursor:pointer;font:inherit}
+.chart-move-handle {display:none;position:absolute;z-index:5;top:2px;left:50%;transform:translateX(-50%);background:var(--field);color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:5px;font-size:11px;touch-action:none;cursor:grab}
+.chart-slot.layout-unlocked .chart-move-handle {display:block}
 .db-controls {display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .db-controls label {display:grid;gap:4px;font-size:12px}.db-controls button {font:inherit;padding:8px;border-radius:7px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}
 .db-scroll {overflow:auto;border:1px solid var(--border);border-radius:10px;max-height:70vh}
@@ -686,27 +697,31 @@ function renderModuleOutput(container, value, theme) {
 
 function renderMarketModule(body, slot, module) {
   let period = Number.isInteger(slot.chart_period) ? slot.chart_period : 20;
-  const interval = module.type === 'gold-chart' ? (slot.chart_interval || '1m') : '1m';
+  let interval = module.type === 'gold-chart' ? (slot.chart_interval || '1m') : '1m';
+  let shownIndicators = new Set(slot.chart_indicators || []), selectedTime = null, requestVersion = 0, pendingRefresh = false;
   let overlay = slot.chart_overlay !== false, includeOpen = slot.chart_live !== false, busy = false;
   let viewCount = 80, endOffset = 0, cachedData = null, olderCandles = [], olderPoints = [], olderBusy = false, noOlder = false;
+  let olderIndicators = {rsi:[], macd:[]};
   function mergeHistory(data) {
     const merge = (older, newer) => {
       const byTime = new Map(); older.forEach(item => byTime.set(item.time, item)); newer.forEach(item => byTime.set(item.time, item));
       return [...byTime.values()].sort((a,b) => a.time - b.time);
     };
     return {...data, candles:merge(olderCandles, data.candles),
+      indicators:Object.fromEntries(['rsi','macd'].map(name => [name, {...data.indicators?.[name], points:merge(olderIndicators[name], data.indicators?.[name]?.points || [])}])),
       moving_average:{...data.moving_average, points:merge(olderPoints, data.moving_average?.points || [])}};
   }
   async function loadOlder() {
     const bridge = window.dashboardModuleState;
     if (!cachedData?.candles.length || !bridge?.ready() || olderBusy || noOlder) return;
-    olderBusy = true;
+    olderBusy = true; const version = requestVersion;
     try {
-      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1, interval);
-      if (!body.isConnected || !bridge.ready()) return;
+      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1, interval, shownIndicators.size > 0);
+      if (version !== requestVersion || !body.isConnected || !bridge.ready()) return;
       const newCandles = data.candles.filter(item => item.time < oldest);
       if (!newCandles.length) { noOlder = true; status.textContent = 'No older candles in the local database.'; return; }
       olderCandles = [...newCandles, ...olderCandles]; olderPoints = [...(data.moving_average?.points || []), ...olderPoints];
+      ['rsi','macd'].forEach(name => { olderIndicators[name] = [...(data.indicators?.[name]?.points || []), ...olderIndicators[name]]; });
       endOffset += Math.max(1, Math.floor(viewCount / 3)); plot(mergeHistory(cachedData));
     } catch (_) { status.textContent = 'Could not load older candles.'; }
     finally { olderBusy = false; }
@@ -731,6 +746,15 @@ function renderMarketModule(body, slot, module) {
   toolbar.append(periodLabel);
   if (module.type === 'gold-chart') toolbar.append(overlayLabel);
   toolbar.append(liveLabel);
+  const indicatorChecks = {};
+  if (module.type === 'gold-chart') {
+    ['rsi','macd'].forEach(name => {
+      const label = makeElement('label', '', name.toUpperCase());
+      const input = makeElement('input', ''); input.type = 'checkbox'; input.checked = shownIndicators.has(name);
+      label.prepend(input); toolbar.append(label); indicatorChecks[name] = input;
+      input.addEventListener('change', () => saveOptions({chart_indicators:Object.keys(indicatorChecks).filter(key => indicatorChecks[key].checked)}));
+    });
+  }
   if (module.type === 'gold-chart') {
     [['−','Zoom out'],['+','Zoom in'],['←','Older candles'],['→','Newer candles']].forEach(([symbol, title]) => {
       const button = makeElement('button', 'slot-icon', symbol); button.type = 'button'; button.title = title; button.setAttribute('aria-label', title);
@@ -749,29 +773,56 @@ function renderMarketModule(body, slot, module) {
   }
   const price = makeElement('div', 'market-price', 'Waiting for market data');
   const status = makeElement('div', 'market-status', 'Loading…');
+  const candleInfo = makeElement('div', 'market-candle-info', 'Move over or click a candle to inspect OHLC');
   const graph = makeElement('div', 'market-graph');
+  const panes = makeElement('div', 'market-indicators');
   const legend = makeElement('div', 'market-legend');
-  body.append(toolbar, price, status, graph, legend);
+  body.append(toolbar, price, status, candleInfo, graph, panes, legend);
   async function saveOptions(updates) {
     toolbar.querySelectorAll('input,select').forEach(element => { element.disabled = true; });
-    try { await window.dashboardModuleState.setSlotAppearance(slot.id, updates); slotGeneration++; await refreshActiveSlots(); }
-    catch (_) {
+    try {
+      await window.dashboardModuleState.setSlotAppearance(slot.id, updates);
+      slotGeneration++;
+      const current = activeSlots.find(item => item.slot === slot.id);
+      if (current) Object.assign(current, updates);
+      document.querySelectorAll('.slot').forEach(card => { if (card.dataset.slotId === slot.id) card.querySelector('.module-body')?._syncChart?.({...slot, ...updates}); });
+      await refreshActiveSlots();
+    } catch (_) {
       periodSelect.value = String(period); overlayInput.checked = overlay; liveInput.checked = includeOpen;
-      status.textContent = 'Could not save chart settings. Refresh and check the slot.';
+      Object.keys(indicatorChecks).forEach(name => { indicatorChecks[name].checked = shownIndicators.has(name); });
+      const selector = toolbar.querySelector('[aria-label="Chart timeframe"]'); if (selector) selector.value = interval;
+      status.textContent = 'Could not save chart settings.';
     } finally { toolbar.querySelectorAll('input,select').forEach(element => { element.disabled = false; }); }
   }
+  body._syncChart = settings => {
+    const nextPeriod = Number.isInteger(settings.chart_period) ? settings.chart_period : 20;
+    const nextInterval = module.type === 'gold-chart' ? (settings.chart_interval || '1m') : '1m';
+    const nextOpen = settings.chart_live !== false, nextOverlay = settings.chart_overlay !== false;
+    const nextIndicators = new Set(settings.chart_indicators || []);
+    const changed = nextPeriod !== period || nextInterval !== interval || nextOpen !== includeOpen ||
+      [...nextIndicators].sort().join(',') !== [...shownIndicators].sort().join(',');
+    const overlayChanged = nextOverlay !== overlay;
+    Object.assign(slot, settings); period = nextPeriod; interval = nextInterval; includeOpen = nextOpen; overlay = nextOverlay; shownIndicators = nextIndicators;
+    periodSelect.value = String(period); overlayInput.checked = overlay; liveInput.checked = includeOpen;
+    const selector = toolbar.querySelector('[aria-label="Chart timeframe"]'); if (selector) selector.value = interval;
+    Object.keys(indicatorChecks).forEach(name => { indicatorChecks[name].checked = shownIndicators.has(name); });
+    if (changed) {
+      requestVersion++; olderCandles = []; olderPoints = []; olderIndicators = {rsi:[], macd:[]}; noOlder = false; endOffset = 0;
+      status.textContent = cachedData ? 'Updating chart · showing previous data' : 'Loading market data…';
+      refresh();
+    } else if (overlayChanged && cachedData) plot(cachedData);
+  };
   periodSelect.addEventListener('change', () => saveOptions({chart_period:Number(periodSelect.value)}));
   overlayInput.addEventListener('change', () => saveOptions({chart_overlay:overlayInput.checked}));
   liveInput.addEventListener('change', () => saveOptions({chart_live:liveInput.checked}));
   function plot(data) {
-    graph.replaceChildren();
     cachedData = data;
     const available = data.candles.filter(item => ['time','open','high','low','close'].every(key => typeof item[key] === 'number' && Number.isFinite(item[key])));
     endOffset = Math.min(endOffset, Math.max(0, available.length - 1));
     const end = Math.max(0, available.length - endOffset);
     const candles = module.type === 'gold-chart' ? available.slice(Math.max(0, end - viewCount), end) : available;
     if (!candles.length) {
-      price.textContent = 'No candles available';
+      graph.replaceChildren(); panes.replaceChildren(); price.textContent = 'No candles available';
       status.textContent = data.collector_error ? 'Source unavailable.' : 'Waiting for market data.';
       legend.textContent = '';
       return;
@@ -824,22 +875,76 @@ function renderMarketModule(body, slot, module) {
     svg.addEventListener('wheel', event => { event.preventDefault(); viewCount = event.deltaY < 0 ? Math.max(20, Math.floor(viewCount/1.25)) : Math.min(500, Math.ceil(viewCount*1.25)); plot(cachedData); }, {passive:false});
     let dragStart = null;
     svg.addEventListener('pointerdown', event => { if (event.button !== 0) return; dragStart = event.clientX; svg.setPointerCapture(event.pointerId); });
-    svg.addEventListener('pointerup', event => { if (dragStart === null) return; const width = svg.getBoundingClientRect().width || 1; endOffset = Math.max(0, endOffset + Math.round((event.clientX-dragStart)/width * viewCount)); dragStart = null; plot(cachedData); });
+    function candleAt(event) {
+      const rect = svg.getBoundingClientRect(), xCoord = (event.clientX - rect.left) / (rect.width || 1) * 800;
+      if (xCoord < 8 || xCoord > 718) return null;
+      return candles[Math.max(0, Math.min(candles.length - 1, Math.floor((xCoord - 8) / 710 * candles.length)))];
+    }
+    const crosshair = document.createElementNS(ns, 'line');
+    crosshair.setAttribute('y1','8'); crosshair.setAttribute('y2','223'); crosshair.setAttribute('stroke','var(--muted)');
+    crosshair.setAttribute('stroke-dasharray','3 3'); crosshair.setAttribute('pointer-events','none'); crosshair.style.display = 'none'; svg.append(crosshair);
+    svg.addEventListener('pointermove', event => { if (dragStart === null) { const candle = candleAt(event); if (candle) {
+      const index = candles.indexOf(candle); crosshair.setAttribute('x1',x(index)); crosshair.setAttribute('x2',x(index)); crosshair.style.display = ''; showCandle(candle, data);
+    } } });
+    svg.addEventListener('pointerleave', () => { crosshair.style.display = 'none'; showCandle(candles.find(item => item.time === selectedTime) || last, data); });
+    svg.addEventListener('pointerup', event => {
+      if (dragStart === null) return;
+      const delta = event.clientX - dragStart, width = svg.getBoundingClientRect().width || 1; dragStart = null;
+      if (Math.abs(delta) < 4) { const candle = candleAt(event); if (candle) { selectedTime = candle.time; showCandle(candle, data); } return; }
+      endOffset = Math.max(0, endOffset + Math.round(delta / width * viewCount)); plot(cachedData);
+    });
     svg.addEventListener('pointercancel', () => { dragStart = null; });
-    graph.append(svg);
+    graph.replaceChildren(svg);
+    renderPanes(data, candles);
+    showCandle(candles.find(item => item.time === selectedTime) || last, data);
     legend.textContent = `${interval} · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${overlay ? ` · SMA ${period} (orange)` : ''} · Live candle outlined`;
+  }
+  function showCandle(candle, data) {
+    const stamp = new Date(candle.time * 1000).toISOString().replace('T', ' ').replace('.000Z', ' UTC');
+    const extra = [...shownIndicators].map(name => {
+      const point = data.indicators?.[name]?.points?.find(item => item.time === candle.time);
+      if (!point) return `${name.toUpperCase()} —`;
+      return name === 'rsi' ? `RSI ${Number(point.value).toFixed(2)}` : `MACD ${Number(point.macd).toFixed(3)} / Signal ${Number(point.signal).toFixed(3)} / Hist ${Number(point.histogram).toFixed(3)}`;
+    }).join(' · ');
+    const smaPoint = overlay ? data.moving_average?.points?.find(item => item.time === candle.time) : null;
+    candleInfo.textContent = `${stamp} · O ${candle.open}  H ${candle.high}  L ${candle.low}  C ${candle.close} · Vol ${candle.tick_volume ?? '—'}${candle.is_open ? ' · LIVE' : ''}${smaPoint ? ` · SMA ${Number(smaPoint.value).toFixed(2)}` : ''}${extra ? ' · ' + extra : ''}`;
+  }
+  function renderPanes(data, candles) {
+    panes.replaceChildren();
+    const ns = 'http://www.w3.org/2000/svg';
+    for (const name of shownIndicators) {
+      const section = makeElement('div', 'market-indicator-pane');
+      section.append(makeElement('span', 'market-indicator-label', name === 'rsi' ? 'RSI 14' : 'MACD 12, 26, 9'));
+      const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox','0 0 800 90'); svg.setAttribute('preserveAspectRatio','none'); svg.setAttribute('role','img'); svg.setAttribute('aria-label', name.toUpperCase() + ' indicator');
+      const indexed = new Map((data.indicators?.[name]?.points || []).map(item => [item.time, item]));
+      const points = candles.map((candle, index) => ({point:indexed.get(candle.time), index})).filter(item => item.point);
+      if (!points.length) { section.append(makeElement('span', 'market-indicator-empty', 'Insufficient candles for this indicator')); panes.append(section); continue; }
+      const values = name === 'rsi' ? [0,100] : points.flatMap(({point}) => [point.macd, point.signal, point.histogram, 0]).filter(Number.isFinite);
+      let low = Math.min(...values), high = Math.max(...values); if (low === high) { low -= 1; high += 1; }
+      const x = index => 8 + (index + .5) * 710 / candles.length, y = value => 7 + (high-value) / (high-low) * 69;
+      const guide = document.createElementNS(ns,'line'); guide.setAttribute('x1','8'); guide.setAttribute('x2','718'); guide.setAttribute('y1',y(name === 'rsi' ? 50 : 0)); guide.setAttribute('y2',y(name === 'rsi' ? 50 : 0)); guide.setAttribute('stroke','var(--border)'); svg.append(guide);
+      if (name === 'macd') points.forEach(({point,index}) => { const bar = document.createElementNS(ns,'line'); bar.setAttribute('x1',x(index)); bar.setAttribute('x2',x(index)); bar.setAttribute('y1',y(0)); bar.setAttribute('y2',y(point.histogram)); bar.setAttribute('stroke',point.histogram >= 0 ? '#22c55e' : '#ef4444'); bar.setAttribute('stroke-width',Math.max(1, Math.min(5, 400 / candles.length))); svg.append(bar); });
+      (name === 'rsi' ? [['value','#a78bfa']] : [['macd','#60a5fa'],['signal','#f59e0b']]).forEach(([key,color]) => {
+        const line = document.createElementNS(ns,'polyline'); line.setAttribute('points', points.filter(({point}) => Number.isFinite(point[key])).map(({point,index}) => `${x(index)},${y(point[key])}`).join(' ')); line.setAttribute('fill','none'); line.setAttribute('stroke',color); line.setAttribute('stroke-width','1.5'); svg.append(line);
+      });
+      [high,low].forEach((value,index) => { const text = document.createElementNS(ns,'text'); text.setAttribute('x','725'); text.setAttribute('y',index ? '77' : '13'); text.setAttribute('fill','var(--muted)'); text.setAttribute('font-size','10'); text.textContent = value.toFixed(2); svg.append(text); });
+      section.append(svg); panes.append(section);
+    }
   }
   async function refresh() {
     const bridge = window.dashboardModuleState;
-    if (!bridge?.ready() || busy) return;
-    busy = true;
-    try { const data = await bridge.marketData(Math.max(500, period), period, includeOpen, null, interval); if (body.isConnected && bridge.ready()) { noOlder = false; plot(mergeHistory(data)); } }
-    catch (_) { if (body.isConnected) status.textContent = 'Market data is unavailable.'; }
-    finally { busy = false; }
+    if (!bridge?.ready()) return;
+    if (busy) { pendingRefresh = true; return; }
+    busy = true; const version = requestVersion;
+    try {
+      const data = await bridge.marketData(Math.max(500, period), period, includeOpen, null, interval, shownIndicators.size > 0);
+      if (version === requestVersion && body.isConnected && bridge.ready()) { noOlder = false; plot(mergeHistory(data)); }
+    } catch (_) { if (version === requestVersion && body.isConnected) status.textContent = cachedData ? 'Update failed · showing previous data' : 'Market data is unavailable.'; }
+    finally { busy = false; if (pendingRefresh && body.isConnected) { pendingRefresh = false; refresh(); } }
   }
   body.addEventListener('slot-refresh', refresh);
   function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 10000); }
-  tick();
+  setTimeout(tick, 0);
 }
 
 function renderIndicator(body, slot, module) {
@@ -887,7 +992,7 @@ function renderIndicator(body, slot, module) {
   }
   body.addEventListener('slot-refresh', refresh);
   function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 10000); }
-  tick();
+  setTimeout(tick, 0);
 }
 
 function renderModuleContent(body, slot, moduleId) {
@@ -926,7 +1031,7 @@ function renderModuleContent(body, slot, moduleId) {
     body.addEventListener('slot-refresh', refresh);
     body.append(output);
     function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 5000); }
-    tick();
+    setTimeout(tick, 0);
     return;
   }
 
@@ -1299,12 +1404,56 @@ function attachSavedResult(body, slot, moduleId) {
   }
   body.addEventListener('slot-refresh', refresh);
   function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 5000); }
-  tick();
+  setTimeout(tick, 0);
+}
+
+function makeChartSlot(row, area) {
+  const slot = {id:row.slot, chart_period:row.chart_period, chart_interval:row.chart_interval,
+    chart_indicators:row.chart_indicators, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
+  const card = makeElement('article', 'slot chart-slot'); card.tabIndex = 0; card.setAttribute('aria-label', `Chart ${row.slot}. Open the context menu for slot options.`); card.dataset.slotId = row.slot;
+  card.dataset.area = area; card.dataset.slotType = row.slot_type; card.title = 'Right-click for slot options';
+  if (row.frame_color) card.style.borderColor = row.frame_color;
+  if (area === 'overview' && row.layout) {
+    card.style.gridColumn = `${row.layout.x + 1} / span ${row.layout.w}`;
+    card.style.gridRow = `${row.layout.y + 1} / span ${row.layout.h}`;
+  }
+  const notice = makeElement('div', 'market-status'); notice.setAttribute('role', 'status');
+  const menu = makeElement('div', 'chart-context'); menu.hidden = true;
+  const pin = makeElement('button', '', row.overview ? 'Remove from Overview' : 'Add to Overview'); pin.type = 'button';
+  pin.addEventListener('click', async () => { pin.disabled = true;
+    try { await window.dashboardModuleState.setOverview(row.slot, !row.overview); slotGeneration++; await refreshActiveSlots(); }
+    catch (_) { notice.textContent = 'Could not update Overview.'; pin.disabled = false; }
+  });
+  const lock = makeElement('button', 'slot-lock', 'Unlock layout'); lock.type = 'button';
+  lock.addEventListener('click', () => {
+    menu.hidden = true;
+    if (!row.overview) { notice.textContent = 'Add this chart to Overview before moving it.'; return; }
+    if (unlockedSlots.has(row.slot)) unlockedSlots.delete(row.slot); else { layoutEditing = true; unlockedSlots.add(row.slot); }
+    if (area !== 'overview') openView('overview'); syncLayoutControls();
+  });
+  const remove = makeElement('button', '', 'Delete chart slot'); remove.type = 'button';
+  remove.addEventListener('click', async () => {
+    if (!window.confirm(`Delete ${row.slot} and its saved module data?`)) return;
+    remove.disabled = true;
+    try { await window.dashboardModuleState.deleteSlot(row.slot); delete slotSettings[row.slot]; delete serverSlotContext[row.slot]; saveSettings(); slotGeneration++; await refreshActiveSlots(); }
+    catch (_) { notice.textContent = 'Could not delete chart slot.'; remove.disabled = false; }
+  });
+  menu.append(pin, lock, remove);
+  card.addEventListener('contextmenu', event => { event.preventDefault(); menu.hidden = !menu.hidden; });
+  card.addEventListener('keydown', event => { if (event.key === 'Escape') menu.hidden = true; });
+  const handle = makeElement('div', 'chart-move-handle', 'Drag to move');
+  const resize = makeElement('button', 'slot-resize', '↘'); resize.type = 'button'; resize.setAttribute('aria-label', `Resize ${row.slot}`);
+  const body = makeElement('div', 'module-body');
+  card.append(menu, handle, notice, body, resize);
+  attachLayoutControls(card, handle, resize, row, notice);
+  renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
+  return card;
 }
 
 function makeSlot(row, area) {
+  if (['chart','fix-chart'].includes(row.slot_type) && row.module_id === 'gold-chart') return makeChartSlot(row, area);
   const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
-    chart_period:row.chart_period, chart_interval:row.chart_interval, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
+    chart_period:row.chart_period, chart_interval:row.chart_interval, chart_indicators:row.chart_indicators, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
   const card = makeElement('article', 'slot');
   card.dataset.slotId = slot.id;
   card.dataset.area = area;
@@ -1561,9 +1710,18 @@ function makeSlot(row, area) {
   return card;
 }
 
+function cardRenderKey(row) {
+  const copy = {...row, worker:row.worker ? {enabled:row.worker.enabled, kind:row.worker.kind,
+    interval_seconds:row.worker.interval_seconds, input:row.worker.input, revision:row.worker.revision,
+    module_id:row.worker.module_id, binding_revision:row.worker.binding_revision} : null};
+  if (['chart','fix-chart'].includes(row.slot_type) && row.module_id === 'gold-chart') {
+    ['chart_period','chart_interval','chart_overlay','chart_live','chart_indicators'].forEach(key => delete copy[key]);
+  }
+  return JSON.stringify(copy);
+}
+
 function renderSlots() {
   const overview = document.getElementById('overview-grid');
-  grid.replaceChildren(); overview.replaceChildren();
   const ready = Boolean(window.dashboardModuleState?.ready());
   document.getElementById('add-slot').disabled = !ready;
   document.getElementById('add-chart-slot').disabled = !ready;
@@ -1571,11 +1729,19 @@ function renderSlots() {
   document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
   const pinned = activeSlots.filter(row => row.overview);
   document.getElementById('overview-empty').textContent = !ready ? 'Sign in to view pinned slots.' : pinned.length ? '' : 'No slots added to Overview yet.';
-  if (!ready) { renderSlotWorkerList(); return; }
-  activeSlots.forEach(row => grid.append(makeSlot(row, 'slots')));
-  pinned.forEach(row => overview.append(makeSlot(row, 'overview')));
-  syncLayoutControls();
-  renderSlotWorkerList();
+  if (!ready) { grid.replaceChildren(); overview.replaceChildren(); renderSlotWorkerList(); return; }
+  function reconcile(container, rows, area) {
+    const old = new Map([...container.children].map(card => [card.dataset.slotId, card]));
+    rows.forEach((row, index) => {
+      const key = cardRenderKey(row); let card = old.get(row.slot); old.delete(row.slot);
+      if (!card || card.dataset.renderKey !== key) { const fresh = makeSlot(row, area); fresh.dataset.renderKey = key; if (card) card.replaceWith(fresh); card = fresh; }
+      const before = container.children[index]; if (before !== card) container.insertBefore(card, before || null);
+      card.querySelector('.module-body')?._syncChart?.(row);
+    });
+    old.forEach(card => card.remove());
+  }
+  reconcile(grid, activeSlots, 'slots'); reconcile(overview, pinned, 'overview');
+  syncLayoutControls(); renderSlotWorkerList();
 }
 
 function renderSlotWorkerList() {
@@ -1628,7 +1794,7 @@ async function refreshActiveSlots() {
     const rows = await bridge.listSlots();
     if (generation !== slotGeneration || !bridge.ready() || pointerEditing) return;
     if (slotStructure(rows) !== slotStructure(activeSlots)) { activeSlots = rows; renderSlots(); }
-    else { activeSlots = rows; document.getElementById('add-slot').disabled = false; updateSlotWorkerStates(); }
+    else { activeSlots = rows; document.getElementById('add-slot').disabled = false; document.querySelectorAll('.chart-slot').forEach(card => { const row = rows.find(item => item.slot === card.dataset.slotId); if (row) card.querySelector('.module-body')?._syncChart?.(row); }); updateSlotWorkerStates(); }
   } catch (_) {
     if (generation === slotGeneration && bridge.ready()) document.getElementById('slots-message').textContent = 'Could not load slots. Refresh and try again.';
   }

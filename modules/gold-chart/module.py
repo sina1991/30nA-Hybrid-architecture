@@ -10,10 +10,10 @@ from market_data.data import chart
 
 
 def run(data):
-    if set(data) - {'limit', 'period', 'include_open', 'end_time', 'interval'}:
+    if set(data) - {'limit', 'period', 'include_open', 'end_time', 'interval', 'include_indicators'}:
         raise ValueError('unknown chart input')
     period = data.get('period', 20)
-    return chart(limit=data.get('limit', max(200, period) if type(period) is int else 200), period=period, include_open=data.get('include_open', True), end_time=data.get('end_time'), interval=data.get('interval', '1m'))
+    return chart(limit=data.get('limit', max(200, period) if type(period) is int else 200), period=period, include_open=data.get('include_open', True), end_time=data.get('end_time'), interval=data.get('interval', '1m'), include_indicators=data.get('include_indicators', False))
 
 
 if __name__ == '__main__':
