@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 
 from .modules.registry import list_modules
+from .modules.execution import UnknownModule, run_module
 from .modules.packages.clock.clock import current_time
 from zoneinfo import ZoneInfoNotFoundError
 
@@ -98,6 +99,16 @@ def clock_time(timezone: str | None = None) -> dict:
         return {"time": current_time(timezone)}
     except (ValueError, ZoneInfoNotFoundError):
         raise HTTPException(status_code=422, detail="Unknown time zone") from None
+
+
+@app.post("/api/modules/{module_id}/run")
+def execute_module(module_id: str, data: dict) -> dict:
+    try:
+        return {"result": run_module(module_id, data)}
+    except UnknownModule:
+        raise HTTPException(status_code=404, detail="Unknown module") from None
+    except (ValueError, TypeError, OverflowError, ZeroDivisionError, ZoneInfoNotFoundError):
+        raise HTTPException(status_code=422, detail="Invalid module input") from None
 
 
 @app.get("/api/modules")
@@ -282,6 +293,16 @@ function makeElement(tag, className, text) {
   return element;
 }
 
+async function invokeModule(id, input) {
+  const response = await fetch("/api/modules/" + encodeURIComponent(id) + "/run", {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify(input), cache: "no-store"
+  });
+  if (!response.ok) throw new Error("اجرای ماژول ناموفق بود.");
+  const data = await response.json();
+  return data.result;
+}
+
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
   const module = availableModules.find(item => item.id === moduleId);
@@ -291,43 +312,15 @@ function renderModuleContent(body, slot, moduleId) {
     return;
   }
 
-  if (module.type === "empty") {
-    body.append(
-      makeElement("div", "empty", "Empty slot"),
-      makeElement("div", "module-detail", module.description)
-    );
-    return;
-  }
-
-  if (module.type === "health") {
-    body.append(
-      makeElement("div", "module-title", module.name),
-      makeElement("div", "module-detail", "Checking service health…")
-    );
-    const detail = body.lastElementChild;
-
-    fetch("/health")
-      .then(response => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return response.json();
-      })
-      .then(data => {
-        detail.textContent = `${data.service}: ${data.status}`;
-        detail.className = "module-status";
-      })
-      .catch(error => {
-        detail.textContent = `Health check failed: ${error.message}`;
-      });
-    return;
-  }
-
-  if (module.type === "theme-summary") {
-    body.append(
-      makeElement("div", "module-title", module.name),
-      makeElement("div", "module-detail", `Theme: ${currentTheme.name}`),
-      makeElement("div", "module-detail", `Slots: ${currentTheme.slots.length}`),
-      makeElement("div", "module-detail", `Grid columns: ${currentTheme.grid.columns}`)
-    );
+  if (["empty", "health", "theme-summary"].includes(module.type)) {
+    const detail = makeElement("div", "module-detail", "در حال دریافت…");
+    body.append(makeElement("div", "module-title", module.name), detail);
+    const input = module.type === "theme-summary" ? {theme: currentTheme.id} : {};
+    invokeModule(module.id, input).then(data => {
+      if (module.type === "health") detail.textContent = data.service + ": " + data.status;
+      else if (module.type === "theme-summary") detail.textContent = data.name + " · " + data.slots + " slots · " + data.columns + " columns";
+      else detail.textContent = data.message;
+    }).catch(() => { detail.textContent = "اجرای ماژول ناموفق بود."; });
     return;
   }
 
@@ -339,10 +332,20 @@ function renderModuleContent(body, slot, moduleId) {
     const textarea = makeElement("textarea", "module-note-input");
     textarea.setAttribute("aria-label", `Note for ${slot.name || slot.id}`);
     textarea.placeholder = "Write a note for this slot…";
+    textarea.maxLength = 10000;
     textarea.value = setting.note;
+    let timer = null, revision = 0;
     textarea.addEventListener("input", () => {
-      settingsFor(slot.id).note = textarea.value;
-      saveSettings();
+      const current = ++revision; clearTimeout(timer);
+      settingsFor(slot.id).note = textarea.value; saveSettings();
+      timer = setTimeout(async () => {
+        try {
+          const output = await invokeModule(module.id, {text:textarea.value});
+          if (current !== revision || !textarea.isConnected) return;
+          settingsFor(slot.id).note = output.text; saveSettings();
+        } catch (_) { textarea.setCustomValidity("ذخیره یادداشت ناموفق بود."); return; }
+        textarea.setCustomValidity("");
+      }, 300);
     });
     body.append(textarea);
     return;
@@ -371,16 +374,21 @@ function renderModuleContent(body, slot, moduleId) {
   }
 
   if (module.type === "counter") {
-    let value = 0;
+    let value = 0, busy = false;
     const display = makeElement("div", "module-title", "0");
     display.setAttribute("aria-live", "polite");
     const controls = makeElement("div", "dice-controls");
-    [["افزایش", 1], ["کاهش", -1], ["صفر کردن", 0]].forEach(([label, amount]) => {
+    [["افزایش", "increment"], ["کاهش", "decrement"], ["صفر کردن", "reset"]].forEach(([label, action]) => {
       const button = makeElement("button", "dice-roll-button", label);
       button.type = "button";
-      button.addEventListener("click", () => {
-        value = amount === 0 ? 0 : value + amount;
-        display.textContent = String(value);
+      button.addEventListener("click", async () => {
+        if (busy) return;
+        busy = true; controls.querySelectorAll("button").forEach(item => { item.disabled = true; });
+        try {
+          const output = await invokeModule(module.id, {value, action});
+          value = output.value; display.textContent = String(value);
+        } catch (_) { display.textContent = "اجرای ماژول ناموفق بود."; }
+        finally { busy = false; controls.querySelectorAll("button").forEach(item => { item.disabled = false; }); }
       });
       controls.append(button);
     });
@@ -409,15 +417,18 @@ function renderModuleContent(body, slot, moduleId) {
     button.type = "button";
     const result = makeElement("div", "dice-result", "نتیجه در اینجا نمایش داده می‌شود.");
     result.setAttribute("aria-live", "polite");
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       const a = Number(first.value), b = Number(second.value);
       if (!first.value || !second.value || !Number.isFinite(a) || !Number.isFinite(b)) {
         result.textContent = "دو عدد معتبر وارد کنید."; return;
       }
       if (operator.value === "divide" && b === 0) { result.textContent = "تقسیم بر صفر ممکن نیست."; return; }
-      const operations = {add: () => a + b, subtract: () => a - b, multiply: () => a * b, divide: () => a / b};
-      const answer = operations[operator.value]();
-      result.textContent = Number.isFinite(answer) ? String(answer) : "نتیجه خارج از محدوده است.";
+      button.disabled = true;
+      try {
+        const output = await invokeModule(module.id, {a, b, operation:operator.value});
+        result.textContent = String(output.result);
+      } catch (_) { result.textContent = "محاسبه ناموفق بود."; }
+      finally { button.disabled = false; }
     });
     controls.append(operator, button);
     body.append(makeElement("div", "module-title", module.name), controls, result);
@@ -454,7 +465,7 @@ function renderModuleContent(body, slot, moduleId) {
     const result = makeElement("div", "dice-result", "Ready to roll.");
     result.setAttribute("aria-live", "polite");
 
-    rollButton.addEventListener("click", () => {
+    rollButton.addEventListener("click", async () => {
       const count = Number(countInput.value);
       const sides = Number(sidesInput.value);
       if (!Number.isInteger(count) || count < 1 || count > 100 ||
@@ -463,13 +474,13 @@ function renderModuleContent(body, slot, moduleId) {
         result.className = "dice-result dice-error";
         return;
       }
-      const rolls = Array.from(
-        { length: count },
-        () => Math.floor(Math.random() * sides) + 1
-      );
-      const total = rolls.reduce((sum, value) => sum + value, 0);
-      result.className = "dice-result";
-      result.textContent = rolls.join(" + ") + " = " + total;
+      rollButton.disabled = true;
+      try {
+        const output = await invokeModule(module.id, {count, sides});
+        result.className = "dice-result";
+        result.textContent = output.rolls.join(" + ") + " = " + output.total;
+      } catch (_) { result.textContent = "اجرای ماژول ناموفق بود."; }
+      finally { rollButton.disabled = false; }
     });
 
     controls.append(countLabel, sidesLabel, rollButton);

@@ -87,3 +87,5 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-archite
 ```
 
 این فرمان فقط release و سرویس Dashboard را به‌روز می‌کند؛ [راهنمای update و rollback](docs/deployment/dashboard-update.md) را بخوانید. Token موجود معتبر می‌ماند؛ پس از reload دوباره وارد حساب شوید.
+
+[اجرای ماژول‌ها در ترمینال و قرارداد ماژول جدید](docs/development/modules-terminal.md)

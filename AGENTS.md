@@ -8,3 +8,5 @@
 - scope این فایل کل مخزن است. Release candidate و موفقیت CI را معادل پذیرش Production روی VPS ندانید. محدودیت‌ها و دستور تست در راهنمای Agent آمده‌اند.
 
 برای یافتن بخش مرتبط بدون بارگذاری کل guide در context: `rg -n "^## |^### |نام_نماد" docs/AGENT_GUIDE.md`، سپس همان بخش و implementation مقصد را بخوانید.
+
+- هر ماژول جدید باید منطق مستقل از مرورگر و دستور اجرای واقعی در ترمینال داشته باشد. Dashboard باید همان منطق server-side را فراخوانی کند؛ دستور هر ماژول در `docs/development/modules-terminal.md` ثبت شود. اجرای کد ارسالی کاربر فقط در مسیر Worker و Sandbox مجاز است.

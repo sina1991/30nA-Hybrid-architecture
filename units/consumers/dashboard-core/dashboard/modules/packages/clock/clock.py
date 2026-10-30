@@ -11,6 +11,10 @@ def current_time(timezone=None):
     return now.strftime('%H:%M:%S').translate(PERSIAN_DIGITS)
 
 
+def run(data):
+    return {"time": current_time(data.get("timezone"))}
+
+
 def main():
     parser = argparse.ArgumentParser(description='Display the Dashboard clock')
     parser.add_argument('--timezone', help='IANA time zone, for example Asia/Tehran')
