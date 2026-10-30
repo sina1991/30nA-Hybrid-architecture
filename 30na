@@ -16,6 +16,7 @@ from uuid import UUID, uuid4
 
 from modules.execution import UnknownModule, run_module
 from modules.registry import list_modules
+from modules import slots
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -88,6 +89,18 @@ def main():
     run.add_argument('--input', type=json_object, default={})
     run.add_argument('--owner')
     run.add_argument('--slot')
+    slot_parser = categories.add_parser('slots')
+    slot_parser.add_argument('--owner', required=True)
+    slot_commands = slot_parser.add_subparsers(dest='action', required=True)
+    slot_commands.add_parser('list')
+    for name in ('read', 'run'):
+        command = slot_commands.add_parser(name)
+        command.add_argument('slot_id')
+        if name == 'run': command.add_argument('--input', type=json_object, default={})
+    bind = slot_commands.add_parser('bind')
+    bind.add_argument('slot_id')
+    bind.add_argument('module_id')
+    bind.add_argument('--context', type=json_object, default={})
     workers = categories.add_parser('workers')
     workers.add_argument('--manager-url', default='https://localhost:18444')
     workers.add_argument('--token-file', default='/etc/30na/customer-token')
@@ -133,6 +146,11 @@ def main():
                 if args.owner:
                     data.update(_state_owner=args.owner, _state_slot=args.slot)
                 result = run_module(args.module_id, data)
+        elif args.category == 'slots':
+            if args.action == 'list': result = {'slots':slots.list_slots(args.owner)}
+            elif args.action == 'read': result = slots.read(args.owner, args.slot_id)
+            elif args.action == 'run': result = slots.execute(args.owner, args.slot_id, args.input)
+            else: result = {'slot':args.slot_id, **slots.binding(args.owner, args.slot_id, args.module_id, args.context)}
         elif args.action == 'list':
             result = worker_request(args, 'GET', '/api/v1/workers')
         elif args.action in ('get','enable','disable','delete','register','configure','run'):
@@ -181,7 +199,7 @@ def main():
             result = worker_request(args, 'POST', path + '/cancel', {}) if args.action == 'cancel' else worker_request(args, 'GET', path)
         print(json.dumps(result, ensure_ascii=False, allow_nan=False))
         return 0
-    except (ValueError, TypeError, KeyError, UnknownModule, OSError, sqlite3.Error) as error:
+    except (ValueError, TypeError, KeyError, LookupError, UnknownModule, OSError, sqlite3.Error) as error:
         print('30na: ' + str(error), file=sys.stderr)
         return 1
 

@@ -255,6 +255,7 @@ const statusText = document.getElementById("status");
 const STORAGE_KEY = "dashboard-core-slot-settings-v1";
 let availableModules = [];
 let currentTheme = null;
+const serverSlotContext = {};
 let slotSettings = readSettings();
 
 function readSettings() {
@@ -295,7 +296,9 @@ function makeElement(tag, className, text) {
   return element;
 }
 
-async function invokeModule(id, input) {
+async function invokeModule(id, input, slotId) {
+  const bridge = window.dashboardModuleState;
+  if (slotId && bridge && bridge.ready()) return bridge.execute(slotId, id, input);
   const response = await fetch("/api/modules/" + encodeURIComponent(id) + "/run", {
     method: "POST", headers: {"Content-Type":"application/json"},
     body: JSON.stringify(input), cache: "no-store"
@@ -318,7 +321,7 @@ function renderModuleContent(body, slot, moduleId) {
     const detail = makeElement("div", "module-detail", "در حال دریافت…");
     body.append(makeElement("div", "module-title", module.name), detail);
     const input = module.type === "theme-summary" ? {theme: currentTheme.id} : {};
-    invokeModule(module.id, input).then(data => {
+    invokeModule(module.id, input, slot.id).then(data => {
       if (module.type === "health") detail.textContent = data.service + ": " + data.status;
       else if (module.type === "theme-summary") detail.textContent = data.name + " · " + data.slots + " slots · " + data.columns + " columns";
       else detail.textContent = data.message;
@@ -382,11 +385,15 @@ function renderModuleContent(body, slot, moduleId) {
       makeElement("div", "module-detail", "زمان محلی مرورگر"));
     async function updateClock() {
       try {
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const response = await fetch("/api/modules/clock?timezone=" + encodeURIComponent(timezone), {cache:"no-store"});
-        if (!response.ok) throw new Error("Clock unavailable");
-        const data = await response.json();
-        display.textContent = data.time;
+        const timezone = serverSlotContext[slot.id]?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const bridge = window.dashboardModuleState;
+        if (bridge && bridge.ready()) {
+          display.textContent = (await bridge.execute(slot.id, module.id, {timezone})).time;
+        } else {
+          const response = await fetch("/api/modules/clock?timezone=" + encodeURIComponent(timezone), {cache:"no-store"});
+          if (!response.ok) throw new Error("Clock unavailable");
+          display.textContent = (await response.json()).time;
+        }
       } catch (_) {
         display.textContent = "دریافت ساعت ممکن نیست.";
       } finally {
@@ -467,7 +474,7 @@ function renderModuleContent(body, slot, moduleId) {
       if (operator.value === "divide" && b === 0) { result.textContent = "تقسیم بر صفر ممکن نیست."; return; }
       button.disabled = true;
       try {
-        const output = await invokeModule(module.id, {a, b, operation:operator.value});
+        const output = await invokeModule(module.id, {a, b, operation:operator.value}, slot.id);
         result.textContent = String(output.result);
       } catch (_) { result.textContent = "محاسبه ناموفق بود."; }
       finally { button.disabled = false; }
@@ -518,7 +525,7 @@ function renderModuleContent(body, slot, moduleId) {
       }
       rollButton.disabled = true;
       try {
-        const output = await invokeModule(module.id, {count, sides});
+        const output = await invokeModule(module.id, {count, sides}, slot.id);
         result.className = "dice-result";
         result.textContent = output.rolls.join(" + ") + " = " + output.total;
       } catch (_) { result.textContent = "اجرای ماژول ناموفق بود."; }
@@ -557,16 +564,67 @@ function makeSlot(slot) {
   select.value = setting.module;
 
   const body = makeElement("div", "module-body");
-  select.addEventListener("change", () => {
-    settingsFor(slot.id).module = select.value;
-    saveSettings();
-    renderModuleContent(body, slot, select.value);
+  let revision = 0, initialized = false;
+  function contextFor(moduleId) {
+    if (moduleId === "clock") return {timezone:Intl.DateTimeFormat().resolvedOptions().timeZone};
+    if (moduleId === "theme-summary") return {theme:currentTheme.id};
+    return {};
+  }
+  async function syncBinding() {
+    const bridge = window.dashboardModuleState;
+    if (!bridge || !bridge.ready() || select.disabled) return;
+    const current = ++revision;
+    try {
+      let binding = await bridge.bind(slot.id, settingsFor(slot.id).module, contextFor(settingsFor(slot.id).module), true);
+      if (current !== revision || !card.isConnected || !bridge.ready()) return;
+      if (!binding || !availableModules.some(item => item.id === binding.module_id)) {
+        statusText.textContent = "ماژول ثبت‌شده برای اسلات در این نسخه موجود نیست."; return;
+      }
+      if (binding.module_id === "theme-summary" && binding.context?.theme !== currentTheme.id) {
+        binding = await bridge.bind(slot.id, binding.module_id, contextFor(binding.module_id), false);
+        if (current !== revision || !card.isConnected || !bridge.ready()) return;
+      }
+      const contextChanged = JSON.stringify(serverSlotContext[slot.id] || {}) !== JSON.stringify(binding.context || {});
+      serverSlotContext[slot.id] = binding.context || {};
+      if (!initialized || settingsFor(slot.id).module !== binding.module_id || contextChanged) {
+        initialized = true; settingsFor(slot.id).module = binding.module_id; select.value = binding.module_id;
+        saveSettings(); renderModuleContent(body, slot, binding.module_id);
+      }
+    } catch (_) { if (current === revision && card.isConnected && bridge.ready()) statusText.textContent = "دریافت تنظیمات اسلات از سرور ناموفق بود."; }
+  }
+  select.addEventListener("change", async () => {
+    const selected = select.value, previous = settingsFor(slot.id).module, bridge = window.dashboardModuleState;
+    ++revision;
+    if (bridge && bridge.ready()) {
+      select.disabled = true;
+      try {
+        const saved = await bridge.bind(slot.id, selected, contextFor(selected), false);
+        if (!card.isConnected || !bridge.ready()) return;
+        serverSlotContext[slot.id] = saved.context || {}; initialized = true;
+      } catch (_) {
+        select.value = previous; statusText.textContent = "ذخیره اسلات ناموفق یا نامشخص بود؛ وضعیت سرور را بررسی کنید.";
+        return;
+      } finally { select.disabled = false; }
+    } else { delete serverSlotContext[slot.id]; initialized = false; }
+    settingsFor(slot.id).module = selected;
+    saveSettings(); renderModuleContent(body, slot, selected);
   });
-
+  function accountChanged() {
+    ++revision; initialized = false;
+    if (!window.dashboardModuleState?.ready()) {
+      delete serverSlotContext[slot.id]; renderModuleContent(body, slot, settingsFor(slot.id).module);
+    } else syncBinding();
+  }
+  document.addEventListener('dashboard-account-state', accountChanged);
   label.append(select);
   controls.append(label);
   card.append(head, controls, body);
   renderModuleContent(body, slot, select.value);
+  function tick() {
+    if (!card.isConnected) { document.removeEventListener('dashboard-account-state', accountChanged); return; }
+    syncBinding(); setTimeout(tick, 3000);
+  }
+  setTimeout(tick, 0);
   return card;
 }
 

@@ -8,6 +8,7 @@ from worker_manager.api import RegisterBody, ConfigureBody
 from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, owner_dependency
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
+from modules import slots
 
 
 class RunRequest(BaseModel):
@@ -76,6 +77,34 @@ def create_router(credential_path, upstream_factory):
         except (ValueError, TypeError, KeyError, OverflowError):
             raise HTTPException(422, 'Invalid module input') from None
         response = JSONResponse(envelope(result))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.post('/slots/{slot_id}/binding')
+    def bind_slot(slot_id: str, body: dict, identity=Depends(owner)):
+        if set(body) - {'module_id', 'context', 'only_if_missing'} or type(body.get('only_if_missing', False)) is not bool:
+            raise HTTPException(422, 'Invalid slot binding')
+        try:
+            value = slots.binding(identity, slot_id, body.get('module_id'), body.get('context'), body.get('only_if_missing', False))
+        except (ValueError, TypeError):
+            raise HTTPException(422, 'Invalid slot binding') from None
+        response = JSONResponse(envelope({'binding':value}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.post('/slots/{slot_id}/execute')
+    def execute_slot(slot_id: str, body: dict, identity=Depends(owner)):
+        if set(body) != {'module_id', 'input'} or not isinstance(body['input'], dict):
+            raise HTTPException(422, 'Invalid module input')
+        try:
+            value = slots.execute(identity, slot_id, body['input'], expected_module=body['module_id'])
+        except LookupError:
+            raise HTTPException(404, 'Slot not configured') from None
+        except (ValueError, TypeError, OverflowError, KeyError):
+            raise HTTPException(422, 'Invalid module input') from None
+        response = JSONResponse(envelope(value))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
         return response

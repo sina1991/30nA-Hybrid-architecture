@@ -189,6 +189,30 @@ PANEL = r'''
   }
   window.dashboardModuleState = {
     ready: () => Boolean(token) && authenticated,
+    async bind(slot, moduleId, context, onlyIfMissing) {
+      if (!token || !authenticated) throw new Error('ورود لازم است.');
+      const current = generation;
+      try {
+        const result = await request('slots/' + encodeURIComponent(slot) + '/binding', {module_id:moduleId, context, only_if_missing:onlyIfMissing});
+        if (current !== generation) throw new Error('نشست تغییر کرد.');
+        return result.binding;
+      } catch (error) {
+        if (current === generation && error.status === 401) disconnect(error.message);
+        throw error;
+      }
+    },
+    async execute(slot, moduleId, input) {
+      if (!token || !authenticated) throw new Error('ورود لازم است.');
+      const current = generation;
+      try {
+        const result = await request('slots/' + encodeURIComponent(slot) + '/execute', {module_id:moduleId, input});
+        if (current !== generation) throw new Error('نشست تغییر کرد.');
+        return result.result;
+      } catch (error) {
+        if (current === generation && error.status === 401) disconnect(error.message);
+        throw error;
+      }
+    },
     async invoke(id, data) {
       if (!token || !authenticated || !['counter','slot-note'].includes(id)) throw new Error('ورود به حساب لازم است.');
       const current = generation;
