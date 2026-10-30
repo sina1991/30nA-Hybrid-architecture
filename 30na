@@ -81,6 +81,11 @@ def worker_request(args, method, path, payload=None):
 def main():
     parser = argparse.ArgumentParser(prog='30na')
     categories = parser.add_subparsers(dest='category', required=True)
+    shell = categories.add_parser('shell', help='منوی تعاملی فارسی')
+    shell.add_argument('--owner', default='customer')
+    shell.add_argument('--manager-url', default='https://localhost:18444')
+    shell.add_argument('--token-file', default='/etc/30na/customer-token')
+    shell.add_argument('--ca-file', default='/etc/30na/ca/trust.pem')
     modules = categories.add_parser('modules')
     module_commands = modules.add_subparsers(dest='action', required=True)
     module_commands.add_parser('list')
@@ -132,8 +137,15 @@ def main():
     submit.add_argument('--idempotency-key')
     for name in ('status','cancel'):
         commands.add_parser(name).add_argument('execution_id', type=UUID)
+    if len(sys.argv) == 1 and sys.stdin.isatty():
+        sys.argv.append('shell')
     args = parser.parse_args()
     try:
+        if args.category == 'shell':
+            if not sys.stdin.isatty():
+                raise ValueError('Interactive mode requires a terminal')
+            from terminal_ui import Terminal
+            return Terminal(args.owner, args.manager_url, args.token_file, args.ca_file).run()
         if args.category == 'modules':
             if args.action == 'list':
                 result = {'modules': list_modules()}
