@@ -1,0 +1,19 @@
+{
+  "id": "forest",
+  "name": "Forest",
+  "version": 1,
+  "colors": {
+    "bg": "#0c1916",
+    "panel": "#142821",
+    "border": "#315044",
+    "muted": "#a0bcae",
+    "text": "#e6f4ec",
+    "accent": "#6ee7b7",
+    "surface": "#10211b",
+    "field": "#0c1916",
+    "sidebar": "#10211b",
+    "nav": "#234638",
+    "button": "#047857",
+    "scheme": "dark"
+  }
+}

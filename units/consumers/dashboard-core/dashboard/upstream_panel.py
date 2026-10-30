@@ -17,18 +17,18 @@ ACCESS = r'''
 
 PANEL = r'''
 <style>
-.account-panel {width:calc(100% - 48px);max-width:1752px;margin:0 auto 24px;padding:24px;border:1px solid #24324a;border-radius:12px;direction:ltr}
+.account-panel {width:calc(100% - 48px);max-width:1752px;margin:0 auto 24px;padding:24px;border:1px solid var(--border);border-radius:12px;direction:ltr}
 .account-panel form,.account-panel fieldset {display:grid;gap:12px}
 .account-panel fieldset {border:0;padding:0;margin:0;min-width:0}
 .account-panel input,.account-panel textarea,.account-panel select,.account-panel button {
- padding:10px;border:1px solid #475569;border-radius:6px;background:#0f172a;color:#f1f5f9;font:inherit}
+ padding:10px;border:1px solid #475569;border-radius:6px;background:var(--field);color:var(--text);font:inherit}
 .account-panel button {cursor:pointer}.account-panel button:disabled {opacity:.5;cursor:default}
 .account-panel textarea,.account-panel pre {direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere}
-.account-panel pre {padding:12px;background:#0b1120;border-radius:6px;max-height:400px;overflow:auto}
+.account-panel pre {padding:12px;background:var(--field);border-radius:6px;max-height:400px;overflow:auto}
 .account-panel .account-actions {display:flex;gap:8px;flex-wrap:wrap}
 .account-panel [hidden] {display:none!important}.account-panel ul {padding-left:20px}
-.account-panel li {padding:8px 0}.account-panel .account-note {color:#aab7ca}
-.account-panel dialog {background:#0f172a;color:#f1f5f9;border:1px solid #475569;border-radius:12px;width:min(640px,90vw);max-height:85vh;overflow:auto;direction:ltr}
+.account-panel li {padding:8px 0}.account-panel .account-note {color:var(--muted)}
+.account-panel dialog {background:var(--field);color:var(--text);border:1px solid #475569;border-radius:12px;width:min(640px,90vw);max-height:85vh;overflow:auto;direction:ltr}
 .account-panel dialog::backdrop {background:rgba(0,0,0,.7)}
 .account-panel label {display:block;margin-top:12px}
 .account-panel dialog input,.account-panel dialog textarea,.account-panel dialog select {box-sizing:border-box;width:100%}
@@ -190,6 +190,22 @@ PANEL = r'''
   }
   window.dashboardModuleState = {
     ready: () => Boolean(token) && authenticated,
+    async slotRequest(path, body, method) {
+      if (!token || !authenticated) throw new Error('Sign in is required.');
+      const current = generation;
+      try {
+        const result = await request(path, body, method);
+        if (current !== generation) throw new Error('The session changed.');
+        return result;
+      } catch (error) {
+        if (current === generation && error.status === 401) disconnect(error.message);
+        throw error;
+      }
+    },
+    async listSlots() { return (await this.slotRequest('slots/active')).slots; },
+    async createSlot() { return (await this.slotRequest('slots', {})).slot; },
+    async setOverview(slot, visible) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/overview', {visible}); },
+    async deleteSlot(slot) { return this.slotRequest('slots/' + encodeURIComponent(slot), undefined, 'DELETE'); },
     async bind(slot, moduleId, context, onlyIfMissing) {
       if (!token || !authenticated) throw new Error('Sign in is required.');
       const current = generation;

@@ -28,7 +28,10 @@ def binding(owner, slot, module_id=None, context=None, only_if_missing=False):
         if module_id is None or (only_if_missing and previous is not None):
             return previous, False
         return {'module_id': module_id, 'context': context, 'revision': str(uuid4())}, True
-    return change(owner, 'slot-binding', slot, None, update)
+    result = change(owner, 'slot-binding', slot, None, update)
+    if module_id is not None and module_id != 'empty' and not only_if_missing:
+        change(owner, 'slot-meta', slot, None, lambda old: (old if old is not None else {'overview': False}, old is None))
+    return result
 
 
 def list_slots(owner):
@@ -41,6 +44,94 @@ def list_slots(owner):
     finally:
         db.close()
     return [{'slot':slot, **json.loads(value)} for slot,value in rows]
+
+
+def _layout_db(owner):
+    binding(owner, 'validation-probe')
+    path = Path(os.environ.get('DASHBOARD_MODULE_STATE_DIR', '/var/lib/30na/dashboard')) / 'module-state.sqlite3'
+    db = sqlite3.connect(path, timeout=10, isolation_level=None)
+    db.execute('BEGIN IMMEDIATE')
+    # Preserve all old bindings and their state. Only non-empty legacy slots
+    # become active on first use of the new dashboard.
+    marker = db.execute("SELECT 1 FROM module_state WHERE owner=? AND module='slot-layout' AND slot='migration'", (owner,)).fetchone()
+    if marker is None:
+        rows = db.execute("SELECT slot,value FROM module_state WHERE owner=? AND module='slot-binding'", (owner,)).fetchall()
+        for slot, value in rows:
+            if json.loads(value).get('module_id') != 'empty':
+                db.execute("INSERT OR IGNORE INTO module_state(owner,module,slot,value) VALUES(?,'slot-meta',?,?)", (owner, slot, json.dumps({'overview': False})))
+        db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-layout','migration','true')", (owner,))
+    return db
+
+
+def list_active(owner):
+    db = _layout_db(owner)
+    try:
+        rows = db.execute("""SELECT b.slot,b.value,m.value FROM module_state b
+            JOIN module_state m ON m.owner=b.owner AND m.slot=b.slot AND m.module='slot-meta'
+            WHERE b.owner=? AND b.module='slot-binding' ORDER BY b.slot""", (owner,)).fetchall()
+        db.commit()
+        return [{'slot': slot, **json.loads(value), 'overview': bool(json.loads(meta).get('overview'))} for slot,value,meta in rows]
+    finally:
+        db.close()
+
+
+def create(owner):
+    db = _layout_db(owner)
+    try:
+        count = db.execute("SELECT count(*) FROM module_state WHERE owner=? AND module='slot-meta'", (owner,)).fetchone()[0]
+        if count >= 100:
+            raise ValueError('slot limit reached')
+        slot = 'slot-' + uuid4().hex[:12]
+        config = {'module_id': 'empty', 'context': {}, 'revision': str(uuid4())}
+        db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-binding',?,?)", (owner, slot, json.dumps(config)))
+        db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-meta',?,?)", (owner, slot, json.dumps({'overview': False})))
+        db.commit()
+        return {'slot': slot, **config, 'overview': False}
+    finally:
+        db.close()
+
+
+def bind_active(owner, slot, module_id, context, only_if_missing=False):
+    if module_id not in MODULE_FILES:
+        raise ValueError('unknown module')
+    if not isinstance(context, dict) or set(context) - {'timezone', 'theme'} or any(
+            not isinstance(value, str) or len(value) > 128 for value in context.values()):
+        raise ValueError('invalid slot context')
+    db = _layout_db(owner)
+    try:
+        meta = db.execute("SELECT 1 FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
+        existing = db.execute("SELECT value FROM module_state WHERE owner=? AND module='slot-binding' AND slot=?", (owner, slot)).fetchone()
+        if not meta or not existing: raise LookupError('slot is not active')
+        value = json.loads(existing[0]) if only_if_missing else {'module_id': module_id, 'context': context, 'revision': str(uuid4())}
+        if not only_if_missing:
+            db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-binding' AND slot=?", (json.dumps(value), owner, slot))
+        db.commit()
+        return value
+    finally:
+        db.close()
+
+
+def set_overview(owner, slot, visible):
+    if type(visible) is not bool:
+        raise ValueError('overview must be boolean')
+    db = _layout_db(owner)
+    try:
+        result = db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps({'overview': visible}), owner, slot))
+        if not result.rowcount: raise LookupError('slot is not active')
+        db.commit()
+    finally:
+        db.close()
+
+
+def delete(owner, slot):
+    db = _layout_db(owner)
+    try:
+        exists = db.execute("SELECT 1 FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
+        if not exists: raise LookupError('slot is not active')
+        db.execute("DELETE FROM module_state WHERE owner=? AND slot=? AND module IN ('slot-binding','slot-meta','slot-output','counter','slot-note')", (owner, slot))
+        db.commit()
+    finally:
+        db.close()
 
 
 def execute(owner, slot, data, expected_module=None):

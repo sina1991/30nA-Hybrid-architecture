@@ -98,12 +98,57 @@ def create_router(credential_path, upstream_factory):
         response.headers['Vary'] = 'Authorization'
         return response
 
+    @router.get('/slots/active')
+    def list_active_slots(identity=Depends(owner)):
+        response = JSONResponse(envelope({'slots': slots.list_active(identity)}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.post('/slots')
+    def create_slot(body: dict, identity=Depends(owner)):
+        if body: raise HTTPException(422, 'Invalid slot request')
+        try:
+            value = slots.create(identity)
+        except ValueError:
+            raise HTTPException(422, 'Cannot create slot') from None
+        response = JSONResponse(envelope({'slot': value}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.post('/slots/{slot_id}/overview')
+    def update_slot_overview(slot_id: str, body: dict, identity=Depends(owner)):
+        if set(body) != {'visible'} or type(body['visible']) is not bool:
+            raise HTTPException(422, 'Invalid slot request')
+        try:
+            slots.set_overview(identity, slot_id, body['visible'])
+        except LookupError:
+            raise HTTPException(404, 'Slot not found') from None
+        response = JSONResponse(envelope({'slot': slot_id, 'visible': body['visible']}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.delete('/slots/{slot_id}')
+    def delete_slot(slot_id: str, identity=Depends(owner)):
+        try:
+            slots.delete(identity, slot_id)
+        except LookupError:
+            raise HTTPException(404, 'Slot not found') from None
+        response = JSONResponse(envelope({'deleted': slot_id}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
     @router.post('/slots/{slot_id}/binding')
     def bind_slot(slot_id: str, body: dict, identity=Depends(owner)):
         if set(body) - {'module_id', 'context', 'only_if_missing'} or type(body.get('only_if_missing', False)) is not bool:
             raise HTTPException(422, 'Invalid slot binding')
         try:
-            value = slots.binding(identity, slot_id, body.get('module_id'), body.get('context'), body.get('only_if_missing', False))
+            value = slots.bind_active(identity, slot_id, body.get('module_id'), body.get('context', {}), body.get('only_if_missing', False))
+        except LookupError:
+            raise HTTPException(404, 'Slot not found') from None
         except (ValueError, TypeError):
             raise HTTPException(422, 'Invalid slot binding') from None
         response = JSONResponse(envelope({'binding':value}))

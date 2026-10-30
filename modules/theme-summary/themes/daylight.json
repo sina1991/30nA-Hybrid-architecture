@@ -1,0 +1,19 @@
+{
+  "id": "daylight",
+  "name": "Daylight",
+  "version": 1,
+  "colors": {
+    "bg": "#f2f5fa",
+    "panel": "#ffffff",
+    "border": "#cbd5e1",
+    "muted": "#475569",
+    "text": "#172033",
+    "accent": "#2563eb",
+    "surface": "#ffffff",
+    "field": "#f8fafc",
+    "sidebar": "#e9eff7",
+    "nav": "#d8e6fa",
+    "button": "#1d4ed8",
+    "scheme": "light"
+  }
+}

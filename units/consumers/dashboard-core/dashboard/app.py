@@ -48,10 +48,13 @@ def load_themes() -> list[dict]:
                 detail=f"Theme id must match filename: {path.name}",
             )
 
-        if not isinstance(theme.get("slots"), list):
+        colors = theme.get('colors')
+        keys = {'bg', 'panel', 'border', 'muted', 'text', 'accent', 'surface', 'field', 'sidebar', 'nav', 'button', 'scheme'}
+        if not isinstance(colors, dict) or set(colors) != keys or colors['scheme'] not in ('dark', 'light') or any(
+                not isinstance(colors[key], str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', colors[key]) for key in keys - {'scheme'}):
             raise HTTPException(
                 status_code=500,
-                detail=f"Theme slots are invalid: {path.name}",
+                detail=f"Theme colors are invalid: {path.name}",
             )
 
         themes.append(theme)
@@ -91,7 +94,6 @@ def list_themes() -> dict:
                 "id": theme["id"],
                 "name": theme["name"],
                 "version": theme["version"],
-                "slot_count": len(theme["slots"]),
             }
             for theme in themes
         ],
@@ -161,6 +163,7 @@ PAGE = r"""<!doctype html>
   --muted: #91a2bb;
   --text: #e7edf7;
   --accent: #60a5fa;
+  --surface: #0f1728; --field: #0b1120; --sidebar: #0c1424; --nav: #1b2b43; --button: #1d4ed8;
 }
 * { box-sizing: border-box; }
 body {
@@ -170,7 +173,7 @@ body {
 header {
   display: flex; align-items: center; justify-content: space-between;
   gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border);
-  background: #0f1728; flex-wrap: wrap;
+  background: var(--surface); flex-wrap: wrap;
 }
 h1 { margin: 0; font-size: 21px; }
 .subtitle { color: var(--muted); margin-top: 3px; }
@@ -187,9 +190,9 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
   align-items: center; margin-bottom: 16px; flex-wrap: wrap;
 }
 #theme-info, #status { color: var(--muted); }
-#grid {
+#grid, #overview-grid {
   display: grid;
-  grid-template-columns: repeat(var(--theme-columns, 12), minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 12px; align-items: stretch;
 }
 .slot {
@@ -198,7 +201,7 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
   padding: 14px; display: flex; flex-direction: column; gap: 12px;
 }
 .slot-head {
-  display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
 }
 .slot-name { font-weight: 650; overflow-wrap: anywhere; }
 .slot-index { color: var(--muted); font-size: 12px; flex-shrink: 0; }
@@ -207,7 +210,7 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
 .module-select { width: 100%; }
 .module-search {
   width: 100%; padding: 9px 10px; margin-top: 4px; color: var(--text);
-  background: #0b1120; border: 1px solid var(--border); border-radius: 8px; font: inherit;
+  background: var(--field); border: 1px solid var(--border); border-radius: 8px; font: inherit;
 }
 .module-search-hint { color: var(--muted); font-size: 12px; }
 .module-body {
@@ -222,7 +225,7 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
 }
 .module-note-input {
   width: 100%; min-height: 70px; resize: vertical; padding: 9px;
-  color: var(--text); background: #0b1120; border: 1px solid var(--border);
+  color: var(--text); background: var(--field); border: 1px solid var(--border);
   border-radius: 8px; font: inherit;
 }
 .dice-controls { display: flex; align-items: end; gap: 8px; flex-wrap: wrap; }
@@ -232,7 +235,7 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
   border: 1px solid var(--border); border-radius: 8px; font: inherit;
 }
 .dice-roll-button {
-  padding: 8px 12px; color: var(--text); background: #1d4ed8;
+  padding: 8px 12px; color: var(--text); background: var(--button);
   border: 1px solid #3b82f6; border-radius: 8px; font: inherit; cursor: pointer;
 }
 .dice-result { color: var(--text); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -240,12 +243,12 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
 .empty { color: var(--muted); }
 footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--border); }
 .app-shell {margin-left:240px;min-height:100vh}
-.sidebar {position:fixed;inset:0 auto 0 0;width:240px;background:#0c1424;border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:20px;z-index:10}
+.sidebar {position:fixed;inset:0 auto 0 0;width:240px;background:var(--sidebar);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:20px;z-index:10}
 .brand {font-weight:750;font-size:20px;color:var(--text);letter-spacing:.03em}
 .brand small {display:block;color:var(--muted);font-size:11px;letter-spacing:.12em;font-weight:500}
 .sidebar nav {display:grid;gap:4px}
 .nav-button {text-align:left;padding:11px 14px;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:9px;font:inherit;cursor:pointer}
-.nav-button:hover,.nav-button[aria-current="page"] {color:#fff;background:#1b2b43;border-color:#304766}
+.nav-button:hover,.nav-button[aria-current="page"] {color:var(--text);background:var(--nav);border-color:#304766}
 .sidebar-footer {margin-top:auto;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
 .mobile-menu {display:none;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font:inherit}
 .view-heading {margin:0 0 4px;font-size:26px}.view-description {color:var(--muted);margin:0 0 22px}
@@ -254,8 +257,12 @@ footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--bo
 .overview-card span {display:block;color:var(--muted);font-size:12px}.overview-card strong {display:block;font-size:26px;margin-top:8px}
 .catalog-card h3 {margin:0 0 4px}.catalog-card p {color:var(--muted);overflow-wrap:anywhere}
 .catalog-card code,.info-card code {overflow-wrap:anywhere}.catalog-card button {margin-top:8px}
-.catalog-search {width:min(100%,440px);padding:10px;background:#0b1120;color:var(--text);border:1px solid var(--border);border-radius:8px;font:inherit;margin:0 0 18px}
+.catalog-search {width:min(100%,440px);padding:10px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:8px;font:inherit;margin:0 0 18px}
 .module-runner {margin:0 0 20px}.module-runner textarea {min-height:90px}.module-runner pre {white-space:pre-wrap;overflow-wrap:anywhere}
+.slot-menu {position:relative}.slot-menu summary {cursor:pointer;color:var(--accent);list-style:none}.slot-menu summary::-webkit-details-marker {display:none}
+.slot-menu-actions {display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.slot-menu-actions button {font:inherit;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer}
+.slot-pin {font:inherit;font-size:12px;background:var(--field);color:var(--accent);border:1px solid var(--border);border-radius:7px;padding:5px 7px;cursor:pointer}
+.slot-menu-actions .delete-slot {color:#e05a5a}.slots-message {color:var(--muted)}
 .page-view[hidden], [hidden] {display:none!important}
 .workspace-note {color:var(--muted)}
 body:not([data-view="workers"]):not([data-view="executions"]) #worker-workspace {display:none!important}
@@ -266,13 +273,11 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
  body.nav-open .sidebar {transform:translateX(0);box-shadow:0 0 0 100vmax #0009}.mobile-menu {display:inline-block}
 }
 @media (max-width: 900px) {
-  #grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-  .slot { grid-column: span 3 !important; grid-row: auto !important; }
+  #grid, #overview-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
 }
 @media (max-width: 560px) {
   header, main { padding: 16px; }
-  #grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .slot { grid-column: span 2 !important; }
+  #grid, #overview-grid { grid-template-columns: minmax(0, 1fr); }
   #theme { min-width: 0; width: 100%; }
 }
 </style>
@@ -308,14 +313,18 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <h2 class="view-heading">Overview</h2><p class="view-description">A quick view of your workspace and server.</p>
     <div class="overview-grid">
       <div class="overview-card"><span>Dashboard</span><strong id="overview-health">Checking</strong></div>
-      <div class="overview-card"><span>Slots in theme</span><strong id="overview-slots">—</strong></div>
+      <div class="overview-card"><span>Active slots</span><strong id="overview-slots">—</strong></div>
       <div class="overview-card"><span>Modules</span><strong id="overview-modules">—</strong></div>
       <div class="overview-card"><span>Workers</span><strong id="overview-workers">Sign in</strong></div>
       <div class="overview-card"><span>Recent executions</span><strong id="overview-executions">Sign in</strong></div>
     </div>
+    <h3>Pinned slots</h3><p class="slots-message" id="overview-empty">Sign in to view pinned slots.</p>
+    <div id="overview-grid" aria-label="Pinned slots"></div>
   </section>
   <section class="page-view" data-page="slots" hidden>
   <h2 class="view-heading">Slots</h2><p class="view-description">Assign modules and inspect their output.</p>
+  <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
+  <p class="slots-message" id="slots-message">Sign in to manage slots.</p>
   <div class="toolbar">
     <div id="theme-info">Loading themes…</div>
     <div id="status" role="status">Starting</div>
@@ -555,10 +564,10 @@ function renderModuleContent(body, slot, moduleId) {
   if (["empty", "health", "theme-summary"].includes(module.type)) {
     const detail = makeElement("div", "module-detail", "Loading...");
     body.append(makeElement("div", "module-title", module.name), detail);
-    const input = module.type === "theme-summary" ? {theme: currentTheme.id} : {};
+    const input = module.type === "theme-summary" ? {theme: currentTheme?.id || "midnight"} : {};
     invokeModule(module.id, input, slot.id).then(data => {
       if (module.type === "health") detail.textContent = data.service + ": " + data.status;
-      else if (module.type === "theme-summary") detail.textContent = data.name + " · " + data.slots + " slots · " + data.columns + " columns";
+      else if (module.type === "theme-summary") detail.textContent = data.name + " · " + data.colors.scheme + " theme";
       else detail.textContent = data.message;
     }).catch(() => { detail.textContent = "Module execution failed."; });
     return;
@@ -772,138 +781,161 @@ function renderModuleContent(body, slot, moduleId) {
   }
 }
 
-function makeSlot(slot) {
-  const card = makeElement("article", "slot");
+let activeSlots = [];
+let slotGeneration = 0;
+let slotRequestPending = false;
+
+function contextFor(moduleId) {
+  if (moduleId === 'clock') return {timezone:Intl.DateTimeFormat().resolvedOptions().timeZone};
+  if (moduleId === 'theme-summary') return {theme:currentTheme?.id || 'midnight'};
+  return {};
+}
+
+function makeSlot(row, area) {
+  const slot = {id:row.slot, name:row.slot};
+  const card = makeElement('article', 'slot');
   card.dataset.slotId = slot.id;
-  card.style.gridColumn = `${slot.column} / span ${slot.column_span}`;
-  card.style.gridRow = `${slot.row} / span ${slot.row_span}`;
-
-  const head = makeElement("div", "slot-head");
-  head.append(
-    makeElement("div", "slot-name", slot.name || slot.id),
-    makeElement("div", "slot-index", slot.id)
-  );
-
-  const controls = makeElement("div", "slot-controls");
-  const searchLabel = makeElement("label", "", "Find module");
-  const search = makeElement("input", "module-search");
-  search.type = "search";
-  search.placeholder = "Search name or ID";
-  search.autocomplete = "off";
-  search.setAttribute("aria-label", `Find module for ${slot.name || slot.id}`);
-  const searchHint = makeElement("div", "module-search-hint");
-  searchHint.setAttribute("aria-live", "polite");
-  const label = makeElement("label", "", "Module");
-  const select = makeElement("select", "module-select");
-  select.setAttribute("aria-label", `Module for ${slot.name || slot.id}`);
-
-  const setting = settingsFor(slot.id);
+  const notice = makeElement('div', 'module-detail'); notice.setAttribute('role', 'status');
+  const head = makeElement('div', 'slot-head');
+  const name = makeElement('div', 'slot-name', slot.name);
+  const menu = makeElement('details', 'slot-menu');
+  const summary = makeElement('summary', '', '⚙ Settings');
+  summary.setAttribute('aria-label', `Settings for ${slot.id}`);
+  const actions = makeElement('div', 'slot-menu-actions');
+  const pin = makeElement('button', 'slot-pin', row.overview ? 'Unpin' : 'Pin to Overview');
+  const pinMenu = makeElement('button', '', row.overview ? 'Remove from Overview' : 'Add to Overview');
+  pin.type = 'button';
+  pinMenu.type = 'button';
+  async function togglePin() {
+    pin.disabled = true; pinMenu.disabled = true;
+    try {
+      await window.dashboardModuleState.setOverview(slot.id, !row.overview);
+      slotGeneration++; await refreshActiveSlots();
+    } catch (_) { notice.textContent = 'Could not update Overview. Refresh and check its state.'; pin.disabled = false; pinMenu.disabled = false; }
+  }
+  pin.addEventListener('click', togglePin); pinMenu.addEventListener('click', togglePin);
+  const remove = makeElement('button', 'delete-slot', 'Delete slot');
+  remove.type = 'button';
+  remove.addEventListener('click', async () => {
+    if (!window.confirm(`Delete ${slot.id} and its saved module data?`)) return;
+    remove.disabled = true;
+    try {
+      await window.dashboardModuleState.deleteSlot(slot.id);
+      delete slotSettings[slot.id]; delete serverSlotContext[slot.id]; saveSettings();
+      slotGeneration++; await refreshActiveSlots();
+    } catch (_) { notice.textContent = 'Could not delete slot. Refresh and check its state.'; remove.disabled = false; }
+  });
+  actions.append(pinMenu, remove); menu.append(summary, actions); head.append(name, pin, menu);
+  const controls = makeElement('div', 'slot-controls');
+  const searchLabel = makeElement('label', '', 'Find module');
+  const search = makeElement('input', 'module-search');
+  search.type = 'search'; search.placeholder = 'Search name or ID'; search.autocomplete = 'off';
+  search.setAttribute('aria-label', `Find module for ${slot.id}`);
+  const searchHint = makeElement('div', 'module-search-hint'); searchHint.setAttribute('aria-live', 'polite');
+  const label = makeElement('label', '', 'Module');
+  const select = makeElement('select', 'module-select'); select.setAttribute('aria-label', `Module for ${slot.id}`);
+  let selectedModule = row.module_id;
   function filterModules(selected) {
     const query = search.value.trim().toLowerCase();
-    const matches = availableModules.filter(module =>
-      module.name.toLowerCase().includes(query) || module.id.toLowerCase().includes(query));
+    const matches = availableModules.filter(module => module.name.toLowerCase().includes(query) || module.id.toLowerCase().includes(query));
     const current = availableModules.find(module => module.id === selected);
     select.replaceChildren();
     if (current && !matches.some(module => module.id === current.id)) {
-      const option = makeElement("option", "", `${current.name} (current)`);
-      option.value = current.id; select.append(option);
+      const option = makeElement('option', '', `${current.name} (current)`); option.value = current.id; select.append(option);
     }
-    matches.forEach(module => {
-      const option = makeElement("option", "", module.name);
-      option.value = module.id; select.append(option);
-    });
+    matches.forEach(module => { const option = makeElement('option', '', module.name); option.value = module.id; select.append(option); });
     select.value = selected;
-    searchHint.textContent = query ? (matches.length ? `${matches.length} matching modules` : "No matching modules") : "";
+    searchHint.textContent = query ? (matches.length ? `${matches.length} matching modules` : 'No matching modules') : '';
   }
-  filterModules(setting.module);
-  search.addEventListener("input", () => filterModules(settingsFor(slot.id).module));
-
-  const body = makeElement("div", "module-body");
-  let revision = 0, initialized = false;
-  function contextFor(moduleId) {
-    if (moduleId === "clock") return {timezone:Intl.DateTimeFormat().resolvedOptions().timeZone};
-    if (moduleId === "theme-summary") return {theme:currentTheme.id};
-    return {};
-  }
-  async function syncBinding() {
-    const bridge = window.dashboardModuleState;
-    if (!bridge || !bridge.ready() || select.disabled) return;
-    const current = ++revision;
+  filterModules(selectedModule);
+  search.addEventListener('input', () => filterModules(selectedModule));
+  const body = makeElement('div', 'module-body');
+  serverSlotContext[slot.id] = row.context || {};
+  select.addEventListener('change', async () => {
+    const chosen = select.value, previous = selectedModule;
+    select.disabled = true; search.disabled = true;
     try {
-      let binding = await bridge.bind(slot.id, settingsFor(slot.id).module, contextFor(settingsFor(slot.id).module), true);
-      if (current !== revision || !card.isConnected || !bridge.ready()) return;
-      if (!binding || !availableModules.some(item => item.id === binding.module_id)) {
-        statusText.textContent = "The slot module is unavailable in this version."; return;
-      }
-      if (binding.module_id === "theme-summary" && binding.context?.theme !== currentTheme.id) {
-        binding = await bridge.bind(slot.id, binding.module_id, contextFor(binding.module_id), false);
-        if (current !== revision || !card.isConnected || !bridge.ready()) return;
-      }
-      const contextChanged = JSON.stringify(serverSlotContext[slot.id] || {}) !== JSON.stringify(binding.context || {});
-      serverSlotContext[slot.id] = binding.context || {};
-      if (!initialized || settingsFor(slot.id).module !== binding.module_id || contextChanged) {
-        initialized = true; settingsFor(slot.id).module = binding.module_id; filterModules(binding.module_id);
-        saveSettings(); renderModuleContent(body, slot, binding.module_id);
-      }
-    } catch (_) { if (current === revision && card.isConnected && bridge.ready()) statusText.textContent = "Could not load slot settings from the server."; }
-  }
-  select.addEventListener("change", async () => {
-    const selected = select.value, previous = settingsFor(slot.id).module, bridge = window.dashboardModuleState;
-    ++revision;
-    if (bridge && bridge.ready()) {
-      select.disabled = true; search.disabled = true;
-      try {
-        const saved = await bridge.bind(slot.id, selected, contextFor(selected), false);
-        if (!card.isConnected || !bridge.ready()) return;
-        serverSlotContext[slot.id] = saved.context || {}; initialized = true;
-      } catch (_) {
-        filterModules(previous); statusText.textContent = "Slot save failed or has an unknown outcome; check the server state.";
-        return;
-      } finally { select.disabled = false; search.disabled = false; }
-    } else { delete serverSlotContext[slot.id]; initialized = false; }
-    settingsFor(slot.id).module = selected;
-    filterModules(selected);
-    saveSettings(); renderModuleContent(body, slot, selected);
+      await window.dashboardModuleState.bind(slot.id, chosen, contextFor(chosen), false);
+      slotGeneration++; await refreshActiveSlots();
+    } catch (_) {
+      filterModules(previous); notice.textContent = 'Slot save failed or has an unknown outcome; check server state.';
+    } finally { select.disabled = false; search.disabled = false; }
   });
-  function accountChanged() {
-    ++revision; initialized = false;
-    if (!window.dashboardModuleState?.ready()) {
-      delete serverSlotContext[slot.id]; renderModuleContent(body, slot, settingsFor(slot.id).module);
-    } else syncBinding();
-  }
-  document.addEventListener('dashboard-account-state', accountChanged);
-  searchLabel.append(search);
-  label.append(select);
-  controls.append(searchLabel, searchHint, label);
-  card.append(head, controls, body);
-  renderModuleContent(body, slot, select.value);
-  function tick() {
-    if (!card.isConnected) { document.removeEventListener('dashboard-account-state', accountChanged); return; }
-    syncBinding(); setTimeout(tick, 3000);
-  }
-  setTimeout(tick, 0);
+  searchLabel.append(search); label.append(select); controls.append(searchLabel, searchHint, label);
+  card.append(head, controls, notice, body);
+  renderModuleContent(body, slot, selectedModule);
   return card;
 }
 
+function renderSlots() {
+  const overview = document.getElementById('overview-grid');
+  grid.replaceChildren(); overview.replaceChildren();
+  const ready = Boolean(window.dashboardModuleState?.ready());
+  document.getElementById('add-slot').disabled = !ready;
+  document.getElementById('overview-slots').textContent = ready ? String(activeSlots.length) : 'Sign in';
+  document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
+  const pinned = activeSlots.filter(row => row.overview);
+  document.getElementById('overview-empty').textContent = !ready ? 'Sign in to view pinned slots.' : pinned.length ? '' : 'No slots added to Overview yet.';
+  if (!ready) return;
+  activeSlots.forEach(row => grid.append(makeSlot(row, 'slots')));
+  pinned.forEach(row => overview.append(makeSlot(row, 'overview')));
+}
+
+async function refreshActiveSlots() {
+  const bridge = window.dashboardModuleState;
+  if (!bridge?.ready()) { activeSlots = []; renderSlots(); return; }
+  const generation = slotGeneration;
+  try {
+    const rows = await bridge.listSlots();
+    if (generation !== slotGeneration || !bridge.ready()) return;
+    if (JSON.stringify(rows) !== JSON.stringify(activeSlots)) { activeSlots = rows; renderSlots(); }
+    else { document.getElementById('add-slot').disabled = false; }
+  } catch (_) {
+    if (generation === slotGeneration && bridge.ready()) document.getElementById('slots-message').textContent = 'Could not load slots. Refresh and try again.';
+  }
+}
+
+document.addEventListener('dashboard-account-state', event => {
+  slotGeneration++; activeSlots = []; renderSlots();
+  if (event.detail.ready) refreshActiveSlots();
+});
+document.getElementById('add-slot').addEventListener('click', async event => {
+  event.currentTarget.disabled = true;
+  try {
+    await window.dashboardModuleState.createSlot();
+    slotGeneration++; await refreshActiveSlots();
+  } catch (_) { document.getElementById('slots-message').textContent = 'Could not add slot. Refresh and check its state.'; }
+  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+});
+async function pollSlots() {
+  if (window.dashboardModuleState?.ready() && !slotRequestPending) {
+    slotRequestPending = true;
+    try { await refreshActiveSlots(); } finally { slotRequestPending = false; }
+  }
+  setTimeout(pollSlots, 5000);
+}
+renderSlots();
+setTimeout(pollSlots, 5000);
+
 async function loadTheme(themeId) {
-  statusText.textContent = "Loading theme…";
+  statusText.textContent = 'Loading theme…';
   try {
     const response = await fetch(`/api/themes/${encodeURIComponent(themeId)}`);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const theme = await response.json();
-
     currentTheme = theme;
-    document.getElementById('overview-slots').textContent = String(theme.slots.length);
-    grid.replaceChildren();
-    grid.style.setProperty("--theme-columns", theme.grid.columns);
-    theme.slots.forEach(slot => grid.append(makeSlot(slot)));
-
-    themeInfo.textContent =
-      `${theme.name} · ${theme.slots.length} slots · ${theme.grid.columns} columns`;
-    statusText.textContent = "Theme loaded · slot settings restored";
-  } catch (error) {
-    statusText.textContent = `Could not load theme: ${error.message}`;
-  }
+    Object.entries(theme.colors).forEach(([key, value]) => {
+      if (key === 'scheme') document.documentElement.style.colorScheme = value;
+      else document.documentElement.style.setProperty('--' + key, value);
+    });
+    themeInfo.textContent = `${theme.name} theme`;
+    statusText.textContent = 'Theme updated';
+    // Only the appearance changes; slot bindings and list stay intact.
+    document.querySelectorAll('.slot').forEach(card => {
+      const row = activeSlots.find(item => item.slot === card.dataset.slotId);
+      if (row?.module_id === 'theme-summary') renderModuleContent(card.querySelector('.module-body'), {id:row.slot}, row.module_id);
+    });
+  } catch (error) { statusText.textContent = `Could not load theme: ${error.message}`; }
 }
 
 async function start() {
@@ -921,10 +953,11 @@ async function start() {
     availableModules = moduleData.modules;
     document.getElementById('overview-modules').textContent = String(availableModules.length);
     renderCatalog();
+    renderSlots();
 
     themeSelect.replaceChildren();
     themeData.themes.forEach(theme => {
-      const option = makeElement("option", "", `${theme.name} (${theme.slot_count})`);
+      const option = makeElement("option", "", theme.name);
       option.value = theme.id;
       themeSelect.append(option);
     });
@@ -938,7 +971,7 @@ async function start() {
     const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
     const validTheme = themeData.themes.some(theme => theme.id === savedTheme);
 
-    themeSelect.value = validTheme ? savedTheme : themeData.themes[0].id;
+    themeSelect.value = validTheme ? savedTheme : (themeData.themes.some(item => item.id === "midnight") ? "midnight" : themeData.themes[0].id);
 
     themeSelect.addEventListener("change", () => {
       try {
