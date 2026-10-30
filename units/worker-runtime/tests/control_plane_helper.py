@@ -100,6 +100,13 @@ def exercise_control_plane(root,cert,key,credentials,code_url,image,artifact_has
                     assert client.get(runtime_url+'/api/v1/executions/'+eid,headers=other).status_code==404
                     assert client.post(dashboard_url+'/api/upstreams/executions/'+eid+'/cancel',headers=other).status_code==404
                     assert client.post(dashboard_url+'/api/upstreams/workers/managed-worker/executions',headers=auth,json=payload).json()['payload']['execution_id']==eid
+                    verification_spec=importlib.util.spec_from_file_location('verify_installed_dashboard',
+                        repository/'scripts/deployment/verify_install.py')
+                    verification=importlib.util.module_from_spec(verification_spec)
+                    verification_spec.loader.exec_module(verification)
+                    with httpx.Client(base_url=dashboard_url,verify=ssl.create_default_context(cafile=str(cert)),
+                                      trust_env=False,follow_redirects=False,headers=auth) as verification_client:
+                        assert verification.verify(verification.DashboardAPI(verification_client))
                     if os.environ.get('DASHBOARD_SKIP_BROWSER')!='1':
                         script=repository/'units/consumers/dashboard-core/browser-tests/check.cjs'
                         browser=subprocess.run(['node',str(script)],text=True,input=json.dumps({
