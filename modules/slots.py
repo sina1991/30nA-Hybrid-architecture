@@ -70,7 +70,12 @@ def list_active(owner):
             JOIN module_state m ON m.owner=b.owner AND m.slot=b.slot AND m.module='slot-meta'
             WHERE b.owner=? AND b.module='slot-binding' ORDER BY b.slot""", (owner,)).fetchall()
         db.commit()
-        return [{'slot': slot, **json.loads(value), 'overview': bool(json.loads(meta).get('overview'))} for slot,value,meta in rows]
+        result = []
+        for slot, value, raw_meta in rows:
+            meta = json.loads(raw_meta)
+            result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
+                           'layout': meta.get('layout'), 'frame_color': meta.get('frame_color')})
+        return result
     finally:
         db.close()
 
@@ -116,9 +121,37 @@ def set_overview(owner, slot, visible):
         raise ValueError('overview must be boolean')
     db = _layout_db(owner)
     try:
-        result = db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps({'overview': visible}), owner, slot))
-        if not result.rowcount: raise LookupError('slot is not active')
+        row = db.execute("SELECT value FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
+        if not row: raise LookupError('slot is not active')
+        meta = json.loads(row[0]); meta['overview'] = visible
+        db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps(meta), owner, slot))
         db.commit()
+    finally:
+        db.close()
+
+
+def update_appearance(owner, slot, updates):
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color'}:
+        raise ValueError('invalid slot appearance')
+    if 'frame_color' in updates:
+        color = updates['frame_color']
+        if color is not None and (not isinstance(color, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', color)):
+            raise ValueError('invalid frame color')
+    if 'layout' in updates:
+        layout = updates['layout']
+        if not isinstance(layout, dict) or set(layout) != {'x', 'y', 'w', 'h'} or any(type(v) is not int for v in layout.values()):
+            raise ValueError('invalid layout')
+        if not (0 <= layout['x'] < 12 and 0 <= layout['y'] <= 500 and 2 <= layout['w'] <= 12
+                and layout['x'] + layout['w'] <= 12 and 4 <= layout['h'] <= 40):
+            raise ValueError('layout out of bounds')
+    db = _layout_db(owner)
+    try:
+        row = db.execute("SELECT value FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
+        if not row: raise LookupError('slot is not active')
+        meta = json.loads(row[0]); meta.update(updates)
+        db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps(meta), owner, slot))
+        db.commit()
+        return meta
     finally:
         db.close()
 

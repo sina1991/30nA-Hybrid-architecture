@@ -141,6 +141,19 @@ def create_router(credential_path, upstream_factory):
         response.headers['Vary'] = 'Authorization'
         return response
 
+    @router.post('/slots/{slot_id}/appearance')
+    def update_slot_appearance(slot_id: str, body: dict, identity=Depends(owner)):
+        try:
+            value = slots.update_appearance(identity, slot_id, body)
+        except LookupError:
+            raise HTTPException(404, 'Slot not found') from None
+        except (ValueError, TypeError):
+            raise HTTPException(422, 'Invalid slot appearance') from None
+        response = JSONResponse(envelope({'appearance': value}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
     @router.post('/slots/{slot_id}/binding')
     def bind_slot(slot_id: str, body: dict, identity=Depends(owner)):
         if set(body) - {'module_id', 'context', 'only_if_missing'} or type(body.get('only_if_missing', False)) is not bool:

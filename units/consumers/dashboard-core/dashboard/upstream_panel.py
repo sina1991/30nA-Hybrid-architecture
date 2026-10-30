@@ -205,6 +205,7 @@ PANEL = r'''
     async listSlots() { return (await this.slotRequest('slots/active')).slots; },
     async createSlot() { return (await this.slotRequest('slots', {})).slot; },
     async setOverview(slot, visible) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/overview', {visible}); },
+    async setSlotAppearance(slot, updates) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/appearance', updates); },
     async deleteSlot(slot) { return this.slotRequest('slots/' + encodeURIComponent(slot), undefined, 'DELETE'); },
     async bind(slot, moduleId, context, onlyIfMissing) {
       if (!token || !authenticated) throw new Error('Sign in is required.');
