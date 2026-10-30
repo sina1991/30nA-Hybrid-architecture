@@ -9,6 +9,7 @@ from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, ow
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
 from modules import slots
+from modules import slot_workers
 
 
 class RunRequest(BaseModel):
@@ -150,6 +151,19 @@ def create_router(credential_path, upstream_factory):
         except (ValueError, TypeError):
             raise HTTPException(422, 'Invalid slot appearance') from None
         response = JSONResponse(envelope({'appearance': value}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.post('/slots/{slot_id}/worker')
+    def configure_slot_worker(slot_id: str, body: dict, identity=Depends(owner)):
+        try:
+            value = slot_workers.configure(identity, slot_id, body)
+        except LookupError:
+            raise HTTPException(404, 'Slot not found') from None
+        except (ValueError, TypeError):
+            raise HTTPException(422, 'Invalid slot worker configuration') from None
+        response = JSONResponse(envelope({'worker': value}))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
         return response

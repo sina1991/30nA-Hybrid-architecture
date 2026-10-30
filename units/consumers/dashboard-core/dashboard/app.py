@@ -242,12 +242,17 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .slot-head-actions .slot-pin {width:34px;height:34px;font-size:16px;border-radius:10px}
 .slot-icon {display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--field);color:var(--text);font:inherit;cursor:pointer}
 .slot-icon:hover,.slot-icon[aria-expanded="true"] {border-color:var(--accent);color:var(--accent)}
+.slot-icon.worker-active {border-color:var(--accent);color:var(--accent)}
 .slot-icon:disabled {opacity:.5;cursor:wait}.slot-run {background:var(--button);color:#fff}
 .slot-drawer {padding:9px;background:var(--field);border:1px solid var(--border);border-radius:9px;min-width:0}
 .slot-drawer h4 {margin:0 0 6px;font-size:12px;color:var(--text)}
 .slot-drawer pre {white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;margin:5px 0 10px;color:var(--text);user-select:text}
 .slot-drawer p {font-size:11px;color:var(--muted);margin:5px 0}
 .slot-drawer textarea {min-height:56px;font-size:12px}
+.slot-worker-form {display:grid;gap:7px}.slot-worker-form label {font-size:11px;color:var(--muted)}
+.slot-worker-form select,.slot-worker-form input {width:100%;font:inherit;color:var(--text);background:var(--panel);border:1px solid var(--border);border-radius:7px;padding:7px}
+.slot-worker-actions {display:flex;gap:6px;flex-wrap:wrap}.slot-worker-actions button {font:inherit;padding:6px 9px;border:1px solid var(--border);border-radius:7px;color:var(--text);background:var(--button);cursor:pointer}
+.slot-worker-actions .stop-worker {background:var(--panel)}
 .slot-drawer:has(+ .slot-drawer:not([hidden])) {margin-bottom:0}
 .slot-index { color: var(--muted); font-size: 12px; flex-shrink: 0; }
 .slot-controls { display: grid; gap: 5px; width:100%; }
@@ -960,6 +965,9 @@ function terminalCommands(slotId, moduleId, context, inputText) {
     ['Run module in this slot', `${slot} run ${shellArgument(slotId)} --input ${shellArgument(inputText)}`],
     ['Run module independently', `${cli} modules run ${shellArgument(moduleId)} --input ${shellArgument(inputText)}`],
     ['Run module file directly', `runuser -u 30na -- python3 ${shellArgument(path)}${directInput}`],
+    ['Slot worker status', `${slot} worker ${shellArgument(slotId)} status`],
+    ['Start a periodic task (60 seconds)', `${slot} worker ${shellArgument(slotId)} start --kind task --interval 60 --input ${shellArgument(inputText)}`],
+    ['Stop slot worker', `${slot} worker ${shellArgument(slotId)} stop`],
   ];
 }
 
@@ -1123,9 +1131,66 @@ function makeSlot(row, area) {
   }
   const inputButton = drawerButton('Input settings', '{}', inputDrawer);
   const terminalButton = drawerButton('Terminal commands', '>_', terminalDrawer);
-  const workerButton = makeElement('button', 'slot-icon', '⚒'); workerButton.type = 'button';
-  workerButton.title = 'Open Worker settings'; workerButton.setAttribute('aria-label', `Open Worker settings for ${slot.id}`);
-  workerButton.addEventListener('click', () => openView('workers'));
+  const workerDrawer = makeElement('div', 'slot-drawer'); workerDrawer.hidden = true;
+  const workerTitle = makeElement('h4', '', 'Slot worker');
+  const workerHelp = makeElement('p', '', 'Runs this slot module on the server while Dashboard is running. Stopping prevents new runs; an active run may finish.');
+  const workerForm = makeElement('div', 'slot-worker-form');
+  const kindLabel = makeElement('label', '', 'Worker type');
+  const kind = makeElement('select', ''); kind.setAttribute('aria-label', `Worker type for ${slot.id}`);
+  const monitorModules = ['clock','dashboard-health','system-monitor','service-monitor','disk-usage','network-monitor','process-monitor','log-viewer','docker-monitor','alerts'];
+  [['monitor', 'Monitor · read-only modules'], ['task', 'Task · run module']].forEach(([value, title]) => {
+    const option = makeElement('option', '', title); option.value = value;
+    if (value === 'monitor' && !monitorModules.includes(row.module_id)) option.disabled = true;
+    kind.append(option);
+  });
+  kind.value = row.worker?.kind || (monitorModules.includes(row.module_id) ? 'monitor' : 'task'); kindLabel.append(kind);
+  const intervalLabel = makeElement('label', '', 'Run every');
+  const interval = makeElement('select', ''); interval.setAttribute('aria-label', `Worker interval for ${slot.id}`);
+  [['10','10 seconds'],['30','30 seconds'],['60','1 minute'],['300','5 minutes'],['900','15 minutes'],['3600','1 hour'],['custom','Custom seconds']].forEach(([value, title]) => {
+    const option = makeElement('option', '', title); option.value = value; interval.append(option);
+  });
+  const seconds = row.worker?.interval_seconds || 60;
+  interval.value = ['10','30','60','300','900','3600'].includes(String(seconds)) ? String(seconds) : 'custom';
+  const custom = makeElement('input', ''); custom.type = 'number'; custom.min = '10'; custom.max = '86400'; custom.step = '1'; custom.value = String(seconds);
+  custom.setAttribute('aria-label', `Custom interval in seconds for ${slot.id}`); custom.hidden = interval.value !== 'custom';
+  interval.addEventListener('change', () => { custom.hidden = interval.value !== 'custom'; });
+  intervalLabel.append(interval, custom);
+  const workerInputDetails = makeElement('details', '');
+  const workerInput = makeElement('textarea', 'module-note-input'); workerInput.value = JSON.stringify(row.worker?.input || {}, null, 2);
+  workerInput.setAttribute('aria-label', `Worker input JSON for ${slot.id}`);
+  workerInputDetails.append(makeElement('summary', '', 'Optional input (JSON)'), workerInput);
+  const workerState = makeElement('p', 'slot-worker-state');
+  workerState.dataset.slotWorkerState = slot.id;
+  workerState.textContent = row.worker ? `Status: ${row.worker.status}${row.worker.last_error ? ' · ' + row.worker.last_error : ''}` : 'Status: not configured';
+  const workerButtons = makeElement('div', 'slot-worker-actions');
+  const workerSave = makeElement('button', '', row.worker?.enabled ? 'Save and restart' : 'Start worker'); workerSave.type = 'button';
+  const workerStop = makeElement('button', 'stop-worker', 'Stop'); workerStop.type = 'button'; workerStop.disabled = !row.worker?.enabled;
+  async function saveWorker(enabled) {
+    let data, delay, selectedKind;
+    try {
+      data = enabled ? JSON.parse(workerInput.value) : (row.worker?.input || {});
+      if (!data || Array.isArray(data) || typeof data !== 'object') throw Error('Enter a JSON object.');
+      delay = enabled ? Number(interval.value === 'custom' ? custom.value : interval.value) : (row.worker?.interval_seconds || 60);
+      selectedKind = enabled ? kind.value : (row.worker?.kind || 'task');
+      if (!Number.isInteger(delay) || delay < 10 || delay > 86400) throw Error('Choose an interval between 10 and 86400 seconds.');
+    } catch (error) { workerState.textContent = error.message || 'Invalid worker settings.'; return; }
+    workerSave.disabled = true; workerStop.disabled = true;
+    try {
+      await window.dashboardModuleState.configureSlotWorker(slot.id, {enabled, kind:selectedKind, interval_seconds:delay, input:data});
+      slotGeneration++; await refreshActiveSlots();
+    } catch (_) {
+      workerState.textContent = 'Could not save. Check the module, input and permissions.';
+      workerSave.disabled = false; workerStop.disabled = !row.worker?.enabled;
+    }
+  }
+  workerSave.addEventListener('click', () => saveWorker(true));
+  workerStop.addEventListener('click', () => saveWorker(false));
+  workerButtons.append(workerSave, workerStop);
+  workerForm.append(kindLabel, intervalLabel, workerInputDetails, workerState, workerButtons);
+  workerDrawer.append(workerTitle, workerHelp, workerForm);
+  const workerButton = drawerButton('Slot worker settings', '⚒', workerDrawer);
+  workerButton.dataset.slotWorker = slot.id;
+  if (row.worker?.enabled) workerButton.classList.add('worker-active');
   const run = makeElement('button', 'slot-icon slot-run', '▶'); run.type = 'button';
   run.title = 'Run module'; run.setAttribute('aria-label', `Run ${row.module_id} in ${slot.id}`);
   run.addEventListener('click', async () => {
@@ -1165,7 +1230,7 @@ function makeSlot(row, area) {
   headActions.append(run, inputButton, terminalButton, workerButton, pin, lock, menu); head.append(headActions);
   const resize = makeElement('button', 'slot-resize', '↘'); resize.type = 'button';
   resize.setAttribute('aria-label', `Resize ${slot.id}`); resize.title = 'Drag to resize';
-  card.append(head, name, actions, inputDrawer, terminalDrawer, notice, body, resize);
+  card.append(head, name, actions, inputDrawer, terminalDrawer, workerDrawer, notice, body, resize);
   attachLayoutControls(card, name, resize, row, notice);
   renderModuleContent(body, slot, selectedModule);
   if (moduleInfo?.type !== 'host-monitor') attachSavedResult(body, slot, selectedModule);
@@ -1180,10 +1245,52 @@ function renderSlots() {
   document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
   const pinned = activeSlots.filter(row => row.overview);
   document.getElementById('overview-empty').textContent = !ready ? 'Sign in to view pinned slots.' : pinned.length ? '' : 'No slots added to Overview yet.';
-  if (!ready) return;
+  if (!ready) { renderSlotWorkerList(); return; }
   activeSlots.forEach(row => grid.append(makeSlot(row, 'slots')));
   pinned.forEach(row => overview.append(makeSlot(row, 'overview')));
   syncLayoutControls();
+  renderSlotWorkerList();
+}
+
+function renderSlotWorkerList() {
+  const list = document.getElementById('slot-worker-list'), summary = document.getElementById('slot-worker-summary');
+  if (!list || !summary) return;
+  list.replaceChildren();
+  const workers = activeSlots.filter(row => row.worker?.enabled || row.worker?.status === 'failed' || row.worker?.status === 'interrupted');
+  const activeCount = workers.filter(row => row.worker.enabled).length;
+  summary.textContent = activeCount ? `${activeCount} active slot worker${activeCount === 1 ? '' : 's'}` : 'No active slot workers.';
+  workers.forEach(row => {
+    const button = makeElement('button', 'slot-worker-item'); button.type = 'button';
+    const title = makeElement('strong', '', row.slot + ' · ' + row.module_id);
+    const details = makeElement('small', '', `${row.worker.kind} · every ${row.worker.interval_seconds}s · ${row.worker.status}`);
+    button.append(title, details);
+    if (row.worker.last_error) button.append(makeElement('small', '', row.worker.last_error));
+    button.addEventListener('click', () => {
+      openView('slots');
+      const card = [...grid.querySelectorAll('.slot')].find(item => item.dataset.slotId === row.slot);
+      if (!card) return;
+      const control = card.querySelector('[data-slot-worker]');
+      if (control?.getAttribute('aria-expanded') !== 'true') control?.click();
+      card.scrollIntoView({behavior:'smooth', block:'center'});
+    });
+    list.append(button);
+  });
+}
+
+function slotStructure(rows) {
+  return JSON.stringify(rows.map(row => ({...row, worker:row.worker ? {
+    enabled:row.worker.enabled, kind:row.worker.kind, interval_seconds:row.worker.interval_seconds,
+    input:row.worker.input, revision:row.worker.revision, module_id:row.worker.module_id,
+    binding_revision:row.worker.binding_revision
+  } : null})));
+}
+
+function updateSlotWorkerStates() {
+  document.querySelectorAll('[data-slot-worker-state]').forEach(element => {
+    const row = activeSlots.find(item => item.slot === element.dataset.slotWorkerState);
+    if (row?.worker) element.textContent = `Status: ${row.worker.status}${row.worker.last_error ? ' · ' + row.worker.last_error : ''}`;
+  });
+  renderSlotWorkerList();
 }
 
 async function refreshActiveSlots() {
@@ -1194,8 +1301,8 @@ async function refreshActiveSlots() {
   try {
     const rows = await bridge.listSlots();
     if (generation !== slotGeneration || !bridge.ready() || pointerEditing) return;
-    if (JSON.stringify(rows) !== JSON.stringify(activeSlots)) { activeSlots = rows; renderSlots(); }
-    else { document.getElementById('add-slot').disabled = false; }
+    if (slotStructure(rows) !== slotStructure(activeSlots)) { activeSlots = rows; renderSlots(); }
+    else { activeSlots = rows; document.getElementById('add-slot').disabled = false; updateSlotWorkerStates(); }
   } catch (_) {
     if (generation === slotGeneration && bridge.ready()) document.getElementById('slots-message').textContent = 'Could not load slots. Refresh and try again.';
   }
@@ -1317,6 +1424,17 @@ def create_app(*, credential_path=None, upstream_factory=None):
         register_error_handlers(instance)
         from .upstreams import create_router
         from .upstream_panel import ACCESS, PANEL
+        from modules.slot_workers import SlotWorkerScheduler
+        scheduler = SlotWorkerScheduler()
+
+        @instance.on_event('startup')
+        def start_slot_workers():
+            scheduler.start()
+
+        @instance.on_event('shutdown')
+        def stop_slot_workers():
+            scheduler.stop()
+
         instance.include_router(create_router(credential_path, upstream_factory))
 
         @instance.get('/', response_class=HTMLResponse)

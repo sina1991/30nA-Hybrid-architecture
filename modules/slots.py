@@ -29,8 +29,16 @@ def binding(owner, slot, module_id=None, context=None, only_if_missing=False):
             return previous, False
         return {'module_id': module_id, 'context': context, 'revision': str(uuid4())}, True
     result = change(owner, 'slot-binding', slot, None, update)
-    if module_id is not None and module_id != 'empty' and not only_if_missing:
-        change(owner, 'slot-meta', slot, None, lambda old: (old if old is not None else {'overview': False}, old is None))
+    if module_id is not None and not only_if_missing:
+        def update_meta(old):
+            if old is None:
+                return ({'overview': False}, True) if module_id != 'empty' else (None, False)
+            worker = old.get('worker')
+            if worker and worker.get('enabled') and worker.get('binding_revision') != result.get('revision'):
+                worker.update(enabled=False, status='stopped', next_due=None, last_error='Module binding changed; configure this worker again.')
+                return old, True
+            return old, False
+        change(owner, 'slot-meta', slot, None, update_meta)
     return result
 
 
@@ -75,7 +83,7 @@ def list_active(owner):
             meta = json.loads(raw_meta)
             result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
                            'layout': meta.get('layout'), 'frame_color': meta.get('frame_color'),
-                           'display_theme': meta.get('display_theme', 'visual')})
+                           'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker')})
         return result
     finally:
         db.close()
@@ -105,12 +113,16 @@ def bind_active(owner, slot, module_id, context, only_if_missing=False):
         raise ValueError('invalid slot context')
     db = _layout_db(owner)
     try:
-        meta = db.execute("SELECT 1 FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
+        meta = db.execute("SELECT value FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
         existing = db.execute("SELECT value FROM module_state WHERE owner=? AND module='slot-binding' AND slot=?", (owner, slot)).fetchone()
         if not meta or not existing: raise LookupError('slot is not active')
         value = json.loads(existing[0]) if only_if_missing else {'module_id': module_id, 'context': context, 'revision': str(uuid4())}
         if not only_if_missing:
             db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-binding' AND slot=?", (json.dumps(value), owner, slot))
+            data = json.loads(meta[0]); worker = data.get('worker')
+            if worker and worker.get('enabled'):
+                worker.update(enabled=False, status='stopped', next_due=None, last_error='Module binding changed; configure this worker again.')
+                db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps(data), owner, slot))
         db.commit()
         return value
     finally:
@@ -170,13 +182,15 @@ def delete(owner, slot):
         db.close()
 
 
-def execute(owner, slot, data, expected_module=None):
+def execute(owner, slot, data, expected_module=None, expected_revision=None):
     config = binding(owner, slot)
     if config is None:
         raise LookupError('slot is not configured')
     module_id = config['module_id']
     _authorize_host_monitor(owner, module_id)
     if expected_module is not None and expected_module != module_id:
+        raise ValueError('slot binding changed')
+    if expected_revision is not None and config.get('revision') != expected_revision:
         raise ValueError('slot binding changed')
     if not isinstance(data, dict) or any(str(key).startswith('_') or key in ('owner', 'slot') for key in data):
         raise ValueError('invalid module input')

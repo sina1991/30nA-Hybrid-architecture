@@ -50,6 +50,9 @@ PANEL = r'''
 .account-panel .worker-run-panel label,.account-panel .worker-section-card label {font-size:12px;font-weight:600;color:var(--muted);margin:8px 0 3px}
 .account-panel .worker-run-panel select,.account-panel .worker-run-panel input,.account-panel .worker-run-panel textarea {width:100%;box-sizing:border-box}
 .account-panel .worker-guided {border-left:2px solid var(--accent);padding:2px 0 2px 12px;margin:4px 0}
+.account-panel .slot-worker-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:8px}
+.account-panel .slot-worker-item {display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:3px;background:var(--field);border:1px solid var(--border);border-radius:9px}
+.account-panel .slot-worker-item small {color:var(--muted)}
 .account-panel .worker-help {font-size:12px;color:var(--muted);margin:4px 0}
 .account-panel .worker-details-row {display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 @media(max-width:1000px){.account-panel .worker-layout {grid-template-columns:1fr}.account-panel .worker-run-panel {position:static}}
@@ -70,6 +73,11 @@ PANEL = r'''
 <section id="worker-workspace" class="account-panel" hidden aria-label="Run Worker">
   <div id="worker-notices"></div>
   <div data-workspace-pane="workers">
+  <section class="worker-section-card" id="slot-workers-panel">
+    <h4>Slot workers</h4><p>Automatically run trusted slot modules on the server.</p>
+    <p class="worker-help" id="slot-worker-summary">No active slot workers.</p>
+    <div id="slot-worker-list" class="slot-worker-list"></div>
+  </section>
   <div class="worker-layout">
   <section id="worker-management" hidden aria-label="Manage Workers">
     <div class="worker-header"><div><h3>Worker library</h3><p class="worker-subtitle">Configure and run published Workers.</p></div>
@@ -253,6 +261,7 @@ PANEL = r'''
     async createSlot() { return (await this.slotRequest('slots', {})).slot; },
     async setOverview(slot, visible) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/overview', {visible}); },
     async setSlotAppearance(slot, updates) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/appearance', updates); },
+    async configureSlotWorker(slot, worker) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/worker', worker); },
     async deleteSlot(slot) { return this.slotRequest('slots/' + encodeURIComponent(slot), undefined, 'DELETE'); },
     async bind(slot, moduleId, context, onlyIfMissing) {
       if (!token || !authenticated) throw new Error('Sign in is required.');

@@ -17,6 +17,7 @@ from uuid import UUID, uuid4
 from modules.execution import UnknownModule, run_module
 from modules.registry import list_modules
 from modules import slots
+from modules import slot_workers
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -108,6 +109,12 @@ def main():
     bind.add_argument('slot_id')
     bind.add_argument('module_id')
     bind.add_argument('--context', type=json_object, default={})
+    slot_worker = slot_commands.add_parser('worker', help='Manage a trusted periodic slot worker')
+    slot_worker.add_argument('slot_id')
+    slot_worker.add_argument('worker_action', choices=('status', 'start', 'stop'))
+    slot_worker.add_argument('--kind', choices=('monitor', 'task'), default='task')
+    slot_worker.add_argument('--interval', type=int, default=60)
+    slot_worker.add_argument('--input', type=json_object, default={})
     workers = categories.add_parser('workers')
     workers.add_argument('--manager-url', default='https://localhost:18444')
     workers.add_argument('--token-file', default='/etc/30na/customer-token')
@@ -165,6 +172,18 @@ def main():
             if args.action == 'list': result = {'slots':slots.list_slots(args.owner)}
             elif args.action == 'read': result = slots.read(args.owner, args.slot_id)
             elif args.action == 'run': result = slots.execute(args.owner, args.slot_id, args.input, expected_module=args.expect_module)
+            elif args.action == 'worker':
+                row = next((item for item in slots.list_active(args.owner) if item['slot'] == args.slot_id), None)
+                if row is None: raise LookupError('slot is not active')
+                existing = row.get('worker')
+                if args.worker_action == 'status': result = {'slot': args.slot_id, 'worker': existing}
+                else:
+                    if args.worker_action == 'stop' and existing is None: raise LookupError('slot worker is not configured')
+                    spec = {'enabled': args.worker_action == 'start',
+                            'kind': args.kind if args.worker_action == 'start' else existing['kind'],
+                            'interval_seconds': args.interval if args.worker_action == 'start' else existing['interval_seconds'],
+                            'input': args.input if args.worker_action == 'start' else existing['input']}
+                    result = {'slot': args.slot_id, 'worker': slot_workers.configure(args.owner, args.slot_id, spec)}
             else: result = {'slot':args.slot_id, **slots.binding(args.owner, args.slot_id, args.module_id, args.context)}
         elif args.action == 'list':
             result = worker_request(args, 'GET', '/api/v1/workers')
