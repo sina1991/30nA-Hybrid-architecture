@@ -100,7 +100,7 @@ def create_router(credential_path, upstream_factory):
 
     @router.get('/slots/active')
     def list_active_slots(identity=Depends(owner)):
-        response = JSONResponse(envelope({'slots': slots.list_active(identity)}))
+        response = JSONResponse(envelope({'slots': slots.list_active(identity), 'owner': identity}))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
         return response

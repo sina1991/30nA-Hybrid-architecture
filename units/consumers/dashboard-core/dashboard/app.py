@@ -225,15 +225,28 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .layout-help {color:var(--muted);font-size:12px}
 .slot {
   min-width: 0; min-height: 190px; background: var(--panel);
-  border: 1px solid var(--border); border-radius: 12px;
-  padding: 14px; display: flex; flex-direction: column; gap: 12px;
+  border: 1px solid var(--border); border-radius: 14px;
+  padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  box-shadow:0 8px 24px #0002;
 }
 .slot-head {
   display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+  padding-bottom:8px; border-bottom:1px solid var(--border);
 }
-.slot-name { font-weight: 650; overflow-wrap: anywhere; }
+.slot-name { font-weight: 650; overflow-wrap: anywhere; min-width:0; flex:1 1 100px; }
+.slot-name strong {display:block;color:var(--text);font-size:14px}.slot-name small {display:block;color:var(--muted);font-size:10px;font-weight:400}
+.slot-head-actions {display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.slot-icon {display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--field);color:var(--text);font:inherit;cursor:pointer}
+.slot-icon:hover,.slot-icon[aria-expanded="true"] {border-color:var(--accent);color:var(--accent)}
+.slot-icon:disabled {opacity:.5;cursor:wait}.slot-run {background:var(--button);color:#fff}
+.slot-drawer {padding:9px;background:var(--field);border:1px solid var(--border);border-radius:9px;min-width:0}
+.slot-drawer h4 {margin:0 0 6px;font-size:12px;color:var(--text)}
+.slot-drawer pre {white-space:pre-wrap;overflow-wrap:anywhere;font-size:11px;margin:5px 0 10px;color:var(--text);user-select:text}
+.slot-drawer p {font-size:11px;color:var(--muted);margin:5px 0}
+.slot-drawer textarea {min-height:56px;font-size:12px}
+.slot-drawer:has(+ .slot-drawer:not([hidden])) {margin-bottom:0}
 .slot-index { color: var(--muted); font-size: 12px; flex-shrink: 0; }
-.slot-controls { display: grid; gap: 5px; }
+.slot-controls { display: grid; gap: 5px; width:100%; }
 .slot-controls label { font-size: 12px; }
 .module-select { width: 100%; }
 .module-search {
@@ -288,7 +301,7 @@ footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--bo
 .catalog-search {width:min(100%,440px);padding:10px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:8px;font:inherit;margin:0 0 18px}
 .module-runner {margin:0 0 20px}.module-runner textarea {min-height:90px}.module-runner pre {white-space:pre-wrap;overflow-wrap:anywhere}
 .slot-menu {position:relative}.slot-menu summary {cursor:pointer;color:var(--accent);list-style:none}.slot-menu summary::-webkit-details-marker {display:none}
-.slot-menu-actions {display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.slot-menu-actions button {font:inherit;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer}
+.slot-menu-actions {display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding:10px;background:var(--field);border:1px solid var(--border);border-radius:9px}.slot-menu-actions button {font:inherit;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer}
 .slot-pin {font:inherit;font-size:12px;background:var(--field);color:var(--accent);border:1px solid var(--border);border-radius:7px;padding:5px 7px;cursor:pointer}
 .slot-menu-actions .delete-slot {color:#e05a5a}.slots-message {color:var(--muted)}
 .page-view[hidden], [hidden] {display:none!important}
@@ -553,7 +566,8 @@ function renderModuleOutput(container, value, theme) {
     container.append(makeElement('pre', 'module-json', JSON.stringify(value, null, 2)));
     return;
   }
-  container.className = theme === 'compact' ? 'metrics-compact' : 'metrics-visual';
+  container.classList.toggle('metrics-compact', theme === 'compact');
+  container.classList.toggle('metrics-visual', theme !== 'compact');
   function renderObject(obj, target, depth) {
     if (depth > 6 || obj === null || typeof obj !== 'object') {
       target.append(makeElement('div', 'metric-value', typeof obj === 'object' ? JSON.stringify(obj) : String(obj))); return;
@@ -593,26 +607,12 @@ function renderModuleContent(body, slot, moduleId) {
   }
 
   if (module.type === "host-monitor") {
-    const hint = makeElement("div", "module-detail", "Sign in to run this monitor.");
-    const input = makeElement("textarea", "module-note-input");
-    input.setAttribute("aria-label", "Module input JSON");
-    const examples = {"system-monitor":"{}", "disk-usage":'{"path":"/"}',
-      "network-monitor":'{"interface":"eth0"}', "service-monitor":'{"service":"nginx.service"}',
-      "process-monitor":'{"name":"nginx"}', "log-viewer":'{"path":"/var/log/example.log","lines":20}',
-      "docker-monitor":"{}", "alerts":'{"disk_used_percent":90}'};
-    input.value = "{}"; input.placeholder = "Example: " + (examples[module.id] || "{}");
-    const inputSettings = makeElement('details', 'module-input-settings');
-    inputSettings.append(makeElement('summary', '', 'Input settings (JSON)'), input);
-    const button = makeElement("button", "dice-roll-button", "Run monitor");
-    button.type = "button";
     const output = makeElement("div", "module-detail", "No result yet.");
-    let busy = false, last = null;
+    let last = null;
     async function refresh() {
       const bridge = window.dashboardModuleState;
       const ready = Boolean(bridge && bridge.ready());
-      button.disabled = !ready || busy; input.disabled = !ready;
       if (!ready) { output.textContent = "Sign in to view this monitor."; last = null; return; }
-      if (busy) return;
       try {
         const result = await bridge.read(slot.id, module.id);
         if (!body.isConnected || !bridge.ready()) return;
@@ -622,20 +622,10 @@ function renderModuleContent(body, slot, moduleId) {
           else renderModuleOutput(output, result, slot.display_theme || 'visual');
           last = serialized;
         }
-        hint.textContent = "Result is shared with the terminal.";
-      } catch (_) { if (body.isConnected) hint.textContent = "Could not read this slot."; }
+      } catch (_) { if (body.isConnected) output.textContent = "Could not read this slot."; }
     }
-    button.addEventListener("click", async () => {
-      let data;
-      try { data = JSON.parse(input.value); if (!data || Array.isArray(data) || typeof data !== "object") throw Error(); }
-      catch (_) { hint.textContent = "Enter a valid JSON object, for example {}."; return; }
-      busy = true; button.disabled = true;
-      let failed = false;
-      try { await window.dashboardModuleState.execute(slot.id, module.id, data); }
-      catch (_) { failed = true; }
-      finally { busy = false; await refresh(); if (failed) hint.textContent = "Monitor failed. Check its input and server permissions."; }
-    });
-    body.append(makeElement("div", "module-title", module.name), output, button, inputSettings, hint);
+    body.addEventListener('slot-refresh', refresh);
+    body.append(output);
     function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 5000); }
     tick();
     return;
@@ -949,6 +939,26 @@ function contextFor(moduleId) {
   return {};
 }
 
+function shellArgument(value) {
+  const quote = String.fromCharCode(39);
+  return quote + String(value).replace(/'/g, String.fromCharCode(39, 92, 39, 39)) + quote;
+}
+
+function terminalCommands(slotId, moduleId, context, inputText) {
+  const owner = window.dashboardModuleState?.owner();
+  if (!owner) return 'Account owner is unavailable. Sign in again.';
+  const cli = 'runuser -u 30na -- 30na';
+  const slot = `${cli} slots --owner ${shellArgument(owner)}`;
+  const path = `/opt/30na/dashboard-current/modules/${moduleId}/${moduleId === 'clock' ? 'clock.py' : 'module.py'}`;
+  const directInput = moduleId === 'clock' ? (context?.timezone ? ` --timezone ${shellArgument(context.timezone)}` : '') : ` --input ${shellArgument(inputText)}`;
+  return [
+    ['Read current slot result', `${slot} read ${shellArgument(slotId)}`],
+    ['Run module in this slot', `${slot} run ${shellArgument(slotId)} --input ${shellArgument(inputText)}`],
+    ['Run module independently', `${cli} modules run ${shellArgument(moduleId)} --input ${shellArgument(inputText)}`],
+    ['Run module file directly', `runuser -u 30na -- python3 ${shellArgument(path)}${directInput}`],
+  ];
+}
+
 function makeSlot(row, area) {
   const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual'};
   const card = makeElement('article', 'slot');
@@ -962,7 +972,10 @@ function makeSlot(row, area) {
   }
   const notice = makeElement('div', 'module-detail'); notice.setAttribute('role', 'status');
   const head = makeElement('div', 'slot-head');
-  const name = makeElement('div', 'slot-name', slot.name);
+  const name = makeElement('div', 'slot-name');
+  const moduleInfo = availableModules.find(item => item.id === row.module_id);
+  name.append(makeElement('strong', '', moduleInfo?.name || row.module_id), makeElement('small', '', slot.id));
+  const headActions = makeElement('div', 'slot-head-actions');
   const lock = makeElement('button', 'slot-lock', '🔒'); lock.type = 'button';
   lock.addEventListener('click', () => {
     if (!row.overview) { notice.textContent = 'Pin this slot to Overview before editing its layout.'; return; }
@@ -972,8 +985,9 @@ function makeSlot(row, area) {
     syncLayoutControls();
   });
   const menu = makeElement('details', 'slot-menu');
-  const summary = makeElement('summary', '', '⚙ Settings');
+  const summary = makeElement('summary', 'slot-icon', '⚙');
   summary.setAttribute('aria-label', `Settings for ${slot.id}`);
+  summary.title = 'Slot settings';
   const actions = makeElement('div', 'slot-menu-actions');
   const colorLabel = makeElement('label', '', 'Frame color ');
   const color = makeElement('input', 'slot-color'); color.type = 'color';
@@ -1004,7 +1018,9 @@ function makeSlot(row, area) {
     finally { displaySelect.disabled = false; }
   });
   displayLabel.append(displaySelect);
-  const pin = makeElement('button', 'slot-pin', row.overview ? 'Unpin' : 'Pin to Overview');
+  const pin = makeElement('button', 'slot-icon', row.overview ? '📌' : '＋');
+  pin.title = row.overview ? 'Remove from Overview' : 'Pin to Overview';
+  pin.setAttribute('aria-label', pin.title);
   const pinMenu = makeElement('button', '', row.overview ? 'Remove from Overview' : 'Add to Overview');
   pin.type = 'button';
   pinMenu.type = 'button';
@@ -1027,7 +1043,7 @@ function makeSlot(row, area) {
       slotGeneration++; await refreshActiveSlots();
     } catch (_) { notice.textContent = 'Could not delete slot. Refresh and check its state.'; remove.disabled = false; }
   });
-  actions.append(pinMenu, displayLabel, colorLabel, resetColor, remove); menu.append(summary, actions); head.append(name, lock, pin, menu);
+  actions.append(pinMenu, displayLabel, colorLabel, resetColor, remove); menu.append(summary, actions);
   const controls = makeElement('div', 'slot-controls');
   const searchLabel = makeElement('label', '', 'Find module');
   const search = makeElement('input', 'module-search');
@@ -1052,6 +1068,56 @@ function makeSlot(row, area) {
   filterModules(selectedModule);
   search.addEventListener('input', () => filterModules(selectedModule));
   const body = makeElement('div', 'module-body');
+  const inputDrawer = makeElement('div', 'slot-drawer'); inputDrawer.hidden = true;
+  const input = makeElement('textarea', 'module-note-input'); input.value = '{}'; input.spellcheck = false;
+  input.setAttribute('aria-label', `Input JSON for ${slot.id}`);
+  const examples = {'calculator':'{"a":5,"b":3,"operation":"add"}', 'dice-roller':'{"count":1,"sides":6}',
+    'service-monitor':'{"service":"nginx.service"}', 'disk-usage':'{"path":"/"}',
+    'network-monitor':'{"interface":"eth0"}', 'process-monitor':'{"name":"nginx"}',
+    'log-viewer':'{"path":"/var/log/example.log","lines":20}', 'alerts':'{"disk_used_percent":90}'};
+  input.placeholder = 'Example: ' + (examples[row.module_id] || '{}');
+  inputDrawer.append(makeElement('h4', '', 'Input settings (JSON)'), input);
+  const terminalDrawer = makeElement('div', 'slot-drawer'); terminalDrawer.hidden = true;
+  const terminalContent = makeElement('div', '');
+  terminalDrawer.append(makeElement('h4', '', 'Terminal commands'), makeElement('p', '', 'Run these commands as root on the installed server.'), terminalContent);
+  function refreshTerminalCommands() {
+    terminalContent.replaceChildren();
+    const commands = terminalCommands(slot.id, row.module_id, row.context, input.value);
+    if (typeof commands === 'string') { terminalContent.append(makeElement('p', '', commands)); return; }
+    commands.forEach(([label, command]) => { terminalContent.append(makeElement('p', '', label), makeElement('pre', '', command)); });
+  }
+  input.addEventListener('input', refreshTerminalCommands);
+  function drawerButton(label, icon, drawer) {
+    const button = makeElement('button', 'slot-icon', icon); button.type = 'button';
+    button.title = label; button.setAttribute('aria-label', `${label} for ${slot.id}`); button.setAttribute('aria-expanded', 'false');
+    button.addEventListener('click', () => { drawer.hidden = !drawer.hidden; button.setAttribute('aria-expanded', String(!drawer.hidden));
+      if (drawer === terminalDrawer && !drawer.hidden) refreshTerminalCommands(); });
+    return button;
+  }
+  const inputButton = drawerButton('Input settings', '{}', inputDrawer);
+  const terminalButton = drawerButton('Terminal commands', '>_', terminalDrawer);
+  const run = makeElement('button', 'slot-icon slot-run', '▶'); run.type = 'button';
+  run.title = 'Run module'; run.setAttribute('aria-label', `Run ${row.module_id} in ${slot.id}`);
+  run.addEventListener('click', async () => {
+    let data;
+    try { data = JSON.parse(input.value); if (!data || Array.isArray(data) || typeof data !== 'object') throw Error(); }
+    catch (_) { notice.textContent = 'Enter a valid JSON object in Input settings.'; inputDrawer.hidden = false; inputButton.setAttribute('aria-expanded', 'true'); return; }
+    const bridge = window.dashboardModuleState;
+    if (!bridge?.ready()) { notice.textContent = 'Sign in to run this module.'; return; }
+    run.disabled = true; notice.textContent = 'Running…';
+    try {
+      const result = await bridge.execute(slot.id, row.module_id, data);
+      if (!card.isConnected || !bridge.ready()) return;
+      notice.textContent = '';
+      if (moduleInfo?.type === 'host-monitor') body.dispatchEvent(new Event('slot-refresh'));
+      else {
+        let resultView = body.querySelector('.slot-quick-result');
+        if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
+        renderModuleOutput(resultView, result, slot.display_theme);
+      }
+    } catch (_) { if (card.isConnected && bridge.ready()) notice.textContent = 'Run failed. Check the input and server permissions.'; }
+    finally { run.disabled = false; }
+  });
   serverSlotContext[slot.id] = row.context || {};
   select.addEventListener('change', async () => {
     const chosen = select.value, previous = selectedModule;
@@ -1063,10 +1129,13 @@ function makeSlot(row, area) {
       filterModules(previous); notice.textContent = 'Slot save failed or has an unknown outcome; check server state.';
     } finally { select.disabled = false; search.disabled = false; }
   });
-  searchLabel.append(search); label.append(select); controls.append(searchLabel, searchHint, label);
+  searchLabel.textContent = 'Find module'; searchLabel.append(search); label.append(select); controls.append(searchLabel, searchHint, label);
+  actions.prepend(controls);
+  lock.classList.add('slot-icon');
+  headActions.append(run, inputButton, terminalButton, lock, pin, menu); head.append(name, headActions);
   const resize = makeElement('button', 'slot-resize', '↘'); resize.type = 'button';
   resize.setAttribute('aria-label', `Resize ${slot.id}`); resize.title = 'Drag to resize';
-  card.append(head, controls, notice, body, resize);
+  card.append(head, inputDrawer, terminalDrawer, notice, body, resize);
   attachLayoutControls(card, name, resize, row, notice);
   renderModuleContent(body, slot, selectedModule);
   return card;

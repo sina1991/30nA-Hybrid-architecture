@@ -119,7 +119,7 @@ PANEL = r'''
   const el = id => document.getElementById(id);
   const labels = {accepted:'Queued',running:'Running',succeeded:'Succeeded',failed:'Failed',cancelled:'Cancelled'};
   const terminal = job => ['succeeded','failed','cancelled'].includes(job.status);
-  let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false;
+  let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false, slotOwner = '';
   let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0, authenticated = false, previousReady = false;
   let active = null, enabledWorkers = [], session = new AbortController();
 
@@ -153,7 +153,7 @@ PANEL = r'''
     el('worker-confirm-form').reset(); el('worker-confirm-status').textContent = '';
     el('worker-confirm-message').textContent = ''; el('edit-lifecycle').textContent = ''; el('worker-search').value = '';
     el('worker-list').replaceChildren(); el('history-worker').value = ''; el('history-status').value = ''; el('history-count').textContent = '';
-    token = ''; pending = null; sending = false; active = null; enabledWorkers = [];
+    token = ''; slotOwner = ''; pending = null; sending = false; active = null; enabledWorkers = [];
     document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:false}}));
     el('account-token').value = '';
     el('account-worker').replaceChildren(); el('account-executions').replaceChildren();
@@ -190,6 +190,7 @@ PANEL = r'''
   }
   window.dashboardModuleState = {
     ready: () => Boolean(token) && authenticated,
+    owner: () => slotOwner,
     async slotRequest(path, body, method) {
       if (!token || !authenticated) throw new Error('Sign in is required.');
       const current = generation;
@@ -202,7 +203,7 @@ PANEL = r'''
         throw error;
       }
     },
-    async listSlots() { return (await this.slotRequest('slots/active')).slots; },
+    async listSlots() { const result = await this.slotRequest('slots/active'); slotOwner = result.owner; return result.slots; },
     async createSlot() { return (await this.slotRequest('slots', {})).slot; },
     async setOverview(slot, visible) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/overview', {visible}); },
     async setSlotAppearance(slot, updates) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/appearance', updates); },
