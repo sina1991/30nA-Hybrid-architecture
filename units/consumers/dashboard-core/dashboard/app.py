@@ -172,7 +172,7 @@ body {
 }
 header {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border);
+  gap: 8px; padding: 6px 16px; border-bottom: 1px solid var(--border);
   background: var(--surface); flex-wrap: wrap;
 }
 h1 { margin: 0; font-size: 21px; }
@@ -185,6 +185,10 @@ select {
 }
 #theme { min-width: 180px; }
 main { padding: 22px 24px; max-width: 1800px; margin: auto; }
+body[data-view="overview"] main {padding:0 12px 12px;max-width:none}
+body[data-view="overview"] footer {display:none}
+body:not([data-view="overview"]) #edit-layout {display:none}
+#overview-empty:empty {display:none}
 .toolbar {
   display: flex; justify-content: space-between; gap: 12px;
   align-items: center; margin-bottom: 16px; flex-wrap: wrap;
@@ -204,6 +208,20 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
 .slot-resize {display:none;position:absolute;right:0;bottom:0;width:25px;height:25px;border:0;border-radius:10px 0 10px 0;background:var(--accent);cursor:nwse-resize;touch-action:none;color:var(--field)}
 #overview-grid .layout-unlocked .slot-resize {display:block}
 .slot-color {width:40px;height:30px;padding:2px;border:1px solid var(--border);background:var(--field);border-radius:6px;cursor:pointer}
+.slot-display-theme {max-width:100%;padding:5px;font:inherit}
+.slot[data-display-theme="compact"] {gap:6px;padding:10px}
+.slot[data-display-theme="compact"] .module-body {gap:4px}
+.metrics-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:7px;width:100%}
+.metric-card {background:var(--field);border:1px solid var(--border);border-radius:9px;padding:9px;min-width:0}
+.metric-label {font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.metric-value {font-size:16px;font-weight:650;color:var(--text);overflow-wrap:anywhere}
+.metric-bar {height:5px;border-radius:5px;background:var(--border);overflow:hidden;margin-top:6px}
+.metric-bar span {display:block;height:100%;background:var(--accent);border-radius:inherit}
+.metric-group {font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:8px 0 4px}
+.metrics-compact .metrics-grid {grid-template-columns:1fr;gap:2px}
+.metrics-compact .metric-card {display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 6px;border:0;background:transparent}
+.metrics-compact .metric-value {font-size:13px}.metrics-compact .metric-bar {display:none}
+.module-json {white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}
 .layout-help {color:var(--muted);font-size:12px}
 .slot {
   min-width: 0; min-height: 190px; background: var(--panel);
@@ -286,7 +304,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   #grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
 }
 @media (max-width: 560px) {
-  header, main { padding: 16px; }
+  header { padding: 6px 12px; } main { padding: 16px; }
   #grid { grid-template-columns: minmax(0, 1fr); }
   #theme { min-width: 0; width: 100%; }
 }
@@ -314,28 +332,12 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 </aside>
 <div class="app-shell">
 <header>
-  <div>
-    <button type="button" class="mobile-menu" id="mobile-menu" aria-controls="sidebar" aria-expanded="false">☰ Menu</button>
-    <h1>30nA Dashboard</h1>
-    <div class="subtitle">Your server workspace</div>
-  </div>
-  <div class="controls">
-    <label for="theme">Theme</label>
-    <select id="theme" aria-label="Select dashboard theme"></select>
-  </div>
+  <button type="button" class="mobile-menu" id="mobile-menu" aria-controls="sidebar" aria-expanded="false">☰ Menu</button>
+  <button type="button" class="dice-roll-button" id="edit-layout">Edit layout</button>
+  <button type="button" class="dice-roll-button" id="account-shortcut">Sign in</button>
 </header>
 <main>
   <section class="page-view" data-page="overview">
-    <h2 class="view-heading">Overview</h2><p class="view-description">A quick view of your workspace and server.</p>
-    <div class="overview-grid">
-      <div class="overview-card"><span>Dashboard</span><strong id="overview-health">Checking</strong></div>
-      <div class="overview-card"><span>Active slots</span><strong id="overview-slots">—</strong></div>
-      <div class="overview-card"><span>Modules</span><strong id="overview-modules">—</strong></div>
-      <div class="overview-card"><span>Workers</span><strong id="overview-workers">Sign in</strong></div>
-      <div class="overview-card"><span>Recent executions</span><strong id="overview-executions">Sign in</strong></div>
-    </div>
-    <h3>Pinned slots</h3><button type="button" class="dice-roll-button" id="edit-layout">Edit layout</button>
-    <p class="layout-help" id="layout-help">Unlock a slot to move or resize it. Desktop layout is saved to your account.</p>
     <p class="slots-message" id="overview-empty">Sign in to view pinned slots.</p>
     <div id="overview-grid" aria-label="Pinned slots"></div>
   </section>
@@ -364,7 +366,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <section class="page-view" data-page="workers" hidden><h2 class="view-heading">Workers</h2><p class="view-description">Manage and run registered Workers.</p><p class="workspace-note" data-auth-note>Sign in to manage Workers.</p></section>
   <section class="page-view" data-page="executions" hidden><h2 class="view-heading">Executions</h2><p class="view-description">Review execution history and results.</p><p class="workspace-note" data-auth-note>Sign in to view executions.</p></section>
   <section class="page-view" data-page="project" hidden><h2 class="view-heading">Project Info</h2><p class="view-description">Version and deployment information.</p><div class="info-card"><p>Project: <strong>30nA Hybrid Architecture</strong></p><p>Version: <strong id="project-version">Loading…</strong></p><p>Installed commit: <code id="project-commit">Loading…</code></p><p>Dashboard: <strong id="project-health">Checking</strong></p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/tree/main/docs" target="_blank" rel="noopener noreferrer">Project documentation ↗</a></div></section>
-  <section class="page-view" data-page="account" hidden><h2 class="view-heading">Account &amp; Settings</h2><p class="view-description">Use the account controls in the header to sign in, refresh or sign out.</p><div class="info-card">The access token stays in memory for this browser session. Theme selection is available in the header.</div></section>
+  <section class="page-view" data-page="account" hidden><h2 class="view-heading">Account &amp; Settings</h2><p class="view-description">Sign in and choose the dashboard appearance.</p><div class="info-card"><div id="account-access-mount"></div><p>The access token stays in memory for this browser session.</p><label for="theme">Dashboard theme</label> <select id="theme" aria-label="Select dashboard theme"></select></div></section>
   <div id="worker-panel-mount"></div>
 </main>
 <footer>30nA · Server workspace</footer>
@@ -397,6 +399,7 @@ function openView(name) {
   document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
 }
 document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => openView(button.dataset.nav)));
+document.getElementById('account-shortcut').addEventListener('click', () => openView('account'));
 document.getElementById('mobile-menu').addEventListener('click', () => {
   const opened = document.body.classList.toggle('nav-open');
   document.getElementById('mobile-menu').setAttribute('aria-expanded', String(opened));
@@ -407,6 +410,7 @@ document.addEventListener('click', event => {
   if (event.target.closest('#worker-workspace-link')) { event.preventDefault(); openView('workers'); }
 });
 document.addEventListener('dashboard-account-state', event => {
+  document.getElementById('account-shortcut').textContent = event.detail.ready ? 'Account' : 'Sign in';
   document.querySelectorAll('[data-auth-note]').forEach(note => { note.hidden = event.detail.ready; });
   if (!event.detail.ready) {
     document.getElementById('runner-output').textContent = '';
@@ -414,12 +418,6 @@ document.addEventListener('dashboard-account-state', event => {
     document.getElementById('runner-input').value = '{}';
   }
 });
-document.addEventListener('dashboard-overview', event => {
-  const info = event.detail;
-  document.getElementById('overview-workers').textContent = info.ready ? `${info.workers} (${info.enabled} active)` : 'Sign in';
-  document.getElementById('overview-executions').textContent = info.ready ? String(info.executions) : 'Sign in';
-});
-
 function renderCatalog() {
   const catalog = document.getElementById('module-catalog');
   const query = document.getElementById('catalog-search').value.trim().toLowerCase();
@@ -470,9 +468,8 @@ async function loadProjectInfo() {
     document.getElementById('project-version').textContent = info.version;
     document.getElementById('project-commit').textContent = info.commit;
     document.getElementById('project-health').textContent = info.dashboard_status;
-    document.getElementById('overview-health').textContent = info.dashboard_status;
   } catch (_) {
-    ['sidebar-version','project-version','project-commit','project-health','overview-health'].forEach(id => { document.getElementById(id).textContent = 'Unavailable'; });
+    ['sidebar-version','project-version','project-commit','project-health'].forEach(id => { document.getElementById(id).textContent = 'Unavailable'; });
   }
 }
 loadProjectInfo();
@@ -527,6 +524,65 @@ async function invokeModule(id, input, slotId) {
   return data.result;
 }
 
+function metricLabel(key) {
+  const names = {cpu:'CPU', ram:'RAM', disk:'Disk', memory:'Memory', uptime:'Uptime',
+    received:'Received', transmitted:'Sent', pid:'PID', id:'ID'};
+  return key.replace(/_(bytes|percent|seconds)$/, '').split('_').map(part => names[part.toLowerCase()] || (part.charAt(0).toUpperCase() + part.slice(1))).join(' ');
+}
+
+function metricValue(key, value) {
+  if (value === null) return '—';
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if (typeof value !== 'number' || !Number.isFinite(value)) return String(value);
+  if (key.endsWith('_bytes')) {
+    const units = ['B', 'KiB', 'MiB', 'GiB', 'TiB']; let scaled = value, index = 0;
+    while (Math.abs(scaled) >= 1024 && index < units.length - 1) { scaled /= 1024; index++; }
+    return `${new Intl.NumberFormat('en', {maximumFractionDigits: 2}).format(scaled)} ${units[index]}`;
+  }
+  if (key.endsWith('_percent')) return `${new Intl.NumberFormat('en', {maximumFractionDigits: 1}).format(value)}%`;
+  if (key.endsWith('_seconds')) {
+    const seconds = Math.max(0, Math.floor(value)), days = Math.floor(seconds / 86400), hours = Math.floor(seconds % 86400 / 3600), minutes = Math.floor(seconds % 3600 / 60);
+    return [days ? `${days}d` : '', hours ? `${hours}h` : '', minutes ? `${minutes}m` : '', !days && !hours ? `${seconds % 60}s` : ''].filter(Boolean).join(' ');
+  }
+  return new Intl.NumberFormat('en', {maximumFractionDigits: 2}).format(value);
+}
+
+function renderModuleOutput(container, value, theme) {
+  container.replaceChildren();
+  if (theme === 'json') {
+    container.append(makeElement('pre', 'module-json', JSON.stringify(value, null, 2)));
+    return;
+  }
+  container.className = theme === 'compact' ? 'metrics-compact' : 'metrics-visual';
+  function renderObject(obj, target, depth) {
+    if (depth > 6 || obj === null || typeof obj !== 'object') {
+      target.append(makeElement('div', 'metric-value', typeof obj === 'object' ? JSON.stringify(obj) : String(obj))); return;
+    }
+    const entries = Object.entries(obj);
+    if (!entries.length) { target.append(makeElement('div', 'module-detail', Array.isArray(obj) ? 'No items' : 'No data')); return; }
+    let grid = makeElement('div', 'metrics-grid');
+    function flush() { if (grid.childNodes.length) { target.append(grid); grid = makeElement('div', 'metrics-grid'); } }
+    entries.forEach(([key, item]) => {
+      if (item !== null && typeof item === 'object') {
+        flush();
+        target.append(makeElement('div', 'metric-group', Array.isArray(obj) ? `Item ${Number(key) + 1}` : metricLabel(key)));
+        renderObject(item, target, depth + 1);
+      } else {
+        const card = makeElement('div', 'metric-card');
+        const label = Array.isArray(obj) ? `Item ${Number(key) + 1}` : metricLabel(key);
+        card.append(makeElement('div', 'metric-label', label), makeElement('div', 'metric-value', metricValue(key, item)));
+        if (key.endsWith('_percent') && typeof item === 'number' && Number.isFinite(item)) {
+          const bar = makeElement('div', 'metric-bar'), fill = makeElement('span', '');
+          fill.style.width = `${Math.max(0, Math.min(100, item))}%`; bar.append(fill); card.append(bar);
+        }
+        grid.append(card);
+      }
+    });
+    flush();
+  }
+  renderObject(value, container, 0);
+}
+
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
   const module = availableModules.find(item => item.id === moduleId);
@@ -545,10 +601,11 @@ function renderModuleContent(body, slot, moduleId) {
       "process-monitor":'{"name":"nginx"}', "log-viewer":'{"path":"/var/log/example.log","lines":20}',
       "docker-monitor":"{}", "alerts":'{"disk_used_percent":90}'};
     input.value = "{}"; input.placeholder = "Example: " + (examples[module.id] || "{}");
+    const inputSettings = makeElement('details', 'module-input-settings');
+    inputSettings.append(makeElement('summary', '', 'Input settings (JSON)'), input);
     const button = makeElement("button", "dice-roll-button", "Run monitor");
     button.type = "button";
-    const output = makeElement("pre", "module-detail", "No result yet.");
-    output.style.whiteSpace = "pre-wrap"; output.style.overflowWrap = "anywhere";
+    const output = makeElement("div", "module-detail", "No result yet.");
     let busy = false, last = null;
     async function refresh() {
       const bridge = window.dashboardModuleState;
@@ -560,8 +617,12 @@ function renderModuleContent(body, slot, moduleId) {
         const result = await bridge.read(slot.id, module.id);
         if (!body.isConnected || !bridge.ready()) return;
         const serialized = result === null ? "No result yet. Run the monitor." : JSON.stringify(result, null, 2);
-        if (serialized !== last) { output.textContent = serialized; last = serialized; }
-        hint.textContent = "Input: JSON object. Result is shared with the terminal.";
+        if (serialized !== last) {
+          if (result === null) output.textContent = serialized;
+          else renderModuleOutput(output, result, slot.display_theme || 'visual');
+          last = serialized;
+        }
+        hint.textContent = "Result is shared with the terminal.";
       } catch (_) { if (body.isConnected) hint.textContent = "Could not read this slot."; }
     }
     button.addEventListener("click", async () => {
@@ -569,11 +630,12 @@ function renderModuleContent(body, slot, moduleId) {
       try { data = JSON.parse(input.value); if (!data || Array.isArray(data) || typeof data !== "object") throw Error(); }
       catch (_) { hint.textContent = "Enter a valid JSON object, for example {}."; return; }
       busy = true; button.disabled = true;
+      let failed = false;
       try { await window.dashboardModuleState.execute(slot.id, module.id, data); }
-      catch (_) { hint.textContent = "Monitor failed. Check its input and server permissions."; }
-      finally { busy = false; await refresh(); }
+      catch (_) { failed = true; }
+      finally { busy = false; await refresh(); if (failed) hint.textContent = "Monitor failed. Check its input and server permissions."; }
     });
-    body.append(makeElement("div", "module-title", module.name), hint, input, button, output);
+    body.append(makeElement("div", "module-title", module.name), output, button, inputSettings, hint);
     function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 5000); }
     tick();
     return;
@@ -888,10 +950,11 @@ function contextFor(moduleId) {
 }
 
 function makeSlot(row, area) {
-  const slot = {id:row.slot, name:row.slot};
+  const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual'};
   const card = makeElement('article', 'slot');
   card.dataset.slotId = slot.id;
   card.dataset.area = area;
+  card.dataset.displayTheme = slot.display_theme;
   if (row.frame_color) card.style.borderColor = row.frame_color;
   if (area === 'overview' && row.layout) {
     card.style.gridColumn = `${row.layout.x + 1} / span ${row.layout.w}`;
@@ -925,6 +988,22 @@ function makeSlot(row, area) {
   color.addEventListener('change', () => saveColor(color.value));
   resetColor.addEventListener('click', () => saveColor(null));
   colorLabel.append(color);
+  const displayLabel = makeElement('label', '', 'Slot theme ');
+  const displaySelect = makeElement('select', 'slot-display-theme');
+  displaySelect.setAttribute('aria-label', `Slot theme for ${slot.id}`);
+  [['visual', 'Visual'], ['compact', 'Compact'], ['json', 'JSON']].forEach(([value, title]) => {
+    const option = makeElement('option', '', title); option.value = value; displaySelect.append(option);
+  });
+  displaySelect.value = slot.display_theme;
+  displaySelect.addEventListener('change', async () => {
+    displaySelect.disabled = true;
+    try {
+      await window.dashboardModuleState.setSlotAppearance(slot.id, {display_theme: displaySelect.value});
+      slotGeneration++; await refreshActiveSlots();
+    } catch (_) { displaySelect.value = slot.display_theme; notice.textContent = 'Could not save slot theme. Refresh and check its state.'; }
+    finally { displaySelect.disabled = false; }
+  });
+  displayLabel.append(displaySelect);
   const pin = makeElement('button', 'slot-pin', row.overview ? 'Unpin' : 'Pin to Overview');
   const pinMenu = makeElement('button', '', row.overview ? 'Remove from Overview' : 'Add to Overview');
   pin.type = 'button';
@@ -948,7 +1027,7 @@ function makeSlot(row, area) {
       slotGeneration++; await refreshActiveSlots();
     } catch (_) { notice.textContent = 'Could not delete slot. Refresh and check its state.'; remove.disabled = false; }
   });
-  actions.append(pinMenu, colorLabel, resetColor, remove); menu.append(summary, actions); head.append(name, lock, pin, menu);
+  actions.append(pinMenu, displayLabel, colorLabel, resetColor, remove); menu.append(summary, actions); head.append(name, lock, pin, menu);
   const controls = makeElement('div', 'slot-controls');
   const searchLabel = makeElement('label', '', 'Find module');
   const search = makeElement('input', 'module-search');
@@ -998,7 +1077,6 @@ function renderSlots() {
   grid.replaceChildren(); overview.replaceChildren();
   const ready = Boolean(window.dashboardModuleState?.ready());
   document.getElementById('add-slot').disabled = !ready;
-  document.getElementById('overview-slots').textContent = ready ? String(activeSlots.length) : 'Sign in';
   document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
   const pinned = activeSlots.filter(row => row.overview);
   document.getElementById('overview-empty').textContent = !ready ? 'Sign in to view pinned slots.' : pinned.length ? '' : 'No slots added to Overview yet.';
@@ -1079,7 +1157,6 @@ async function start() {
     const themeData = await themeResponse.json();
     const moduleData = await moduleResponse.json();
     availableModules = moduleData.modules;
-    document.getElementById('overview-modules').textContent = String(availableModules.length);
     renderCatalog();
     renderSlots();
 
@@ -1144,5 +1221,5 @@ def create_app(*, credential_path=None, upstream_factory=None):
 
         @instance.get('/', response_class=HTMLResponse)
         def connected_dashboard():
-            return dashboard().replace('</header>', ACCESS + '</header>', 1).replace('<div id="worker-panel-mount"></div>', PANEL, 1)
+            return dashboard().replace('<div id="account-access-mount"></div>', ACCESS, 1).replace('<div id="worker-panel-mount"></div>', PANEL, 1)
     return instance

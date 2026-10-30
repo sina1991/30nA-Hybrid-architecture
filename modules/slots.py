@@ -74,7 +74,8 @@ def list_active(owner):
         for slot, value, raw_meta in rows:
             meta = json.loads(raw_meta)
             result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
-                           'layout': meta.get('layout'), 'frame_color': meta.get('frame_color')})
+                           'layout': meta.get('layout'), 'frame_color': meta.get('frame_color'),
+                           'display_theme': meta.get('display_theme', 'visual')})
         return result
     finally:
         db.close()
@@ -131,8 +132,10 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme'}:
         raise ValueError('invalid slot appearance')
+    if 'display_theme' in updates and updates['display_theme'] not in ('visual', 'compact', 'json'):
+        raise ValueError('invalid display theme')
     if 'frame_color' in updates:
         color = updates['frame_color']
         if color is not None and (not isinstance(color, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', color)):
