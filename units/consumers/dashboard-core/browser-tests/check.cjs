@@ -114,11 +114,15 @@ async function main() {
       await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('توقف اجرا تأیید نشد'));
       assert.equal(await page.locator('#execution-status').textContent(),'در حال اجرا');
     }
+    if(isReal) await require('./management.cjs')(page);
     const storage=await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}));
     assert(!storage.includes(isReal?input.token:'browser-test-token'));
     assert.equal(await page.locator('#account-token').inputValue(),'');
     await page.locator('#account-disconnect').click();
     assert(await page.locator('#execution-detail').isHidden());
+    assert(await page.locator('#worker-editor').isHidden());
+    assert.equal(await page.locator('#edit-artifact-id').inputValue(),'');
+    assert.equal(await page.locator('#worker-list').textContent(),'');
     assert.equal(await page.locator('#execution-output').textContent(),'');
     if(!isReal) {
       await page.locator('#account-token').fill('browser-test-token');await page.locator('#account-connect').click();

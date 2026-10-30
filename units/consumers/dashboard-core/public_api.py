@@ -64,6 +64,14 @@ class PublicAPI:
             raise ValueError("request payload must be an object")
         return self._request("POST", path, payload)
 
+    def patch(self, path: str, payload: dict) -> dict:
+        if not isinstance(payload, dict):
+            raise ValueError("request payload must be an object")
+        return self._request("PATCH", path, payload)
+
+    def delete(self, path: str) -> dict:
+        return self._request("DELETE", path)
+
     def _request(self, method: str, path: str, payload=None) -> dict:
         if not path.startswith("/api/v1/") or ".." in path or "?" in path or "#" in path:
             raise ValueError("unsupported API path")
