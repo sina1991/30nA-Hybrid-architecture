@@ -336,6 +336,75 @@ function renderModuleContent(body, slot, moduleId) {
     return;
   }
 
+  if (module.type === "clock") {
+    const display = makeElement("div", "module-title");
+    display.setAttribute("aria-label", "زمان محلی");
+    body.append(makeElement("div", "module-title", module.name), display,
+      makeElement("div", "module-detail", "زمان محلی مرورگر"));
+    function updateClock() {
+      display.textContent = new Intl.DateTimeFormat("fa-IR", {
+        hour: "2-digit", minute: "2-digit", second: "2-digit"
+      }).format(new Date());
+      setTimeout(() => { if (display.isConnected) updateClock(); }, 1000);
+    }
+    updateClock();
+    return;
+  }
+
+  if (module.type === "counter") {
+    let value = 0;
+    const display = makeElement("div", "module-title", "0");
+    display.setAttribute("aria-live", "polite");
+    const controls = makeElement("div", "dice-controls");
+    [["افزایش", 1], ["کاهش", -1], ["صفر کردن", 0]].forEach(([label, amount]) => {
+      const button = makeElement("button", "dice-roll-button", label);
+      button.type = "button";
+      button.addEventListener("click", () => {
+        value = amount === 0 ? 0 : value + amount;
+        display.textContent = String(value);
+      });
+      controls.append(button);
+    });
+    body.append(makeElement("div", "module-title", module.name), display, controls);
+    return;
+  }
+
+  if (module.type === "calculator") {
+    const controls = makeElement("div", "dice-controls");
+    function numberField(labelText) {
+      const label = makeElement("label", "dice-field", labelText);
+      const input = makeElement("input", "dice-input");
+      input.type = "number"; input.step = "any";
+      input.setAttribute("aria-label", labelText);
+      label.append(input); controls.append(label);
+      return input;
+    }
+    const first = numberField("عدد اول");
+    const second = numberField("عدد دوم");
+    const operator = makeElement("select", "");
+    operator.setAttribute("aria-label", "عملیات");
+    [["add", "+"], ["subtract", "−"], ["multiply", "×"], ["divide", "÷"]].forEach(([value, label]) => {
+      const option = makeElement("option", "", label); option.value = value; operator.append(option);
+    });
+    const button = makeElement("button", "dice-roll-button", "محاسبه");
+    button.type = "button";
+    const result = makeElement("div", "dice-result", "نتیجه در اینجا نمایش داده می‌شود.");
+    result.setAttribute("aria-live", "polite");
+    button.addEventListener("click", () => {
+      const a = Number(first.value), b = Number(second.value);
+      if (!first.value || !second.value || !Number.isFinite(a) || !Number.isFinite(b)) {
+        result.textContent = "دو عدد معتبر وارد کنید."; return;
+      }
+      if (operator.value === "divide" && b === 0) { result.textContent = "تقسیم بر صفر ممکن نیست."; return; }
+      const operations = {add: () => a + b, subtract: () => a - b, multiply: () => a * b, divide: () => a / b};
+      const answer = operations[operator.value]();
+      result.textContent = Number.isFinite(answer) ? String(answer) : "نتیجه خارج از محدوده است.";
+    });
+    controls.append(operator, button);
+    body.append(makeElement("div", "module-title", module.name), controls, result);
+    return;
+  }
+
   if (module.type === "dice-roller") {
     body.append(makeElement("div", "module-title", module.name));
     body.append(makeElement("div", "module-detail", module.description));

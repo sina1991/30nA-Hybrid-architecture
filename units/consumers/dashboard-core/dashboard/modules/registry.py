@@ -16,6 +16,9 @@ SUPPORTED_TYPES = {
     "theme-summary",
     "slot-note",
     "dice-roller",
+    "clock",
+    "counter",
+    "calculator",
 }
 
 
