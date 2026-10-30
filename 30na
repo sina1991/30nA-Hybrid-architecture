@@ -112,6 +112,7 @@ def main():
     workers.add_argument('--ca-file', default='/etc/30na/ca/trust.pem')
     commands = workers.add_subparsers(dest='action', required=True)
     commands.add_parser('list')
+    commands.add_parser('history')
     for name in ('get','enable','disable'):
         commands.add_parser(name).add_argument('worker_id')
     remove = commands.add_parser('delete')
@@ -165,6 +166,8 @@ def main():
             else: result = {'slot':args.slot_id, **slots.binding(args.owner, args.slot_id, args.module_id, args.context)}
         elif args.action == 'list':
             result = worker_request(args, 'GET', '/api/v1/workers')
+        elif args.action == 'history':
+            result = worker_request(args, 'GET', '/api/v1/executions')
         elif args.action in ('get','enable','disable','delete','register','configure','run'):
             if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,127}', args.worker_id) or '..' in args.worker_id:
                 raise ValueError('Invalid worker ID')
