@@ -10,10 +10,10 @@ Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORK
 
 ```bash
 sudo -i
-bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/feat/release-readiness/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/main/install.sh)
 ```
 
-در مراحل نصب، **دامنه و email** پرسیده می‌شوند؛ خرید یا دریافت دستی certificate لازم نیست. این فرمان مربوط به branch `feat/release-readiness` است. پس از Build و اجرای موفق نمونه، آدرس `https://دامنه-شما` نمایش داده می‌شود. token ورود در فایل root-only `/etc/30na/customer-token` ساخته می‌شود و چاپ نمی‌شود.
+در مراحل نصب، **دامنه و email** پرسیده می‌شوند؛ خرید یا دریافت دستی certificate لازم نیست. این فرمان مربوط به branch `main` است. پس از Build و اجرای موفق نمونه، آدرس `https://دامنه-شما` نمایش داده می‌شود. token ورود در فایل root-only `/etc/30na/customer-token` ساخته می‌شود و چاپ نمی‌شود.
 
 installer وجود مسیرها، حساب‌ها و portهای مرتبط را بررسی و در صورت تداخل متوقف می‌شود؛ شناسایی همه داده‌ها و سرویس‌های نامرتبط ممکن نیست، پس آن را فقط روی VPS خالی اختصاصی اجرا کنید. [راهنمای installer](docs/deployment/installer.md) شامل پیش‌نیاز، دانلود قابل بررسی، `--check-only`، ادامه نصب ناموفق، تمدید certificate و خطایابی است. نصب موفق جای پذیرش امنیتی نهایی VPS نیست.
 
@@ -57,7 +57,7 @@ runner یک DATA MANAGER موقت و DB جداگانه ایجاد و پس از �
 - HTTP API با bearer identity، ownership و SQLite persistence برای مدیریت Worker و اجراها.
 - interval scheduler با claim/lease تراکنشی و رفتار صریح restart؛ فقط یک process مالک هر state است.
 - Runtime با Sandbox اجباری در HTTP، تاریخچه جداگانه هر owner و transport HTTPS.
-- Dashboard با themeها، ماژول‌ها، اجرای Worker و مشاهده نتیجه و history کاربر.
+- Dashboard با مدیریت Worker، configuration و schedule، enable/disable، اجرای Worker، نتیجه و فیلتر history حساب.
 
 ## استقرار و محدودیت‌ها
 
@@ -77,3 +77,13 @@ Native dependency wheel، scheduler توزیع‌شده، exactly-once و replay
 ```bash
 npm ci --prefix units/consumers/dashboard-core/browser-tests --ignore-scripts --no-audit --no-fund
 ```
+
+## به‌روزرسانی مستقل Dashboard نصب‌شده
+
+روی VPS نصب‌شده با root اجرا کنید:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/main/scripts/deployment/update_dashboard.sh)
+```
+
+این فرمان فقط release و سرویس Dashboard را به‌روز می‌کند؛ [راهنمای update و rollback](docs/deployment/dashboard-update.md) را بخوانید. Token موجود معتبر می‌ماند؛ پس از reload دوباره وارد حساب شوید.

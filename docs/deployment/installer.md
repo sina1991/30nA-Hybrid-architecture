@@ -14,11 +14,11 @@ TCP **80 و 443** باید از اینترنت به همین سرور برسند
 
 ## فرمان نصب
 
-این نسخه روی branch `feat/release-readiness` است؛ `main` هنوز مقصد این installer نیست. در ترمینال VPS:
+این نسخه روی branch اصلی `main` است. در ترمینال VPS:
 
 ```bash
 sudo -i
-bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/feat/release-readiness/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/main/install.sh)
 ```
 
 اسکریپت دامنه و email حساب ACME را از ترمینال می‌پرسد؛ email برای Let’s Encrypt ارسال می‌شود و اجرای نصب با Terms of Service آن موافقت می‌کند. token یا password از شما دریافت نمی‌شود. اگر root هستید، `sudo -i` لازم نیست. از `curl -f` و TLS verification استفاده کنید.
@@ -26,7 +26,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-archite
 برای دانلود قابل بررسی و آشکارشدن خطای دانلود پیش از اجرای Bash:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/feat/release-readiness/install.sh -o /tmp/30na-install.sh
+curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/main/install.sh -o /tmp/30na-install.sh
 less /tmp/30na-install.sh
 bash /tmp/30na-install.sh --domain dashboard.example.com --email admin@example.com --non-interactive
 ```

@@ -10,7 +10,7 @@
 
 ۱. صفحه HTTPS را باز کنید؛ Access token اختصاصی حساب را وارد کنید. ۲. Worker enabled را انتخاب کنید. ۳. JSON object و timeout بین ۱ تا ۳۰۰ ثانیه بدهید. ۴. اجرای Worker را بزنید. ۵. وضعیت و execution ID را ببینید؛ خروجی موفق به‌صورت JSON نمایش داده می‌شود. ۶. در history، اجرای قبلی را انتخاب کنید. ۷. cancel، درخواست best-effort می‌فرستد؛ تا وضعیت terminal نیاید، cancelled ساخته نمی‌شود.
 
-ورودی پیش‌فرض برای Worker نمونه `{"values":[10,20,30]}` است؛ همه Workerها الزاماً همین input را نمی‌پذیرند. نبود Worker فعال را operator با seed/register/enable حل می‌کند؛ UI کارفرما registration یا source upload ندارد.
+ورودی پیش‌فرض برای Worker نمونه `{"values":[10,20,30]}` است؛ همه Workerها الزاماً همین input را نمی‌پذیرند. پنل اکنون ثبت Worker با reference Artifact، جزئیات، ویرایش configuration/schedule، enable/disable و حذف دارد. UI هنوز source upload یا Build/Publication ندارد؛ reference باید برای اجرای موفق از Artifact منتشرشده همان owner باشد و وجود آن در لحظه ثبت بررسی نمی‌شود.
 
 در ارسال مبهم، UI snapshot body و idempotency key را در حافظه نگه می‌دارد و همان درخواست را retry می‌کند. ارسال معمول بعدی key تازه دارد. قبل از قطعیت، refresh کامل صفحه یا ارسال مستقل جدید می‌تواند وضعیت ابهام را از حافظه UI پاک کند؛ ابتدا history را بررسی کنید. خروج از حساب requestهای UI را abort و داده قابل مشاهده را پاک می‌کند؛ workload پذیرفته‌شده سرور ادامه دارد.
 
@@ -26,6 +26,8 @@ BFF قبل از تماس upstream، credential کاربر را از hash mapping
 |---|---|
 | shell | GET `/`، `/health`، `/api/themes`، `/api/themes/{theme_id}`، `/api/modules` |
 | مشاهده حساب | GET `/api/upstreams/workers`، `/executions`، `/sources` |
+| مدیریت | POST `/api/upstreams/workers`؛ GET/PATCH/DELETE `/api/upstreams/workers/{worker_id}` |
+| lifecycle | POST `/api/upstreams/workers/{worker_id}/enable` یا `/disable` |
 | اجرا | POST `/api/upstreams/workers/{worker_id}/executions` |
 | نتیجه | GET `/api/upstreams/executions/{execution_id}` |
 | cancel | POST `/api/upstreams/executions/{execution_id}/cancel` |
@@ -41,3 +43,11 @@ dice-roller در browser اجرا می‌شود، Worker Runtime نیست؛ تع
 ## زمان و ظرفیت UI
 
 Polling حدود هر ثانیه، window خودکار شش دقیقه و fetch timeout هشت ثانیه است. پایان polling خودکار به معنی پایان اجرای سرور نیست؛ از بررسی وضعیت/history ادامه دهید. textarea تا ۵۰۰٬۰۰۰ کاراکتر و بررسی input encoded تا ۹۰۰٬۰۰۰ byte دارد؛ body و transport نیز limit مستقل دارند. خطا را با execution ID، نسخه و ورودی بدون credential گزارش کنید.
+
+## پنل مدیریت و محدودیت‌ها
+
+همه lifecycleها در فهرست مدیریت دیده می‌شوند و فقط enabledها برای اجرا انتخاب می‌شوند. definition شامل Artifact reference و entrypoint پس از ثبت immutable است؛ برای عوض‌کردن آن Worker جدید بسازید. configuration یک JSON object است و ذخیره آن جایگزینی کامل است، نه merge جزئی. schedule دستی یا interval با ثانیه صحیح مثبت دارد. interval enabled با input خالی اجرا می‌شود؛ Worker نمونه summary برای این ورودی طراحی نشده است. فعال/غیرفعال‌کردن به confirmation نیاز دارد و تغییرات ذخیره‌نشده فرم را ذخیره نمی‌کند.
+
+حذف نیازمند تایپ دقیق Worker ID است؛ این عملیات history را حذف و اجرای پذیرفته‌شده را متوقف نمی‌کند. برای توقف از cancel و سپس بررسی terminal status استفاده کنید. عملیات mutation پس از timeout یا پاسخ مبهم خودکار تکرار نمی‌شود؛ ابتدا فرم را ببندید و فهرست را refresh کنید. mutation هنگام unresolved run retry مسدود است تا snapshot اجرای قبلی بی‌صدا عوض نشود. logout داده‌های فرم مدیریت را نیز پاک می‌کند؛ نتیجه درخواست قدیمی نباید وارد session جدید شود.
+
+History فعلاً حداکثر ۱۰۰ اجرای اخیر است. فیلتر Worker/execution ID و status در browser روی همین snapshot کار می‌کند؛ pagination تمام تاریخچه وجود ندارد. صفحه وضعیت هم‌زمان چند اجرای زنده یا ویرایش optimistic/versioned را تضمین نمی‌کند. [به‌روزرسانی مستقل Dashboard](../deployment/dashboard-update.md) برای VPS نصب‌شده در دسترس است.

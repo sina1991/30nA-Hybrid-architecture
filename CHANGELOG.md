@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.0 — 2026-10-30
+
+نسخه MVP مدیریت Worker و اجراها؛ [Release notes](docs/releases/v0.1.0.md). شاخه اصلی نصب و توسعه `main` است.
+
 ## Unreleased — Documentation and Runtime correctness
 
 - Preserve active and terminal Runtime history when an invalid request reuses an execution ID; cover SQLite restart and idempotency replay.
@@ -37,3 +41,10 @@ Production release remains gated on reviewed rootless target-host acceptance, li
 
 - Use Certbot standalone HTTP-01, stopping and restoring installer-owned Nginx even after issuance failure; configure standalone renewal pre/post hooks.
 - Normalize outer terminal paste whitespace/direction wrappers while preserving strict address validation; test valid/invalid contacts and real PTY prompts.
+
+## Unreleased — Worker management Dashboard
+
+- Add owner-bound Worker CRUD, configuration/schedule editing, lifecycle confirmation and typed deletion to Dashboard BFF and UI.
+- Filter the latest 100 executions by Worker/execution ID and status; keep history after Worker deletion.
+- Exercise real HTTPS/Docker CRUD in Chromium, clear private editor fields on logout and reject stale refresh results.
+- Add an opt-in Dashboard-only VPS updater with startup rollback, leaving backend units and data unchanged.

@@ -149,3 +149,7 @@ DATA direct envelope، provisioning children در HTTP و propagation سرتاس
 ## توسعه installer
 
 `install.sh` orchestrator سیستم Ubuntu خالی است؛ آن را روی workspace یا سرور فعال اجرا نکنید. `scripts/deployment/provision.py` config و credential را atomic تولید می‌کند؛ `verify_install.py` با adapter محدود `DashboardAPI` مسیر BFF را بررسی می‌کند، چون `PublicAPI` فقط `/api/v1/` می‌پذیرد. تست هدف `units/consumers/dashboard-core/tests/test_installer.py` است. portهای داخلی HTTPS روی loopback 18443..18446 هستند. دستور کاربر و failure/resume در [راهنمای نصب](deployment/installer.md) آمده است. هر تغییر topology یا env را هم در renderer و هم در راهنمای نصب و تست wiring منعکس کنید.
+
+## پنل مدیریت Worker
+
+`dashboard/upstreams.py`، schemaهای RegisterBody/ConfigureBody را از API Manager مصرف می‌کند و routeهای صریح CRUD و enable/disable دارد. `PublicAPI.patch/delete` method واقعی را ارسال می‌کنند. فرم‌های مدیریت در `upstream_panel.py`، confirmation عملیات، immutable reference، حذف تایپی و generation guard دارند؛ تست browser واقعی `browser-tests/management.cjs` است. تست `test_worker_management.py` از BFF با PublicAPI به API واقعی Manager می‌رود و owner binding و حفظ history پس از حذف را بررسی می‌کند. history filter فقط روی ۱۰۰ اجرای اخیر است. برای انتقال تغییر UI از `scripts/deployment/update_dashboard.sh` و [راهنمای update](deployment/dashboard-update.md) استفاده کنید؛ backend DB/unitها در این روش تغییر نمی‌کنند.

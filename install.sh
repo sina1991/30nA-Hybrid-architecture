@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 umask 077
 REPOSITORY=https://github.com/sina1991/30nA-Hybrid-architecture.git
-REF=feat/release-readiness
+REF=main
 DOMAIN='' EMAIL='' CHECK_ONLY=0 NONINTERACTIVE=0
 CONFIG=/etc/30na
 say() { printf '\n%s\n' "$*"; }

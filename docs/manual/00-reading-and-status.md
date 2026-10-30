@@ -1,13 +1,13 @@
 # ۰۰ — دامنه، وضعیت و روش استفاده
 
-این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit `0948a3f3f33fac3d6795e9409bbbedbd7cbc0a92` روی branch `feat/release-readiness` است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.
+این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit `2e08ca8b948d30265aef2e6350c84d36deb77690` روی branch اصلی `main` است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.
 
 ## وضعیت قابل اثبات
 
 - نسخه فعلی **Release candidate برای demo با Workerهای trusted و ازپیش‌ثبت‌شده** است.
-- آخرین اجرای کامل محلی پیش از اصلاح ورودی و ACME، روی کد `87ad0ab` و Python 3.11 و 3.12: `303 passed, 65 subtests passed`، بدون skipped یا warning. اصلاحات جدید installer در هر دو Python با `19 passed` تست هدف، شامل PTY واقعی و failure recovery، تأیید شده‌اند. CI نسخه جاری در لینک branch قابل بررسی است.
-- [CI پیشین c3b97d2](https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604) روی Ubuntu 24.04 شامل تست‌های هر دو Python، Chromium و security scans موفق بوده است؛ این لینک evidence تاریخی همان SHA است. اصلاحات فعلی به‌صورت محلی در هر دو Python تأیید شده‌اند؛ نتیجه CI checkout جدید را در [صفحه Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Frelease-readiness) بررسی کنید.
-- کد برای VPS، systemd، credential files و HTTPS آماده شده؛ **استقرار واقعی، Rootless host acceptance، fault-injection روی میزبان هدف و backup/restore عملیاتی هنوز تأیید نشده‌اند**.
+- اجرای کامل محلی پنل مدیریت Worker روی Python 3.11 و 3.12: `315 passed, 65 subtests passed`، بدون skipped/warning؛ شامل Chromium CRUD واقعی روی HTTPS/Docker است.
+- [CI پیشین c3b97d2](https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604) روی Ubuntu 24.04 شامل تست‌های هر دو Python، Chromium و security scans موفق بوده است؛ این لینک evidence تاریخی همان SHA است. اصلاحات فعلی به‌صورت محلی در هر دو Python تأیید شده‌اند؛ نتیجه CI checkout جدید را در [صفحه Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Amain) بررسی کنید.
+- کد برای VPS، systemd، credential files و HTTPS آماده شده؛ log ارائه‌شده operator، موفقیت نصب و smoke اجرای واقعی روی VPS را گزارش می‌کند؛ این شاهد محدود به مسیر نصب و اجرای نمونه است. Rootless security acceptance، fault-injection و backup/restore مستقل هنوز تأیید نشده‌اند. update جدید Dashboard از Cloud روی VPS اعمال نشده است.
 - Docker محیط Cloud rootful بود. نتیجه آن پذیرش امنیتی rootless روی VPS نیست.
 
 ## ترتیب منابع و حل تعارض

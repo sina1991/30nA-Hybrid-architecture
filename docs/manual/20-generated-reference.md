@@ -3,7 +3,7 @@
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **192**؛ تعداد نمادهای Python: **873**.
+تعداد فایل‌های فنی و پشتیبان: **196**؛ تعداد نمادهای Python: **887**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -13,11 +13,12 @@
 | [.gitattributes](../../.gitattributes) | 108 | `5c74770b9a41953e78518fc6f380870b3d0b1b7985a19f8cd6ad52e8bcd07b08` |
 | [.github/workflows/baseline-verification.yml](../../.github/workflows/baseline-verification.yml) | 4601 | `43337a0b754e591affe6f08657892e35202a16978aa7ca8f5086f8dda730b088` |
 | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
+| [.github/workflows/release.yml](../../.github/workflows/release.yml) | 2942 | `5926c18228ff1b63b55802734b821e711256ba963a5f3e3bc8440b2c25e6209a` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
 | [AGENTS.md](../../AGENTS.md) | 1710 | `92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d` |
-| [CHANGELOG.md](../../CHANGELOG.md) | 3438 | `a1715fc0f6e72e922e994d4f887a72aba6291a8bb8ef18ab7ba2a33dd10cdb69` |
+| [CHANGELOG.md](../../CHANGELOG.md) | 4123 | `a78e265041ae828aeab4cb8a07431927d48a3c67415908936b457a764ae41c38` |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
-| [README.md](../../README.md) | 6574 | `485982298d1161d6957e8f484b876487f3ef033d0d372249f435d842424e9452` |
+| [README.md](../../README.md) | 7125 | `64e253f497f8eda7e7a65cc342f9cd81b24463efe655ce46cb20a04d785d4110` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
 | [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
 | [agents/base-prompt.md](../../agents/base-prompt.md) | 5002 | `967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a` |
@@ -47,7 +48,7 @@
 | [contracts/core/tests/test_contracts.py](../../contracts/core/tests/test_contracts.py) | 2933 | `01535ca31860a661daf075957a25061c505c93409a6309853f7dee4e2713753b` |
 | [contracts/core/versioning/README.md](../../contracts/core/versioning/README.md) | 514 | `beb95aafadef9d863f9b65c34848686eaec2d630e17eaf80fbd94c4bb5b18cf5` |
 | [contracts/core/versioning/policy.yaml](../../contracts/core/versioning/policy.yaml) | 1488 | `9756a66df3ebe23388826af0ad86eda82792f2c2fcd4e8cdb6502baeed0e1f4e` |
-| [contracts/dashboard/openapi.json](../../contracts/dashboard/openapi.json) | 37233 | `773fec46700fcfc708f3e5cea24911d18aaf13088976c756be19c942c811bc49` |
+| [contracts/dashboard/openapi.json](../../contracts/dashboard/openapi.json) | 87160 | `5b7f9d05718fe65149f4e2d4d1bb4e87ccf177f3fa909a2c5e8b1534fcd7a68d` |
 | [contracts/data/README.md](../../contracts/data/README.md) | 610 | `6e3be41bfeaccd9fc7ef80a15eeedc64de35f42edfb6dcf789f46be2e52e5920` |
 | [contracts/data/access/contract.yaml](../../contracts/data/access/contract.yaml) | 455 | `abcd6762c91e6e3385423d8ba2be905864f2cce0eb098e54bcfb09bfc1a4b339` |
 | [contracts/data/api/contract.yaml](../../contracts/data/api/contract.yaml) | 1189 | `79387e6f1eb0f14c323f74ec410f26cc88ce9d4ca7bae8f0e535e84ee08d003a` |
@@ -69,7 +70,7 @@
 | [examples/demo-summary/demo_worker.py](../../examples/demo-summary/demo_worker.py) | 691 | `339e8d841d6a233bba5d48cd5373d03a96bd68db1f9ec486cacb63c92e303a0f` |
 | [examples/demo-summary/tests/__init__.py](../../examples/demo-summary/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [examples/demo-summary/tests/test_demo.py](../../examples/demo-summary/tests/test_demo.py) | 463 | `17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f` |
-| [install.sh](../../install.sh) | 16042 | `d943918a66c0fc00a9c9dc86b00a65dcff2eb05bd90eb7ac1a6f4192e88472ab` |
+| [install.sh](../../install.sh) | 16024 | `62050220579e2ff848786576895831c1bc0ee415b918d589569d4846507c1ac7` |
 | [requirements-dev.txt](../../requirements-dev.txt) | 191 | `baa71328e392be7ddb0840fff882f389a2ee21c1d5f96cea2c87b7bdf7cae04d` |
 | [requirements-docs.lock](../../requirements-docs.lock) | 371 | `6bd1ef812562571e65c9d9e4152ff06caa9c93aa23e079f25d630fd1bf1e3876` |
 | [requirements-docs.txt](../../requirements-docs.txt) | 104 | `a5f88176f3e70130d2af9dd3f55e17a4080489288844d229d585d543a164c0b3` |
@@ -80,6 +81,7 @@
 | [scripts/deployment/prepare.sh](../../scripts/deployment/prepare.sh) | 266 | `b257cb69651bdb04f156083b51360ea30467afda1e598fab40322889e2cc7bc1` |
 | [scripts/deployment/provision.py](../../scripts/deployment/provision.py) | 7563 | `301c3a12e9b293ce1df803aca14524db40f26cd8d7561cc420e4687fa282e321` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py) | 4454 | `f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20` |
+| [scripts/deployment/update_dashboard.sh](../../scripts/deployment/update_dashboard.sh) | 3502 | `98e8944c6310380684d75dd28ba16d35f22b7f64a20141bfacbd37a2469c2d58` |
 | [scripts/deployment/verify_install.py](../../scripts/deployment/verify_install.py) | 3205 | `c0ac64d85583279ec7d81447003f45f2c045ca84a172b1c7dfc7554901e3b8f1` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py) | 1164 | `5e9d644203ae3157224aa5742c9bd46ee52007b3607c3b43de94af32f9a38b78` |
 | [scripts/development/export_openapi.py](../../scripts/development/export_openapi.py) | 1373 | `3443bd17d389f8cd8e500ce70138239f9037a00418237d0851a25aa3145000a6` |
@@ -119,8 +121,9 @@
 | [units/code-manager/tests/test_source_archive.py](../../units/code-manager/tests/test_source_archive.py) | 4072 | `725c536a24cf9107074404b8d035f34148455d27f7a3b5311e3d444b29f3ffeb` |
 | [units/code-manager/tests/test_source_registration.py](../../units/code-manager/tests/test_source_registration.py) | 3772 | `aa451da0cc27ec1d438239eba22bcb4380c4d056cd38e2f02a8bd64ca096ffae` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py) | 3829 | `6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0` |
-| [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 4394 | `9e097b0a43ddd4d2199d9859c0247bbe4ae946eec4ba462471d59ba34a843925` |
-| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 8497 | `3e3360524dcbff03407e3dc0681de213ce09ca1628cdd9ae56b10bfbd5e011f9` |
+| [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 4893 | `de518e2387bef4224e01ca855b637119c986449ef16beae5e26f61ffbaf2dac3` |
+| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 8760 | `3c9baafec9e470a057909ab4b49bc7845e8e8ddbddce03cb112a3045c9286c62` |
+| [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3504 | `63c4510592921047bbafc86bffde93908fac5e7ca40e96707a6c0e700639588e` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
 | [units/consumers/dashboard-core/dashboard/__init__.py](../../units/consumers/dashboard-core/dashboard/__init__.py) | 34 | `df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048` |
@@ -136,11 +139,11 @@
 | [units/consumers/dashboard-core/dashboard/themes/compact-6.json](../../units/consumers/dashboard-core/dashboard/themes/compact-6.json) | 701 | `ae0ea5e577c3455e1e5186426078b92ba4a71c2c4407c28c426ae14e1c1e5475` |
 | [units/consumers/dashboard-core/dashboard/themes/standard-8.json](../../units/consumers/dashboard-core/dashboard/themes/standard-8.json) | 897 | `5eca7faeff243bd66d0d543f9abd3cf8cb546d3ba9a0255fe6be2fc25962861a` |
 | [units/consumers/dashboard-core/dashboard/themes/wide-12.json](../../units/consumers/dashboard-core/dashboard/themes/wide-12.json) | 1284 | `10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048` |
-| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 13747 | `c21944087ffab0905ba54764cddd4cb1690f0405bc1425d773b441a487a36412` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py) | 3713 | `f009a9922380a142c338d983939c1f698bd01eadb00bb683bb0a1996de43c673` |
+| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 27189 | `772b4eca9df15b972a60b5031a1862b96b209fbe84cfbd6c205d659559eff2d1` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py) | 5769 | `bb2c271684aa4b2f54cd62f67b3ad45f6a8ff94c6735243f4012abe4f1d2da3c` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py) | 1948 | `6c79bea530d6ac779e5930b263d58bd030e1844b23ce95a14cf3abaf256caaa7` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../units/consumers/dashboard-core/legacy-tests/test_registry.py) | 3954 | `aaa8da8a33038f063560bd693de4722924f8ec35121f506933ff53fc3d196d22` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py) | 7265 | `5cd701b294b1dd0352fa2baa16277c37d1435e2cb3f8456cd6dfc711debe0dbb` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py) | 7569 | `56cb6258ba13de0f6bfb586c872f9f8c915cb60cfedcf7663812b815066d1d74` |
 | [units/consumers/dashboard-core/requirements-dev.txt](../../units/consumers/dashboard-core/requirements-dev.txt) | 49 | `76d1b0013bd73822840766e68b234055b0962571813765d60b2c012dc82ec88e` |
 | [units/consumers/dashboard-core/requirements.txt](../../units/consumers/dashboard-core/requirements.txt) | 35 | `db7518ee2c4a66fe896a926b2f2024ab7a8cf85c0f0d3d0827388da44234e223` |
 | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py) | 887 | `7297377436f1100bd7097db30d78183ebcc9683434f078b497bb951224d736d6` |
@@ -149,6 +152,7 @@
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py) | 1034 | `7d3066b58ba3b049424dfa54cef414e4b5d5bbaa3b312c853212614266a53bb7` |
 | [units/consumers/dashboard-core/tests/test_public_api.py](../../units/consumers/dashboard-core/tests/test_public_api.py) | 5718 | `412284d0158636ec9b1241252b21a3cc8c7ed4f4e24d9f2b9304eb0af970fd25` |
 | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py) | 5974 | `4780e8e8a2c632f3e96a0fff2589f556d4b2971b25adc95145d72bdd6b4e4817` |
+| [units/consumers/dashboard-core/tests/test_worker_management.py](../../units/consumers/dashboard-core/tests/test_worker_management.py) | 4692 | `63350e22fcc54eb1ca7e7662a3b2b32eb56c28b147d243e299802d318dcaa548` |
 | [units/data-manager/README.md](../../units/data-manager/README.md) | 2923 | `68a95bf1737bb4f9fdbda0710cf1870e0029e3620761598fcee16d19daa3dd6f` |
 | [units/data-manager/__init__.py](../../units/data-manager/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [units/data-manager/api/__init__.py](../../units/data-manager/api/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
@@ -341,11 +345,11 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `INVALID_INPUT` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L28) |
 | `INVALID_INPUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L205) |
 | `INVALID_INPUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L377) |
-| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L91) |
-| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L100) |
-| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L102) |
-| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L109) |
-| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L112) |
+| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L99) |
+| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L108) |
+| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L110) |
+| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L117) |
+| `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L120) |
 | `NOT_FOUND` | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L60) |
 | `NOT_FOUND` | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L64) |
 | `NOT_FOUND` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L13) |
@@ -354,7 +358,7 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `RUNTIME_RESTARTED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L74) |
 | `SANDBOX_CLEANUP_UNCONFIRMED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L144) |
 | `SANDBOX_UNAVAILABLE` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L259) |
-| `SERVICE_UNAVAILABLE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L96) |
+| `SERVICE_UNAVAILABLE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L104) |
 | `SOURCE_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L232) |
 | `SOURCE_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L237) |
 | `SOURCE_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L241) |
@@ -382,7 +386,7 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `SOURCE_VERSION_CONFLICT` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L691) |
 | `TIMEOUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L332) |
 | `TIMEOUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L382) |
-| `UNSUPPORTED_CONTRACT_VERSION` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L105) |
+| `UNSUPPORTED_CONTRACT_VERSION` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L113) |
 | `UNSUPPORTED_VERSION` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L33) |
 | `UPSTREAM_ERROR` | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L107) |
 
@@ -930,13 +934,20 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/consumers/dashboard-core/dashboard/modules/registry.py](../../units/consumers/dashboard-core/dashboard/modules/registry.py#L105) | `get_module` | `(module_id: str)` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L8) | `create_app` | `()` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L12) | `create_app.upstreams` | `(owner, token)` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L11) | `RunRequest` | `class` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L18) | `create_router` | `(credential_path, upstream_factory)` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L30) | `create_router.forward` | `(request, identity, name, method, path, payload=None, status=200)` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L49) | `create_router.read` | `(operation: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L56) | `create_router.run` | `(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L67) | `create_router.execution` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L71) | `create_router.cancel` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L12) | `RunRequest` | `class` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L19) | `create_router` | `(credential_path, upstream_factory)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L31) | `create_router.forward` | `(request, identity, name, method, path, payload=None, status=200)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L52) | `create_router.read` | `(operation: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L58) | `create_router.worker_path` | `(worker_id)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L67) | `create_router.register` | `(body: RegisterBody, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L72) | `create_router.worker` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L76) | `create_router.configure` | `(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L82) | `create_router.remove` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L86) | `create_router.enable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L90) | `create_router.disable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L94) | `create_router.run` | `(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L105) | `create_router.execution` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L109) | `create_router.cancel` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L13) | `test_health_endpoint` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L22) | `test_themes_endpoint` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L32) | `test_each_theme_has_slots` | `()` |
@@ -965,14 +976,16 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L32) | `PublicAPI.__init__` | `(self, base_url: str, *, token: str \| None=None, timeout: float=5.0, identity_header: str \| None=None, identity: str \| None=None, transport=None)` |
 | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L59) | `PublicAPI.get` | `(self, path: str)` |
 | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L62) | `PublicAPI.post` | `(self, path: str, payload: dict)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L67) | `PublicAPI._request` | `(self, method: str, path: str, payload=None)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L115) | `PublicAPI.list_sources` | `(self)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L118) | `PublicAPI.get_source` | `(self, source_id: str, source_version: str)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L121) | `PublicAPI.get_model` | `(self, model_id: str)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L124) | `PublicAPI.get_resource` | `(self, resource_id: str)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L127) | `PublicAPI.list_records` | `(self, resource_id: str)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L130) | `PublicAPI.get_record` | `(self, resource_id: str, record_id: str)` |
-| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L134) | `from_environment` | `(prefix: str)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L67) | `PublicAPI.patch` | `(self, path: str, payload: dict)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L72) | `PublicAPI.delete` | `(self, path: str)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L75) | `PublicAPI._request` | `(self, method: str, path: str, payload=None)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L123) | `PublicAPI.list_sources` | `(self)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L126) | `PublicAPI.get_source` | `(self, source_id: str, source_version: str)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L129) | `PublicAPI.get_model` | `(self, model_id: str)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L132) | `PublicAPI.get_resource` | `(self, resource_id: str)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L135) | `PublicAPI.list_records` | `(self, resource_id: str)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L138) | `PublicAPI.get_record` | `(self, resource_id: str, record_id: str)` |
+| [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L142) | `from_environment` | `(prefix: str)` |
 | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py#L11) | `test_account_execution_ui_in_chromium` | `(tmp_path)` |
 | [units/consumers/dashboard-core/tests/test_demo_seed.py](../../units/consumers/dashboard-core/tests/test_demo_seed.py#L11) | `test_token_file_must_be_private` | `(tmp_path)` |
 | [units/consumers/dashboard-core/tests/test_demo_seed.py](../../units/consumers/dashboard-core/tests/test_demo_seed.py#L20) | `test_seed_does_not_replace_conflicting_worker_or_reenable_disabled_worker` | `()` |
@@ -1041,6 +1054,11 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L104) | `test_submission_errors_preserve_status_without_leaking_diagnostics` | `(tmp_path, status)` |
 | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L106) | `test_submission_errors_preserve_status_without_leaking_diagnostics.Adapter` | `class` |
 | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L107) | `test_submission_errors_preserve_status_without_leaking_diagnostics.Adapter.post` | `(self, path, body)` |
+| [units/consumers/dashboard-core/tests/test_worker_management.py](../../units/consumers/dashboard-core/tests/test_worker_management.py#L17) | `clients` | `(tmp_path)` |
+| [units/consumers/dashboard-core/tests/test_worker_management.py](../../units/consumers/dashboard-core/tests/test_worker_management.py#L23) | `clients.factory` | `(owner, token)` |
+| [units/consumers/dashboard-core/tests/test_worker_management.py](../../units/consumers/dashboard-core/tests/test_worker_management.py#L25) | `clients.factory.transport` | `(request, timeout)` |
+| [units/consumers/dashboard-core/tests/test_worker_management.py](../../units/consumers/dashboard-core/tests/test_worker_management.py#L38) | `test_worker_crud_owner_binding_and_history_after_deletion` | `(clients)` |
+| [units/consumers/dashboard-core/tests/test_worker_management.py](../../units/consumers/dashboard-core/tests/test_worker_management.py#L68) | `test_management_auth_validation_and_immutable_definition_precede_forwarding` | `(clients)` |
 | [units/data-manager/api/app.py](../../units/data-manager/api/app.py#L21) | `_json_response` | `(start_response, status, payload)` |
 | [units/data-manager/api/app.py](../../units/data-manager/api/app.py#L44) | `_request_body` | `(environ)` |
 | [units/data-manager/api/app.py](../../units/data-manager/api/app.py#L66) | `_requester` | `(environ)` |
@@ -1720,9 +1738,49 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | GET | `/api/themes/{theme_id}` | `get_theme_api_themes__theme_id__get` | 200, 422 |
 | GET | `/api/upstreams/executions/{execution_id}` | `execution_api_upstreams_executions__execution_id__get` | 200, 401, 403, 404, 409, 413, 422, 503 |
 | POST | `/api/upstreams/executions/{execution_id}/cancel` | `cancel_api_upstreams_executions__execution_id__cancel_post` | 200, 401, 403, 404, 409, 413, 422, 503 |
+| POST | `/api/upstreams/workers` | `register_api_upstreams_workers_post` | 201, 401, 403, 404, 409, 413, 422, 503 |
+| DELETE | `/api/upstreams/workers/{worker_id}` | `remove_api_upstreams_workers__worker_id__delete` | 200, 401, 403, 404, 409, 413, 422, 503 |
+| GET | `/api/upstreams/workers/{worker_id}` | `worker_api_upstreams_workers__worker_id__get` | 200, 401, 403, 404, 409, 413, 422, 503 |
+| PATCH | `/api/upstreams/workers/{worker_id}` | `configure_api_upstreams_workers__worker_id__patch` | 200, 401, 403, 404, 409, 413, 422, 503 |
+| POST | `/api/upstreams/workers/{worker_id}/disable` | `disable_api_upstreams_workers__worker_id__disable_post` | 200, 401, 403, 404, 409, 413, 422, 503 |
+| POST | `/api/upstreams/workers/{worker_id}/enable` | `enable_api_upstreams_workers__worker_id__enable_post` | 200, 401, 403, 404, 409, 413, 422, 503 |
 | POST | `/api/upstreams/workers/{worker_id}/executions` | `run_api_upstreams_workers__worker_id__executions_post` | 202, 401, 403, 404, 409, 413, 422, 503 |
 | GET | `/api/upstreams/{operation}` | `read_api_upstreams__operation__get` | 200, 401, 403, 404, 409, 413, 422, 503 |
 | GET | `/health` | `health_health_get` | 200 |
+
+### Schema: ConfigureBody — Dashboard Core
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "configuration": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Configuration"
+    },
+    "schedule": {
+      "anyOf": [
+        {
+          "$ref": "#/components/schemas/ScheduleBody"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "title": "ConfigureBody",
+  "type": "object"
+}
+```
 
 ### Schema: HTTPValidationError — Dashboard Core
 
@@ -1738,6 +1796,55 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
     }
   },
   "title": "HTTPValidationError",
+  "type": "object"
+}
+```
+
+### Schema: RegisterBody — Dashboard Core
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "artifact_hash": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Hash",
+      "type": "string"
+    },
+    "artifact_id": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Artifact Id",
+      "type": "string"
+    },
+    "configuration": {
+      "additionalProperties": true,
+      "title": "Configuration",
+      "type": "object"
+    },
+    "entrypoint": {
+      "maxLength": 256,
+      "minLength": 3,
+      "title": "Entrypoint",
+      "type": "string"
+    },
+    "schedule": {
+      "$ref": "#/components/schemas/ScheduleBody"
+    },
+    "worker_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Worker Id",
+      "type": "string"
+    }
+  },
+  "required": [
+    "worker_id",
+    "artifact_id",
+    "artifact_hash",
+    "entrypoint"
+  ],
+  "title": "RegisterBody",
   "type": "object"
 }
 ```
@@ -1771,6 +1878,35 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
     "idempotency_key"
   ],
   "title": "RunRequest",
+  "type": "object"
+}
+```
+
+### Schema: ScheduleBody — Dashboard Core
+
+```json
+{
+  "additionalProperties": false,
+  "properties": {
+    "interval_seconds": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Interval Seconds"
+    },
+    "kind": {
+      "default": "manual",
+      "title": "Kind",
+      "type": "string"
+    }
+  },
+  "title": "ScheduleBody",
   "type": "object"
 }
 ```

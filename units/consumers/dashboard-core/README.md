@@ -20,7 +20,7 @@ Themeها: `compact-6`، `standard-8`، `wide-12`. ماژول‌ها: `empty`، 
 
 ## Public API Adapter
 
-`public_api.py` عملیات GET/POST با کنترل نسخه، Timeout و خطاها ارائه می‌کند. factory احراز هویت‌شده، مسیرهای مجاز Worker list/run/history/detail/cancel و مشاهده CODE sources را وصل می‌کند. DATA موفقیت raw دارد و اتصال مستقیم آن به adapter envelope فعلی پشتیبانی‌شده نیست. قرار دادن Token عمومی سرویس در Endpoint عمومی ممنوع است.
+`public_api.py` عملیات GET/POST/PATCH/DELETE با کنترل نسخه، Timeout و خطاها ارائه می‌کند. factory احراز هویت‌شده، مسیرهای مجاز Worker CRUD/configuration/schedule/enable/disable و run/history/detail/cancel و مشاهده CODE sources را وصل می‌کند. DATA موفقیت raw دارد و اتصال مستقیم آن به adapter envelope فعلی پشتیبانی‌شده نیست. قرار دادن Token عمومی سرویس در Endpoint عمومی ممنوع است.
 
 متغیرهای اختیاری: `DATA_MANAGER_URL`, `DATA_MANAGER_TOKEN`, `DATA_MANAGER_TIMEOUT` و مشابه آن‌ها برای `CODE_MANAGER`. از Development identity header فقط روی loopback و با تأیید محیط استفاده شود.
 
@@ -63,3 +63,7 @@ persisted in browser storage or rendered into HTML. Errors/degradation are expli
 The old static Dashboard entrypoint remains available without upstream bindings.
 Full rootless target-host acceptance and live production-identity configuration
 still require deployment evidence.
+
+## مدیریت Worker و update مستقل
+
+پنل ثبت، جزئیات، configuration، schedule، lifecycle و حذف با تأیید شناسه دارد. history تا ۱۰۰ اجرای اخیر با فیلتر محلی نمایش داده می‌شود. definition immutable است و source upload/Build در scope این پنل نیست. [راهنمای update روی VPS نصب‌شده](../../../docs/deployment/dashboard-update.md).

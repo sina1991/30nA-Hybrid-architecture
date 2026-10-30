@@ -46,3 +46,7 @@
 ## نصب خودکار MVP
 
 [installer دامنه و HTTPS](deployment/installer.md) برای Ubuntu 24.04 خالی اضافه شد. تست کامل محلی هر دو Python اکنون `303 passed, 65 subtests passed` است؛ verification خود installer در E2E با HTTPS/Docker واقعی اجرا می‌شود. ShellCheck و nginx -t روی config تولیدشده موفق‌اند؛ provisioning کامل VPS و ACME واقعی در Cloud اجرا نشده‌اند.
+
+## پنل مدیریت Worker
+
+پنل CRUD/configuration/schedule/enable/disable، تأیید حذف، فیلتر history و updater مستقل Dashboard اضافه شده است. تست کامل محلی هر دو Python: `315 passed, 65 subtests passed`. log operator موفقیت نصب نسخه قبل و اجرای نمونه روی VPS را تأیید می‌کند؛ این update جدید هنوز از Cloud روی آن سرور اعمال نشده است. [روش انتقال و پذیرش](deployment/dashboard-update.md).

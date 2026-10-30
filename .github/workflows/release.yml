@@ -1,0 +1,68 @@
+name: Publish release
+on:
+  push:
+    tags: ['v*.*.*']
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.11'
+      - name: Verify release tag and main CI for the exact commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          test -f "docs/releases/$GITHUB_REF_NAME.md"
+          release_sha=$(git rev-parse HEAD)
+          ready=false
+          for attempt in {1..60}; do
+            state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$release_sha&branch=main&event=push" --jq ".workflow_runs | any(.head_sha == \"$release_sha\" and .conclusion == \"success\")")
+            if [[ "$state" == true ]]; then ready=true; break; fi
+            sleep 10
+          done
+          [[ "$ready" == true ]] || { echo 'Successful main CI for this commit is required.' >&2; exit 1; }
+      - name: Verify documentation artifacts
+        run: |
+          python -m pip install --require-hashes -r requirements-docs.lock
+          python scripts/documentation/build_manual.py --check
+          python scripts/documentation/check_docs.py
+      - name: Prepare assets and SHA-256 checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          directory="$RUNNER_TEMP/30na-release"
+          mkdir -p "$directory"
+          cp install.sh scripts/deployment/update_dashboard.sh docs/AGENT_GUIDE.md docs/manual/PROJECT_MANUAL.pdf docs/manual/PROJECT_MANUAL.html docs/manual/BOOK.md docs/manual/source-inventory.json "$directory/"
+          python - "$directory" <<'PY'
+          import hashlib,pathlib,sys
+          root=pathlib.Path(sys.argv[1])
+          lines=[hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.name for p in sorted(root.iterdir()) if p.is_file()]
+          (root/'SHA256SUMS').write_text('\n'.join(lines)+'\n')
+          PY
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo 'Release already exists; no assets overwritten.'
+            exit 0
+          fi
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/30na-release/"* --verify-tag --latest --title "$GITHUB_REF_NAME — مدیریت Worker و اجراها" --notes-file "docs/releases/$GITHUB_REF_NAME.md" --repo "$GITHUB_REPOSITORY"

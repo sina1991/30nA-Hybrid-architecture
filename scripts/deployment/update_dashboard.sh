@@ -2,7 +2,7 @@
 # Update only Dashboard on an installer-owned VPS; leave backend units/state alone.
 set -Eeuo pipefail
 umask 077
-REF=${1:-feat/release-readiness}
+REF=${1:-main}
 [[ $REF =~ ^[a-zA-Z0-9][a-zA-Z0-9._/-]*$ && $REF != *..* ]] || { echo 'Invalid Git ref' >&2; exit 1; }
 [[ $EUID == 0 && -f /etc/30na/installed-release ]] || { echo 'Run as root on an installer-owned VPS.' >&2; exit 1; }
 exec 9>/run/lock/30na-install.lock

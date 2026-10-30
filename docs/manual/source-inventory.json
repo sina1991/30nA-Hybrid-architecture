@@ -669,27 +669,27 @@
     [
       "INVALID_RESPONSE",
       "units/consumers/dashboard-core/public_api.py",
-      91
+      99
     ],
     [
       "INVALID_RESPONSE",
       "units/consumers/dashboard-core/public_api.py",
-      100
+      108
     ],
     [
       "INVALID_RESPONSE",
       "units/consumers/dashboard-core/public_api.py",
-      102
+      110
     ],
     [
       "INVALID_RESPONSE",
       "units/consumers/dashboard-core/public_api.py",
-      109
+      117
     ],
     [
       "INVALID_RESPONSE",
       "units/consumers/dashboard-core/public_api.py",
-      112
+      120
     ],
     [
       "NOT_FOUND",
@@ -734,7 +734,7 @@
     [
       "SERVICE_UNAVAILABLE",
       "units/consumers/dashboard-core/public_api.py",
-      96
+      104
     ],
     [
       "SOURCE_INVALID",
@@ -874,7 +874,7 @@
     [
       "UNSUPPORTED_CONTRACT_VERSION",
       "units/consumers/dashboard-core/public_api.py",
-      105
+      113
     ],
     [
       "UNSUPPORTED_VERSION",
@@ -909,6 +909,11 @@
       "sha256": "889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf"
     },
     {
+      "bytes": 2942,
+      "path": ".github/workflows/release.yml",
+      "sha256": "5926c18228ff1b63b55802734b821e711256ba963a5f3e3bc8440b2c25e6209a"
+    },
+    {
       "bytes": 265,
       "path": ".gitignore",
       "sha256": "0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e"
@@ -919,9 +924,9 @@
       "sha256": "92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d"
     },
     {
-      "bytes": 3438,
+      "bytes": 4123,
       "path": "CHANGELOG.md",
-      "sha256": "a1715fc0f6e72e922e994d4f887a72aba6291a8bb8ef18ab7ba2a33dd10cdb69"
+      "sha256": "a78e265041ae828aeab4cb8a07431927d48a3c67415908936b457a764ae41c38"
     },
     {
       "bytes": 2817,
@@ -929,9 +934,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 6574,
+      "bytes": 7125,
       "path": "README.md",
-      "sha256": "485982298d1161d6957e8f484b876487f3ef033d0d372249f435d842424e9452"
+      "sha256": "64e253f497f8eda7e7a65cc342f9cd81b24463efe655ce46cb20a04d785d4110"
     },
     {
       "bytes": 1866,
@@ -1079,9 +1084,9 @@
       "sha256": "9756a66df3ebe23388826af0ad86eda82792f2c2fcd4e8cdb6502baeed0e1f4e"
     },
     {
-      "bytes": 37233,
+      "bytes": 87160,
       "path": "contracts/dashboard/openapi.json",
-      "sha256": "773fec46700fcfc708f3e5cea24911d18aaf13088976c756be19c942c811bc49"
+      "sha256": "5b7f9d05718fe65149f4e2d4d1bb4e87ccf177f3fa909a2c5e8b1534fcd7a68d"
     },
     {
       "bytes": 610,
@@ -1189,9 +1194,9 @@
       "sha256": "17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f"
     },
     {
-      "bytes": 16042,
+      "bytes": 16024,
       "path": "install.sh",
-      "sha256": "d943918a66c0fc00a9c9dc86b00a65dcff2eb05bd90eb7ac1a6f4192e88472ab"
+      "sha256": "62050220579e2ff848786576895831c1bc0ee415b918d589569d4846507c1ac7"
     },
     {
       "bytes": 191,
@@ -1242,6 +1247,11 @@
       "bytes": 4454,
       "path": "scripts/deployment/seed_demo.py",
       "sha256": "f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20"
+    },
+    {
+      "bytes": 3502,
+      "path": "scripts/deployment/update_dashboard.sh",
+      "sha256": "98e8944c6310380684d75dd28ba16d35f22b7f64a20141bfacbd37a2469c2d58"
     },
     {
       "bytes": 3205,
@@ -1439,14 +1449,19 @@
       "sha256": "6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0"
     },
     {
-      "bytes": 4394,
+      "bytes": 4893,
       "path": "units/consumers/dashboard-core/README.md",
-      "sha256": "9e097b0a43ddd4d2199d9859c0247bbe4ae946eec4ba462471d59ba34a843925"
+      "sha256": "de518e2387bef4224e01ca855b637119c986449ef16beae5e26f61ffbaf2dac3"
     },
     {
-      "bytes": 8497,
+      "bytes": 8760,
       "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "3e3360524dcbff03407e3dc0681de213ce09ca1628cdd9ae56b10bfbd5e011f9"
+      "sha256": "3c9baafec9e470a057909ab4b49bc7845e8e8ddbddce03cb112a3045c9286c62"
+    },
+    {
+      "bytes": 3504,
+      "path": "units/consumers/dashboard-core/browser-tests/management.cjs",
+      "sha256": "63c4510592921047bbafc86bffde93908fac5e7ca40e96707a6c0e700639588e"
     },
     {
       "bytes": 1765,
@@ -1524,14 +1539,14 @@
       "sha256": "10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048"
     },
     {
-      "bytes": 13747,
+      "bytes": 27189,
       "path": "units/consumers/dashboard-core/dashboard/upstream_panel.py",
-      "sha256": "c21944087ffab0905ba54764cddd4cb1690f0405bc1425d773b441a487a36412"
+      "sha256": "772b4eca9df15b972a60b5031a1862b96b209fbe84cfbd6c205d659559eff2d1"
     },
     {
-      "bytes": 3713,
+      "bytes": 5769,
       "path": "units/consumers/dashboard-core/dashboard/upstreams.py",
-      "sha256": "f009a9922380a142c338d983939c1f698bd01eadb00bb683bb0a1996de43c673"
+      "sha256": "bb2c271684aa4b2f54cd62f67b3ad45f6a8ff94c6735243f4012abe4f1d2da3c"
     },
     {
       "bytes": 1948,
@@ -1544,9 +1559,9 @@
       "sha256": "aaa8da8a33038f063560bd693de4722924f8ec35121f506933ff53fc3d196d22"
     },
     {
-      "bytes": 7265,
+      "bytes": 7569,
       "path": "units/consumers/dashboard-core/public_api.py",
-      "sha256": "5cd701b294b1dd0352fa2baa16277c37d1435e2cb3f8456cd6dfc711debe0dbb"
+      "sha256": "56cb6258ba13de0f6bfb586c872f9f8c915cb60cfedcf7663812b815066d1d74"
     },
     {
       "bytes": 49,
@@ -1587,6 +1602,11 @@
       "bytes": 5974,
       "path": "units/consumers/dashboard-core/tests/test_upstreams.py",
       "sha256": "4780e8e8a2c632f3e96a0fff2589f556d4b2971b25adc95145d72bdd6b4e4817"
+    },
+    {
+      "bytes": 4692,
+      "path": "units/consumers/dashboard-core/tests/test_worker_management.py",
+      "sha256": "63350e22fcc54eb1ca7e7662a3b2b32eb56c28b147d243e299802d318dcaa548"
     },
     {
       "bytes": 2923,
@@ -4048,43 +4068,85 @@
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      11,
+      12,
       "RunRequest",
       "class"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      18,
+      19,
       "create_router",
       "(credential_path, upstream_factory)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      30,
+      31,
       "create_router.forward",
       "(request, identity, name, method, path, payload=None, status=200)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      49,
+      52,
       "create_router.read",
       "(operation: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      56,
+      58,
+      "create_router.worker_path",
+      "(worker_id)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      67,
+      "create_router.register",
+      "(body: RegisterBody, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      72,
+      "create_router.worker",
+      "(worker_id: str, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      76,
+      "create_router.configure",
+      "(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      82,
+      "create_router.remove",
+      "(worker_id: str, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      86,
+      "create_router.enable",
+      "(worker_id: str, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      90,
+      "create_router.disable",
+      "(worker_id: str, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      94,
       "create_router.run",
       "(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      67,
+      105,
       "create_router.execution",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      71,
+      109,
       "create_router.cancel",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
@@ -4259,48 +4321,60 @@
     [
       "units/consumers/dashboard-core/public_api.py",
       67,
+      "PublicAPI.patch",
+      "(self, path: str, payload: dict)"
+    ],
+    [
+      "units/consumers/dashboard-core/public_api.py",
+      72,
+      "PublicAPI.delete",
+      "(self, path: str)"
+    ],
+    [
+      "units/consumers/dashboard-core/public_api.py",
+      75,
       "PublicAPI._request",
       "(self, method: str, path: str, payload=None)"
     ],
     [
       "units/consumers/dashboard-core/public_api.py",
-      115,
+      123,
       "PublicAPI.list_sources",
       "(self)"
     ],
     [
       "units/consumers/dashboard-core/public_api.py",
-      118,
+      126,
       "PublicAPI.get_source",
       "(self, source_id: str, source_version: str)"
     ],
     [
       "units/consumers/dashboard-core/public_api.py",
-      121,
+      129,
       "PublicAPI.get_model",
       "(self, model_id: str)"
     ],
     [
       "units/consumers/dashboard-core/public_api.py",
-      124,
+      132,
       "PublicAPI.get_resource",
       "(self, resource_id: str)"
     ],
     [
       "units/consumers/dashboard-core/public_api.py",
-      127,
+      135,
       "PublicAPI.list_records",
       "(self, resource_id: str)"
     ],
     [
       "units/consumers/dashboard-core/public_api.py",
-      130,
+      138,
       "PublicAPI.get_record",
       "(self, resource_id: str, record_id: str)"
     ],
     [
       "units/consumers/dashboard-core/public_api.py",
-      134,
+      142,
       "from_environment",
       "(prefix: str)"
     ],
@@ -4711,6 +4785,36 @@
       107,
       "test_submission_errors_preserve_status_without_leaking_diagnostics.Adapter.post",
       "(self, path, body)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_worker_management.py",
+      17,
+      "clients",
+      "(tmp_path)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_worker_management.py",
+      23,
+      "clients.factory",
+      "(owner, token)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_worker_management.py",
+      25,
+      "clients.factory.transport",
+      "(request, timeout)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_worker_management.py",
+      38,
+      "test_worker_crud_owner_binding_and_history_after_deletion",
+      "(clients)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_worker_management.py",
+      68,
+      "test_management_auth_validation_and_immutable_definition_precede_forwarding",
+      "(clients)"
     ],
     [
       "units/data-manager/api/app.py",
