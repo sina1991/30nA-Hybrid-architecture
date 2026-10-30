@@ -1,5 +1,8 @@
 # CODE MANAGER Contracts
 
+مرجع رفتار فعلی و اختلاف قراردادهای قدیمی: [دفترچه جامع](../../docs/manual/05-code-manager.md) و [دفتر اختلاف‌ها](../../docs/manual/19-troubleshooting-and-gaps.md). وجود label قرارداد به معنی پذیرش deployment نیست.
+
+
 Status: draft.
 
 These contracts define the Python-only Code Manager domain for Ubuntu.

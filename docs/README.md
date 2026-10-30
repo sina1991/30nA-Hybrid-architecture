@@ -1,46 +1,30 @@
-# فهرست مرکزی مستندات
+# مستندات پروژه 30nA
 
-این فایل درگاه ورود به مستندات پروژه است. برای جلوگیری از تکرار ممیزی، هر سند باید وضعیت، تاریخ بررسی، نسخه/Commit مبنا، شواهد و موارد نامشخص را مشخص کند.
+مرجع نسخه فعلی: **[دفترچه جامع پروژه](manual/README.md)**.
 
-## راهنمای اصلی
+- [نسخه یک‌جلدی Markdown](manual/BOOK.md)
+- [دفترچه PDF](manual/PROJECT_MANUAL.pdf)
+- [نسخه HTML قابل چاپ](manual/PROJECT_MANUAL.html)
+- [تنظیمات و limitها](manual/10-configuration.md)
+- [APIها و همه schemaهای HTTP](manual/20-generated-reference.md)
+- [راهنمای Ubuntu](deployment/ubuntu.md)
+- [تحویل نسخه اولیه](deployment/first-delivery.md)
+- [Release checklist](PROJECT_FINALIZATION_STATUS.md)
 
-- [کتابچه فنی و فهرست فصل‌ها](handbook/README.md)
-- [خط مبنای ممیزی](handbook/00-audit-baseline.md)
-- [قواعد مستندسازی و حاکمیت تغییر](handbook/01-documentation-governance.md)
-- [نقشه راه تکمیل پروژه](handbook/02-completion-roadmap.md)
-- [گزارش مرحله ۱: تحلیل شکست‌های CI و قراردادهای CODE](handbook/03-code-contract-findings.md)
-- [تست‌ها و CI](handbook/testing-and-ci.md)
-- [دفتر تصمیم‌های معماری](handbook/decisions/README.md)
+## منابع نزدیک به implementation
 
-## امنیت و استقرار
+- [معماری](architecture/overview.md)
+- [قراردادهای CORE](../contracts/core/README.md)
+- [قراردادهای CODE](../contracts/code/README.md)
+- [قراردادهای DATA](../contracts/data/README.md)
+- [قرارداد Worker](../contracts/worker/README.md)
+- [مدل تهدید Sandbox](security/worker-runtime-sandbox-threat-model.md)
+- [پذیرش میزبان](security/production-host-sandbox-acceptance.md)
+- [بازیابی cleanup](security/sandbox-cleanup-recovery.md)
+- [ADR کنترل اجرای owner-scoped](handbook/decisions/0001-owner-scoped-control-plane.md)
 
-- [پذیرش مرحله راه‌اندازی Rootless Docker](security/rootless-docker-stage-acceptance.md) — تأیید این مرحله به معنی تأیید Production نیست.
-- [مدل تهدید و معیارهای پذیرش Sandbox در Worker Runtime](security/worker-runtime-sandbox-threat-model.md)
-- [بازیابی cleanup نامطمئن](security/sandbox-cleanup-recovery.md)
+## تاریخچه و baseline
 
+[کتابچه ممیزی تاریخی](handbook/README.md)، اسناد `audit/` و `migration/` برای حفظ شواهد قبلی باقی مانده‌اند. بعضی findingها مربوط به SHA قدیمی‌اند و بیانگر نبود قابلیت جدید در branch آماده‌سازی نیستند. اختلاف‌ها و محدودیت‌های واقعی در [فصل عیب‌یابی و شکاف‌ها](manual/19-troubleshooting-and-gaps.md) ثبت می‌شوند.
 
-## ممیزی و اصلاحات
-
-- [ماتریس تطبیق قابلیت‌ها و APIها](audit/feature-capability-matrix.md)
-- [برنامه اصلاحات و معیارهای پذیرش](audit/remediation-plan.md)
-- [وضعیت شاخه‌ها، CI و خط مبنای تست](audit/ci-and-branch-state.md)
-- [یافته‌های اولیه API در DATA MANAGER و CODE MANAGER](audit/unit-api-findings.md)
-
-## فصل‌های یونیت‌ها
-
-- [CORE و قراردادهای مشترک](handbook/units/00-core-contracts.md)
-- [DATA MANAGER](handbook/units/01-data-manager.md)
-- [CODE MANAGER](handbook/units/02-code-manager.md)
-- [WORKER MANAGER](handbook/units/03-worker-manager.md)
-- [WORKER RUNTIME](handbook/units/04-worker-runtime.md)
-- [DASHBOARD CORE CONSUMER](handbook/units/05-dashboard-core.md)
-- [Integration / Agent 08](handbook/units/06-integration-agent08.md)
-
-## وضعیت تکمیل مستندات
-
-این فهرست و فصل‌های اولیه، خط مبنای مستندسازی هستند؛ به معنی پایان ممیزی یا تأیید عملیاتی پروژه نیستند. هر فصل باید در طول ممیزی با شواهد کد، قراردادها، فرمان‌های اجرا و نتایج واقعی تست به‌روزرسانی شود.
-
-## آماده‌سازی نسخه و استقرار
-
-- [وضعیت آماده‌سازی انتشار و Release checklist](PROJECT_FINALIZATION_STATUS.md)
-- [استقرار روی Ubuntu VPS، credentialها، backup و recovery](deployment/ubuntu.md)
+کد و تست روی SHA مشخص، OpenAPI فعلی و مستندات نسخه جاری را کنار هم بخوانید. هیچ گزارش CI محلی جای پذیرش Production روی VPS را نمی‌گیرد.

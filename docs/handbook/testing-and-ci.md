@@ -1,5 +1,8 @@
 # فصل 03 — تست‌ها و CI
 
+> این سند baseline/تاریخچه است؛ برای وضعیت نسخه فعلی به [دفترچه جامع](../manual/16-testing-and-ci.md) مراجعه کنید. نتیجه یا محدودیت قدیمی را بدون بررسی SHA به نسخه فعلی نسبت ندهید.
+
+
 ## Workflow موجود
 
 فایل: `.github/workflows/baseline-verification.yml`

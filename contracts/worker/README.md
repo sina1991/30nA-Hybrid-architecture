@@ -1,5 +1,8 @@
 # Worker execution contract v1.0.0
 
+مرجع رفتار فعلی و اختلاف قراردادهای قدیمی: [دفترچه جامع](../../docs/manual/07-worker-runtime.md) و [دفتر اختلاف‌ها](../../docs/manual/19-troubleshooting-and-gaps.md). وجود label قرارداد به معنی پذیرش deployment نیست.
+
+
 Request: `ExecutionRequest(definition, configuration, input_payload, execution_id, timeout_seconds, idempotency_key, parent_execution_id, depth)`. Definition contains `worker_id`, `artifact_id`, `artifact_hash` (`sha256:<hex>`), `entrypoint` (`module:function`). Inputs and configuration must be JSON objects.
 
 Gateway `submit(request)` returns `ExecutionResult(execution_id, worker_id, accepted, status, result, error, children)`. `status` uses CORE operation statuses `accepted/running/succeeded/failed/cancelled`; rejection is `accepted=False, status=failed`. Errors contain CORE `code/message/retryable`. Timeout maps to failed/TIMEOUT, explicit cancellation to cancelled/CANCELLED. Lifecycle belongs only to Manager.

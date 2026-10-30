@@ -1,5 +1,8 @@
 # Agent 06 — Dashboard Core Consumer
 
+مرجع جامع نسخه فعلی: [دفترچه واحد](../../../docs/manual/08-dashboard.md). اسناد تاریخی این README باید با وضعیت نسخه فعلی تطبیق داده شوند.
+
+
 این بسته Dashboard Core مرجع را از خروجی‌های ثبت‌شده در audit بازیابی می‌کند و PublicAPI اولیه را حفظ می‌کند.
 
 ## اجرای Dashboard

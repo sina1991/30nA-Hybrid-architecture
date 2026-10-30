@@ -1,5 +1,8 @@
 # فصل U-05 — DASHBOARD CORE CONSUMER
 
+> این سند baseline/تاریخچه است؛ برای وضعیت نسخه فعلی به [دفترچه جامع](../../manual/08-dashboard.md) مراجعه کنید. نتیجه یا محدودیت قدیمی را بدون بررسی SHA به نسخه فعلی نسبت ندهید.
+
+
 ## مسیرها و اجرا
 
 - پیاده‌سازی: `units/consumers/dashboard-core/`

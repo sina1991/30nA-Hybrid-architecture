@@ -1,5 +1,8 @@
 # WORKER MANAGER
 
+مرجع جامع نسخه فعلی: [دفترچه واحد](../../docs/manual/06-worker-manager.md). اسناد تاریخی این README باید با وضعیت نسخه فعلی تطبیق داده شوند.
+
+
 WORKER MANAGER owns worker definitions, manager-side configuration, manager lifecycle and scheduling policy. It does not load or execute worker code.
 
 ## Current scope

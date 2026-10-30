@@ -67,7 +67,27 @@ jobs:
         run: npm audit --prefix units/consumers/dashboard-core/browser-tests --audit-level=low
       - name: Audit application and development lockfile
         run: python -m pip_audit -r requirements.lock --no-deps --disable-pip --strict
+      - name: Audit documentation renderer lockfile
+        run: python -m pip_audit -r requirements-docs.lock --no-deps --disable-pip --strict
       - name: Install checksum-verified Gitleaks
         run: python scripts/security/install_gitleaks.py --output "$RUNNER_TEMP/gitleaks"
       - name: Scan repository history without exposing findings
         run: '"$RUNNER_TEMP/gitleaks" git --log-opts="--all --diff-merges=first-parent" --redact --no-banner'
+
+  documentation:
+    name: Handbook freshness, coverage and links
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.11'
+      - name: Install hash-locked manual renderer
+        run: python -m pip install --require-hashes -r requirements-docs.lock
+      - name: Check generated handbook, inventory, PDF checksums and all local links
+        run: |
+          python scripts/documentation/build_manual.py --check
+          python scripts/documentation/check_docs.py

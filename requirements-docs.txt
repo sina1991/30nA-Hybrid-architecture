@@ -1,0 +1,2 @@
+# Printable manual renderer; documentation scripts otherwise use the standard library.
+Markdown>=3.7,<4

@@ -4,6 +4,12 @@ Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORK
 
 **وضعیت: Release candidate؛ پذیرش نهایی Production هنوز باز است.**
 
+## دفترچه کامل پروژه
+
+[فهرست دفترچه جامع](docs/manual/README.md) · [کتاب یک‌جلدی](docs/manual/BOOK.md) · [PDF قابل دانلود](docs/manual/PROJECT_MANUAL.pdf) · [HTML قابل چاپ](docs/manual/PROJECT_MANUAL.html)
+
+معماری، APIها، تنظیمات، توسعه، Docker، Ubuntu، امنیت، DB، backup/recovery، تست، تحویل و مرجع ماشینی فایل‌ها در ۲۱ فصل ارائه شده‌اند. اسناد baseline قدیمی از مرجع فعلی جدا هستند.
+
 ## شروع توسعه
 
 Python 3.11 یا 3.12، Docker و OpenSSL لازم‌اند. برای تست کامل UI، Node و Chrome/Chromium نیز لازم است. از checkout موجود استفاده کنید؛ Git worktree تازه لازم نیست.

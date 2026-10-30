@@ -1,0 +1,30 @@
+{
+  "title": "دفترچه جامع پروژه 30nA Hybrid Architecture",
+  "date": "2026-10-30",
+  "application_commit": "c3b97d2ce8365a3beafd04e3e49465de2181ea59",
+  "ci_url": "https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604",
+  "chapters": [
+    "00-reading-and-status.md",
+    "01-architecture.md",
+    "02-development.md",
+    "03-core-contracts.md",
+    "04-data-manager.md",
+    "05-code-manager.md",
+    "06-worker-manager.md",
+    "07-worker-runtime.md",
+    "08-dashboard.md",
+    "09-agent08.md",
+    "10-configuration.md",
+    "11-storage-and-migrations.md",
+    "12-security.md",
+    "13-ubuntu-deployment.md",
+    "14-operations-and-observability.md",
+    "15-backup-and-recovery.md",
+    "16-testing-and-ci.md",
+    "17-customer-delivery.md",
+    "18-extension-and-governance.md",
+    "19-troubleshooting-and-gaps.md",
+    "20-generated-reference.md"
+  ],
+  "repository_ref": "feat/release-readiness"
+}

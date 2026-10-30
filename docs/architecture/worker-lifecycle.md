@@ -1,12 +1,9 @@
-# چرخه استاندارد Worker
+# چرخه عمر Worker و execution
 
-1. دریافت درخواست اجرا
-2. اعتبارسنجی ورودی و تنظیمات
-3. اجرای وظیفه اختصاصی
-4. فراخوانی Workerهای فرزند، در صورت نیاز
-5. پردازش و اعتبارسنجی نتایج
-6. تولید خروجی استاندارد
-7. گزارش نتیجه، وضعیت و خطاها
+WorkerDefinition immutable است. lifecycle مدیریتی: `configured`، `enabled`، `disabled`؛ عملیات remove، metadata را حذف می‌کند. disable/remove، اجرای پذیرفته‌شده را خودکار cancel نمی‌کند.
 
-تمام Workerها از قرارداد مشترک پیروی می‌کنند.
-تفاوت آن‌ها در وظیفه و سطح مسئولیت است.
+execution: `accepted` → `running` → یکی از `succeeded`، `failed`، `cancelled`. شکست/لغو پیش از running نیز ممکن است. cancel best-effort است و false یا cleanup نامعلوم نباید cancelled/succeeded فرض شود.
+
+Manager queue و Runtime history لایه‌های جدا دارند. پس از restart، Manager running را `MANAGER_RESTARTED` و Runtime snapshot nonterminal را `RUNTIME_RESTARTED` می‌کند؛ live process resume نمی‌شود و remote workload ممکن است هنوز به reconciliation نیاز داشته باشد. lease expired خودکار replay نمی‌شود.
+
+Worker function دو argument input/configuration دارد و JSON-compatible return می‌دهد. children در library با definitions صریح پشتیبانی می‌شوند، اما wiring HTTP آن فعلاً کامل نیست. [فصل Runtime](../manual/07-worker-runtime.md) و [ذخیره‌سازی](../manual/11-storage-and-migrations.md) معیارهای دقیق را ثبت می‌کنند.

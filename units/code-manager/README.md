@@ -1,5 +1,8 @@
 # CODE MANAGER
 
+مرجع جامع نسخه فعلی: [دفترچه واحد](../../docs/manual/05-code-manager.md). اسناد تاریخی این README باید با وضعیت نسخه فعلی تطبیق داده شوند.
+
+
 ## Implemented
 
 - `code_manager/blob_storage.py` stores binary content by SHA-256.

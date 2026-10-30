@@ -1,5 +1,8 @@
 # فصل U-03 — WORKER MANAGER
 
+> این سند baseline/تاریخچه است؛ برای وضعیت نسخه فعلی به [دفترچه جامع](../../manual/06-worker-manager.md) مراجعه کنید. نتیجه یا محدودیت قدیمی را بدون بررسی SHA به نسخه فعلی نسبت ندهید.
+
+
 ## مسیرها
 
 - پیاده‌سازی: \`units/worker-manager/worker_manager/\`

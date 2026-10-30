@@ -1,5 +1,8 @@
 # WORKER RUNTIME — Stage 4
 
+مرجع جامع نسخه فعلی: [دفترچه واحد](../../docs/manual/07-worker-runtime.md). اسناد تاریخی این README باید با وضعیت نسخه فعلی تطبیق داده شوند.
+
+
 The synchronous `WorkerRuntime.submit` returns an `ExecutionResult`. `get` exposes
 accepted/running/terminal state and `cancel` terminates the active process group
 and propagates a cancellation request to descendant executions. Worker lifecycle

@@ -1,31 +1,7 @@
-# نمای کلی معماری
+# معماری فعلی پروژه
 
-## هدف
+مرجع کامل: [فصل معماری دفترچه](../manual/01-architecture.md). وضعیت Release candidate و مبنای بررسی برنامه `c3b97d2` است؛ این سند approval Production نیست.
 
-این سند مرجع معماری کلان پروژه است.
+Dashboard یک BFF احراز هویت‌شده است؛ درخواست اجرای Worker از آن به Manager HTTP، صف پایدار و Runtime HTTP می‌رسد. Runtime با credential همان owner از CODE، Artifact ساخته‌شده را دریافت و در Docker اجرا می‌کند. CODE در entrypoint تولیدی، DATA API را با transport داخلی WSGI و identity معتبر مصرف می‌کند؛ DATA لزوماً process شبکه مستقل نیست.
 
-## واحدهای اصلی
-
-### CORE
-تعریف قراردادها و استانداردهای مشترک.
-
-### DATA MANAGER
-مدیریت مدل‌های داده، اعتبارسنجی، ذخیره‌سازی،
-مهاجرت‌ها و رابط عمومی دسترسی به داده.
-
-### CODE MANAGER
-مدیریت کدها، اسکریپت‌ها و نسخه‌های آن‌ها.
-
-### WORKER MANAGER
-مدیریت Workerها، پیکربندی و زمان‌بندی اجرا.
-
-### WORKER RUNTIME
-اجرای وظایف Workerها و مدیریت فراخوانی Workerهای فرزند.
-
-### CONSUMERS
-مصرف اطلاعات از طریق رابط‌های عمومی.
-
-## اصل مهم
-
-این تعریف مفهومی است. جزئیات نهایی باید پس از بررسی
-کدها و قراردادهای موجود تثبیت شوند.
+CORE فقط قرارداد مشترک است. Worker lifecycle، execution status و Build stages مستقل‌اند. SQLite و file lockها مالک تک-process دارند. Agent08 مسیر proof قدیمی جدا از MVP فعلی است. diagram، مرز مسئولیت، مسیرهای کد و محدودیت‌های دقیق در دفترچه قرار دارند.
