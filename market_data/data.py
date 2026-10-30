@@ -281,7 +281,46 @@ def database_table(table, limit=50, offset=0, candle_state="all", indicator_name
     return {'table':table, 'rows':rows, 'count':count, 'limit':limit, 'offset':offset}
 
 
-def chart(limit=200, period=20, include_open=True, end_time=None):
+def chart(limit=200, period=20, include_open=True, end_time=None, interval='1m'):
+    if interval not in ('1m', '5m', '15m'):
+        raise ValueError('invalid chart interval')
+    if interval != '1m':
+        if type(limit) is not int or not 1 <= limit <= 1000 or type(include_open) is not bool or (end_time is not None and (type(end_time) is not int or end_time < 0)):
+            raise ValueError('invalid candle query')
+        indicators.normalize('sma', {'period':period})
+        minutes = int(interval[:-1]); seconds = minutes * 60
+        db = connect()
+        try:
+            db.execute('BEGIN')
+            where = 'WHERE time<=?' if end_time is not None else ''
+            args = ([end_time] if end_time is not None else []) + [(limit + period + 2) * minutes]
+            rows = db.execute('SELECT time,open,high,low,close,tick_volume,is_open FROM candles ' + where + ' ORDER BY time DESC LIMIT ?', args).fetchall()
+            status = dict(db.execute('SELECT key,value FROM collector_status').fetchall())
+        finally: db.close()
+        groups = {}
+        for row in reversed(rows):
+            bucket = row['time'] // seconds * seconds
+            groups.setdefault(bucket, []).append(row)
+        bars = []
+        now = int(time.time())
+        for bucket, group in groups.items():
+            complete = len(group) == minutes and all(item['time'] == bucket + index * 60 for index, item in enumerate(group))
+            provisional = bucket + seconds > now or any(item['is_open'] for item in group)
+            contiguous = all(item['time'] == bucket + index * 60 for index, item in enumerate(group))
+            if not complete and (not provisional or not contiguous): continue
+            if provisional and not include_open: continue
+            volume = [item['tick_volume'] for item in group]
+            bars.append({'time':bucket, 'open':group[0]['open'], 'high':max(item['high'] for item in group),
+                         'low':min(item['low'] for item in group), 'close':group[-1]['close'],
+                         'tick_volume':sum(item for item in volume if item is not None) if any(item is not None for item in volume) else None,
+                         'is_open':provisional})
+        points = moving_average(bars, period)
+        selected = bars[-limit:]
+        times = {bar['time'] for bar in selected}
+        return {'symbol':SYMBOL, 'interval':interval, 'candles':selected,
+                'last_success':float(status['last_success']) if status.get('last_success') else None,
+                'collector_error':status.get('error') or None,
+                'moving_average':{'type':'SMA', 'period':period, 'points':[point for point in points if point['time'] in times]}}
     data = snapshot(limit=limit, include_open=include_open, end_time=end_time)
     result = indicator('sma', {'period':period}, limit=limit, include_open=include_open, end_time=end_time)
     data['moving_average'] = {'type':'SMA', 'period':period, 'points':result['points']}

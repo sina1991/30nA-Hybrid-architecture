@@ -168,7 +168,7 @@ PAGE = r"""<!doctype html>
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
-  font: 14px/1.5 system-ui, sans-serif;
+  font: 13px/1.45 system-ui, sans-serif;
 }
 header {
   display: flex; align-items: center; justify-content: space-between;
@@ -181,10 +181,10 @@ h1 { margin: 0; font-size: 21px; }
 label { color: var(--muted); }
 select {
   background: var(--panel); color: var(--text); border: 1px solid var(--border);
-  padding: 9px 10px; border-radius: 8px; min-width: 0; max-width: 100%;
+  padding: 6px 8px; border-radius: 7px; min-width: 0; max-width: 100%;
 }
 #theme { min-width: 180px; }
-main { padding: 22px 24px; max-width: 1800px; margin: auto; }
+main { padding: 16px 18px; max-width: 1800px; margin: auto; }
 body[data-view="overview"] main {padding:0 12px 12px;max-width:none}
 body[data-view="overview"] footer {display:none}
 body:not([data-view="overview"]) #edit-layout {display:none}
@@ -197,18 +197,26 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 #grid, #overview-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-  gap: 12px; align-items: stretch;
+  gap: 9px; align-items: stretch;
 }
 #overview-grid {grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:56px;grid-auto-flow:row;}
 #overview-grid .slot {grid-column:span 4;grid-row:span 5;overflow:auto;position:relative;}
-#overview-grid .slot[data-slot-type="chart"] {grid-column:span 8;grid-row:span 8}
+#overview-grid .slot[data-slot-type="chart"],#overview-grid .slot[data-slot-type="fix-chart"] {grid-column:span 8;grid-row:span 8}
+#grid .slot[data-slot-type="fix-chart"] {grid-column:1 / -1}
 .slot[data-slot-type="chart"] .market-chart {height:clamp(240px,45vh,520px)}
+.slot[data-slot-type="fix-chart"] .module-body {min-height:0;gap:4px}
+.slot[data-slot-type="fix-chart"] .market-graph {flex:1;min-height:200px}
+.slot[data-slot-type="fix-chart"] .market-chart {height:100%;min-height:200px}
+.slot[data-slot-type="fix-chart"] .market-price {font-size:15px}
+.slot[data-slot-type="fix-chart"] .market-legend {display:none}
+.slot[data-slot-type="fix-chart"] .market-status:empty {display:none}
 #overview-grid .slot.layout-unlocked {outline:2px dashed var(--accent);outline-offset:2px}
 .slot-lock {border:1px solid var(--border);background:var(--field);color:var(--text);border-radius:7px;padding:5px 7px;cursor:pointer;font:inherit}
 .layout-unlocked .slot-name {cursor:grab;touch-action:none;user-select:none}
 .layout-unlocked .slot-name:active {cursor:grabbing}
 .slot-resize {display:none;position:absolute;right:0;bottom:0;width:25px;height:25px;border:0;border-radius:10px 0 10px 0;background:var(--accent);cursor:nwse-resize;touch-action:none;color:var(--field)}
 #overview-grid .layout-unlocked .slot-resize {display:block}
+#overview-grid .slot[data-slot-type="fix-chart"] .slot-resize {display:none}
 .slot-color {width:40px;height:30px;padding:2px;border:1px solid var(--border);background:var(--field);border-radius:6px;cursor:pointer}
 .slot-display-theme {max-width:100%;padding:5px;font:inherit}
 .slot[data-display-theme="compact"] {gap:6px;padding:10px}
@@ -238,8 +246,8 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .layout-help {color:var(--muted);font-size:12px}
 .slot {
   min-width: 0; min-height: 190px; background: var(--panel);
-  border: 1px solid var(--border); border-radius: 14px;
-  padding: 12px; display: flex; flex-direction: column; gap: 8px;
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 9px; display: flex; flex-direction: column; gap: 6px;
   box-shadow:0 8px 24px #0002;
 }
 .slot-head {
@@ -252,8 +260,8 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .slot-head-actions::before,.slot-head-actions::after {content:'';margin:auto}
 .slot-head-actions > * {flex:none}
 .slot-head-actions .slot-lock,.slot-head-actions .slot-menu {width:auto;padding:0 7px;white-space:nowrap;font-size:11px}
-.slot-head-actions .slot-pin {width:34px;height:34px;font-size:16px;border-radius:10px}
-.slot-icon {display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--field);color:var(--text);font:inherit;cursor:pointer}
+.slot-head-actions .slot-pin {width:28px;height:28px;font-size:13px;border-radius:7px}
+.slot-icon {display:inline-flex;align-items:center;justify-content:center;width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:8px;background:var(--field);color:var(--text);font:inherit;cursor:pointer}
 .slot-icon:hover,.slot-icon[aria-expanded="true"] {border-color:var(--accent);color:var(--accent)}
 .slot-icon.worker-active {border-color:#16a34a;color:#16a34a;background:#16a34a1a}
 .slot-icon.worker-inactive {border-color:#dc2626;color:#dc2626;background:#dc26261a}
@@ -306,18 +314,20 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .dice-error { color: #fca5a5; }
 .empty { color: var(--muted); }
 footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--border); }
-.app-shell {margin-left:240px;min-height:100vh}
-.sidebar {position:fixed;inset:0 auto 0 0;width:240px;background:var(--sidebar);border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:20px;z-index:10}
-.brand {font-weight:750;font-size:20px;color:var(--text);letter-spacing:.03em}
+.app-shell {margin-left:var(--sidebar-width, 210px);min-height:100vh}
+.sidebar {position:fixed;inset:0 auto 0 0;width:var(--sidebar-width, 210px);background:var(--sidebar);border-right:1px solid var(--border);padding:18px 12px;display:flex;flex-direction:column;gap:14px;z-index:10}
+.brand {font-weight:750;font-size:17px;color:var(--text);letter-spacing:.03em}
 .brand small {display:block;color:var(--muted);font-size:11px;letter-spacing:.12em;font-weight:500}
 .sidebar nav {display:grid;gap:4px}
-.nav-button {text-align:left;padding:11px 14px;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:9px;font:inherit;cursor:pointer}
+.nav-button {text-align:left;padding:8px 10px;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:9px;font:inherit;cursor:pointer}
 .nav-button:hover,.nav-button[aria-current="page"] {color:var(--text);background:var(--nav);border-color:#304766}
+.sidebar-resize {position:absolute;right:-4px;top:0;bottom:0;width:9px;cursor:col-resize;touch-action:none;z-index:12;background:transparent;border:0;padding:0}
+.sidebar-resize:hover,.sidebar-resize:focus-visible {background:var(--accent);opacity:.6}
 .sidebar-footer {margin-top:auto;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
 .mobile-menu {display:none;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font:inherit}
-.view-heading {margin:0 0 4px;font-size:26px}.view-description {color:var(--muted);margin:0 0 22px}
+.view-heading {margin:0 0 4px;font-size:21px}.view-description {color:var(--muted);margin:0 0 15px}
 .overview-grid,.module-catalog {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
-.overview-card,.catalog-card,.info-card {background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;min-width:0}
+.overview-card,.catalog-card,.info-card {background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:13px;min-width:0}
 .overview-card span {display:block;color:var(--muted);font-size:12px}.overview-card strong {display:block;font-size:26px;margin-top:8px}
 .catalog-card h3 {margin:0 0 4px}.catalog-card p {color:var(--muted);overflow-wrap:anywhere}
 .catalog-card code,.info-card code {overflow-wrap:anywhere}.catalog-card button {margin-top:8px}
@@ -333,7 +343,7 @@ body:not([data-view="workers"]):not([data-view="executions"]) #worker-workspace 
 body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="executions"] [data-workspace-pane="workers"] {display:none!important}
 .account-panel {width:100%!important;max-width:none!important;margin:0!important}
 @media (max-width: 760px) {
- .app-shell {margin-left:0}.sidebar {transform:translateX(-100%);transition:transform .2s ease;box-shadow:0 0 0 transparent}
+ .app-shell {margin-left:0}.sidebar-resize {display:none}.sidebar {transform:translateX(-100%);transition:transform .2s ease;box-shadow:0 0 0 transparent}
  body.nav-open .sidebar {transform:translateX(0);box-shadow:0 0 0 100vmax #0009}.mobile-menu {display:inline-block}
 }
 @media (max-width: 900px) {
@@ -342,6 +352,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 @media (max-width: 560px) {
   header { padding: 6px 12px; } main { padding: 16px; }
   #grid { grid-template-columns: minmax(0, 1fr); }
+  #grid .slot[data-slot-type="fix-chart"] {grid-column:auto}
   #theme { min-width: 0; width: 100%; }
 }
 @media (max-width: 760px) {
@@ -365,6 +376,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <button class="nav-button" type="button" data-nav="project">Project Info</button>
     <button class="nav-button" type="button" data-nav="account">Account &amp; Settings</button>
   </nav>
+  <button class="sidebar-resize" id="sidebar-resize" type="button" aria-label="Resize sidebar, use arrow keys" title="Drag to resize sidebar"></button>
   <div class="sidebar-footer">Version <span id="sidebar-version">Loading…</span><br>Server workspace</div>
 </aside>
 <div class="app-shell">
@@ -382,6 +394,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <h2 class="view-heading">Slots</h2><p class="view-description">Assign modules and inspect their output.</p>
   <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
   <button type="button" class="dice-roll-button" id="add-chart-slot" disabled>+ Chart slot</button>
+  <button type="button" class="dice-roll-button" id="add-fixed-chart-slot" disabled>+ Fix Chart slot</button>
   <p class="slots-message" id="slots-message">Sign in to manage slots.</p>
   <div class="toolbar">
     <div id="theme-info">Loading themes…</div>
@@ -673,6 +686,7 @@ function renderModuleOutput(container, value, theme) {
 
 function renderMarketModule(body, slot, module) {
   let period = Number.isInteger(slot.chart_period) ? slot.chart_period : 20;
+  const interval = module.type === 'gold-chart' ? (slot.chart_interval || '1m') : '1m';
   let overlay = slot.chart_overlay !== false, includeOpen = slot.chart_live !== false, busy = false;
   let viewCount = 80, endOffset = 0, cachedData = null, olderCandles = [], olderPoints = [], olderBusy = false, noOlder = false;
   function mergeHistory(data) {
@@ -688,7 +702,7 @@ function renderMarketModule(body, slot, module) {
     if (!cachedData?.candles.length || !bridge?.ready() || olderBusy || noOlder) return;
     olderBusy = true;
     try {
-      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1);
+      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1, interval);
       if (!body.isConnected || !bridge.ready()) return;
       const newCandles = data.candles.filter(item => item.time < oldest);
       if (!newCandles.length) { noOlder = true; status.textContent = 'No older candles in the local database.'; return; }
@@ -698,6 +712,13 @@ function renderMarketModule(body, slot, module) {
     finally { olderBusy = false; }
   }
   const toolbar = makeElement('div', 'market-toolbar');
+  if (module.type === 'gold-chart') {
+    const intervalLabel = makeElement('label', '', 'Timeframe');
+    const intervalSelect = makeElement('select', ''); intervalSelect.setAttribute('aria-label', 'Chart timeframe');
+    ['1m', '5m', '15m'].forEach(value => { const option = makeElement('option', '', value); option.value = value; intervalSelect.append(option); });
+    intervalSelect.value = interval; intervalLabel.append(intervalSelect); toolbar.append(intervalLabel);
+    intervalSelect.addEventListener('change', () => saveOptions({chart_interval:intervalSelect.value}));
+  }
   const periodLabel = makeElement('label', '', 'SMA');
   const periodSelect = makeElement('select', ''); periodSelect.setAttribute('aria-label', 'Moving average period');
   [10, 20, 50, 100, 200].forEach(value => { const option = makeElement('option', '', String(value)); option.value = String(value); periodSelect.append(option); });
@@ -765,7 +786,7 @@ function renderMarketModule(body, slot, module) {
     if (module.type === 'moving-average') { legend.textContent = `${candles.length} candles · ${points.length} SMA values`; return; }
     const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('viewBox', '0 0 800 260'); svg.setAttribute('preserveAspectRatio', 'none');
-    svg.setAttribute('class', 'market-chart'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'XAUUSD one-minute candlestick chart');
+    svg.setAttribute('class', 'market-chart'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', `XAUUSD ${interval} candlestick chart`);
     let low = Math.min(...candles.map(item => item.low)), high = Math.max(...candles.map(item => item.high));
     const actualLow = low, actualHigh = high;
     if (high === low) { high += 1; low -= 1; }
@@ -806,13 +827,13 @@ function renderMarketModule(body, slot, module) {
     svg.addEventListener('pointerup', event => { if (dragStart === null) return; const width = svg.getBoundingClientRect().width || 1; endOffset = Math.max(0, endOffset + Math.round((event.clientX-dragStart)/width * viewCount)); dragStart = null; plot(cachedData); });
     svg.addEventListener('pointercancel', () => { dragStart = null; });
     graph.append(svg);
-    legend.textContent = `1m · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${overlay ? ` · SMA ${period} (orange)` : ''} · Live candle outlined`;
+    legend.textContent = `${interval} · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${overlay ? ` · SMA ${period} (orange)` : ''} · Live candle outlined`;
   }
   async function refresh() {
     const bridge = window.dashboardModuleState;
     if (!bridge?.ready() || busy) return;
     busy = true;
-    try { const data = await bridge.marketData(Math.max(500, period), period, includeOpen); if (body.isConnected && bridge.ready()) { noOlder = false; plot(mergeHistory(data)); } }
+    try { const data = await bridge.marketData(Math.max(500, period), period, includeOpen, null, interval); if (body.isConnected && bridge.ready()) { noOlder = false; plot(mergeHistory(data)); } }
     catch (_) { if (body.isConnected) status.textContent = 'Market data is unavailable.'; }
     finally { busy = false; }
   }
@@ -1152,6 +1173,23 @@ function syncLayoutControls() {
     }
   });
 }
+const sidebarResize = document.getElementById('sidebar-resize');
+function setSidebarWidth(value, save = true) {
+  const width = Math.max(160, Math.min(340, Math.round(value)));
+  document.documentElement.style.setProperty('--sidebar-width', `${width}px`);
+  if (save) { try { localStorage.setItem('30na-sidebar-width', String(width)); } catch (_) {} }
+}
+try { const saved = Number(localStorage.getItem('30na-sidebar-width')); if (saved >= 160 && saved <= 340) setSidebarWidth(saved, false); } catch (_) {}
+sidebarResize.addEventListener('pointerdown', event => {
+  if (event.button !== 0) return;
+  event.preventDefault(); sidebarResize.setPointerCapture(event.pointerId);
+});
+sidebarResize.addEventListener('pointermove', event => { if (sidebarResize.hasPointerCapture(event.pointerId)) setSidebarWidth(event.clientX); });
+sidebarResize.addEventListener('keydown', event => {
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+  event.preventDefault(); setSidebarWidth(document.getElementById('sidebar').getBoundingClientRect().width + (event.key === 'ArrowRight' ? 10 : -10));
+});
+
 document.getElementById('edit-layout').addEventListener('click', () => {
   layoutEditing = !layoutEditing;
   if (!layoutEditing) unlockedSlots.clear();
@@ -1162,6 +1200,7 @@ function attachLayoutControls(card, handle, resize, row, notice) {
   if (card.dataset.area !== 'overview') return;
   const container = document.getElementById('overview-grid');
   function begin(event, mode) {
+    if (mode === 'resize' && row.slot_type === 'fix-chart') return;
     if (!layoutEditing || !unlockedSlots.has(row.slot) || event.button !== 0 || window.matchMedia('(max-width: 760px)').matches) return;
     event.preventDefault();
     const rect = container.getBoundingClientRect();
@@ -1265,7 +1304,7 @@ function attachSavedResult(body, slot, moduleId) {
 
 function makeSlot(row, area) {
   const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
-    chart_period:row.chart_period, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
+    chart_period:row.chart_period, chart_interval:row.chart_interval, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
   const card = makeElement('article', 'slot');
   card.dataset.slotId = slot.id;
   card.dataset.area = area;
@@ -1296,7 +1335,7 @@ function makeSlot(row, area) {
   const actions = makeElement('div', 'slot-menu-actions'); actions.hidden = true;
   const typeLabel = makeElement('label', '', 'Slot type ');
   const slotType = makeElement('select', 'slot-display-theme');
-  [['standard','Standard'],['chart','Chart']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
+  [['standard','Standard'],['chart','Chart'],['fix-chart','Fix Chart']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
   slotType.value = row.slot_type || 'standard';
   slotType.addEventListener('change', async () => {
     slotType.disabled = true;
@@ -1528,6 +1567,7 @@ function renderSlots() {
   const ready = Boolean(window.dashboardModuleState?.ready());
   document.getElementById('add-slot').disabled = !ready;
   document.getElementById('add-chart-slot').disabled = !ready;
+  document.getElementById('add-fixed-chart-slot').disabled = !ready;
   document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
   const pinned = activeSlots.filter(row => row.overview);
   document.getElementById('overview-empty').textContent = !ready ? 'Sign in to view pinned slots.' : pinned.length ? '' : 'No slots added to Overview yet.';
@@ -1610,6 +1650,12 @@ document.getElementById('add-chart-slot').addEventListener('click', async event 
   event.currentTarget.disabled = true;
   try { await window.dashboardModuleState.createSlot('chart'); slotGeneration++; await refreshActiveSlots(); }
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add chart slot. Refresh and check its state.'; }
+  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+});
+document.getElementById('add-fixed-chart-slot').addEventListener('click', async event => {
+  event.currentTarget.disabled = true;
+  try { await window.dashboardModuleState.createSlot('fix-chart'); slotGeneration++; await refreshActiveSlots(); }
+  catch (_) { document.getElementById('slots-message').textContent = 'Could not add fixed chart slot.'; }
   finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
 });
 async function pollSlots() {

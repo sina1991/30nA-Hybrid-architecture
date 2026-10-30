@@ -258,8 +258,8 @@ PANEL = r'''
       }
     },
     async listSlots() { const result = await this.slotRequest('slots/active'); slotOwner = result.owner; return result.slots; },
-    async marketData(limit, period, includeOpen, endTime = null) {
-      return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen) + (endTime === null ? '' : '&end_time=' + encodeURIComponent(endTime)));
+    async marketData(limit, period, includeOpen, endTime = null, interval = '1m') {
+      return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen) + '&interval=' + encodeURIComponent(interval) + (endTime === null ? '' : '&end_time=' + encodeURIComponent(endTime)));
     },
     async marketIndicator(name, period, includeOpen) {
       return this.slotRequest('market/indicators/' + encodeURIComponent(name) + '?limit=200&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen));

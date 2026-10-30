@@ -85,7 +85,7 @@ def list_active(owner):
                            'layout': meta.get('layout'), 'frame_color': meta.get('frame_color'),
                            'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker'),
                            'slot_type': meta.get('slot_type', 'standard'),
-                           'chart_period': meta.get('chart_period', 20), 'indicator_period': meta.get('indicator_period', 14), 'chart_overlay': meta.get('chart_overlay', True),
+                           'chart_period': meta.get('chart_period', 20), 'chart_interval': meta.get('chart_interval', '1m'), 'indicator_period': meta.get('indicator_period', 14), 'chart_overlay': meta.get('chart_overlay', True),
                            'chart_live': meta.get('chart_live', True)})
         return result
     finally:
@@ -93,14 +93,14 @@ def list_active(owner):
 
 
 def create(owner, slot_type='standard'):
-    if slot_type not in ('standard', 'chart'): raise ValueError('invalid slot type')
+    if slot_type not in ('standard', 'chart', 'fix-chart'): raise ValueError('invalid slot type')
     db = _layout_db(owner)
     try:
         count = db.execute("SELECT count(*) FROM module_state WHERE owner=? AND module='slot-meta'", (owner,)).fetchone()[0]
         if count >= 100:
             raise ValueError('slot limit reached')
         slot = 'slot-' + uuid4().hex[:12]
-        config = {'module_id': 'gold-chart' if slot_type == 'chart' else 'empty', 'context': {}, 'revision': str(uuid4())}
+        config = {'module_id': 'gold-chart' if slot_type in ('chart', 'fix-chart') else 'empty', 'context': {}, 'revision': str(uuid4())}
         db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-binding',?,?)", (owner, slot, json.dumps(config)))
         db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-meta',?,?)", (owner, slot, json.dumps({'overview': False, 'slot_type':slot_type})))
         db.commit()
@@ -148,10 +148,12 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval'}:
         raise ValueError('invalid slot appearance')
-    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'chart'):
+    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'chart', 'fix-chart'):
         raise ValueError('invalid slot type')
+    if 'chart_interval' in updates and updates['chart_interval'] not in ('1m', '5m', '15m'):
+        raise ValueError('invalid chart interval')
     if 'indicator_period' in updates and (type(updates['indicator_period']) is not int or not 1 <= updates['indicator_period'] <= 500):
         raise ValueError('invalid indicator period')
     if 'chart_period' in updates and (type(updates['chart_period']) is not int or not 1 <= updates['chart_period'] <= 500):
@@ -175,7 +177,13 @@ def update_appearance(owner, slot, updates):
     try:
         row = db.execute("SELECT value FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
         if not row: raise LookupError('slot is not active')
-        meta = json.loads(row[0]); meta.update(updates)
+        meta = json.loads(row[0])
+        resulting_type = updates.get('slot_type', meta.get('slot_type', 'standard'))
+        if resulting_type == 'fix-chart' and 'layout' in updates and (updates['layout']['w'], updates['layout']['h']) != (8, 8):
+            raise ValueError('fixed chart dimensions cannot be changed')
+        if resulting_type == 'fix-chart' and meta.get('slot_type') != 'fix-chart':
+            meta.pop('layout', None)
+        meta.update(updates)
         db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps(meta), owner, slot))
         db.commit()
         return meta
@@ -198,6 +206,7 @@ def _market_preferences(owner, slot, module_id):
     meta = change(owner, 'slot-meta', slot, None, lambda old: (old, False)) or {}
     result = {'include_open': meta.get('chart_live', True)}
     if module_id in ('gold-chart', 'moving-average'): result['period'] = meta.get('chart_period', 20)
+    if module_id == 'gold-chart': result['interval'] = meta.get('chart_interval', '1m')
     if module_id == 'rsi': result['period'] = meta.get('indicator_period', 14)
     return result
 

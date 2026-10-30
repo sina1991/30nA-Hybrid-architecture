@@ -72,9 +72,10 @@ def create_router(credential_path, upstream_factory):
     @router.get('/market/candles')
     def market_candles(limit: int = Query(default=200, ge=1, le=1000),
                        period: int = Query(default=20, ge=1, le=500),
-                       include_open: bool = True, end_time: int | None = Query(default=None, ge=0), identity=Depends(owner)):
+                       include_open: bool = True, end_time: int | None = Query(default=None, ge=0),
+                       interval: str = '1m', identity=Depends(owner)):
         try:
-            result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time)
+            result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time, interval=interval)
         except (ValueError, OSError, sqlite3.Error):
             raise HTTPException(503, 'Market data is unavailable') from None
         response = JSONResponse(envelope(result))
