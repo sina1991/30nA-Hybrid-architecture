@@ -909,9 +909,9 @@
       "sha256": "889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf"
     },
     {
-      "bytes": 2942,
+      "bytes": 2995,
       "path": ".github/workflows/release.yml",
-      "sha256": "5926c18228ff1b63b55802734b821e711256ba963a5f3e3bc8440b2c25e6209a"
+      "sha256": "3bd849d3a5468419d50a6d21ac431f9d552580595629e5cdfdcbf6206843f8f1"
     },
     {
       "bytes": 265,

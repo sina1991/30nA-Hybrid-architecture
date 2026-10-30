@@ -34,6 +34,7 @@ jobs:
           for attempt in {1..60}; do
             state=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$release_sha&branch=main&event=push" --jq ".workflow_runs | any(.head_sha == \"$release_sha\" and .conclusion == \"success\")")
             if [[ "$state" == true ]]; then ready=true; break; fi
+            echo "Waiting for main CI ($attempt/60)"
             sleep 10
           done
           [[ "$ready" == true ]] || { echo 'Successful main CI for this commit is required.' >&2; exit 1; }

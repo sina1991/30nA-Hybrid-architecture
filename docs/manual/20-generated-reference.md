@@ -13,7 +13,7 @@
 | [.gitattributes](../../.gitattributes) | 108 | `5c74770b9a41953e78518fc6f380870b3d0b1b7985a19f8cd6ad52e8bcd07b08` |
 | [.github/workflows/baseline-verification.yml](../../.github/workflows/baseline-verification.yml) | 4601 | `43337a0b754e591affe6f08657892e35202a16978aa7ca8f5086f8dda730b088` |
 | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
-| [.github/workflows/release.yml](../../.github/workflows/release.yml) | 2942 | `5926c18228ff1b63b55802734b821e711256ba963a5f3e3bc8440b2c25e6209a` |
+| [.github/workflows/release.yml](../../.github/workflows/release.yml) | 2995 | `3bd849d3a5468419d50a6d21ac431f9d552580595629e5cdfdcbf6206843f8f1` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
 | [AGENTS.md](../../AGENTS.md) | 1710 | `92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d` |
 | [CHANGELOG.md](../../CHANGELOG.md) | 4123 | `a78e265041ae828aeab4cb8a07431927d48a3c67415908936b457a764ae41c38` |
