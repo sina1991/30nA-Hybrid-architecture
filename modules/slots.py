@@ -6,7 +6,14 @@ import re
 import sqlite3
 from uuid import uuid4
 from .module_state import change
-from .execution import MODULE_FILES, run_module
+from .execution import MODULE_FILES, HOST_MONITORS, run_module
+
+
+def _authorize_host_monitor(owner, module_id):
+    if module_id in HOST_MONITORS:
+        allowed = {item.strip() for item in os.environ.get('THIRTYNA_MONITOR_OWNERS', 'customer').split(',') if item.strip()}
+        if owner not in allowed:
+            raise ValueError('owner is not authorized for host monitors')
 
 
 def binding(owner, slot, module_id=None, context=None, only_if_missing=False):
@@ -41,6 +48,7 @@ def execute(owner, slot, data, expected_module=None):
     if config is None:
         raise LookupError('slot is not configured')
     module_id = config['module_id']
+    _authorize_host_monitor(owner, module_id)
     if expected_module is not None and expected_module != module_id:
         raise ValueError('slot binding changed')
     if not isinstance(data, dict) or any(str(key).startswith('_') or key in ('owner', 'slot') for key in data):
@@ -59,6 +67,7 @@ def read(owner, slot):
     if config is None:
         raise LookupError('slot is not configured')
     module_id = config['module_id']
+    _authorize_host_monitor(owner, module_id)
     if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health'):
         data = {'action':'get'} if module_id in ('counter','slot-note') else {}
         # Reads never change the saved output or execute arbitrary code.

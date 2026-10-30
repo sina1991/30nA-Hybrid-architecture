@@ -201,6 +201,18 @@ PANEL = r'''
         throw error;
       }
     },
+    async read(slot, moduleId) {
+      if (!token || !authenticated) throw new Error('Sign in is required.');
+      const current = generation;
+      try {
+        const result = await request('slots/' + encodeURIComponent(slot) + '/read', {module_id:moduleId});
+        if (current !== generation) throw new Error('The session changed.');
+        return result.result;
+      } catch (error) {
+        if (current === generation && error.status === 401) disconnect(error.message);
+        throw error;
+      }
+    },
     async execute(slot, moduleId, input) {
       if (!token || !authenticated) throw new Error('Sign in is required.');
       const current = generation;

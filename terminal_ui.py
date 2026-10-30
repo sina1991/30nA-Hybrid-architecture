@@ -186,6 +186,23 @@ class Terminal:
             return {}
         if module_id in ('empty', 'dashboard-health'):
             return {}
+        examples = {
+            'system-monitor': '{}', 'disk-usage': '{"path":"/"}',
+            'network-monitor': '{"interface":"eth0"}',
+            'service-monitor': '{"service":"nginx.service"}',
+            'process-monitor': '{"name":"nginx"}',
+            'log-viewer': '{"path":"/var/log/example.log","lines":20}',
+            'docker-monitor': '{}', 'alerts': '{"disk_used_percent":90}',
+        }
+        if module_id in examples:
+            raw = self.ask('Input JSON object (example: ' + examples[module_id] + ')', '{}')
+            try:
+                data = json.loads(raw)
+                if not isinstance(data, dict): raise ValueError()
+                json.dumps(data, allow_nan=False)
+                return data
+            except (TypeError, ValueError):
+                raise ValueError('Input must be a valid JSON object.') from None
         raw = self.ask('Input JSON object (example: {"key":"value"})', '{}')
         try:
             data = json.loads(raw)

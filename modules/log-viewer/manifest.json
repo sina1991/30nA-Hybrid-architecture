@@ -1,0 +1,8 @@
+{
+  "id": "log-viewer",
+  "name": "Log Viewer",
+  "description": "Read allowed log files.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "host-monitor"
+}

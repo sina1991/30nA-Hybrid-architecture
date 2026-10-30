@@ -94,6 +94,23 @@ def create_router(credential_path, upstream_factory):
         response.headers['Vary'] = 'Authorization'
         return response
 
+    @router.post('/slots/{slot_id}/read')
+    def read_slot(slot_id: str, body: dict, identity=Depends(owner)):
+        if set(body) != {'module_id'} or not isinstance(body['module_id'], str):
+            raise HTTPException(422, 'Invalid slot request')
+        try:
+            value = slots.read(identity, slot_id)
+            if value['module_id'] != body['module_id']:
+                raise ValueError('slot binding changed')
+        except LookupError:
+            raise HTTPException(404, 'Slot not configured') from None
+        except (ValueError, TypeError, OverflowError, KeyError):
+            raise HTTPException(422, 'Invalid slot request') from None
+        response = JSONResponse(envelope(value))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
     @router.post('/slots/{slot_id}/execute')
     def execute_slot(slot_id: str, body: dict, identity=Depends(owner)):
         if set(body) != {'module_id', 'input'} or not isinstance(body['input'], dict):

@@ -76,3 +76,29 @@ state در SQLite زیر `/var/lib/30na/dashboard` با مالکیت خصوصی 
 یادداشت‌های نسخه قدیمی همچنان در localStorage مرورگر باقی می‌مانند و خودکار به هیچ owner منتقل نمی‌شوند. پس از ورود، دکمه «انتقال یادداشت قدیمی مرورگر» آن را برای همان owner و slot ذخیره می‌کند؛ اگر سرور متن دیگری داشته باشد، ابتدا تأیید جایگزینی می‌خواهد. انتخاب theme و ماژول اسلات هنوز محلی مرورگر است.
 
 برای هر module جدید، فایل Python دارای `run(data)` و ورودی/خروجی JSON، manifest معتبر، ثبت صریح type در registry و مسیر trusted در `execution.py`، UI متناسب و **فرمان واقعی ترمینال** در همین بخش لازم است. از import بر اساس path یا دستور دلخواه دریافت‌شده از کاربر خودداری کنید. CLI جامع در آینده و جداگانه ساخته می‌شود.
+
+## Server monitoring modules
+
+The following read-only modules run independently and can also be selected in an authenticated Dashboard slot. Their results are JSON. For a bound slot, `30na slots --owner customer run slot-01 --input '{}'` executes its module and saves the result; `30na slots --owner customer read slot-01` reads that saved result. Replace the slot ID with the desired slot. Dashboard displays the last saved result, including results initiated from the terminal.
+
+```bash
+30na modules run system-monitor --input '{}'
+30na modules run service-monitor --input '{"service":"nginx.service"}'
+30na modules run disk-usage --input '{"path":"/"}'
+30na modules run network-monitor --input '{}'
+30na modules run process-monitor --input '{"name":"nginx"}'
+30na modules run alerts --input '{"disk_used_percent":90,"service":"nginx.service"}'
+30na modules run log-viewer --input '{"path":"/var/log/example.log","lines":20,"query":"error"}'
+30na modules run docker-monitor --input '{}'
+```
+
+Each module can also be called directly, for example:
+
+```bash
+python3 /opt/30na/dashboard-current/modules/system-monitor/module.py --input '{}'
+python3 /opt/30na/dashboard-current/modules/disk-usage/module.py --input '{"path":"/"}'
+```
+
+Replace `system-monitor` in the direct path with any module ID listed above. Network figures are cumulative interface counters; CPU is sampled briefly. Process counts, CPU and memory cover only processes visible to the executing user. A container or systemd sandbox may restrict what the service can see. Alerts are evaluated only when the module runs; they do not schedule background checks or send notifications.
+
+Dashboard slot execution runs under the Dashboard service account. Its host monitor owners are restricted by `THIRTYNA_MONITOR_OWNERS` (comma-separated, default `customer`). `THIRTYNA_MONITOR_DISK_PATHS` is a colon-separated exact-path allowlist (default `/`); `THIRTYNA_MONITOR_SERVICES` is a comma-separated list (default `nginx.service,docker.service`). Log Viewer requires an administrator-controlled colon-separated `THIRTYNA_MONITOR_LOG_PATHS` allowlist and ordinary read permission; it reads at most the last 256 KiB. Docker Monitor is disabled unless `THIRTYNA_MONITOR_DOCKER=1` is set for the executing environment, and it uses only that user's existing Docker access. Docker socket access can grant broad control of the daemon; do not grant it merely to make monitoring work. These variables must be configured separately for the Dashboard service and terminal process if both need the same access. Use trusted, administrator-controlled paths; never add credential or secret files to the log allowlist.

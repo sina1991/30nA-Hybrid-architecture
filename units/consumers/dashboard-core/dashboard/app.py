@@ -104,6 +104,9 @@ def clock_time(timezone: str | None = None) -> dict:
 @app.post("/api/modules/{module_id}/run")
 def execute_module(module_id: str, data: dict) -> dict:
     try:
+        from modules.execution import HOST_MONITORS
+        if module_id in HOST_MONITORS:
+            raise HTTPException(status_code=403, detail="Sign in to use this module")
         if any(str(key).startswith('_') for key in data):
             raise ValueError('reserved input field')
         return {"result": run_module(module_id, data)}
@@ -314,6 +317,49 @@ function renderModuleContent(body, slot, moduleId) {
 
   if (!module) {
     body.append(makeElement("div", "module-title", "Unknown module"));
+    return;
+  }
+
+  if (module.type === "host-monitor") {
+    const hint = makeElement("div", "module-detail", "Sign in to run this monitor.");
+    const input = makeElement("textarea", "module-note-input");
+    input.setAttribute("aria-label", "Module input JSON");
+    const examples = {"system-monitor":"{}", "disk-usage":'{"path":"/"}',
+      "network-monitor":'{"interface":"eth0"}', "service-monitor":'{"service":"nginx.service"}',
+      "process-monitor":'{"name":"nginx"}', "log-viewer":'{"path":"/var/log/example.log","lines":20}',
+      "docker-monitor":"{}", "alerts":'{"disk_used_percent":90}'};
+    input.value = "{}"; input.placeholder = "Example: " + (examples[module.id] || "{}");
+    const button = makeElement("button", "dice-roll-button", "Run monitor");
+    button.type = "button";
+    const output = makeElement("pre", "module-detail", "No result yet.");
+    output.style.whiteSpace = "pre-wrap"; output.style.overflowWrap = "anywhere";
+    let busy = false, last = null;
+    async function refresh() {
+      const bridge = window.dashboardModuleState;
+      const ready = Boolean(bridge && bridge.ready());
+      button.disabled = !ready || busy; input.disabled = !ready;
+      if (!ready) { output.textContent = "Sign in to view this monitor."; last = null; return; }
+      if (busy) return;
+      try {
+        const result = await bridge.read(slot.id, module.id);
+        if (!body.isConnected || !bridge.ready()) return;
+        const serialized = result === null ? "No result yet. Run the monitor." : JSON.stringify(result, null, 2);
+        if (serialized !== last) { output.textContent = serialized; last = serialized; }
+        hint.textContent = "Input: JSON object. Result is shared with the terminal.";
+      } catch (_) { if (body.isConnected) hint.textContent = "Could not read this slot."; }
+    }
+    button.addEventListener("click", async () => {
+      let data;
+      try { data = JSON.parse(input.value); if (!data || Array.isArray(data) || typeof data !== "object") throw Error(); }
+      catch (_) { hint.textContent = "Enter a valid JSON object, for example {}."; return; }
+      busy = true; button.disabled = true;
+      try { await window.dashboardModuleState.execute(slot.id, module.id, data); }
+      catch (_) { hint.textContent = "Monitor failed. Check its input and server permissions."; }
+      finally { busy = false; await refresh(); }
+    });
+    body.append(makeElement("div", "module-title", module.name), hint, input, button, output);
+    function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 5000); }
+    tick();
     return;
   }
 

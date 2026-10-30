@@ -1,0 +1,8 @@
+{
+  "id": "service-monitor",
+  "name": "Service Monitor",
+  "description": "Status of permitted systemd services.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "host-monitor"
+}

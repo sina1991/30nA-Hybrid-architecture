@@ -19,6 +19,7 @@ SUPPORTED_TYPES = {
     "clock",
     "counter",
     "calculator",
+    "host-monitor",
 }
 
 

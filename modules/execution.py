@@ -9,14 +9,20 @@ MODULE_FILES = {
     'counter': 'counter/module.py', 'dice-roller': 'dice-roller/module.py',
     'slot-note': 'slot-note/module.py', 'theme-summary': 'theme-summary/module.py',
     'dashboard-health': 'dashboard-health/module.py', 'empty': 'empty/module.py',
+    'system-monitor': 'system-monitor/module.py', 'service-monitor': 'service-monitor/module.py',
+    'disk-usage': 'disk-usage/module.py', 'network-monitor': 'network-monitor/module.py',
+    'process-monitor': 'process-monitor/module.py', 'alerts': 'alerts/module.py',
+    'log-viewer': 'log-viewer/module.py', 'docker-monitor': 'docker-monitor/module.py',
 }
+
+HOST_MONITORS = frozenset(('system-monitor', 'service-monitor', 'disk-usage', 'network-monitor', 'process-monitor', 'alerts', 'log-viewer', 'docker-monitor'))
 
 
 class UnknownModule(LookupError):
     pass
 
 
-@lru_cache(maxsize=8)
+@lru_cache(maxsize=32)
 def _load(module_id):
     spec = importlib.util.spec_from_file_location('trusted_module_' + module_id.replace('-', '_'), PACKAGES / MODULE_FILES[module_id])
     module = importlib.util.module_from_spec(spec)
@@ -29,4 +35,9 @@ def run_module(module_id, data):
         raise UnknownModule('Unknown module')
     if not isinstance(data, dict):
         raise ValueError('input must be a JSON object')
-    return _load(module_id).run(data)
+    try:
+        return _load(module_id).run(data)
+    except (OSError, UnicodeError) as error:
+        if module_id in HOST_MONITORS:
+            raise ValueError('monitor cannot access the requested resource') from error
+        raise

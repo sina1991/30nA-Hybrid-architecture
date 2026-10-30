@@ -24,4 +24,7 @@ def main(run):
     except (ValueError, TypeError, KeyError, OverflowError, ZeroDivisionError) as error:
         print(json.dumps({'error': str(error)}, ensure_ascii=False), file=sys.stderr)
         return 2
+    except (OSError, UnicodeError):
+        print(json.dumps({'error': 'resource unavailable'}, ensure_ascii=False), file=sys.stderr)
+        return 2
     return 0

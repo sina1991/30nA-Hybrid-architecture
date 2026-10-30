@@ -1,0 +1,8 @@
+{
+  "id": "network-monitor",
+  "name": "Network Monitor",
+  "description": "Interface traffic counters.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "host-monitor"
+}
