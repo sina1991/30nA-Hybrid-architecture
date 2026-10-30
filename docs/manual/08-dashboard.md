@@ -4,7 +4,7 @@
 
 ## دو حالت مستقل
 
-`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، account panel را در ابتدای صفحه اضافه می‌کند. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
+`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، ورود کوچک را در header و Workspace حساب را پس از بخش اسلات‌ها قرار می‌دهد. Workspace تا دریافت موفق داده حساب پنهان است. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
 
 ## راهنمای کاربر
 
@@ -51,3 +51,7 @@ Polling حدود هر ثانیه، window خودکار شش دقیقه و fetch 
 حذف نیازمند تایپ دقیق Worker ID است؛ این عملیات history را حذف و اجرای پذیرفته‌شده را متوقف نمی‌کند. برای توقف از cancel و سپس بررسی terminal status استفاده کنید. عملیات mutation پس از timeout یا پاسخ مبهم خودکار تکرار نمی‌شود؛ ابتدا فرم را ببندید و فهرست را refresh کنید. mutation هنگام unresolved run retry مسدود است تا snapshot اجرای قبلی بی‌صدا عوض نشود. logout داده‌های فرم مدیریت را نیز پاک می‌کند؛ نتیجه درخواست قدیمی نباید وارد session جدید شود.
 
 History فعلاً حداکثر ۱۰۰ اجرای اخیر است. فیلتر Worker/execution ID و status در browser روی همین snapshot کار می‌کند؛ pagination تمام تاریخچه وجود ندارد. صفحه وضعیت هم‌زمان چند اجرای زنده یا ویرایش optimistic/versioned را تضمین نمی‌کند. [به‌روزرسانی مستقل Dashboard](../deployment/dashboard-update.md) برای VPS نصب‌شده در دسترس است.
+
+## چیدمان v0.1.1
+
+اسلات‌ها در بالای صفحه باقی می‌مانند؛ login/logout جای آن‌ها را تغییر نمی‌دهد. پس از ورود، مدیریت، اجرا و history زیر تمام اسلات‌ها نمایش داده می‌شوند. پیام‌های Worker داخل Workspace و پیام ورود در header قرار می‌گیرند. لینک header دسترسی مستقیم به Workspace پایین صفحه می‌دهد. [نسخه توسعه و روش بررسی روی VPS](../development/dashboard-v0.1.1.md).

@@ -209,6 +209,12 @@
       "required lookup"
     ],
     [
+      "DASHBOARD_LAYOUT_SCREENSHOT",
+      "units/consumers/dashboard-core/tests/test_browser.py",
+      18,
+      "optional lookup"
+    ],
+    [
       "DASHBOARD_SCREENSHOT",
       "units/worker-runtime/tests/control_plane_helper.py",
       114,
@@ -924,9 +930,9 @@
       "sha256": "92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d"
     },
     {
-      "bytes": 4123,
+      "bytes": 4463,
       "path": "CHANGELOG.md",
-      "sha256": "a78e265041ae828aeab4cb8a07431927d48a3c67415908936b457a764ae41c38"
+      "sha256": "657127747553e3b0435afb0e6347a9c1b060d39873170bb8305ed14cf5dacdcf"
     },
     {
       "bytes": 2817,
@@ -934,9 +940,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 7125,
+      "bytes": 7225,
       "path": "README.md",
-      "sha256": "64e253f497f8eda7e7a65cc342f9cd81b24463efe655ce46cb20a04d785d4110"
+      "sha256": "7034ed3a96b530b9cfc7ad430dd21c46833c2e902b43f887f8cea7f2bd33cbd8"
     },
     {
       "bytes": 1866,
@@ -1086,7 +1092,7 @@
     {
       "bytes": 87160,
       "path": "contracts/dashboard/openapi.json",
-      "sha256": "5b7f9d05718fe65149f4e2d4d1bb4e87ccf177f3fa909a2c5e8b1534fcd7a68d"
+      "sha256": "d01301bec686569681d82bbb18f14b1cfe2e95070a4dffc52686b1d50ad6808c"
     },
     {
       "bytes": 610,
@@ -1449,14 +1455,19 @@
       "sha256": "6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0"
     },
     {
-      "bytes": 4893,
+      "bytes": 5199,
       "path": "units/consumers/dashboard-core/README.md",
-      "sha256": "de518e2387bef4224e01ca855b637119c986449ef16beae5e26f61ffbaf2dac3"
+      "sha256": "f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496"
     },
     {
-      "bytes": 8760,
+      "bytes": 9235,
       "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "3c9baafec9e470a057909ab4b49bc7845e8e8ddbddce03cb112a3045c9286c62"
+      "sha256": "6269ab8ca3627ed929df40a46f013002b69f6d9a8a7a5c1b564440cec259b6d1"
+    },
+    {
+      "bytes": 1610,
+      "path": "units/consumers/dashboard-core/browser-tests/layout.cjs",
+      "sha256": "0eea28bbe25519a5668c8e2ef224d1b934c3d769d4060b44c824809a444c6547"
     },
     {
       "bytes": 3504,
@@ -1479,9 +1490,9 @@
       "sha256": "df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048"
     },
     {
-      "bytes": 17129,
+      "bytes": 17185,
       "path": "units/consumers/dashboard-core/dashboard/app.py",
-      "sha256": "5c1602f4dcee30461aa9af01cab8f9c13bc08826d6be28df9791910c9dd122fe"
+      "sha256": "26f079fccb43b6685cfa507b6bac4065d5024f6d0cc16632a2b32692b1cd1499"
     },
     {
       "bytes": 41,
@@ -1539,9 +1550,9 @@
       "sha256": "10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048"
     },
     {
-      "bytes": 27189,
+      "bytes": 28869,
       "path": "units/consumers/dashboard-core/dashboard/upstream_panel.py",
-      "sha256": "772b4eca9df15b972a60b5031a1862b96b209fbe84cfbd6c205d659559eff2d1"
+      "sha256": "3f649355983ad84edefed4610252870040ccaf5bdf071f0d8baea65534eed588"
     },
     {
       "bytes": 5769,
@@ -1574,9 +1585,9 @@
       "sha256": "db7518ee2c4a66fe896a926b2f2024ab7a8cf85c0f0d3d0827388da44234e223"
     },
     {
-      "bytes": 887,
+      "bytes": 1078,
       "path": "units/consumers/dashboard-core/tests/test_browser.py",
-      "sha256": "7297377436f1100bd7097db30d78183ebcc9683434f078b497bb951224d736d6"
+      "sha256": "ac5fd4144681577f53d209afa1887b1deb1a28a8f3451cae02a099189d429540"
     },
     {
       "bytes": 1782,

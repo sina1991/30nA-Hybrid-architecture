@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased — v0.1.1 Dashboard layout
+
+- Compact account access in the header; keep slots at the top before and after login.
+- Show Worker management, execution and history below all slots only after account data loads.
+- Keep Worker notices out of the header and add desktop/mobile layout regression using real theme/module fixtures.
+
 ## v0.1.0 — 2026-10-30
 
 نسخه MVP مدیریت Worker و اجراها؛ [Release notes](docs/releases/v0.1.0.md). شاخه اصلی نصب و توسعه `main` است.

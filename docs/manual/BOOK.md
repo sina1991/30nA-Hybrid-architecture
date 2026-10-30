@@ -1,6 +1,6 @@
 # دفترچه جامع پروژه 30nA Hybrid Architecture
 
-تاریخ بررسی: `2026-10-30`؛ مبنای رفتار برنامه: `2e08ca8b948d30265aef2e6350c84d36deb77690`.
+تاریخ بررسی: `2026-10-30`؛ مبنای رفتار برنامه: `6f71531301ea97b29d479b371e02cee0838ffd76`.
 
 این کتاب نسخه یک‌جلدی فصل‌های همین پوشه است. فصل‌ها و مرجع ماشینی منبع نگهداری هستند؛ BOOK.md و HTML را دستی ویرایش نکنید.
 
@@ -32,13 +32,13 @@
 
 # ۰۰ — دامنه، وضعیت و روش استفاده
 
-این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit `2e08ca8b948d30265aef2e6350c84d36deb77690` روی branch اصلی `main` است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.
+این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit `6f71531301ea97b29d479b371e02cee0838ffd76` روی branch توسعه `feat/dashboard-v0.1.1` است؛ Release رسمی فعلی `v0.1.0` باقی مانده است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.
 
 ## وضعیت قابل اثبات
 
 - نسخه فعلی **Release candidate برای demo با Workerهای trusted و ازپیش‌ثبت‌شده** است.
-- اجرای کامل محلی پنل مدیریت Worker روی Python 3.11 و 3.12: `315 passed, 65 subtests passed`، بدون skipped/warning؛ شامل Chromium CRUD واقعی روی HTTPS/Docker است.
-- [CI پیشین c3b97d2](https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604) روی Ubuntu 24.04 شامل تست‌های هر دو Python، Chromium و security scans موفق بوده است؛ این لینک evidence تاریخی همان SHA است. اصلاحات فعلی به‌صورت محلی در هر دو Python تأیید شده‌اند؛ نتیجه CI checkout جدید را در [صفحه Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Amain) بررسی کنید.
+- اجرای کامل محلی چیدمان v0.1.1 و پنل مدیریت Worker روی Python 3.11 و 3.12: `315 passed, 65 subtests passed`، بدون skipped/warning؛ شامل چیدمان desktop/mobile، قبل و بعد از login/logout و Chromium CRUD واقعی روی HTTPS/Docker است.
+- [CI پیشین c3b97d2](https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604) روی Ubuntu 24.04 شامل تست‌های هر دو Python، Chromium و security scans موفق بوده است؛ این لینک evidence تاریخی همان SHA است. اصلاحات فعلی به‌صورت محلی در هر دو Python تأیید شده‌اند؛ نتیجه CI checkout جدید را در [صفحه Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Fdashboard-v0.1.1) بررسی کنید.
 - کد برای VPS، systemd، credential files و HTTPS آماده شده؛ log ارائه‌شده operator، موفقیت نصب و smoke اجرای واقعی روی VPS را گزارش می‌کند؛ این شاهد محدود به مسیر نصب و اجرای نمونه است. Rootless security acceptance، fault-injection و backup/restore مستقل هنوز تأیید نشده‌اند. update جدید Dashboard از Cloud روی VPS اعمال نشده است.
 - Docker محیط Cloud rootful بود. نتیجه آن پذیرش امنیتی rootless روی VPS نیست.
 
@@ -448,7 +448,7 @@ Worker می‌تواند `{"value":7,"children":[{"worker_id":"child","input":{}
 
 ## دو حالت مستقل
 
-`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، account panel را در ابتدای صفحه اضافه می‌کند. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
+`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، ورود کوچک را در header و Workspace حساب را پس از بخش اسلات‌ها قرار می‌دهد. Workspace تا دریافت موفق داده حساب پنهان است. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
 
 ## راهنمای کاربر
 
@@ -495,6 +495,10 @@ Polling حدود هر ثانیه، window خودکار شش دقیقه و fetch 
 حذف نیازمند تایپ دقیق Worker ID است؛ این عملیات history را حذف و اجرای پذیرفته‌شده را متوقف نمی‌کند. برای توقف از cancel و سپس بررسی terminal status استفاده کنید. عملیات mutation پس از timeout یا پاسخ مبهم خودکار تکرار نمی‌شود؛ ابتدا فرم را ببندید و فهرست را refresh کنید. mutation هنگام unresolved run retry مسدود است تا snapshot اجرای قبلی بی‌صدا عوض نشود. logout داده‌های فرم مدیریت را نیز پاک می‌کند؛ نتیجه درخواست قدیمی نباید وارد session جدید شود.
 
 History فعلاً حداکثر ۱۰۰ اجرای اخیر است. فیلتر Worker/execution ID و status در browser روی همین snapshot کار می‌کند؛ pagination تمام تاریخچه وجود ندارد. صفحه وضعیت هم‌زمان چند اجرای زنده یا ویرایش optimistic/versioned را تضمین نمی‌کند. [به‌روزرسانی مستقل Dashboard](../deployment/dashboard-update.md) برای VPS نصب‌شده در دسترس است.
+
+## چیدمان v0.1.1
+
+اسلات‌ها در بالای صفحه باقی می‌مانند؛ login/logout جای آن‌ها را تغییر نمی‌دهد. پس از ورود، مدیریت، اجرا و history زیر تمام اسلات‌ها نمایش داده می‌شوند. پیام‌های Worker داخل Workspace و پیام ورود در header قرار می‌گیرند. لینک header دسترسی مستقیم به Workspace پایین صفحه می‌دهد. [نسخه توسعه و روش بررسی روی VPS](../development/dashboard-v0.1.1.md).
 
 <a id="chapter-09"></a>
 
@@ -917,7 +921,7 @@ workflow تاریخی `baseline-verification.yml` روی SHA ثابت قدیمی
 
 HTTP 200، exit صفر فرمان آخر pipe، PID، port باز، تعداد صفر تست یا skipped job به‌تنهایی موفقیت نیست. passed، failed، subtests، skipped، xfail و unrun باید متمایز ثبت شوند. runner کامل، skipped و zero-test را رد و pytest exit را ثبت می‌کند. unit-only، Docker/Browser را صریح محدود می‌کند و برای Release معتبر نیست.
 
-شواهد محلی نسخه مدیریت Worker `2e08ca8`: `315 passed, 65 subtests passed` در هر دو Python، بدون skipped/warning. Chromium، ثبت/configure/enable/disable/delete را روی سرویس HTTPS واقعی بررسی می‌کند؛ تست BFF نیز owner isolation و باقی‌ماندن history پس از حذف را می‌سنجد. CI checkout جدید در [Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Amain) قابل پیگیری است. نتیجه تست نسخه‌های قدیمی را به SHA فعلی نسبت ندهید.
+شواهد محلی نسخه چیدمان v0.1.1 `6f71531`: `315 passed, 65 subtests passed` در هر دو Python، بدون skipped/warning. Chromium، ثبت/configure/enable/disable/delete را روی سرویس HTTPS واقعی بررسی می‌کند؛ تست BFF نیز owner isolation و باقی‌ماندن history پس از حذف را می‌سنجد. CI checkout جدید در [Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Fdashboard-v0.1.1) قابل پیگیری است. نتیجه تست نسخه‌های قدیمی را به SHA فعلی نسبت ندهید.
 
 ## مستندات در CI
 
@@ -1100,7 +1104,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **196**؛ تعداد نمادهای Python: **887**.
+تعداد فایل‌های فنی و پشتیبان: **197**؛ تعداد نمادهای Python: **887**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -1113,9 +1117,9 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [.github/workflows/release.yml](../../.github/workflows/release.yml) | 2995 | `3bd849d3a5468419d50a6d21ac431f9d552580595629e5cdfdcbf6206843f8f1` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
 | [AGENTS.md](../../AGENTS.md) | 1710 | `92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d` |
-| [CHANGELOG.md](../../CHANGELOG.md) | 4123 | `a78e265041ae828aeab4cb8a07431927d48a3c67415908936b457a764ae41c38` |
+| [CHANGELOG.md](../../CHANGELOG.md) | 4463 | `657127747553e3b0435afb0e6347a9c1b060d39873170bb8305ed14cf5dacdcf` |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
-| [README.md](../../README.md) | 7125 | `64e253f497f8eda7e7a65cc342f9cd81b24463efe655ce46cb20a04d785d4110` |
+| [README.md](../../README.md) | 7225 | `7034ed3a96b530b9cfc7ad430dd21c46833c2e902b43f887f8cea7f2bd33cbd8` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
 | [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
 | [agents/base-prompt.md](../../agents/base-prompt.md) | 5002 | `967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a` |
@@ -1145,7 +1149,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [contracts/core/tests/test_contracts.py](../../contracts/core/tests/test_contracts.py) | 2933 | `01535ca31860a661daf075957a25061c505c93409a6309853f7dee4e2713753b` |
 | [contracts/core/versioning/README.md](../../contracts/core/versioning/README.md) | 514 | `beb95aafadef9d863f9b65c34848686eaec2d630e17eaf80fbd94c4bb5b18cf5` |
 | [contracts/core/versioning/policy.yaml](../../contracts/core/versioning/policy.yaml) | 1488 | `9756a66df3ebe23388826af0ad86eda82792f2c2fcd4e8cdb6502baeed0e1f4e` |
-| [contracts/dashboard/openapi.json](../../contracts/dashboard/openapi.json) | 87160 | `5b7f9d05718fe65149f4e2d4d1bb4e87ccf177f3fa909a2c5e8b1534fcd7a68d` |
+| [contracts/dashboard/openapi.json](../../contracts/dashboard/openapi.json) | 87160 | `d01301bec686569681d82bbb18f14b1cfe2e95070a4dffc52686b1d50ad6808c` |
 | [contracts/data/README.md](../../contracts/data/README.md) | 610 | `6e3be41bfeaccd9fc7ef80a15eeedc64de35f42edfb6dcf789f46be2e52e5920` |
 | [contracts/data/access/contract.yaml](../../contracts/data/access/contract.yaml) | 455 | `abcd6762c91e6e3385423d8ba2be905864f2cce0eb098e54bcfb09bfc1a4b339` |
 | [contracts/data/api/contract.yaml](../../contracts/data/api/contract.yaml) | 1189 | `79387e6f1eb0f14c323f74ec410f26cc88ce9d4ca7bae8f0e535e84ee08d003a` |
@@ -1218,13 +1222,14 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/code-manager/tests/test_source_archive.py](../../units/code-manager/tests/test_source_archive.py) | 4072 | `725c536a24cf9107074404b8d035f34148455d27f7a3b5311e3d444b29f3ffeb` |
 | [units/code-manager/tests/test_source_registration.py](../../units/code-manager/tests/test_source_registration.py) | 3772 | `aa451da0cc27ec1d438239eba22bcb4380c4d056cd38e2f02a8bd64ca096ffae` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py) | 3829 | `6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0` |
-| [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 4893 | `de518e2387bef4224e01ca855b637119c986449ef16beae5e26f61ffbaf2dac3` |
-| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 8760 | `3c9baafec9e470a057909ab4b49bc7845e8e8ddbddce03cb112a3045c9286c62` |
+| [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 5199 | `f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496` |
+| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 9235 | `6269ab8ca3627ed929df40a46f013002b69f6d9a8a7a5c1b564440cec259b6d1` |
+| [units/consumers/dashboard-core/browser-tests/layout.cjs](../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1610 | `0eea28bbe25519a5668c8e2ef224d1b934c3d769d4060b44c824809a444c6547` |
 | [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3504 | `63c4510592921047bbafc86bffde93908fac5e7ca40e96707a6c0e700639588e` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
 | [units/consumers/dashboard-core/dashboard/__init__.py](../../units/consumers/dashboard-core/dashboard/__init__.py) | 34 | `df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 17129 | `5c1602f4dcee30461aa9af01cab8f9c13bc08826d6be28df9791910c9dd122fe` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 17185 | `26f079fccb43b6685cfa507b6bac4065d5024f6d0cc16632a2b32692b1cd1499` |
 | [units/consumers/dashboard-core/dashboard/modules/__init__.py](../../units/consumers/dashboard-core/dashboard/modules/__init__.py) | 41 | `35ef8ebac64753121ad6a4d2e62c7c2c90b29160f0c22dbadb2faf113226622f` |
 | [units/consumers/dashboard-core/dashboard/modules/packages/dashboard-health/manifest.json](../../units/consumers/dashboard-core/dashboard/modules/packages/dashboard-health/manifest.json) | 180 | `83759a4b520e69bf9722b5238ae5e92488da03bcde70b77a877665548125fd51` |
 | [units/consumers/dashboard-core/dashboard/modules/packages/dice-roller/manifest.json](../../units/consumers/dashboard-core/dashboard/modules/packages/dice-roller/manifest.json) | 199 | `ead3dda45d00b8d1e8582ccd2d859486385ef0c682aa3b1a6d750cf1c0a3c33b` |
@@ -1236,14 +1241,14 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/consumers/dashboard-core/dashboard/themes/compact-6.json](../../units/consumers/dashboard-core/dashboard/themes/compact-6.json) | 701 | `ae0ea5e577c3455e1e5186426078b92ba4a71c2c4407c28c426ae14e1c1e5475` |
 | [units/consumers/dashboard-core/dashboard/themes/standard-8.json](../../units/consumers/dashboard-core/dashboard/themes/standard-8.json) | 897 | `5eca7faeff243bd66d0d543f9abd3cf8cb546d3ba9a0255fe6be2fc25962861a` |
 | [units/consumers/dashboard-core/dashboard/themes/wide-12.json](../../units/consumers/dashboard-core/dashboard/themes/wide-12.json) | 1284 | `10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048` |
-| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 27189 | `772b4eca9df15b972a60b5031a1862b96b209fbe84cfbd6c205d659559eff2d1` |
+| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 28869 | `3f649355983ad84edefed4610252870040ccaf5bdf071f0d8baea65534eed588` |
 | [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py) | 5769 | `bb2c271684aa4b2f54cd62f67b3ad45f6a8ff94c6735243f4012abe4f1d2da3c` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py) | 1948 | `6c79bea530d6ac779e5930b263d58bd030e1844b23ce95a14cf3abaf256caaa7` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../units/consumers/dashboard-core/legacy-tests/test_registry.py) | 3954 | `aaa8da8a33038f063560bd693de4722924f8ec35121f506933ff53fc3d196d22` |
 | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py) | 7569 | `56cb6258ba13de0f6bfb586c872f9f8c915cb60cfedcf7663812b815066d1d74` |
 | [units/consumers/dashboard-core/requirements-dev.txt](../../units/consumers/dashboard-core/requirements-dev.txt) | 49 | `76d1b0013bd73822840766e68b234055b0962571813765d60b2c012dc82ec88e` |
 | [units/consumers/dashboard-core/requirements.txt](../../units/consumers/dashboard-core/requirements.txt) | 35 | `db7518ee2c4a66fe896a926b2f2024ab7a8cf85c0f0d3d0827388da44234e223` |
-| [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py) | 887 | `7297377436f1100bd7097db30d78183ebcc9683434f078b497bb951224d736d6` |
+| [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py) | 1078 | `ac5fd4144681577f53d209afa1887b1deb1a28a8f3451cae02a099189d429540` |
 | [units/consumers/dashboard-core/tests/test_demo_seed.py](../../units/consumers/dashboard-core/tests/test_demo_seed.py) | 1782 | `689e6c3a35708d88e7ac8f3d69d0298eec5d26a71a2d7cb8c6c3c21c97cb123e` |
 | [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py) | 8578 | `12b26f91c3be9fbbbee012b54a1f2a556c99a52cc829d3afd0bdfe26213ab35d` |
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py) | 1034 | `7d3066b58ba3b049424dfa54cef414e4b5d5bbaa3b312c853212614266a53bb7` |
@@ -1330,6 +1335,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | `CODE_MANAGER_INTEGRATION_OWNER` | [units/code-manager/tests/test_data_manager_integration.py](../../units/code-manager/tests/test_data_manager_integration.py#L40) | optional lookup |
 | `CREDENTIALS_DIRECTORY` | [units/integration/agent08/agent08.py](../../units/integration/agent08/agent08.py#L68) | optional lookup |
 | `DASHBOARD_CREDENTIAL_FILE` | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L15) | required lookup |
+| `DASHBOARD_LAYOUT_SCREENSHOT` | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py#L18) | optional lookup |
 | `DASHBOARD_SCREENSHOT` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L114) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py#L12) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L110) | optional lookup |

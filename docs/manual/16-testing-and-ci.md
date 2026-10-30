@@ -34,7 +34,7 @@ workflow تاریخی `baseline-verification.yml` روی SHA ثابت قدیمی
 
 HTTP 200، exit صفر فرمان آخر pipe، PID، port باز، تعداد صفر تست یا skipped job به‌تنهایی موفقیت نیست. passed، failed، subtests، skipped، xfail و unrun باید متمایز ثبت شوند. runner کامل، skipped و zero-test را رد و pytest exit را ثبت می‌کند. unit-only، Docker/Browser را صریح محدود می‌کند و برای Release معتبر نیست.
 
-شواهد محلی نسخه مدیریت Worker `2e08ca8`: `315 passed, 65 subtests passed` در هر دو Python، بدون skipped/warning. Chromium، ثبت/configure/enable/disable/delete را روی سرویس HTTPS واقعی بررسی می‌کند؛ تست BFF نیز owner isolation و باقی‌ماندن history پس از حذف را می‌سنجد. CI checkout جدید در [Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Amain) قابل پیگیری است. نتیجه تست نسخه‌های قدیمی را به SHA فعلی نسبت ندهید.
+شواهد محلی نسخه چیدمان v0.1.1 `6f71531`: `315 passed, 65 subtests passed` در هر دو Python، بدون skipped/warning. Chromium، ثبت/configure/enable/disable/delete را روی سرویس HTTPS واقعی بررسی می‌کند؛ تست BFF نیز owner isolation و باقی‌ماندن history پس از حذف را می‌سنجد. CI checkout جدید در [Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Fdashboard-v0.1.1) قابل پیگیری است. نتیجه تست نسخه‌های قدیمی را به SHA فعلی نسبت ندهید.
 
 ## مستندات در CI
 

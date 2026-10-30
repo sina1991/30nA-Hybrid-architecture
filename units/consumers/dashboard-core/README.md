@@ -67,3 +67,7 @@ still require deployment evidence.
 ## مدیریت Worker و update مستقل
 
 پنل ثبت، جزئیات، configuration، schedule، lifecycle و حذف با تأیید شناسه دارد. history تا ۱۰۰ اجرای اخیر با فیلتر محلی نمایش داده می‌شود. definition immutable است و source upload/Build در scope این پنل نیست. [راهنمای update روی VPS نصب‌شده](../../../docs/deployment/dashboard-update.md).
+
+## چیدمان نسخه توسعه v0.1.1
+
+ورود جمع‌وجور در header است؛ Workspace مدیریت/اجرای Worker بعد از ورود زیر اسلات‌ها قرار می‌گیرد. [راهنمای بررسی و update این branch](../../../docs/development/dashboard-v0.1.1.md).

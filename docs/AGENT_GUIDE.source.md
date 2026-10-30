@@ -153,3 +153,7 @@ DATA direct envelope، provisioning children در HTTP و propagation سرتاس
 ## پنل مدیریت Worker
 
 `dashboard/upstreams.py`، schemaهای RegisterBody/ConfigureBody را از API Manager مصرف می‌کند و routeهای صریح CRUD و enable/disable دارد. `PublicAPI.patch/delete` method واقعی را ارسال می‌کنند. فرم‌های مدیریت در `upstream_panel.py`، confirmation عملیات، immutable reference، حذف تایپی و generation guard دارند؛ تست browser واقعی `browser-tests/management.cjs` است. تست `test_worker_management.py` از BFF با PublicAPI به API واقعی Manager می‌رود و owner binding و حفظ history پس از حذف را بررسی می‌کند. history filter فقط روی ۱۰۰ اجرای اخیر است. برای انتقال تغییر UI از `scripts/deployment/update_dashboard.sh` و [راهنمای update](deployment/dashboard-update.md) استفاده کنید؛ backend DB/unitها در این روش تغییر نمی‌کنند.
+
+## چیدمان v0.1.1
+
+`upstream_panel.py`، `ACCESS` برای header و `PANEL` برای Workspace پایین اسلات‌ها دارد؛ factory در `app.py` آن‌ها را مستقل تزریق می‌کند. `authenticated` پس از refresh موفق، Workspace را باز می‌کند؛ logout آن را پنهان می‌کند. پیام `account-status` میان ناحیه ورود و Workspace جابه‌جا می‌شود. تست `browser-tests/layout.cjs` اندازه کنترل ورود و موقعیت اسلات/Workspace را در desktop و mobile و سه حالت ورود بررسی می‌کند. fixture browser از theme/module واقعی پروژه استفاده می‌کند.

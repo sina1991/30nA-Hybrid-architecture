@@ -50,3 +50,7 @@
 ## پنل مدیریت Worker
 
 پنل CRUD/configuration/schedule/enable/disable، تأیید حذف، فیلتر history و updater مستقل Dashboard اضافه شده است. تست کامل محلی هر دو Python: `315 passed, 65 subtests passed`. log operator موفقیت نصب نسخه قبل و اجرای نمونه روی VPS را تأیید می‌کند؛ این update جدید هنوز از Cloud روی آن سرور اعمال نشده است. [روش انتقال و پذیرش](deployment/dashboard-update.md).
+
+## توسعه v0.1.1
+
+ورود جمع‌وجور header و اولویت اسلات‌ها و Workspace پایین صفحه روی `feat/dashboard-v0.1.1` پیاده شده‌اند. تست کامل هر دو Python: `315 passed, 65 subtests passed`. main و Release رسمی v0.1.0 تغییر نکرده‌اند. [روش بررسی نسخه توسعه](development/dashboard-v0.1.1.md).
