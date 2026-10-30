@@ -9,7 +9,7 @@ from module_support import main
 import math
 
 def run(data):
-    a, b = data.get('a'), data.get('b')
+    a, b = data.get('a', 0), data.get('b', 1)
     if type(a) not in (int, float) or type(b) not in (int, float) or not math.isfinite(a) or not math.isfinite(b):
         raise ValueError('a and b must be finite numbers')
     action = data.get('operation', 'add')

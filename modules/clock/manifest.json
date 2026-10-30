@@ -1,7 +1,7 @@
 {
   "id": "clock",
-  "name": "ساعت",
-  "description": "نمایش زمان محلی مرورگر",
+  "name": "Clock",
+  "description": "Display browser local time.",
   "version": "1.0.0",
   "api_version": "1",
   "type": "clock"

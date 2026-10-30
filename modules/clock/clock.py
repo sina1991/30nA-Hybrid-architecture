@@ -3,12 +3,10 @@ import argparse
 from datetime import datetime
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-PERSIAN_DIGITS = str.maketrans('0123456789', '۰۱۲۳۴۵۶۷۸۹')
-
 
 def current_time(timezone=None):
     now = datetime.now(ZoneInfo(timezone)) if timezone else datetime.now().astimezone()
-    return now.strftime('%H:%M:%S').translate(PERSIAN_DIGITS)
+    return now.strftime('%H:%M:%S')
 
 
 def run(data):

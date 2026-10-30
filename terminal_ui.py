@@ -20,7 +20,7 @@ class Terminal:
         value = input(prompt + suffix + ': ').strip()
         return value if value else (default if default is not None else '')
 
-    def json_input(self, prompt='ورودی JSON object', default='{}'):
+    def json_input(self, prompt='JSON object input', default='{}'):
         raw = self.ask(prompt, default)
         try:
             data = json.loads(raw)
@@ -28,7 +28,7 @@ class Terminal:
                 raise ValueError()
             return json.dumps(data, ensure_ascii=False, allow_nan=False)
         except (ValueError, TypeError):
-            raise ValueError('ورودی باید یک JSON object معتبر باشد.') from None
+            raise ValueError('Input must be a valid JSON object.') from None
 
     def call(self, args, *, state=False):
         command = [sys.executable, self.program, *args]
@@ -45,7 +45,7 @@ class Terminal:
             else:
                 if isinstance(output, dict) and isinstance(output.get('slots'), list):
                     if not output['slots']:
-                        print('اسلاتی برای این حساب ثبت نشده است؛ ابتدا در Dashboard وارد حساب شوید.')
+                        print('No slots are registered for this account; sign in to the Dashboard first.')
                     for slot in output['slots']:
                         print(f"{slot['slot']}  |  {slot['module_id']}")
                 elif isinstance(output, dict) and isinstance(output.get('modules'), list):
@@ -53,13 +53,13 @@ class Terminal:
                         print(f"{module['id']}  |  {module['name']}")
                 elif isinstance(output, dict) and isinstance(output.get('workers'), list):
                     if not output['workers']:
-                        print('Worker ثبت‌شده‌ای برای این حساب وجود ندارد.')
+                        print('No Workers are registered for this account.')
                     for worker in output['workers']:
                         print(f"{worker['definition']['worker_id']}  |  {worker['lifecycle']}")
                 else:
                     print(json.dumps(output, ensure_ascii=False, indent=2))
         if completed.returncode:
-            print('عملیات انجام نشد.', file=sys.stderr)
+            print('Operation failed.', file=sys.stderr)
         return completed.returncode
 
     def slot_args(self, *args):
@@ -70,40 +70,40 @@ class Terminal:
                 '--ca-file', self.ca_file, *args]
 
     def run(self):
-        print('30nA — مدیریت اسلات، ماژول و Worker')
-        print('وضعیت اسلات‌ها متعلق به owner انتخاب‌شده است؛ Workerها با فایل token احراز هویت می‌شوند.')
+        print('30nA - Slots, modules, and Workers')
+        print('Slots use the selected owner; Workers authenticate with the token file.')
         while True:
-            print(f'\nحساب اسلات: {self.owner}')
-            print('۱. فهرست اسلات‌ها       ۲. خواندن اسلات        ۳. اجرای اسلات')
-            print('۴. اتصال ماژول به اسلات   ۵. فهرست ماژول‌ها      ۶. اجرای ماژول')
-            print('۷. فهرست Workerها        ۸. اجرای Worker        ۹. وضعیت اجرا')
-            print('۱۰. لغو اجرا             ۱۱. تنظیم حساب و اتصال  ۰. خروج')
+            print(f'\nSlot owner: {self.owner}')
+            print('1. List slots         2. Read slot           3. Run slot')
+            print('4. Bind slot          5. List modules        6. Run module')
+            print('7. List Workers       8. Run Worker          9. Execution status')
+            print('10. Cancel execution  11. Account and connection  0. Exit')
             try:
-                choice = self.ask('انتخاب').translate(str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789'))
+                choice = self.ask('Choice')
                 if choice in ('0', 'q', 'exit'):
                     return 0
                 if choice == '1':
                     self.call(self.slot_args('list'), state=True)
                 elif choice == '2':
-                    self.call(self.slot_args('read', self.ask('شناسه اسلات، مانند slot-04')), state=True)
+                    self.call(self.slot_args('read', self.ask('Slot ID, e.g. slot-04')), state=True)
                 elif choice == '3':
-                    slot = self.ask('شناسه اسلات')
+                    slot = self.ask('Slot ID')
                     data = self.json_input()
                     self.call(self.slot_args('run', slot, '--input', data), state=True)
                 elif choice == '4':
-                    slot = self.ask('شناسه اسلات')
-                    module = self.ask('شناسه ماژول')
-                    context = self.json_input('تنظیمات اسلات، مانند timezone یا theme')
+                    slot = self.ask('Slot ID')
+                    module = self.ask('Module ID')
+                    context = self.json_input('Slot context, such as timezone or theme')
                     self.call(self.slot_args('bind', slot, module, '--context', context), state=True)
                 elif choice == '5':
                     self.call(['modules', 'list'])
                 elif choice == '6':
-                    module = self.ask('شناسه ماژول')
+                    module = self.ask('Module ID')
                     data = self.json_input()
                     args = ['modules', 'run', module, '--input', data]
                     shared = False
                     if module in ('counter', 'slot-note'):
-                        slot = self.ask('شناسه اسلات برای وضعیت مشترک؛ برای اجرای مستقل خالی بگذارید')
+                        slot = self.ask('Slot ID for shared state; leave blank for standalone execution')
                         if slot:
                             args += ['--owner', self.owner, '--slot', slot]
                             shared = True
@@ -111,27 +111,27 @@ class Terminal:
                 elif choice == '7':
                     self.call(self.worker_args('list'))
                 elif choice == '8':
-                    worker = self.ask('شناسه Worker')
+                    worker = self.ask('Worker ID')
                     data = self.json_input()
-                    timeout = self.ask('حداکثر زمان اجرا به ثانیه', '30')
-                    key = self.ask('idempotency key قبلی برای تکرار همان درخواست؛ در غیر این صورت خالی')
+                    timeout = self.ask('Execution timeout in seconds', '30')
+                    key = self.ask('Previous idempotency key to retry the same request; otherwise leave blank')
                     args = ['run', worker, '--input', data, '--timeout', timeout]
                     if key:
                         args += ['--idempotency-key', key]
                     self.call(self.worker_args(*args))
                 elif choice in ('9', '10'):
-                    execution_id = self.ask('شناسه اجرا')
+                    execution_id = self.ask('Execution ID')
                     self.call(self.worker_args('status' if choice == '9' else 'cancel', execution_id))
                 elif choice == '11':
-                    print('شناسه owner اسلات و صاحب token برای Worker باید به یک حساب اشاره کنند.')
-                    self.owner = self.ask('owner اسلات', self.owner)
-                    self.manager_url = self.ask('آدرس HTTPS Manager', self.manager_url)
-                    self.token_file = self.ask('مسیر فایل خصوصی token', self.token_file)
-                    self.ca_file = self.ask('مسیر CA bundle', self.ca_file)
+                    print('Slot owner and Worker token must refer to the same account.')
+                    self.owner = self.ask('Slot owner', self.owner)
+                    self.manager_url = self.ask('Manager HTTPS URL', self.manager_url)
+                    self.token_file = self.ask('Private token file path', self.token_file)
+                    self.ca_file = self.ask('CA bundle path', self.ca_file)
                 else:
-                    print('گزینه معتبر را انتخاب کنید.')
+                    print('Choose a valid option.')
             except ValueError as error:
                 print(str(error), file=sys.stderr)
             except (EOFError, KeyboardInterrupt):
-                print('\nخروج از 30nA')
+                print('\nExiting 30nA')
                 return 0

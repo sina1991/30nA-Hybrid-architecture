@@ -1,7 +1,7 @@
 {
   "id": "calculator",
-  "name": "ماشین‌حساب",
-  "description": "چهار عمل اصلی برای دو عدد",
+  "name": "Calculator",
+  "description": "Perform basic arithmetic on two numbers.",
   "version": "1.0.0",
   "api_version": "1",
   "type": "calculator"

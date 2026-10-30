@@ -81,7 +81,7 @@ def worker_request(args, method, path, payload=None):
 def main():
     parser = argparse.ArgumentParser(prog='30na')
     categories = parser.add_subparsers(dest='category', required=True)
-    shell = categories.add_parser('shell', help='منوی تعاملی فارسی')
+    shell = categories.add_parser('shell', help='Interactive terminal menu')
     shell.add_argument('--owner', default='customer')
     shell.add_argument('--manager-url', default='https://localhost:18444')
     shell.add_argument('--token-file', default='/etc/30na/customer-token')

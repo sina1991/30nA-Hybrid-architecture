@@ -1,7 +1,7 @@
 {
   "id": "counter",
-  "name": "شمارنده",
-  "description": "افزایش، کاهش و صفر کردن شمارنده",
+  "name": "Counter",
+  "description": "Increase, decrease, or reset a counter.",
   "version": "1.0.0",
   "api_version": "1",
   "type": "counter"

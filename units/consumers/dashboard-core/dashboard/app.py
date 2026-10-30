@@ -303,7 +303,7 @@ async function invokeModule(id, input, slotId) {
     method: "POST", headers: {"Content-Type":"application/json"},
     body: JSON.stringify(input), cache: "no-store"
   });
-  if (!response.ok) throw new Error("اجرای ماژول ناموفق بود.");
+  if (!response.ok) throw new Error("Module execution failed.");
   const data = await response.json();
   return data.result;
 }
@@ -318,54 +318,54 @@ function renderModuleContent(body, slot, moduleId) {
   }
 
   if (["empty", "health", "theme-summary"].includes(module.type)) {
-    const detail = makeElement("div", "module-detail", "در حال دریافت…");
+    const detail = makeElement("div", "module-detail", "Loading...");
     body.append(makeElement("div", "module-title", module.name), detail);
     const input = module.type === "theme-summary" ? {theme: currentTheme.id} : {};
     invokeModule(module.id, input, slot.id).then(data => {
       if (module.type === "health") detail.textContent = data.service + ": " + data.status;
       else if (module.type === "theme-summary") detail.textContent = data.name + " · " + data.slots + " slots · " + data.columns + " columns";
       else detail.textContent = data.message;
-    }).catch(() => { detail.textContent = "اجرای ماژول ناموفق بود."; });
+    }).catch(() => { detail.textContent = "Module execution failed."; });
     return;
   }
 
   if (module.type === "slot-note") {
     body.append(makeElement("div", "module-title", module.name));
-    const hint = makeElement("div", "module-detail", "برای یادداشت مشترک با ترمینال وارد حساب شوید.");
+    const hint = makeElement("div", "module-detail", "Sign in to share this note with the terminal.");
     const textarea = makeElement("textarea", "module-note-input");
     textarea.setAttribute("aria-label", `Note for ${slot.name || slot.id}`);
     textarea.maxLength = 10000; textarea.disabled = true;
     const legacy = settingsFor(slot.id).note;
-    const migrate = makeElement("button", "dice-roll-button", "انتقال یادداشت قدیمی مرورگر");
+    const migrate = makeElement("button", "dice-roll-button", "Import previous browser note");
     migrate.type = "button"; migrate.hidden = !legacy; migrate.disabled = true;
     migrate.addEventListener('click', () => {
-      if (textarea.value && textarea.value !== legacy && !window.confirm('یادداشت سرور با یادداشت قدیمی مرورگر جایگزین شود؟')) return;
+      if (textarea.value && textarea.value !== legacy && !window.confirm('Replace the server note with the previous browser note?')) return;
       textarea.value = legacy; textarea.dispatchEvent(new Event('input', {bubbles:true}));
     });
     body.append(hint, textarea, migrate);
     let timer = null, revision = 0, writing = false;
     async function refreshNote() {
       const bridge = window.dashboardModuleState;
-      if (!bridge || !bridge.ready()) { textarea.value = ''; textarea.disabled = true; migrate.disabled = true; hint.textContent = "برای یادداشت مشترک وارد حساب شوید."; return; }
+      if (!bridge || !bridge.ready()) { textarea.value = ''; textarea.disabled = true; migrate.disabled = true; hint.textContent = "Sign in to use a shared note."; return; }
       textarea.disabled = false; migrate.disabled = false;
       if (writing || document.activeElement === textarea) return;
       const current = revision;
       try {
         const output = await bridge.invoke(module.id, {slot:slot.id, action:'get'});
         if (current !== revision || !textarea.isConnected || !bridge.ready()) return;
-        textarea.value = output.text; hint.textContent = "یادداشت سرور، مشترک با ترمینال";
-      } catch (_) { if (textarea.isConnected && bridge.ready()) hint.textContent = "دریافت یادداشت سرور ناموفق بود."; }
+        textarea.value = output.text; hint.textContent = "Server note, shared with the terminal";
+      } catch (_) { if (textarea.isConnected && bridge.ready()) hint.textContent = "Could not load the server note."; }
     }
     function accountChanged() { revision++; clearTimeout(timer); writing = false; refreshNote(); }
     document.addEventListener('dashboard-account-state', accountChanged);
     textarea.addEventListener("input", () => {
       const current = ++revision; clearTimeout(timer); writing = true;
-      hint.textContent = "در حال ذخیره…";
+      hint.textContent = "Saving...";
       timer = setTimeout(async () => {
         try {
           await window.dashboardModuleState.invoke(module.id, {slot:slot.id, action:'set', text:textarea.value});
-          if (current === revision && textarea.isConnected) hint.textContent = "در سرور ذخیره شد.";
-        } catch (_) { if (current === revision && textarea.isConnected) hint.textContent = "ذخیره ناموفق بود؛ دوباره ویرایش کنید."; }
+          if (current === revision && textarea.isConnected) hint.textContent = "Saved on the server.";
+        } catch (_) { if (current === revision && textarea.isConnected) hint.textContent = "Save failed; edit again to retry."; }
         finally { if (current === revision) writing = false; }
       }, 300);
     });
@@ -380,9 +380,9 @@ function renderModuleContent(body, slot, moduleId) {
 
   if (module.type === "clock") {
     const display = makeElement("div", "module-title");
-    display.setAttribute("aria-label", "زمان محلی");
+    display.setAttribute("aria-label", "Local time");
     body.append(makeElement("div", "module-title", module.name), display,
-      makeElement("div", "module-detail", "زمان محلی مرورگر"));
+      makeElement("div", "module-detail", "Browser local time"));
     async function updateClock() {
       try {
         const timezone = serverSlotContext[slot.id]?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -395,7 +395,7 @@ function renderModuleContent(body, slot, moduleId) {
           display.textContent = (await response.json()).time;
         }
       } catch (_) {
-        display.textContent = "دریافت ساعت ممکن نیست.";
+        display.textContent = "Could not retrieve the clock.";
       } finally {
         setTimeout(() => { if (display.isConnected) updateClock(); }, 1000);
       }
@@ -406,23 +406,23 @@ function renderModuleContent(body, slot, moduleId) {
 
   if (module.type === "counter") {
     let busy = false;
-    const display = makeElement("div", "module-title", "برای استفاده وارد حساب شوید.");
+    const display = makeElement("div", "module-title", "Sign in to use this module.");
     display.setAttribute("aria-live", "polite");
     const controls = makeElement("div", "dice-controls");
     function buttons(disabled) { controls.querySelectorAll("button").forEach(item => { item.disabled = disabled; }); }
     async function refreshCounter() {
       const bridge = window.dashboardModuleState;
-      if (!bridge || !bridge.ready()) { display.textContent = "برای استفاده وارد حساب شوید."; buttons(true); return; }
+      if (!bridge || !bridge.ready()) { display.textContent = "Sign in to use this module."; buttons(true); return; }
       if (busy) return;
       buttons(false);
       try {
         const output = await bridge.invoke(module.id, {slot:slot.id, action:'get'});
         if (display.isConnected && bridge.ready() && !busy) display.textContent = String(output.value);
-      } catch (_) { if (display.isConnected && bridge.ready()) display.textContent = "دریافت شمارنده ناموفق بود."; }
+      } catch (_) { if (display.isConnected && bridge.ready()) display.textContent = "Could not load the counter."; }
     }
     function accountChanged() { refreshCounter(); }
     document.addEventListener('dashboard-account-state', accountChanged);
-    [["افزایش", "increment"], ["کاهش", "decrement"], ["صفر کردن", "reset"]].forEach(([label, action]) => {
+    [["Increase", "increment"], ["Decrease", "decrement"], ["Reset", "reset"]].forEach(([label, action]) => {
       const button = makeElement("button", "dice-roll-button", label);
       button.type = "button"; button.disabled = true;
       button.addEventListener("click", async () => {
@@ -431,7 +431,7 @@ function renderModuleContent(body, slot, moduleId) {
         try {
           const output = await window.dashboardModuleState.invoke(module.id, {slot:slot.id, action});
           if (display.isConnected && window.dashboardModuleState.ready()) display.textContent = String(output.value);
-        } catch (_) { if (display.isConnected && window.dashboardModuleState.ready()) display.textContent = "اجرای ماژول ناموفق بود."; }
+        } catch (_) { if (display.isConnected && window.dashboardModuleState.ready()) display.textContent = "Module execution failed."; }
         finally { busy = false; buttons(!window.dashboardModuleState.ready()); }
       });
       controls.append(button);
@@ -447,36 +447,36 @@ function renderModuleContent(body, slot, moduleId) {
 
   if (module.type === "calculator") {
     const controls = makeElement("div", "dice-controls");
-    function numberField(labelText) {
+    function numberField(labelText, initialValue) {
       const label = makeElement("label", "dice-field", labelText);
       const input = makeElement("input", "dice-input");
-      input.type = "number"; input.step = "any";
+      input.type = "number"; input.step = "any"; input.value = initialValue;
       input.setAttribute("aria-label", labelText);
       label.append(input); controls.append(label);
       return input;
     }
-    const first = numberField("عدد اول");
-    const second = numberField("عدد دوم");
+    const first = numberField("First number", "0");
+    const second = numberField("Second number", "1");
     const operator = makeElement("select", "");
-    operator.setAttribute("aria-label", "عملیات");
+    operator.setAttribute("aria-label", "Operation");
     [["add", "+"], ["subtract", "−"], ["multiply", "×"], ["divide", "÷"]].forEach(([value, label]) => {
       const option = makeElement("option", "", label); option.value = value; operator.append(option);
     });
-    const button = makeElement("button", "dice-roll-button", "محاسبه");
+    const button = makeElement("button", "dice-roll-button", "Calculate");
     button.type = "button";
-    const result = makeElement("div", "dice-result", "نتیجه در اینجا نمایش داده می‌شود.");
+    const result = makeElement("div", "dice-result", "Result will appear here.");
     result.setAttribute("aria-live", "polite");
     button.addEventListener("click", async () => {
       const a = Number(first.value), b = Number(second.value);
       if (!first.value || !second.value || !Number.isFinite(a) || !Number.isFinite(b)) {
-        result.textContent = "دو عدد معتبر وارد کنید."; return;
+        result.textContent = "Enter two valid numbers."; return;
       }
-      if (operator.value === "divide" && b === 0) { result.textContent = "تقسیم بر صفر ممکن نیست."; return; }
+      if (operator.value === "divide" && b === 0) { result.textContent = "Cannot divide by zero."; return; }
       button.disabled = true;
       try {
         const output = await invokeModule(module.id, {a, b, operation:operator.value}, slot.id);
         result.textContent = String(output.result);
-      } catch (_) { result.textContent = "محاسبه ناموفق بود."; }
+      } catch (_) { result.textContent = "Calculation failed."; }
       finally { button.disabled = false; }
     });
     controls.append(operator, button);
@@ -528,7 +528,7 @@ function renderModuleContent(body, slot, moduleId) {
         const output = await invokeModule(module.id, {count, sides}, slot.id);
         result.className = "dice-result";
         result.textContent = output.rolls.join(" + ") + " = " + output.total;
-      } catch (_) { result.textContent = "اجرای ماژول ناموفق بود."; }
+      } catch (_) { result.textContent = "Module execution failed."; }
       finally { rollButton.disabled = false; }
     });
 
@@ -578,7 +578,7 @@ function makeSlot(slot) {
       let binding = await bridge.bind(slot.id, settingsFor(slot.id).module, contextFor(settingsFor(slot.id).module), true);
       if (current !== revision || !card.isConnected || !bridge.ready()) return;
       if (!binding || !availableModules.some(item => item.id === binding.module_id)) {
-        statusText.textContent = "ماژول ثبت‌شده برای اسلات در این نسخه موجود نیست."; return;
+        statusText.textContent = "The slot module is unavailable in this version."; return;
       }
       if (binding.module_id === "theme-summary" && binding.context?.theme !== currentTheme.id) {
         binding = await bridge.bind(slot.id, binding.module_id, contextFor(binding.module_id), false);
@@ -590,7 +590,7 @@ function makeSlot(slot) {
         initialized = true; settingsFor(slot.id).module = binding.module_id; select.value = binding.module_id;
         saveSettings(); renderModuleContent(body, slot, binding.module_id);
       }
-    } catch (_) { if (current === revision && card.isConnected && bridge.ready()) statusText.textContent = "دریافت تنظیمات اسلات از سرور ناموفق بود."; }
+    } catch (_) { if (current === revision && card.isConnected && bridge.ready()) statusText.textContent = "Could not load slot settings from the server."; }
   }
   select.addEventListener("change", async () => {
     const selected = select.value, previous = settingsFor(slot.id).module, bridge = window.dashboardModuleState;
@@ -602,7 +602,7 @@ function makeSlot(slot) {
         if (!card.isConnected || !bridge.ready()) return;
         serverSlotContext[slot.id] = saved.context || {}; initialized = true;
       } catch (_) {
-        select.value = previous; statusText.textContent = "ذخیره اسلات ناموفق یا نامشخص بود؛ وضعیت سرور را بررسی کنید.";
+        select.value = previous; statusText.textContent = "Slot save failed or has an unknown outcome; check the server state.";
         return;
       } finally { select.disabled = false; }
     } else { delete serverSlotContext[slot.id]; initialized = false; }

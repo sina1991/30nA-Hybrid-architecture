@@ -1,15 +1,15 @@
 """Account workspace for trusted, pre-registered workers; credentials stay in memory."""
 ACCESS = r'''
-<div class="account-access" dir="rtl" aria-label="حساب کاربری">
+<div class="account-access" dir="ltr" aria-label="Account">
   <form id="account-form">
-    <label class="account-label" for="account-token">Access token حساب</label>
+    <label class="account-label" for="account-token">Account access token</label>
     <input id="account-token" type="password" autocomplete="off" placeholder="Access token" required>
-    <button id="account-connect" type="submit">ورود به حساب</button>
+    <button id="account-connect" type="submit">Sign in</button>
   </form>
   <div id="account-actions" class="account-actions" hidden>
-    <a id="worker-workspace-link" href="#worker-workspace">مدیریت Workerها ↓</a>
-    <button id="account-refresh" type="button">به‌روزرسانی</button>
-    <button id="account-disconnect" type="button">خروج از حساب</button>
+    <a id="worker-workspace-link" href="#worker-workspace">Manage Workers ↓</a>
+    <button id="account-refresh" type="button">Refresh</button>
+    <button id="account-disconnect" type="button">Sign out</button>
   </div>
   <div id="account-notices"><p id="account-status" role="status" aria-live="polite"></p></div>
 </div>
@@ -17,7 +17,7 @@ ACCESS = r'''
 
 PANEL = r'''
 <style>
-.account-panel {width:calc(100% - 48px);max-width:1752px;margin:0 auto 24px;padding:24px;border:1px solid #24324a;border-radius:12px;direction:rtl}
+.account-panel {width:calc(100% - 48px);max-width:1752px;margin:0 auto 24px;padding:24px;border:1px solid #24324a;border-radius:12px;direction:ltr}
 .account-panel form,.account-panel fieldset {display:grid;gap:12px}
 .account-panel fieldset {border:0;padding:0;margin:0;min-width:0}
 .account-panel input,.account-panel textarea,.account-panel select,.account-panel button {
@@ -26,9 +26,9 @@ PANEL = r'''
 .account-panel textarea,.account-panel pre {direction:ltr;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere}
 .account-panel pre {padding:12px;background:#0b1120;border-radius:6px;max-height:400px;overflow:auto}
 .account-panel .account-actions {display:flex;gap:8px;flex-wrap:wrap}
-.account-panel [hidden] {display:none!important}.account-panel ul {padding-right:20px}
+.account-panel [hidden] {display:none!important}.account-panel ul {padding-left:20px}
 .account-panel li {padding:8px 0}.account-panel .account-note {color:#aab7ca}
-.account-panel dialog {background:#0f172a;color:#f1f5f9;border:1px solid #475569;border-radius:12px;width:min(640px,90vw);max-height:85vh;overflow:auto;direction:rtl}
+.account-panel dialog {background:#0f172a;color:#f1f5f9;border:1px solid #475569;border-radius:12px;width:min(640px,90vw);max-height:85vh;overflow:auto;direction:ltr}
 .account-panel dialog::backdrop {background:rgba(0,0,0,.7)}
 .account-panel label {display:block;margin-top:12px}
 .account-panel dialog input,.account-panel dialog textarea,.account-panel dialog select {box-sizing:border-box;width:100%}
@@ -45,79 +45,79 @@ PANEL = r'''
 .account-label {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media(max-width:560px){.account-access{flex-basis:100%}.account-panel{width:calc(100% - 32px);padding:16px}}
 </style>
-<section id="worker-workspace" class="account-panel" hidden aria-label="اجرای Worker">
-  <h2>محیط اجرای Worker</h2>
-  <p class="account-note">نسخه اولیه برای اجرای Workerهای مورداعتماد و ازپیش‌ثبت‌شده است.</p>
+<section id="worker-workspace" class="account-panel" hidden aria-label="Run Worker">
+  <h2>Worker workspace</h2>
+  <p class="account-note">Run trusted, pre-registered Workers.</p>
   <div id="worker-notices"></div>
-  <section id="worker-management" hidden aria-label="مدیریت Workerها">
-    <h3>مدیریت Workerها</h3>
-    <button id="worker-create" type="button">ثبت Worker جدید</button>
-    <label for="worker-search">جست‌وجوی Worker</label>
-    <input id="worker-search" type="search" placeholder="شناسه Worker">
+  <section id="worker-management" hidden aria-label="Manage Workers">
+    <h3>Manage Workers</h3>
+    <button id="worker-create" type="button">Register Worker</button>
+    <label for="worker-search">Search Workers</label>
+    <input id="worker-search" type="search" placeholder="Worker ID">
     <ul id="worker-list"></ul>
-    <p class="account-note">برای اجرای موفق، reference یک Artifact منتشرشده لازم است؛ وجود آن هنگام ثبت بررسی نمی‌شود. تغییر configuration روی اجرای پذیرفته‌شده قبلی اثر ندارد.</p>
+    <p class="account-note">Execution requires a published Artifact. Its existence is not checked at registration. Configuration changes do not affect accepted executions.</p>
   </section>
   <dialog id="worker-editor" aria-labelledby="worker-editor-title">
     <form id="worker-edit-form">
       <h3 id="worker-editor-title">Worker</h3>
       <fieldset id="worker-edit-fields">
         <label for="edit-worker-id">Worker ID</label><input id="edit-worker-id" required maxlength="128" dir="ltr">
-        <label for="edit-artifact-id">Artifact ID منتشرشده</label><input id="edit-artifact-id" required maxlength="256" dir="ltr">
+        <label for="edit-artifact-id">Published Artifact ID</label><input id="edit-artifact-id" required maxlength="256" dir="ltr">
         <label for="edit-artifact-hash">Artifact SHA-256</label><input id="edit-artifact-hash" required pattern="sha256:[0-9a-f]{64}" dir="ltr">
         <label for="edit-entrypoint">Entrypoint (module:function)</label><input id="edit-entrypoint" required maxlength="256" dir="ltr">
         <label for="edit-configuration">Configuration (JSON object)</label><textarea id="edit-configuration" rows="5" maxlength="500000" spellcheck="false"></textarea>
-        <label for="edit-schedule">زمان‌بندی</label><select id="edit-schedule"><option value="manual">دستی</option><option value="interval">interval</option></select>
-        <label for="edit-interval">فاصله اجرای interval، ثانیه</label><input id="edit-interval" type="number" min="1" step="1" value="60">
-        <p class="account-note">interval در حالت enabled با input خالی اجرا می‌شود؛ Worker باید این ورودی را پشتیبانی کند.</p>
+        <label for="edit-schedule">Schedule</label><select id="edit-schedule"><option value="manual">Manual</option><option value="interval">interval</option></select>
+        <label for="edit-interval">Interval in seconds</label><input id="edit-interval" type="number" min="1" step="1" value="60">
+        <p class="account-note">An enabled interval runs with empty input; the Worker must support it.</p>
         <p id="edit-lifecycle"></p>
-        <div class="account-actions"><button id="worker-save" type="submit">ذخیره</button><button id="worker-toggle" type="button">تغییر وضعیت</button><button id="worker-delete" type="button">حذف Worker</button></div>
+        <div class="account-actions"><button id="worker-save" type="submit">Save</button><button id="worker-toggle" type="button">Change status</button><button id="worker-delete" type="button">Delete Worker</button></div>
       </fieldset>
       <p id="worker-edit-status" role="status" aria-live="polite"></p>
-      <button id="worker-editor-close" type="button">بستن</button>
+      <button id="worker-editor-close" type="button">Close</button>
     </form>
   </dialog>
   <dialog id="worker-confirm" aria-labelledby="worker-confirm-title">
     <form id="worker-confirm-form">
-      <h3 id="worker-confirm-title">تأیید عملیات</h3><p id="worker-confirm-message"></p>
-      <label id="worker-confirm-label" for="worker-confirm-id">برای حذف، شناسه Worker را دقیق وارد کنید.</label>
+      <h3 id="worker-confirm-title">Confirm operation</h3><p id="worker-confirm-message"></p>
+      <label id="worker-confirm-label" for="worker-confirm-id">Enter the exact Worker ID to delete.</label>
       <input id="worker-confirm-id" autocomplete="off" dir="ltr">
       <p id="worker-confirm-status" role="status"></p>
-      <button id="worker-confirm-submit" type="submit">تأیید</button><button id="worker-confirm-close" type="button">انصراف</button>
+      <button id="worker-confirm-submit" type="submit">Confirm</button><button id="worker-confirm-close" type="button">Cancel</button>
     </form>
   </dialog>
   <form id="worker-run-form" hidden>
     <fieldset id="worker-run-fields" disabled>
-      <label for="account-worker">Worker فعال</label>
+      <label for="account-worker">Active Worker</label>
       <select id="account-worker" required></select>
-      <label for="worker-input">داده ورودی به‌شکل JSON object</label>
+      <label for="worker-input">Input as a JSON object</label>
       <textarea id="worker-input" rows="6" maxlength="500000" spellcheck="false">{"values":[10,20,30]}</textarea>
-      <label for="worker-timeout">حداکثر زمان اجرا، به ثانیه</label>
+      <label for="worker-timeout">Execution timeout in seconds</label>
       <input id="worker-timeout" type="number" min="1" max="300" step="1" value="30" required>
-      <button id="worker-run" type="submit">اجرای Worker</button>
+      <button id="worker-run" type="submit">Run Worker</button>
     </fieldset>
   </form>
-  <button id="worker-retry" type="button" hidden>ارسال دوباره همان درخواست</button>
-  <section id="execution-detail" hidden aria-label="نتیجه اجرا">
-    <h3>وضعیت و نتیجه</h3>
+  <button id="worker-retry" type="button" hidden>Retry the same request</button>
+  <section id="execution-detail" hidden aria-label="Execution result">
+    <h3>Status and result</h3>
     <p id="execution-status" role="status" aria-live="polite"></p>
     <p id="execution-id" dir="ltr"></p>
-    <button id="execution-refresh" type="button">بررسی وضعیت</button>
-    <button id="execution-cancel" type="button" hidden>درخواست لغو اجرا</button>
+    <button id="execution-refresh" type="button">Check status</button>
+    <button id="execution-cancel" type="button" hidden>Request cancellation</button>
     <pre id="execution-output"></pre>
   </section>
-  <section aria-label="تاریخچه اجراها">
-    <h3>تاریخچه اجراها</h3>
-    <label for="history-worker">فیلتر شناسه Worker یا اجرا</label><input id="history-worker" type="search">
-    <label for="history-status">وضعیت اجرا</label><select id="history-status"><option value="">همه وضعیت‌ها</option value="accepted">در صف</option><option value="running">در حال اجرا</option><option value="succeeded">موفق</option><option value="failed">ناموفق</option><option value="cancelled">لغوشده</option></select>
+  <section aria-label="Execution history">
+    <h3>Execution history</h3>
+    <label for="history-worker">Filter by Worker or execution ID</label><input id="history-worker" type="search">
+    <label for="history-status">Execution status</label><select id="history-status"><option value="">All statuses</option><option value="accepted">Queued</option><option value="running">Running</option><option value="succeeded">Succeeded</option><option value="failed">Failed</option><option value="cancelled">Cancelled</option></select>
     <p id="history-count" role="status"></p><ul id="account-executions"></ul>
-    <p class="account-note">فیلتر روی ۱۰۰ اجرای اخیر دریافت‌شده از سرور اعمال می‌شود؛ این صفحه pagination سرتاسری ندارد.</p>
+    <p class="account-note">Filter applies to the 100 most recent executions; full pagination is unavailable.</p>
   </section>
 </section>
 <script>
 (function () {
   "use strict";
   const el = id => document.getElementById(id);
-  const labels = {accepted:'در صف',running:'در حال اجرا',succeeded:'موفق',failed:'ناموفق',cancelled:'لغوشده'};
+  const labels = {accepted:'Queued',running:'Running',succeeded:'Succeeded',failed:'Failed',cancelled:'Cancelled'};
   const terminal = job => ['succeeded','failed','cancelled'].includes(job.status);
   let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false;
   let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0, authenticated = false, previousReady = false;
@@ -145,7 +145,7 @@ PANEL = r'''
     el('worker-retry').disabled = sending;
     el('execution-cancel').disabled = sending;
   }
-  function disconnect(message = 'از حساب خارج شدید. اجراهای پذیرفته‌شده در سرور ادامه دارند.') {
+  function disconnect(message = 'Signed out. Accepted executions continue on the server.') {
     generation++; watcher++; clearTimeout(timer); session.abort(); session = new AbortController();
     authenticated = false; refreshTicket++; allWorkers = []; historyRows = []; editing = null; confirmation = null; managing = false;
     el('worker-editor').close(); el('worker-confirm').close();
@@ -175,13 +175,13 @@ PANEL = r'''
         signal:controller.signal, cache:'no-store',redirect:'error',credentials:'omit'
       });
       if (!response.ok) {
-        const error = new Error(({401:'دسترسی حساب معتبر نیست؛ دوباره وارد شوید.',403:'مجوز این عملیات را ندارید.',
-          404:'Worker یا اجرا پیدا نشد.',409:'شناسه تکراری است یا عملیات با وضعیت فعلی Worker سازگار نیست.',
-          413:'حجم ورودی بیش از حد مجاز است.',422:'داده درخواست معتبر نیست.'})[response.status] || 'سرویس موقتاً در دسترس نیست.');
+        const error = new Error(({401:'Invalid account credentials; sign in again.',403:'You are not authorized for this operation.',
+          404:'Worker or execution not found.',409:'Duplicate ID or operation conflicts with the current Worker state.',
+          413:'Input exceeds the size limit.',422:'Invalid request data.'})[response.status] || 'The service is temporarily unavailable.');
         error.status = response.status; throw error;
       }
       const data = await response.json();
-      if (!data.payload || typeof data.payload !== 'object') throw new Error('پاسخ سرویس معتبر نیست.');
+      if (!data.payload || typeof data.payload !== 'object') throw new Error('Invalid service response.');
       return data.payload;
     } finally {
       clearTimeout(timeout); parent.removeEventListener('abort', abort);
@@ -190,11 +190,11 @@ PANEL = r'''
   window.dashboardModuleState = {
     ready: () => Boolean(token) && authenticated,
     async bind(slot, moduleId, context, onlyIfMissing) {
-      if (!token || !authenticated) throw new Error('ورود لازم است.');
+      if (!token || !authenticated) throw new Error('Sign in is required.');
       const current = generation;
       try {
         const result = await request('slots/' + encodeURIComponent(slot) + '/binding', {module_id:moduleId, context, only_if_missing:onlyIfMissing});
-        if (current !== generation) throw new Error('نشست تغییر کرد.');
+        if (current !== generation) throw new Error('The session changed.');
         return result.binding;
       } catch (error) {
         if (current === generation && error.status === 401) disconnect(error.message);
@@ -202,11 +202,11 @@ PANEL = r'''
       }
     },
     async execute(slot, moduleId, input) {
-      if (!token || !authenticated) throw new Error('ورود لازم است.');
+      if (!token || !authenticated) throw new Error('Sign in is required.');
       const current = generation;
       try {
         const result = await request('slots/' + encodeURIComponent(slot) + '/execute', {module_id:moduleId, input});
-        if (current !== generation) throw new Error('نشست تغییر کرد.');
+        if (current !== generation) throw new Error('The session changed.');
         return result.result;
       } catch (error) {
         if (current === generation && error.status === 401) disconnect(error.message);
@@ -214,11 +214,11 @@ PANEL = r'''
       }
     },
     async invoke(id, data) {
-      if (!token || !authenticated || !['counter','slot-note'].includes(id)) throw new Error('ورود به حساب لازم است.');
+      if (!token || !authenticated || !['counter','slot-note'].includes(id)) throw new Error('Sign in is required.');
       const current = generation;
       try {
         const result = await request('modules/' + encodeURIComponent(id) + '/state', data);
-        if (current !== generation) throw new Error('نشست تغییر کرد.');
+        if (current !== generation) throw new Error('The session changed.');
         return result;
       } catch (error) {
         if (current === generation && error.status === 401) disconnect(error.message);
@@ -228,20 +228,20 @@ PANEL = r'''
   };
   function handleError(error) {
     if (error.status === 401) disconnect(error.message);
-    else status(error.message || 'ارتباط با سرویس برقرار نشد.');
+    else status(error.message || 'Could not connect to the service.');
   }
   function renderHistory(rows) {
     historyRows = rows;
     const search = el('history-worker').value.trim().toLowerCase(), filter = el('history-status').value;
     const filtered = rows.filter(job => (!filter || job.status === filter) && (!search || (job.worker_id + ' ' + job.execution_id).toLowerCase().includes(search)));
-    el('history-count').textContent = filtered.length + ' از ' + rows.length + ' اجرای دریافت‌شده';
+    el('history-count').textContent = filtered.length + ' of ' + rows.length + ' executions received';
     const list = el('account-executions'); list.replaceChildren();
-    if (!rows.length) { list.textContent = 'هنوز اجرایی ثبت نشده است.'; return; }
-    if (!filtered.length) { list.textContent = 'اجرایی با این فیلتر پیدا نشد.'; return; }
+    if (!rows.length) { list.textContent = 'No executions yet.'; return; }
+    if (!filtered.length) { list.textContent = 'No executions match this filter.'; return; }
     filtered.forEach(job => {
       const item = document.createElement('li');
       const button = document.createElement('button'); button.type = 'button';
-      button.textContent = job.worker_id + ' · ' + (labels[job.status] || job.status) + ' · مشاهده';
+      button.textContent = job.worker_id + ' · ' + (labels[job.status] || job.status) + ' · View';
       button.disabled = Boolean(pending);
       button.addEventListener('click', () => watchJob(job.execution_id));
       item.append(button); list.append(item);
@@ -263,19 +263,19 @@ PANEL = r'''
       });
       if (enabledWorkers.some(row => row.definition.worker_id === previous)) el('account-worker').value = previous;
       renderHistory(history.executions); controls();
-      status(enabledWorkers.length ? 'حساب آماده است. Worker و ورودی را انتخاب کنید.' : 'Worker فعالی ندارید؛ Worker منتشرشده‌ای را ثبت و فعال کنید.');
+      status(enabledWorkers.length ? 'Account ready. Select a Worker and input.' : 'No active Worker. Register and enable a published Worker.');
     } catch (error) { if (current === generation && ticket === refreshTicket) handleError(error); }
   }
-  const lifecycle = {configured:'پیکربندی‌شده',enabled:'فعال',disabled:'غیرفعال'};
+  const lifecycle = {configured:'Configured',enabled:'Enabled',disabled:'Disabled'};
   function renderWorkers() {
     const query = el('worker-search').value.trim().toLowerCase();
     const rows = allWorkers.filter(row => row.definition.worker_id.toLowerCase().includes(query));
     const list = el('worker-list'); list.replaceChildren();
-    if (!rows.length) { list.textContent = 'Worker با این مشخصات وجود ندارد.'; return; }
+    if (!rows.length) { list.textContent = 'No Workers match this search.'; return; }
     rows.forEach(row => {
       const item = document.createElement('li'), button = document.createElement('button');
       button.type = 'button'; button.dataset.worker = row.definition.worker_id;
-      button.textContent = row.definition.worker_id + ' · ' + (lifecycle[row.lifecycle] || row.lifecycle) + ' · جزئیات و تنظیمات';
+      button.textContent = row.definition.worker_id + ' · ' + (lifecycle[row.lifecycle] || row.lifecycle) + ' · Details and settings';
       button.disabled = managing || Boolean(pending);
       button.addEventListener('click', () => editWorker(row));
       item.append(button); list.append(item);
@@ -284,16 +284,16 @@ PANEL = r'''
   function editWorker(row = null) {
     if (managing || pending) return;
     editing = row; el('worker-edit-form').reset(); el('worker-edit-status').textContent = '';
-    el('worker-editor-title').textContent = row ? 'جزئیات Worker' : 'ثبت Worker جدید';
+    el('worker-editor-title').textContent = row ? 'Worker details' : 'Register Worker';
     const fields = {'edit-worker-id':'worker_id','edit-artifact-id':'artifact_id','edit-artifact-hash':'artifact_hash','edit-entrypoint':'entrypoint'};
     Object.entries(fields).forEach(([id,key]) => {el(id).value = row ? row.definition[key] : ''; el(id).readOnly = Boolean(row);});
     el('edit-configuration').value = JSON.stringify(row ? row.configuration : {},null,2);
     el('edit-schedule').value = row ? row.schedule.kind : 'manual';
     el('edit-interval').value = row && row.schedule.interval_seconds || 60;
     el('edit-interval').disabled = el('edit-schedule').value !== 'interval';
-    el('edit-lifecycle').textContent = row ? 'وضعیت: ' + lifecycle[row.lifecycle] : 'پس از ثبت، Worker خودکار فعال نمی‌شود.';
+    el('edit-lifecycle').textContent = row ? 'Status: ' + lifecycle[row.lifecycle] : 'A registered Worker is not automatically enabled.';
     el('worker-toggle').hidden = !row; el('worker-delete').hidden = !row;
-    el('worker-toggle').textContent = row && row.lifecycle === 'enabled' ? 'غیرفعال‌کردن' : 'فعال‌کردن';
+    el('worker-toggle').textContent = row && row.lifecycle === 'enabled' ? 'Disable' : 'Enable';
     el('worker-editor').showModal();
   }
   function askWorkerAction(action) {
@@ -302,9 +302,9 @@ PANEL = r'''
     el('worker-confirm-id').value = ''; el('worker-confirm-status').textContent = '';
     const removing = action === 'delete';
     el('worker-confirm-label').hidden = !removing; el('worker-confirm-id').hidden = !removing;
-    el('worker-confirm-message').textContent = removing ? 'حذف ' + confirmation.worker + '؟ history حفظ می‌شود و اجرای پذیرفته‌شده متوقف نمی‌شود.' :
-      action === 'disable' ? 'اجرای جدید و schedule متوقف می‌شوند؛ اجراهای پذیرفته‌شده ادامه دارند.' :
-      editing.schedule.kind === 'interval' ? 'با فعال‌کردن، اجرای خودکار interval با input خالی آغاز می‌شود. تغییرات ذخیره‌نشده فرم اعمال نمی‌شوند.' : 'Worker برای اجرای دستی فعال شود؟ تغییرات ذخیره‌نشده فرم اعمال نمی‌شوند.';
+    el('worker-confirm-message').textContent = removing ? 'Delete ' + confirmation.worker + '? History is retained and accepted executions continue.' :
+      action === 'disable' ? 'New executions and scheduling stop; accepted executions continue.' :
+      editing.schedule.kind === 'interval' ? 'Enabling starts interval execution with empty input. Unsaved form changes are not applied.' : 'Enable this Worker for manual execution? Unsaved form changes are not applied.';
     el('worker-confirm').showModal();
   }
   async function mutateWorker(path, body, method) {
@@ -318,7 +318,7 @@ PANEL = r'''
       el('worker-confirm').close(); el('worker-editor').close(); confirmation = null; editing = null;
     } catch (error) {
       if (current !== generation) return;
-      const message = error.status && error.status < 500 ? error.message : 'نتیجه عملیات قطعی نیست؛ پیش از تکرار، فرم را ببندید و فهرست را به‌روز کنید.';
+      const message = error.status && error.status < 500 ? error.message : 'The outcome is unknown. Close the form and refresh the list before retrying.';
       el('worker-edit-status').textContent = message; el('worker-confirm-status').textContent = message;
       handleError(error);
     } finally { if (current === generation) {managing = false; controls(); renderWorkers();} }
@@ -336,7 +336,7 @@ PANEL = r'''
   el('worker-confirm-form').addEventListener('submit', async event => {
     event.preventDefault(); if (!confirmation || managing) return;
     if (confirmation.action === 'delete' && el('worker-confirm-id').value !== confirmation.worker) {
-      el('worker-confirm-status').textContent = 'شناسه دقیق Worker را وارد کنید.'; return;
+      el('worker-confirm-status').textContent = 'Enter the exact Worker ID.'; return;
     }
     const path = 'workers/' + encodeURIComponent(confirmation.worker);
     await mutateWorker(confirmation.action === 'delete' ? path : path + '/' + confirmation.action,
@@ -346,11 +346,11 @@ PANEL = r'''
     event.preventDefault(); if (managing || pending) return;
     try {
       const configuration = JSON.parse(el('edit-configuration').value);
-      if (!configuration || Array.isArray(configuration) || typeof configuration !== 'object') throw new Error('Configuration باید JSON object باشد.');
+      if (!configuration || Array.isArray(configuration) || typeof configuration !== 'object') throw new Error('Configuration must be a JSON object.');
       const schedule = {kind:el('edit-schedule').value,interval_seconds:null};
       if (schedule.kind === 'interval') {
         schedule.interval_seconds = Number(el('edit-interval').value);
-        if (!Number.isSafeInteger(schedule.interval_seconds) || schedule.interval_seconds < 1) throw new Error('interval باید عدد صحیح مثبت باشد.');
+        if (!Number.isSafeInteger(schedule.interval_seconds) || schedule.interval_seconds < 1) throw new Error('Interval must be a positive integer.');
       }
       const body = {configuration,schedule};
       if (!editing) Object.assign(body,{worker_id:el('edit-worker-id').value.trim(),artifact_id:el('edit-artifact-id').value.trim(),artifact_hash:el('edit-artifact-hash').value.trim(),entrypoint:el('edit-entrypoint').value.trim()});
@@ -378,7 +378,7 @@ PANEL = r'''
         renderJob(job);
         if (terminal(job)) await refresh();
         else if (Date.now() < deadline) timer = setTimeout(poll,1000);
-        else status('اجرا هنوز پایان نیافته است؛ با «بررسی وضعیت» ادامه را ببینید.');
+        else status('Execution has not finished; use Check status to continue.');
       } catch (error) { if (current === generation && watch === watcher) handleError(error); }
     }
     await poll();
@@ -387,40 +387,40 @@ PANEL = r'''
     if (!pending || sending) return;
     const current = generation, submission = pending;
     sending = true; el('worker-retry').hidden = true; controls();
-    status('در حال ارسال درخواست اجرا…');
+    status('Submitting execution request...');
     try {
       const job = await request('workers/' + encodeURIComponent(submission.worker) + '/executions',submission.body);
       if (current !== generation) return;
-      if (typeof job.execution_id !== 'string' || !labels[job.status]) throw new Error('پاسخ پذیرش اجرا معتبر نیست.');
-      pending = null; renderJob(job); status('درخواست ثبت شد. وضعیت اجرا در همین صفحه به‌روزرسانی می‌شود.');
+      if (typeof job.execution_id !== 'string' || !labels[job.status]) throw new Error('Invalid execution acceptance response.');
+      pending = null; renderJob(job); status('Request accepted. Execution status updates on this page.');
       await watchJob(job.execution_id);
     } catch (error) {
       if (current !== generation) return;
       if (error.status && error.status < 500) { pending = null; handleError(error); }
       else {
         el('worker-retry').hidden = false;
-        status('پاسخ قطعی دریافت نشد. برای جلوگیری از اجرای تکراری، «ارسال دوباره همان درخواست» را بزنید یا تاریخچه را بررسی کنید.');
+        status('No definitive response. Retry the same request or check history to avoid duplicate execution.');
       }
     } finally { if (current === generation) { sending = false; controls(); } }
   }
   el('account-form').addEventListener('submit', async event => {
     event.preventDefault(); const value = el('account-token').value.trim();
     if (location.protocol !== 'https:' && !['localhost','127.0.0.1','[::1]'].includes(location.hostname)) {
-      el('account-token').value = ''; status('ورود به حساب فقط از طریق HTTPS مجاز است.'); return;
+      el('account-token').value = ''; status('Sign-in requires HTTPS.'); return;
     }
-    if (!value) { status('Access token را وارد کنید.'); return; }
-    disconnect('در حال ورود…'); token = value; controls(); await refresh();
+    if (!value) { status('Enter your access token.'); return; }
+    disconnect('Signing in...'); token = value; controls(); await refresh();
   });
   el('worker-run-form').addEventListener('submit', async event => {
     event.preventDefault(); if (pending || sending || (active && !terminal(active))) return;
     try {
       const input = JSON.parse(el('worker-input').value);
-      if (input === null || Array.isArray(input) || typeof input !== 'object') throw new Error('ورودی باید یک JSON object باشد.');
+      if (input === null || Array.isArray(input) || typeof input !== 'object') throw new Error('Input must be a JSON object.');
       const seconds = Number(el('worker-timeout').value);
-      if (!Number.isFinite(seconds) || seconds < 1 || seconds > 300) throw new Error('زمان اجرا باید بین ۱ تا ۳۰۰ ثانیه باشد.');
-      if (new TextEncoder().encode(JSON.stringify(input)).length > 900000) throw new Error('حجم ورودی بیش از حد مجاز است.');
+      if (!Number.isFinite(seconds) || seconds < 1 || seconds > 300) throw new Error('Execution timeout must be between 1 and 300 seconds.');
+      if (new TextEncoder().encode(JSON.stringify(input)).length > 900000) throw new Error('Input exceeds the size limit.');
       const worker = el('account-worker').value;
-      if (!enabledWorkers.some(row => row.definition.worker_id === worker)) throw new Error('یک Worker فعال انتخاب کنید.');
+      if (!enabledWorkers.some(row => row.definition.worker_id === worker)) throw new Error('Select an active Worker.');
       pending = {worker,body:{input_payload:input,timeout_seconds:seconds,idempotency_key:crypto.randomUUID()}};
       await submitPending();
     } catch (error) { handleError(error); }
@@ -436,7 +436,7 @@ PANEL = r'''
     try {
       const result = await request('executions/' + encodeURIComponent(id) + '/cancel',{});
       if (current !== generation) return;
-      status(result.cancelled ? 'درخواست لغو تأیید شد؛ وضعیت نهایی را بررسی می‌کنیم.' : 'توقف اجرا تأیید نشد؛ وضعیت را دوباره بررسی کنید.');
+      status(result.cancelled ? 'Cancellation request acknowledged; checking final status.' : 'Cancellation was not confirmed; check the status again.');
       await watchJob(id);
     } catch (error) { if (current === generation) handleError(error); }
     finally { if (current === generation) controls(); }
