@@ -9,7 +9,7 @@ th{background:#eff5fa}pre{direction:ltr;text-align:left;background:#f1f5f9;paddi
 code{direction:ltr;unicode-bidi:isolate;font-family:monospace;overflow-wrap:anywhere}.nowrap{white-space:nowrap;direction:ltr;unicode-bidi:isolate}blockquote{border-right:4px solid #c48a11;padding:8px 16px;margin:16px 0;background:#fff8e7}
 @media print{body{font-size:10pt;padding:0;max-width:none}h1{break-before:page}pre,table{font-size:8pt}tr{break-inside:avoid}a{color:inherit;text-decoration:none}@page{size:A4;margin:16mm}}
 </style><body><h1 id="30na-hybrid-architecture">دفترچه جامع پروژه 30nA Hybrid Architecture</h1>
-<p>تاریخ بررسی: <code>2026-10-30</code>؛ مبنای رفتار برنامه: <code>610983301f90748b8ffe7aae732427ccd729aa13</code>.</p>
+<p>تاریخ بررسی: <code>2026-10-30</code>؛ مبنای رفتار برنامه: <code>87ad0ab696276e7fdeb75f118e78185f81e4dfc7</code>.</p>
 <p>این کتاب نسخه یک‌جلدی فصل‌های همین پوشه است. فصل‌ها و مرجع ماشینی منبع نگهداری هستند؛ BOOK.md و HTML را دستی ویرایش نکنید.</p>
 <h2 id="_1">فهرست مطالب</h2>
 <ul>
@@ -37,11 +37,11 @@ code{direction:ltr;unicode-bidi:isolate;font-family:monospace;overflow-wrap:anyw
 </ul>
 <p><a id="chapter-00"></a></p>
 <h1 id="_2">۰۰ — دامنه، وضعیت و روش استفاده</h1>
-<p>این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit <code>610983301f90748b8ffe7aae732427ccd729aa13</code> روی branch <code>feat/release-readiness</code> است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.</p>
+<p>این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit <code>87ad0ab696276e7fdeb75f118e78185f81e4dfc7</code> روی branch <code>feat/release-readiness</code> است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.</p>
 <h2 id="_3">وضعیت قابل اثبات</h2>
 <ul>
 <li>نسخه فعلی <strong>Release candidate برای demo با Workerهای trusted و ازپیش‌ثبت‌شده</strong> است.</li>
-<li>اجرای کامل محلی روی Python 3.11 و 3.12: <code>294 passed, 65 subtests passed</code>، بدون skipped یا warning.</li>
+<li>اجرای کامل محلی روی Python 3.11 و 3.12: <code>303 passed, 65 subtests passed</code>، بدون skipped یا warning.</li>
 <li><a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604">CI پیشین c3b97d2</a> روی Ubuntu 24.04 شامل تست‌های هر دو Python، Chromium و security scans موفق بوده است؛ این لینک evidence تاریخی همان SHA است. اصلاحات فعلی به‌صورت محلی در هر دو Python تأیید شده‌اند؛ نتیجه CI checkout جدید را در <a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Frelease-readiness">صفحه Actions branch</a> بررسی کنید.</li>
 <li>کد برای VPS، systemd، credential files و HTTPS آماده شده؛ <strong>استقرار واقعی، Rootless host acceptance، fault-injection روی میزبان هدف و backup/restore عملیاتی هنوز تأیید نشده‌اند</strong>.</li>
 <li>Docker محیط Cloud rootful بود. نتیجه آن پذیرش امنیتی rootless روی VPS نیست.</li>
@@ -1005,6 +1005,8 @@ sudo /usr/local/sbin/30na-review status
 <p>helper باید قبلاً مطابق راهنمای تحویل نصب شده باشد. <code>systemctl active</code> یا port باز کافی نیست: با credential صحیح، worker list، seed، اجرای موفق و ناموفق، owner دیگر، history و restart را بررسی کنید. CODE endpoint <code>/health</code> استاندارد ندارد؛ برای check authenticated از عملیات مناسب آن استفاده کنید.</p>
 <h2 id="deployment">تعریف پایان deployment</h2>
 <p>processها پایدار؛ startup بعد از reboot سنجیده؛ TLS و credential rotation/revocation درست؛ schema و state persistent؛ hash Artifact صحیح؛ rootless resource limits enforce؛ cleanup/recovery بازبینی؛ backup restore آزموده؛ مشتری نمونه را از Dashboard اجرا کرده و logها را از Terminal محدود می‌بیند. تا ثبت این شواهد، وضعیت VPS «تأییدنشده» است.</p>
+<h2 id="installer">installer خودکار</h2>
+<p><a href="../deployment/installer.md">راهنمای install.sh</a> دامنه/email، Rootless Docker، credential، TLS داخلی، Let’s Encrypt و smoke اجرای واقعی را برای VPS خالی تنظیم می‌کند. نصب خودکار جای host acceptance و backup/restore rehearsal را نمی‌گیرد.</p>
 <p><a id="chapter-14"></a></p>
 <h1 id="_29">۱۴ — عملیات روزمره و مشاهده‌پذیری</h1>
 <h2 id="deploy">کنترل ابتدای شیفت یا پس از deploy</h2>
@@ -1179,7 +1181,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <p>workflow تاریخی <code>baseline-verification.yml</code> روی SHA ثابت قدیمی اجرا می‌شود. شکست آن یا تعداد تست آن با وضعیت main/branch فعلی یکسان نیست. آن baseline عمداً برای تاریخچه نگه داشته شده و معیار Release جاری نیست.</p>
 <h2 id="outcome">تفسیر outcome</h2>
 <p>HTTP 200، exit صفر فرمان آخر pipe، PID، port باز، تعداد صفر تست یا skipped job به‌تنهایی موفقیت نیست. passed، failed، subtests، skipped، xfail و unrun باید متمایز ثبت شوند. runner کامل، skipped و zero-test را رد و pytest exit را ثبت می‌کند. unit-only، Docker/Browser را صریح محدود می‌کند و برای Release معتبر نیست.</p>
-<p>شواهد محلی اصلاحات کد <code>6109833</code>: <code>294 passed, 65 subtests passed</code> در هر دو Python، بدون skipped/warning. <a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604">CI پیشین c3b97d2</a> موفق است و به نسخه قدیمی 279تستی مربوط است. نتیجه CI جدید را در <a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Frelease-readiness">Actions branch</a> بررسی کنید. این اعداد برای همان نسخه‌اند؛ اضافه‌شدن تست یا تغییر branch می‌تواند آن‌ها را تغییر دهد. نتیجه host قدیمی 217/225 یا CI PRهای قبلی را به SHA جدید نسبت ندهید.</p>
+<p>شواهد محلی کد و installer <code>87ad0ab</code>: <code>303 passed, 65 subtests passed</code> در هر دو Python، بدون skipped/warning. <a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604">CI پیشین c3b97d2</a> موفق است و به نسخه قدیمی 279تستی مربوط است. نتیجه CI جدید را در <a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Frelease-readiness">Actions branch</a> بررسی کنید. این اعداد برای همان نسخه‌اند؛ اضافه‌شدن تست یا تغییر branch می‌تواند آن‌ها را تغییر دهد. نتیجه host قدیمی 217/225 یا CI PRهای قبلی را به SHA جدید نسبت ندهید.</p>
 <h2 id="ci_2">مستندات در CI</h2>
 <p>ابزارهای <code>scripts/documentation/</code> موجودی را از source بدون import برنامه استخراج، کتاب/HTML و راهنمای مستقل Agent با snapshot قراردادها و signatureها را تولید و linkها و freshness را بررسی می‌کنند. برای ساخت ابتدا dependency docs را با <code>requirements-docs.lock</code> نصب کنید. PDF، خروجی چاپ HTML و artifact توزیعی است؛ صحت محتوایی از chapterها و checker می‌آید.</p>
 <h2 id="release">تصمیم Release</h2>
@@ -1423,7 +1425,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <h1 id="_45">مرجع ماشینی و پوشش فایل‌ها</h1>
 <p>این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.</p>
-<p>تعداد فایل‌های فنی و پشتیبان: <strong>188</strong>؛ تعداد نمادهای Python: <strong>844</strong>.</p>
+<p>تعداد فایل‌های فنی و پشتیبان: <strong>192</strong>؛ تعداد نمادهای Python: <strong>868</strong>.</p>
 <h2 id="_46">موجودی کامل فایل‌های فنی</h2>
 <table>
 <thead>
@@ -1466,8 +1468,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/CHANGELOG.md">CHANGELOG.md</a></td>
-<td style="text-align: right;">2616</td>
-<td><code>a0e00efbcf9dcc3a6cb2dad170a1a221287d74d804d8d4e5b5b3bc2fd34b13c6</code></td>
+<td style="text-align: right;">3074</td>
+<td><code>b2449af9794abe29c4f8116284270a08b4c2b74f1238033ad13247d1bfacdb58</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/CONTRIBUTING.md">CONTRIBUTING.md</a></td>
@@ -1476,8 +1478,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/README.md">README.md</a></td>
-<td style="text-align: right;">4920</td>
-<td><code>3ea86d5c3f477d33bc333ed168060f2940b0f8c50b87244c62668f1d4a725f25</code></td>
+<td style="text-align: right;">6319</td>
+<td><code>b131c6fd9ae7b5c981bf33a417d34fc52a0152a4973275c9b79090428a05e72b</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/SECURITY.md">SECURITY.md</a></td>
@@ -1735,6 +1737,11 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/install.sh">install.sh</a></td>
+<td style="text-align: right;">14486</td>
+<td><code>81b2273e90d6e7b7063abb268f2e1bf762336f8ee0ddc24a4e146d3c0b41eb3a</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/requirements-dev.txt">requirements-dev.txt</a></td>
 <td style="text-align: right;">191</td>
 <td><code>baa71328e392be7ddb0840fff882f389a2ee21c1d5f96cea2c87b7bdf7cae04d</code></td>
@@ -1775,9 +1782,19 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>b257cb69651bdb04f156083b51360ea30467afda1e598fab40322889e2cc7bc1</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py">scripts/deployment/provision.py</a></td>
+<td style="text-align: right;">7563</td>
+<td><code>301c3a12e9b293ce1df803aca14524db40f26cd8d7561cc420e4687fa282e321</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/seed_demo.py">scripts/deployment/seed_demo.py</a></td>
 <td style="text-align: right;">4454</td>
 <td><code>f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py">scripts/deployment/verify_install.py</a></td>
+<td style="text-align: right;">3205</td>
+<td><code>c0ac64d85583279ec7d81447003f45f2c045ca84a172b1c7dfc7554901e3b8f1</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/development/data_manager_server.py">scripts/development/data_manager_server.py</a></td>
@@ -2100,6 +2117,11 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>689e6c3a35708d88e7ac8f3d69d0298eec5d26a71a2d7cb8c6c3c21c97cb123e</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td style="text-align: right;">4965</td>
+<td><code>8c7493a9dd12cb1102611f8114a532f3be158a924f5470cce3de3146efdb582a</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_issue26_dice_roller.py">units/consumers/dashboard-core/tests/test_issue26_dice_roller.py</a></td>
 <td style="text-align: right;">1034</td>
 <td><code>7d3066b58ba3b049424dfa54cef414e4b5d5bbaa3b312c853212614266a53bb7</code></td>
@@ -2271,8 +2293,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/worker-runtime/tests/control_plane_helper.py">units/worker-runtime/tests/control_plane_helper.py</a></td>
-<td style="text-align: right;">7113</td>
-<td><code>30f0ce1f3b69dcb89f1188458d3afc007566ac5c0ae3b27547a0cb65cc816928</code></td>
+<td style="text-align: right;">7778</td>
+<td><code>1065dd26993984d47e8c2c62902ee38fd4a69eefb0c4548971adf050998900d9</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/worker-runtime/tests/sandbox-image/Dockerfile">units/worker-runtime/tests/sandbox-image/Dockerfile</a></td>
@@ -2494,7 +2516,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><code>DASHBOARD_SCREENSHOT</code></td>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/worker-runtime/tests/control_plane_helper.py#L107">units/worker-runtime/tests/control_plane_helper.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/worker-runtime/tests/control_plane_helper.py#L114">units/worker-runtime/tests/control_plane_helper.py</a></td>
 <td>optional lookup</td>
 </tr>
 <tr>
@@ -2504,7 +2526,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><code>DASHBOARD_SKIP_BROWSER</code></td>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/worker-runtime/tests/control_plane_helper.py#L103">units/worker-runtime/tests/control_plane_helper.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/worker-runtime/tests/control_plane_helper.py#L110">units/worker-runtime/tests/control_plane_helper.py</a></td>
 <td>optional lookup</td>
 </tr>
 <tr>
@@ -2683,6 +2705,22 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 </thead>
 <tbody>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L132">scripts/deployment/provision.py</a></td>
+<td><code>--domain</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L133">scripts/deployment/provision.py</a></td>
+<td><code>--image</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L134">scripts/deployment/provision.py</a></td>
+<td><code>--sandbox-uid</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L135">scripts/deployment/provision.py</a></td>
+<td><code>--public-tls</code></td>
+</tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/seed_demo.py#L76">scripts/deployment/seed_demo.py</a></td>
 <td><code>--code-url</code></td>
@@ -3382,6 +3420,36 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(self)</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L17">scripts/deployment/provision.py</a></td>
+<td><code>validate</code></td>
+<td><code>(domain, image, sandbox_uid)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L27">scripts/deployment/provision.py</a></td>
+<td><code>atomic</code></td>
+<td><code>(path, content, *, mode=416, uid=0, gid=0)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L43">scripts/deployment/provision.py</a></td>
+<td><code>nginx_config</code></td>
+<td><code>(domain, public_tls=False)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L87">scripts/deployment/provision.py</a></td>
+<td><code>environments</code></td>
+<td><code>(image, sandbox_uid)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L98">scripts/deployment/provision.py</a></td>
+<td><code>provision</code></td>
+<td><code>(config, nginx_path, *, domain, image, sandbox_uid, service_gid, sandbox_gid, owner_uid=0, public_tls=False)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/provision.py#L130">scripts/deployment/provision.py</a></td>
+<td><code>main</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/seed_demo.py#L20">scripts/deployment/seed_demo.py</a></td>
 <td><code>source_archive</code></td>
 <td><code>()</code></td>
@@ -3398,6 +3466,46 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/seed_demo.py#L74">scripts/deployment/seed_demo.py</a></td>
+<td><code>main</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L18">scripts/deployment/verify_install.py</a></td>
+<td><code>DashboardAPI</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L20">scripts/deployment/verify_install.py</a></td>
+<td><code>DashboardAPI.__init__</code></td>
+<td><code>(self, client)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L22">scripts/deployment/verify_install.py</a></td>
+<td><code>DashboardAPI._request</code></td>
+<td><code>(self, method, path, payload=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L36">scripts/deployment/verify_install.py</a></td>
+<td><code>DashboardAPI.post</code></td>
+<td><code>(self, path, payload)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L37">scripts/deployment/verify_install.py</a></td>
+<td><code>DashboardAPI.get</code></td>
+<td><code>(self, path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L40">scripts/deployment/verify_install.py</a></td>
+<td><code>verify</code></td>
+<td><code>(api, *, timeout=90)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L41">scripts/deployment/verify_install.py</a></td>
+<td><code>verify.execute</code></td>
+<td><code>(payload)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/scripts/deployment/verify_install.py#L60">scripts/deployment/verify_install.py</a></td>
 <td><code>main</code></td>
 <td><code>()</code></td>
 </tr>
@@ -5265,6 +5373,56 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_demo_seed.py#L31">units/consumers/dashboard-core/tests/test_demo_seed.py</a></td>
 <td><code>test_seed_does_not_replace_conflicting_worker_or_reenable_disabled_worker.Manager.get</code></td>
 <td><code>(self, path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L14">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>load</code></td>
+<td><code>(name)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L25">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_provision_retains_credentials_and_binds_every_hop_to_customer</code></td>
+<td><code>(tmp_path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L52">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_untrusted_installer_values_cannot_generate_config</code></td>
+<td><code>(domain)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L56">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_partial_credential_state_is_not_silently_rotated</code></td>
+<td><code>(tmp_path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L64">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_verification_rejects_false_success_and_uses_bff_routes</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L66">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_verification_rejects_false_success_and_uses_bff_routes.route</code></td>
+<td><code>(request)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L80">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_verification_rejects_false_success_and_uses_bff_routes.WrongResult</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L81">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_verification_rejects_false_success_and_uses_bff_routes.WrongResult.post</code></td>
+<td><code>(self, *args)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L82">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_verification_rejects_false_success_and_uses_bff_routes.WrongResult.get</code></td>
+<td><code>(self, *args)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L86">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_installer_shell_validation_and_help_do_not_provision</code></td>
+<td><code>()</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_issue26_dice_roller.py#L11">units/consumers/dashboard-core/tests/test_issue26_dice_roller.py</a></td>

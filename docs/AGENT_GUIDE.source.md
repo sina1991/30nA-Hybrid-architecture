@@ -30,7 +30,7 @@
 | BFF upstream و wire error | `units/consumers/dashboard-core/public_api.py`، `PublicAPI`؛ `dashboard/app.py` | Dashboard tests؛ real E2E |
 | auth مشترک/body limit/WSGI | `worker_manager/http_common.py`، `owner_dependency`، `BodyLimitMiddleware`، `register_error_handlers`؛ `code_manager/secure_gateway.py`، `authenticated_wsgi` | `test_control_api.py`، `test_http_api.py`، `test_production_entrypoints.py`؛ owner isolation E2E |
 | demo تحویل | `examples/demo-summary/`؛ `scripts/deployment/seed_demo.py` | `units/consumers/dashboard-core/tests/test_demo_seed.py` و real E2E |
-| راه‌اندازی Ubuntu | `deployment/systemd/`، `deployment/30na-review`؛ `scripts/deployment/prepare.sh` | `test_production_entrypoints.py`؛ تست روی VPS مجزا |
+| راه‌اندازی Ubuntu | `install.sh`، `scripts/deployment/provision.py`، `deployment/systemd/` و `deployment/30na-review` | `test_installer.py`، `test_production_entrypoints.py`؛ نصب واقعی روی VPS مجزا |
 | مستندات/تصاویر | `docs/manual/00..19`؛ این source؛ `scripts/documentation/`؛ `docs/assets/` | build `--check`، link/PDF check |
 | CI/dependency | `.github/workflows/ci.yml`؛ `requirements*.lock`؛ browser `package-lock.json` | `scripts/testing/run_ci.py`؛ security job |
 | Agent08 قدیمی | `units/integration/agent08/agent08.py` | integration fixture tests؛ مسیر اصلی MVP نیست |
@@ -145,3 +145,7 @@ DATA direct envelope، provisioning children در HTTP و propagation سرتاس
 ## پیوست تولیدشده: قراردادها و مرجع کامل کد
 
 بخش بعد تمام YAMLهای قرارداد، موجودی فایل، SHA-256، lookupهای env، CLIها، literal errorها، DDLها، class/function/method signatureها و HTTP schemaها را از همین checkout در خود دارد. پیاده‌سازی JavaScript و shell در inventory مشخص است؛ AST توابع مربوط به Python است. این index تحلیل dynamic dispatch، reflection، runtime value و semantic approval قرارداد نیست.
+
+## توسعه installer
+
+`install.sh` orchestrator سیستم Ubuntu خالی است؛ آن را روی workspace یا سرور فعال اجرا نکنید. `scripts/deployment/provision.py` config و credential را atomic تولید می‌کند؛ `verify_install.py` با adapter محدود `DashboardAPI` مسیر BFF را بررسی می‌کند، چون `PublicAPI` فقط `/api/v1/` می‌پذیرد. تست هدف `units/consumers/dashboard-core/tests/test_installer.py` است. portهای داخلی HTTPS روی loopback 18443..18446 هستند. دستور کاربر و failure/resume در [راهنمای نصب](deployment/installer.md) آمده است. هر تغییر topology یا env را هم در renderer و هم در راهنمای نصب و تست wiring منعکس کنید.

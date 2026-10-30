@@ -32,3 +32,5 @@
 ## راهنمای توسعه برای Agent
 
 [راهنمای فنی مستقل Agent](AGENT_GUIDE.md) شامل نقشه تغییر، invariantها، توابع، قراردادها و تست‌های مرتبط است. [گزارش بازبینی سراسری](DOCUMENTATION_REVIEW.md) تغییرات و مرزهای باقی‌مانده را ثبت می‌کند.
+
+برای نصب MVP روی VPS خالی، [راهنمای installer با HTTPS خودکار](deployment/installer.md) را ببینید.

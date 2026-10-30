@@ -149,3 +149,7 @@ Dashboard اکنون علاوه بر مشاهده، اجرای Worker فعالِ
 ```bash
 npm ci --prefix units/consumers/dashboard-core/browser-tests --ignore-scripts --no-audit --no-fund
 ```
+
+## نصب خودکار روی سرور خالی
+
+[install.sh و HTTPS خودکار](installer.md) مسیر نصب MVP روی Ubuntu 24.04 اختصاصی است؛ روش دستی این سند برای تنظیمات اختصاصی باقی می‌ماند.

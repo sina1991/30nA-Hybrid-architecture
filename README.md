@@ -4,6 +4,19 @@ Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORK
 
 **وضعیت: Release candidate؛ پذیرش نهایی Production هنوز باز است.**
 
+## نصب کامل روی Ubuntu VPS
+
+یک VPS خالی با **Ubuntu 24.04 LTS**، دسترسی root و دامنه یا subdomain متصل به IP آن آماده کنید. TCP `80/443` باید در firewall سرور و پنل VPS باز باشند. installer، HTTPS رایگان Let’s Encrypt و تمدید آن، Rootless Docker، سرویس‌ها و Worker نمونه را تنظیم می‌کند.
+
+```bash
+sudo -i
+bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/feat/release-readiness/install.sh)
+```
+
+در مراحل نصب، **دامنه و email** پرسیده می‌شوند؛ خرید یا دریافت دستی certificate لازم نیست. این فرمان مربوط به branch `feat/release-readiness` است. پس از Build و اجرای موفق نمونه، آدرس `https://دامنه-شما` نمایش داده می‌شود. token ورود در فایل root-only `/etc/30na/customer-token` ساخته می‌شود و چاپ نمی‌شود.
+
+نصب روی سرور دارای سرویس/داده موجود متوقف می‌شود. [راهنمای installer](docs/deployment/installer.md) شامل پیش‌نیاز، دانلود قابل بررسی، `--check-only`، ادامه نصب ناموفق، تمدید certificate و خطایابی است. نصب موفق جای پذیرش امنیتی نهایی VPS نیست.
+
 ## دفترچه کامل پروژه
 
 [فهرست دفترچه جامع](docs/manual/README.md) · [کتاب یک‌جلدی](docs/manual/BOOK.md) · [PDF قابل دانلود](docs/manual/PROJECT_MANUAL.pdf) · [HTML قابل چاپ](docs/manual/PROJECT_MANUAL.html)

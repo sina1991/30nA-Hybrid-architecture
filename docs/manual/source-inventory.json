@@ -1,6 +1,26 @@
 {
   "cli": [
     [
+      "scripts/deployment/provision.py",
+      132,
+      "--domain"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      133,
+      "--image"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      134,
+      "--sandbox-uid"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      135,
+      "--public-tls"
+    ],
+    [
       "scripts/deployment/seed_demo.py",
       76,
       "--code-url"
@@ -191,7 +211,7 @@
     [
       "DASHBOARD_SCREENSHOT",
       "units/worker-runtime/tests/control_plane_helper.py",
-      107,
+      114,
       "optional lookup"
     ],
     [
@@ -203,7 +223,7 @@
     [
       "DASHBOARD_SKIP_BROWSER",
       "units/worker-runtime/tests/control_plane_helper.py",
-      103,
+      110,
       "optional lookup"
     ],
     [
@@ -899,9 +919,9 @@
       "sha256": "92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d"
     },
     {
-      "bytes": 2616,
+      "bytes": 3074,
       "path": "CHANGELOG.md",
-      "sha256": "a0e00efbcf9dcc3a6cb2dad170a1a221287d74d804d8d4e5b5b3bc2fd34b13c6"
+      "sha256": "b2449af9794abe29c4f8116284270a08b4c2b74f1238033ad13247d1bfacdb58"
     },
     {
       "bytes": 2817,
@@ -909,9 +929,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 4920,
+      "bytes": 6319,
       "path": "README.md",
-      "sha256": "3ea86d5c3f477d33bc333ed168060f2940b0f8c50b87244c62668f1d4a725f25"
+      "sha256": "b131c6fd9ae7b5c981bf33a417d34fc52a0152a4973275c9b79090428a05e72b"
     },
     {
       "bytes": 1866,
@@ -1169,6 +1189,11 @@
       "sha256": "17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f"
     },
     {
+      "bytes": 14486,
+      "path": "install.sh",
+      "sha256": "81b2273e90d6e7b7063abb268f2e1bf762336f8ee0ddc24a4e146d3c0b41eb3a"
+    },
+    {
       "bytes": 191,
       "path": "requirements-dev.txt",
       "sha256": "baa71328e392be7ddb0840fff882f389a2ee21c1d5f96cea2c87b7bdf7cae04d"
@@ -1209,9 +1234,19 @@
       "sha256": "b257cb69651bdb04f156083b51360ea30467afda1e598fab40322889e2cc7bc1"
     },
     {
+      "bytes": 7563,
+      "path": "scripts/deployment/provision.py",
+      "sha256": "301c3a12e9b293ce1df803aca14524db40f26cd8d7561cc420e4687fa282e321"
+    },
+    {
       "bytes": 4454,
       "path": "scripts/deployment/seed_demo.py",
       "sha256": "f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20"
+    },
+    {
+      "bytes": 3205,
+      "path": "scripts/deployment/verify_install.py",
+      "sha256": "c0ac64d85583279ec7d81447003f45f2c045ca84a172b1c7dfc7554901e3b8f1"
     },
     {
       "bytes": 1164,
@@ -1534,6 +1569,11 @@
       "sha256": "689e6c3a35708d88e7ac8f3d69d0298eec5d26a71a2d7cb8c6c3c21c97cb123e"
     },
     {
+      "bytes": 4965,
+      "path": "units/consumers/dashboard-core/tests/test_installer.py",
+      "sha256": "8c7493a9dd12cb1102611f8114a532f3be158a924f5470cce3de3146efdb582a"
+    },
+    {
       "bytes": 1034,
       "path": "units/consumers/dashboard-core/tests/test_issue26_dice_roller.py",
       "sha256": "7d3066b58ba3b049424dfa54cef414e4b5d5bbaa3b312c853212614266a53bb7"
@@ -1704,9 +1744,9 @@
       "sha256": "927188b494450962688cb4422c855902fb480ecb0fb7502665b3f544c74ca064"
     },
     {
-      "bytes": 7113,
+      "bytes": 7778,
       "path": "units/worker-runtime/tests/control_plane_helper.py",
-      "sha256": "30f0ce1f3b69dcb89f1188458d3afc007566ac5c0ae3b27547a0cb65cc816928"
+      "sha256": "1065dd26993984d47e8c2c62902ee38fd4a69eefb0c4548971adf050998900d9"
     },
     {
       "bytes": 237,
@@ -1973,6 +2013,42 @@
       "(self)"
     ],
     [
+      "scripts/deployment/provision.py",
+      17,
+      "validate",
+      "(domain, image, sandbox_uid)"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      27,
+      "atomic",
+      "(path, content, *, mode=416, uid=0, gid=0)"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      43,
+      "nginx_config",
+      "(domain, public_tls=False)"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      87,
+      "environments",
+      "(image, sandbox_uid)"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      98,
+      "provision",
+      "(config, nginx_path, *, domain, image, sandbox_uid, service_gid, sandbox_gid, owner_uid=0, public_tls=False)"
+    ],
+    [
+      "scripts/deployment/provision.py",
+      130,
+      "main",
+      "()"
+    ],
+    [
       "scripts/deployment/seed_demo.py",
       20,
       "source_archive",
@@ -1993,6 +2069,54 @@
     [
       "scripts/deployment/seed_demo.py",
       74,
+      "main",
+      "()"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      18,
+      "DashboardAPI",
+      "class"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      20,
+      "DashboardAPI.__init__",
+      "(self, client)"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      22,
+      "DashboardAPI._request",
+      "(self, method, path, payload=None)"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      36,
+      "DashboardAPI.post",
+      "(self, path, payload)"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      37,
+      "DashboardAPI.get",
+      "(self, path)"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      40,
+      "verify",
+      "(api, *, timeout=90)"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      41,
+      "verify.execute",
+      "(payload)"
+    ],
+    [
+      "scripts/deployment/verify_install.py",
+      60,
       "main",
       "()"
     ],
@@ -4233,6 +4357,66 @@
       31,
       "test_seed_does_not_replace_conflicting_worker_or_reenable_disabled_worker.Manager.get",
       "(self, path)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      14,
+      "load",
+      "(name)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      25,
+      "test_provision_retains_credentials_and_binds_every_hop_to_customer",
+      "(tmp_path)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      52,
+      "test_untrusted_installer_values_cannot_generate_config",
+      "(domain)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      56,
+      "test_partial_credential_state_is_not_silently_rotated",
+      "(tmp_path)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      64,
+      "test_verification_rejects_false_success_and_uses_bff_routes",
+      "()"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      66,
+      "test_verification_rejects_false_success_and_uses_bff_routes.route",
+      "(request)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      80,
+      "test_verification_rejects_false_success_and_uses_bff_routes.WrongResult",
+      "class"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      81,
+      "test_verification_rejects_false_success_and_uses_bff_routes.WrongResult.post",
+      "(self, *args)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      82,
+      "test_verification_rejects_false_success_and_uses_bff_routes.WrongResult.get",
+      "(self, *args)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_installer.py",
+      86,
+      "test_installer_shell_validation_and_help_do_not_provision",
+      "()"
     ],
     [
       "units/consumers/dashboard-core/tests/test_issue26_dice_roller.py",

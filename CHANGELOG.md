@@ -26,3 +26,9 @@
 - Add Ubuntu/systemd deployment templates, OpenAPI contracts, recovery guidance and an explicit release checklist.
 
 Production release remains gated on reviewed rootless target-host acceptance, live daemon fault-injection, deployed identity/TLS configuration and green CI on the exact release SHA. No final release tag is created by this preparation.
+
+## Unreleased — Guided Ubuntu installation
+
+- Add a fresh-host Ubuntu 24.04 installer with dedicated Rootless Docker, generated owner-bound credentials, systemd services and Nginx.
+- Obtain and renew a public Let’s Encrypt certificate for the supplied Dashboard domain; keep private upstream TLS on loopback.
+- Gate completion on Build/publication and real Dashboard BFF success/failure verification; preserve install credentials and SHA when resuming.

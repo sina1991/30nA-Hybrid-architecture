@@ -42,3 +42,7 @@
 ## بازبینی سراسری مستندات
 
 قراردادهای CODE/Worker و READMEهای فعال هماهنگ شدند؛ bug بازنویسی history Runtime رفع و CA خصوصی Manager → Runtime اضافه شد. اصلاحات در تست کامل محلی هر دو Python با `294 passed, 65 subtests passed` بررسی شدند. [گزارش بازبینی](DOCUMENTATION_REVIEW.md) و [راهنمای مستقل Agent](AGENT_GUIDE.md) جزئیات دارند. این نتیجه جای پذیرش VPS نیست.
+
+## نصب خودکار MVP
+
+[installer دامنه و HTTPS](deployment/installer.md) برای Ubuntu 24.04 خالی اضافه شد. تست کامل محلی هر دو Python اکنون `303 passed, 65 subtests passed` است؛ verification خود installer در E2E با HTTPS/Docker واقعی اجرا می‌شود. ShellCheck و nginx -t روی config تولیدشده موفق‌اند؛ provisioning کامل VPS و ACME واقعی در Cloud اجرا نشده‌اند.

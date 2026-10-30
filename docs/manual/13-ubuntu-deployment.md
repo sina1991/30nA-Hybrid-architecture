@@ -50,3 +50,7 @@ helper باید قبلاً مطابق راهنمای تحویل نصب شده ب
 ## تعریف پایان deployment
 
 processها پایدار؛ startup بعد از reboot سنجیده؛ TLS و credential rotation/revocation درست؛ schema و state persistent؛ hash Artifact صحیح؛ rootless resource limits enforce؛ cleanup/recovery بازبینی؛ backup restore آزموده؛ مشتری نمونه را از Dashboard اجرا کرده و logها را از Terminal محدود می‌بیند. تا ثبت این شواهد، وضعیت VPS «تأییدنشده» است.
+
+## installer خودکار
+
+[راهنمای install.sh](../deployment/installer.md) دامنه/email، Rootless Docker، credential، TLS داخلی، Let’s Encrypt و smoke اجرای واقعی را برای VPS خالی تنظیم می‌کند. نصب خودکار جای host acceptance و backup/restore rehearsal را نمی‌گیرد.
