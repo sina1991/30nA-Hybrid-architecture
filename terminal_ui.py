@@ -19,10 +19,16 @@ class Terminal:
         self.notice = None
         self.path = ['Main menu']
         self.selected_number = None
+        self.color = sys.stdout.isatty() and os.environ.get('TERM', '') != 'dumb' and 'NO_COLOR' not in os.environ
+
+    def style(self, text, *codes):
+        if not self.color:
+            return str(text)
+        return '\033[' + ';'.join(codes) + 'm' + str(text) + '\033[0m'
 
     def ask(self, label, default=None):
         suffix = f' [{default}]' if default is not None else ''
-        value = input(label + suffix + ': ').strip()
+        value = input(self.style(label, '1', '36') + self.style(suffix, '2') + ': ').strip()
         return value if value else (str(default) if default is not None else '')
 
     def choose(self, title, rows, label, default=0):
@@ -34,8 +40,8 @@ class Terminal:
                 self.ask('Press Enter to continue')
                 return None
             for index, row in enumerate(current_rows, 1):
-                print(f'  {index}. {label(row)}')
-            print('  0. Back')
+                print('  ' + self.style(f'{index:>2}.', '1', '36') + ' ' + str(label(row)))
+            print('  ' + self.style(' 0.', '1', '36') + ' Back')
             value = self.ask('Select a number (example: 1)', str(default))
             if value == '0': return None
             if value.isascii() and value.isdigit() and 1 <= int(value) <= len(current_rows):
@@ -68,7 +74,7 @@ class Terminal:
         if value is not None:
             self.screen('Result')
             if isinstance(value, dict) and 'slot' in value and 'module_id' in value and 'result' in value:
-                print(f"Slot: {value['slot']}  |  Module: {value['module_id']}")
+                print(self.style('Slot:', '1') + f" {value['slot']}  |  " + self.style('Module:', '1') + f" {value['module_id']}")
                 if value.get('context'):
                     print('Context: ' + json.dumps(value['context'], ensure_ascii=False))
                 print(json.dumps(value['result'], ensure_ascii=False, indent=2))
@@ -103,11 +109,12 @@ class Terminal:
         width = max(20, min(shutil.get_terminal_size((100, 24)).columns, 160))
         count = lambda value: str(len(value)) if value is not None else 'unavailable'
         enabled = sum(row.get('lifecycle') == 'enabled' for row in (self.worker_rows or []))
-        print('=' * width)
-        print('30nA STATUS  |  Owner: ' + self.owner)
-        print(f'Dashboard: {self.health}  |  Slots: {count(self.slot_rows)}  |  Modules: {count(self.module_rows)}  |  Workers: {count(self.worker_rows)}' + (f' ({enabled} enabled)' if self.worker_rows is not None else ''))
-        print('-' * width)
-        print('SLOTS')
+        print(self.style('=' * width, '36'))
+        print(self.style('30nA STATUS', '1', '36') + self.style('  |  v0.1.2 (preview)', '2') + '  |  Owner: ' + self.style(self.owner, '1'))
+        health_color = '32' if str(self.health).lower() in ('ok', 'healthy', 'up') else '33'
+        print('Dashboard: ' + self.style(self.health, '1', health_color) + f'  |  Slots: {count(self.slot_rows)}  |  Modules: {count(self.module_rows)}  |  Workers: {count(self.worker_rows)}' + (f' ({enabled} enabled)' if self.worker_rows is not None else ''))
+        print(self.style('-' * width, '2'))
+        print(self.style('SLOTS', '1', '36'))
         if self.slot_rows is None:
             print('  Unavailable')
         elif not self.slot_rows:
@@ -118,32 +125,36 @@ class Terminal:
             columns = max(1, min(3, width // cell))
             for offset in range(0, len(items), columns):
                 group = items[offset:offset + columns]
-                print(''.join(item.ljust(cell) if i < len(group) - 1 else item for i, item in enumerate(group)))
-        print('-' * width)
-        print('WORKERS')
+                cells = []
+                for i, item in enumerate(group):
+                    number, details = item.split('. ', 1)
+                    slot_id, module_id = details.split(' | ', 1)
+                    formatted = self.style(number + '.', '1', '36') + ' ' + self.style(slot_id, '1') + ' | ' + self.style(module_id, '2' if module_id == 'empty' else '37')
+                    cells.append(formatted + (' ' * (cell - len(item)) if i < len(group) - 1 else ''))
+                print(''.join(cells))
+        print(self.style('-' * width, '2'))
+        print(self.style('WORKERS', '1', '36'))
         if self.worker_rows is None:
             print('  Unavailable')
         elif not self.worker_rows:
             print('  No Workers registered.')
         else:
             for index, worker in enumerate(self.worker_rows, 1):
-                print(f"  {index}. {worker['definition']['worker_id']} | {worker['lifecycle']}")
-        print('=' * width)
-        print('Path: ' + ' > '.join(self.path + ([title] if title and title.lower() != self.path[-1].lower() else [])))
+                lifecycle = worker['lifecycle']
+                print('  ' + self.style(f'{index}.', '1', '36') + f" {worker['definition']['worker_id']} | " + self.style(lifecycle, '32' if lifecycle == 'enabled' else '33'))
+        print(self.style('=' * width, '36'))
+        print(self.style('Path: ', '1') + self.style(' > '.join(self.path + ([title] if title and title.lower() != self.path[-1].lower() else [])), '36'))
         if title:
-            print('\n' + title)
+            print('\n' + self.style(title, '1', '36'))
         if self.notice:
-            print(self.notice)
+            print(self.style(self.notice, '1', '33'))
             self.notice = None
 
     def overview(self):
         self.screen('MAIN MENU')
-        print('  1. Slots')
-        print('  2. Modules')
-        print('  3. Workers and executions')
-        print('  4. Refresh status')
-        print('  5. Account and connection settings')
-        print('  0. Exit')
+        for number, label in enumerate(['Slots', 'Modules', 'Workers and executions', 'Refresh status', 'Account and connection settings'], 1):
+            print('  ' + self.style(f'{number}.', '1', '36') + ' ' + label)
+        print('  ' + self.style('0.', '1', '36') + ' Exit')
 
     def input_for(self, module_id):
         self.screen('INPUT - ' + module_id)
