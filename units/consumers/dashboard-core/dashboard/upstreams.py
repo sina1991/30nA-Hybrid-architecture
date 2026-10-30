@@ -12,6 +12,7 @@ from modules.execution import run_module
 from modules import slots
 from modules import slot_workers
 from market_data.data import chart as gold_chart
+from market_data.data import indicator as market_indicator, database_table
 
 
 class RunRequest(BaseModel):
@@ -71,9 +72,9 @@ def create_router(credential_path, upstream_factory):
     @router.get('/market/candles')
     def market_candles(limit: int = Query(default=200, ge=1, le=1000),
                        period: int = Query(default=20, ge=1, le=500),
-                       include_open: bool = True, identity=Depends(owner)):
+                       include_open: bool = True, end_time: int | None = Query(default=None, ge=0), identity=Depends(owner)):
         try:
-            result = gold_chart(limit=limit, period=period, include_open=include_open)
+            result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time)
         except (ValueError, OSError, sqlite3.Error):
             raise HTTPException(503, 'Market data is unavailable') from None
         response = JSONResponse(envelope(result))
@@ -94,6 +95,38 @@ def create_router(credential_path, upstream_factory):
             'collector_error':result['collector_error']}))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.get('/market/indicators/{name}')
+    def indicators_endpoint(name: str, limit: int = Query(default=200, ge=1, le=1000),
+                            period: int = Query(default=14, ge=1, le=500),
+                            fast: int = Query(default=12, ge=1, le=500),
+                            slow: int = Query(default=26, ge=1, le=500),
+                            signal: int = Query(default=9, ge=1, le=500),
+                            include_open: bool = True, identity=Depends(owner)):
+        if name not in ('rsi', 'macd'): raise HTTPException(404, 'Indicator not found')
+        try:
+            result = market_indicator(name, {'period':period} if name == 'rsi' else {'fast':fast, 'slow':slow, 'signal':signal}, limit, include_open)
+        except ValueError:
+            raise HTTPException(422, 'Invalid indicator parameters') from None
+        except (OSError, sqlite3.Error):
+            raise HTTPException(503, 'Indicator data is unavailable') from None
+        response = JSONResponse(envelope(result))
+        response.headers['Cache-Control'] = 'no-store'; response.headers['Vary'] = 'Authorization'
+        return response
+
+    @router.get('/market/database/{table}')
+    def market_database(table: str, limit: int = Query(default=50, ge=1, le=200),
+                        offset: int = Query(default=0, ge=0, le=1000000), candle_state: str = 'all',
+                        indicator_name: str = 'all', identity=Depends(owner)):
+        try:
+            result = database_table(table, limit, offset, candle_state, indicator_name)
+        except ValueError:
+            raise HTTPException(404, 'Table not found') from None
+        except (OSError, sqlite3.Error):
+            raise HTTPException(503, 'Market database is unavailable') from None
+        response = JSONResponse(envelope(result))
+        response.headers['Cache-Control'] = 'no-store'; response.headers['Vary'] = 'Authorization'
         return response
 
     @router.post('/modules/{module_id}/state')
@@ -138,9 +171,9 @@ def create_router(credential_path, upstream_factory):
 
     @router.post('/slots')
     def create_slot(body: dict, identity=Depends(owner)):
-        if body: raise HTTPException(422, 'Invalid slot request')
+        if set(body) - {'type'}: raise HTTPException(422, 'Invalid slot request')
         try:
-            value = slots.create(identity)
+            value = slots.create(identity, body.get('type', 'standard'))
         except ValueError:
             raise HTTPException(422, 'Cannot create slot') from None
         response = JSONResponse(envelope({'slot': value}))

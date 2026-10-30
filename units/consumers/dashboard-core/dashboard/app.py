@@ -201,6 +201,8 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 }
 #overview-grid {grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:56px;grid-auto-flow:row;}
 #overview-grid .slot {grid-column:span 4;grid-row:span 5;overflow:auto;position:relative;}
+#overview-grid .slot[data-slot-type="chart"] {grid-column:span 8;grid-row:span 8}
+.slot[data-slot-type="chart"] .market-chart {height:clamp(240px,45vh,520px)}
 #overview-grid .slot.layout-unlocked {outline:2px dashed var(--accent);outline-offset:2px}
 .slot-lock {border:1px solid var(--border);background:var(--field);color:var(--text);border-radius:7px;padding:5px 7px;cursor:pointer;font:inherit}
 .layout-unlocked .slot-name {cursor:grab;touch-action:none;user-select:none}
@@ -228,6 +230,11 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .market-status {font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 .market-chart {width:100%;height:220px;min-height:120px;display:block;background:var(--field);border:1px solid var(--border);border-radius:8px}
 .market-legend {font-size:11px;color:var(--muted)}
+.db-controls {display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.db-controls label {display:grid;gap:4px;font-size:12px}.db-controls button {font:inherit;padding:8px;border-radius:7px;border:1px solid var(--border);background:var(--panel);color:var(--text);cursor:pointer}
+.db-scroll {overflow:auto;border:1px solid var(--border);border-radius:10px;max-height:70vh}
+.db-table {border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}.db-table th,.db-table td {padding:8px 10px;border-bottom:1px solid var(--border);text-align:left}
+.db-table th {position:sticky;top:0;background:var(--panel);color:var(--muted)}
 .layout-help {color:var(--muted);font-size:12px}
 .slot {
   min-width: 0; min-height: 190px; background: var(--panel);
@@ -354,6 +361,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <button class="nav-button" type="button" data-nav="modules">Modules</button>
     <button class="nav-button" type="button" data-nav="workers">Workers</button>
     <button class="nav-button" type="button" data-nav="executions">Executions</button>
+    <button class="nav-button" type="button" data-nav="database">Database</button>
     <button class="nav-button" type="button" data-nav="project">Project Info</button>
     <button class="nav-button" type="button" data-nav="account">Account &amp; Settings</button>
   </nav>
@@ -373,6 +381,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <section class="page-view" data-page="slots" hidden>
   <h2 class="view-heading">Slots</h2><p class="view-description">Assign modules and inspect their output.</p>
   <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
+  <button type="button" class="dice-roll-button" id="add-chart-slot" disabled>+ Chart slot</button>
   <p class="slots-message" id="slots-message">Sign in to manage slots.</p>
   <div class="toolbar">
     <div id="theme-info">Loading themes…</div>
@@ -394,6 +403,15 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   </section>
   <section class="page-view" data-page="workers" hidden><h2 class="view-heading">Workers</h2><p class="view-description">Manage and run registered Workers.</p><p class="workspace-note" data-auth-note>Sign in to manage Workers.</p></section>
   <section class="page-view" data-page="executions" hidden><h2 class="view-heading">Executions</h2><p class="view-description">Review execution history and results.</p><p class="workspace-note" data-auth-note>Sign in to view executions.</p></section>
+  <section class="page-view" data-page="database" hidden>
+    <h2 class="view-heading">Market Database</h2><p class="view-description">Read-only view of XAUUSD candles and saved indicators.</p>
+    <div class="db-controls"><label>Table<select id="db-table"><option value="candles_with_indicators">Candles + indicators</option><option value="candles">Candles</option><option value="indicator_values">Indicator values</option><option value="indicator_specs">Indicator settings</option><option value="collector_status">Collector status</option></select></label>
+      <label>Candle state<select id="db-state"><option value="all">All</option><option value="open">Open</option><option value="closed">Closed</option></select></label>
+      <label>Indicator<select id="db-indicator"><option value="all">All</option><option value="sma">SMA</option><option value="rsi">RSI</option><option value="macd">MACD</option></select></label>
+      <label>Rows<select id="db-limit"><option>25</option><option selected>50</option><option>100</option><option>200</option></select></label>
+      <button type="button" id="db-refresh">Refresh</button><button type="button" id="db-prev">Previous</button><button type="button" id="db-next">Next</button>
+    </div><p id="db-status" class="market-status" role="status">Sign in to view market data.</p><div class="db-scroll"><table class="db-table" id="db-output"></table></div>
+  </section>
   <section class="page-view" data-page="project" hidden><h2 class="view-heading">Project Info</h2><p class="view-description">Version and deployment information.</p><div class="info-card"><p>Project: <strong>30nA Hybrid Architecture</strong></p><p>Version: <strong id="project-version">Loading…</strong></p><p>Installed commit: <code id="project-commit">Loading…</code></p><p>Dashboard: <strong id="project-health">Checking</strong></p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/tree/main/docs" target="_blank" rel="noopener noreferrer">Project documentation ↗</a></div></section>
   <section class="page-view" data-page="account" hidden><h2 class="view-heading">Account &amp; Settings</h2><p class="view-description">Sign in and choose the dashboard appearance.</p><div class="info-card"><div id="account-access-mount"></div><p>The access token stays in memory for this browser session.</p><label for="theme">Dashboard theme</label> <select id="theme" aria-label="Select dashboard theme"></select></div></section>
   <div id="worker-panel-mount"></div>
@@ -426,6 +444,7 @@ function openView(name) {
   });
   document.body.classList.remove('nav-open');
   document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
+  if (name === 'database') refreshDatabase();
 }
 document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => openView(button.dataset.nav)));
 document.getElementById('account-shortcut').addEventListener('click', () => openView('account'));
@@ -445,8 +464,47 @@ document.addEventListener('dashboard-account-state', event => {
     document.getElementById('runner-output').textContent = '';
     document.getElementById('runner-status').textContent = '';
     document.getElementById('runner-input').value = '{}';
+    document.getElementById('db-output').replaceChildren();
+    document.getElementById('db-status').textContent = 'Sign in to view market data.';
+  } else if (document.body.dataset.view === 'database') {
+    refreshDatabase();
   }
 });
+
+let databaseOffset = 0, databaseBusy = false, databasePending = false;
+async function refreshDatabase() {
+  const bridge = window.dashboardModuleState, status = document.getElementById('db-status');
+  if (!bridge?.ready()) { status.textContent = 'Sign in to view market data.'; return; }
+  if (databaseBusy) { databasePending = true; return; }
+  databaseBusy = true;
+  const tableName = document.getElementById('db-table').value, limit = Number(document.getElementById('db-limit').value), offset = databaseOffset;
+  try {
+    const data = await bridge.marketTable(tableName, limit, offset, document.getElementById('db-state').value, document.getElementById('db-indicator').value);
+    if (!bridge.ready() || tableName !== document.getElementById('db-table').value || offset !== databaseOffset) return;
+    const table = document.getElementById('db-output'); table.replaceChildren();
+    if (data.rows.length) {
+      const columns = Object.keys(data.rows[0]), head = document.createElement('thead'), row = document.createElement('tr');
+      columns.forEach(key => row.append(makeElement('th', '', key))); head.append(row); table.append(head);
+      const tbody = document.createElement('tbody');
+      data.rows.forEach(item => {
+        const tr = document.createElement('tr');
+        columns.forEach(key => { const value = item[key]; const cell = makeElement('td', '', value === null ? '—' : String(value));
+          if (key === 'time' && typeof value === 'number') cell.title = new Date(value * 1000).toISOString();
+          tr.append(cell); });
+        tbody.append(tr);
+      }); table.append(tbody);
+    }
+    status.textContent = data.count ? `${offset + 1}–${Math.min(offset + data.rows.length, data.count)} of ${data.count} rows · timestamps in Unix seconds (UTC)` : 'No rows available.';
+    document.getElementById('db-prev').disabled = offset === 0;
+    document.getElementById('db-next').disabled = offset + data.rows.length >= data.count;
+  } catch (_) { if (bridge.ready()) status.textContent = 'Could not read the database.'; }
+  finally { databaseBusy = false; if (databasePending) { databasePending = false; refreshDatabase(); } }
+}
+document.getElementById('db-table').addEventListener('change', () => { databaseOffset = 0; refreshDatabase(); });
+['db-limit', 'db-state', 'db-indicator'].forEach(id => document.getElementById(id).addEventListener('change', () => { databaseOffset = 0; refreshDatabase(); }));
+document.getElementById('db-refresh').addEventListener('click', refreshDatabase);
+document.getElementById('db-prev').addEventListener('click', () => { databaseOffset = Math.max(0, databaseOffset - Number(document.getElementById('db-limit').value)); refreshDatabase(); });
+document.getElementById('db-next').addEventListener('click', () => { databaseOffset += Number(document.getElementById('db-limit').value); refreshDatabase(); });
 function renderCatalog() {
   const catalog = document.getElementById('module-catalog');
   const query = document.getElementById('catalog-search').value.trim().toLowerCase();
@@ -616,6 +674,29 @@ function renderModuleOutput(container, value, theme) {
 function renderMarketModule(body, slot, module) {
   let period = Number.isInteger(slot.chart_period) ? slot.chart_period : 20;
   let overlay = slot.chart_overlay !== false, includeOpen = slot.chart_live !== false, busy = false;
+  let viewCount = 80, endOffset = 0, cachedData = null, olderCandles = [], olderPoints = [], olderBusy = false, noOlder = false;
+  function mergeHistory(data) {
+    const merge = (older, newer) => {
+      const byTime = new Map(); older.forEach(item => byTime.set(item.time, item)); newer.forEach(item => byTime.set(item.time, item));
+      return [...byTime.values()].sort((a,b) => a.time - b.time);
+    };
+    return {...data, candles:merge(olderCandles, data.candles),
+      moving_average:{...data.moving_average, points:merge(olderPoints, data.moving_average?.points || [])}};
+  }
+  async function loadOlder() {
+    const bridge = window.dashboardModuleState;
+    if (!cachedData?.candles.length || !bridge?.ready() || olderBusy || noOlder) return;
+    olderBusy = true;
+    try {
+      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1);
+      if (!body.isConnected || !bridge.ready()) return;
+      const newCandles = data.candles.filter(item => item.time < oldest);
+      if (!newCandles.length) { noOlder = true; status.textContent = 'No older candles in the local database.'; return; }
+      olderCandles = [...newCandles, ...olderCandles]; olderPoints = [...(data.moving_average?.points || []), ...olderPoints];
+      endOffset += Math.max(1, Math.floor(viewCount / 3)); plot(mergeHistory(cachedData));
+    } catch (_) { status.textContent = 'Could not load older candles.'; }
+    finally { olderBusy = false; }
+  }
   const toolbar = makeElement('div', 'market-toolbar');
   const periodLabel = makeElement('label', '', 'SMA');
   const periodSelect = makeElement('select', ''); periodSelect.setAttribute('aria-label', 'Moving average period');
@@ -629,6 +710,22 @@ function renderMarketModule(body, slot, module) {
   toolbar.append(periodLabel);
   if (module.type === 'gold-chart') toolbar.append(overlayLabel);
   toolbar.append(liveLabel);
+  if (module.type === 'gold-chart') {
+    [['−','Zoom out'],['+','Zoom in'],['←','Older candles'],['→','Newer candles']].forEach(([symbol, title]) => {
+      const button = makeElement('button', 'slot-icon', symbol); button.type = 'button'; button.title = title; button.setAttribute('aria-label', title);
+      button.addEventListener('click', async () => {
+        if (symbol === '+') viewCount = Math.max(20, Math.floor(viewCount / 1.5));
+        if (symbol === '−') viewCount = Math.min(500, Math.ceil(viewCount * 1.5));
+        if (symbol === '←') {
+          if (cachedData && endOffset + viewCount >= cachedData.candles.length && !noOlder) { await loadOlder(); return; }
+          endOffset += Math.max(1, Math.floor(viewCount / 3));
+        }
+        if (symbol === '→') endOffset = Math.max(0, endOffset - Math.max(1, Math.floor(viewCount / 3)));
+        if (cachedData) plot(cachedData);
+      });
+      toolbar.append(button);
+    });
+  }
   const price = makeElement('div', 'market-price', 'Waiting for market data');
   const status = makeElement('div', 'market-status', 'Loading…');
   const graph = makeElement('div', 'market-graph');
@@ -647,7 +744,11 @@ function renderMarketModule(body, slot, module) {
   liveInput.addEventListener('change', () => saveOptions({chart_live:liveInput.checked}));
   function plot(data) {
     graph.replaceChildren();
-    const candles = data.candles.filter(item => ['time','open','high','low','close'].every(key => typeof item[key] === 'number' && Number.isFinite(item[key])));
+    cachedData = data;
+    const available = data.candles.filter(item => ['time','open','high','low','close'].every(key => typeof item[key] === 'number' && Number.isFinite(item[key])));
+    endOffset = Math.min(endOffset, Math.max(0, available.length - 1));
+    const end = Math.max(0, available.length - endOffset);
+    const candles = module.type === 'gold-chart' ? available.slice(Math.max(0, end - viewCount), end) : available;
     if (!candles.length) {
       price.textContent = 'No candles available';
       status.textContent = data.collector_error ? 'Source unavailable.' : 'Waiting for market data.';
@@ -660,17 +761,24 @@ function renderMarketModule(body, slot, module) {
     const stale = !data.last_success || Date.now() / 1000 - data.last_success > 30;
     const latest = module.type === 'moving-average' ? lastSma : last;
     price.textContent = latest ? (module.type === 'moving-average' ? `SMA ${period}: ` : 'XAUUSD: ') + Number(module.type === 'moving-average' ? latest.value : latest.close).toFixed(2) : `SMA ${period}: insufficient candles`;
-    status.textContent = `${latest?.is_open ? 'Live candle · provisional' : 'Closed candle'}${stale ? ' · data may be stale' : ''}${data.collector_error ? ' · source unavailable' : ''}`;
+    status.textContent = `${endOffset && module.type === 'gold-chart' ? 'Historical view · ' : ''}${latest?.is_open ? 'Live candle · provisional' : 'Closed candle'}${stale ? ' · data may be stale' : ''}${data.collector_error ? ' · source unavailable' : ''}`;
     if (module.type === 'moving-average') { legend.textContent = `${candles.length} candles · ${points.length} SMA values`; return; }
     const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('viewBox', '0 0 800 240'); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('viewBox', '0 0 800 260'); svg.setAttribute('preserveAspectRatio', 'none');
     svg.setAttribute('class', 'market-chart'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', 'XAUUSD one-minute candlestick chart');
     let low = Math.min(...candles.map(item => item.low)), high = Math.max(...candles.map(item => item.high));
     const actualLow = low, actualHigh = high;
     if (high === low) { high += 1; low -= 1; }
     const padding = (high - low) * .06; high += padding; low -= padding;
-    const x = index => 8 + (index + .5) * (784 / candles.length), y = value => 8 + (high - value) / (high - low) * 224;
-    const step = 784 / candles.length, bodyWidth = Math.max(1, Math.min(8, step * .65));
+    const x = index => 8 + (index + .5) * (710 / candles.length), y = value => 8 + (high - value) / (high - low) * 215;
+    const step = 710 / candles.length, bodyWidth = Math.max(1, Math.min(12, step * .65));
+    for (let index = 0; index <= 4; index++) {
+      const priceTick = high - (high-low) * index / 4, line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', '8'); line.setAttribute('x2', '718'); line.setAttribute('y1', y(priceTick)); line.setAttribute('y2', y(priceTick));
+      line.setAttribute('stroke', 'var(--border)'); line.setAttribute('stroke-dasharray', '3 4'); svg.append(line);
+      const label = document.createElementNS(ns, 'text'); label.setAttribute('x','725'); label.setAttribute('y',y(priceTick)+4);
+      label.setAttribute('fill','var(--muted)'); label.setAttribute('font-size','10'); label.textContent = priceTick.toFixed(2); svg.append(label);
+    }
     candles.forEach((candle, index) => {
       const color = candle.close >= candle.open ? '#22c55e' : '#ef4444';
       const wick = document.createElementNS(ns, 'line');
@@ -687,15 +795,73 @@ function renderMarketModule(body, slot, module) {
       const coords = points.filter(point => positions.has(point.time) && Number.isFinite(point.value)).map(point => `${x(positions.get(point.time))},${y(point.value)}`).join(' ');
       const line = document.createElementNS(ns, 'polyline'); line.setAttribute('points', coords); line.setAttribute('fill', 'none'); line.setAttribute('stroke', '#f59e0b'); line.setAttribute('stroke-width', '2'); svg.append(line);
     }
+    [0, Math.floor((candles.length - 1) / 2), candles.length - 1].forEach((index, position) => {
+      const label = document.createElementNS(ns, 'text'); label.setAttribute('x', x(index)); label.setAttribute('y', '247');
+      label.setAttribute('text-anchor', position === 0 ? 'start' : position === 2 ? 'end' : 'middle'); label.setAttribute('fill', 'var(--muted)'); label.setAttribute('font-size', '10');
+      label.textContent = new Date(candles[index].time * 1000).toLocaleString('en-GB', {timeZone:'UTC', day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'}); svg.append(label);
+    });
+    svg.addEventListener('wheel', event => { event.preventDefault(); viewCount = event.deltaY < 0 ? Math.max(20, Math.floor(viewCount/1.25)) : Math.min(500, Math.ceil(viewCount*1.25)); plot(cachedData); }, {passive:false});
+    let dragStart = null;
+    svg.addEventListener('pointerdown', event => { if (event.button !== 0) return; dragStart = event.clientX; svg.setPointerCapture(event.pointerId); });
+    svg.addEventListener('pointerup', event => { if (dragStart === null) return; const width = svg.getBoundingClientRect().width || 1; endOffset = Math.max(0, endOffset + Math.round((event.clientX-dragStart)/width * viewCount)); dragStart = null; plot(cachedData); });
+    svg.addEventListener('pointercancel', () => { dragStart = null; });
     graph.append(svg);
-    legend.textContent = `1m · ${candles.length} candles · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${overlay ? ` · SMA ${period} (orange)` : ''} · Live candle outlined`;
+    legend.textContent = `1m · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${overlay ? ` · SMA ${period} (orange)` : ''} · Live candle outlined`;
   }
   async function refresh() {
     const bridge = window.dashboardModuleState;
     if (!bridge?.ready() || busy) return;
     busy = true;
-    try { const data = await bridge.marketData(Math.max(200, period), period, includeOpen); if (body.isConnected && bridge.ready()) plot(data); }
+    try { const data = await bridge.marketData(Math.max(500, period), period, includeOpen); if (body.isConnected && bridge.ready()) { noOlder = false; plot(mergeHistory(data)); } }
     catch (_) { if (body.isConnected) status.textContent = 'Market data is unavailable.'; }
+    finally { busy = false; }
+  }
+  body.addEventListener('slot-refresh', refresh);
+  function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 10000); }
+  tick();
+}
+
+function renderIndicator(body, slot, module) {
+  const type = module.id, period = Number.isInteger(slot.indicator_period) ? slot.indicator_period : 14;
+  const toolbar = makeElement('div', 'market-toolbar');
+  if (type === 'rsi') {
+    const label = makeElement('label', '', 'RSI period'); const select = makeElement('select', '');
+    [6, 14, 21, 28].forEach(value => { const option = makeElement('option', '', String(value)); option.value = String(value); select.append(option); });
+    if (![6,14,21,28].includes(period)) { const option = makeElement('option', '', String(period)); option.value = String(period); select.append(option); }
+    select.value = String(period);
+    select.addEventListener('change', async () => { select.disabled = true;
+      try { await window.dashboardModuleState.setSlotAppearance(slot.id, {indicator_period:Number(select.value)}); slotGeneration++; await refreshActiveSlots(); }
+      catch (_) { select.value = String(period); status.textContent = 'Could not save indicator period.'; }
+      finally { select.disabled = false; }
+    });
+    label.append(select); toolbar.append(label);
+  }
+  const liveLabel = makeElement('label', '', 'Live candle'); const live = makeElement('input', '');
+  live.type = 'checkbox'; live.checked = slot.chart_live !== false; liveLabel.prepend(live); toolbar.append(liveLabel);
+  const value = makeElement('div', 'market-price', 'Waiting for indicator data');
+  const status = makeElement('div', 'market-status', 'Loading…');
+  const detail = makeElement('div', 'market-legend');
+  body.append(toolbar, value, status, detail);
+  live.addEventListener('change', async () => { live.disabled = true;
+    try { await window.dashboardModuleState.setSlotAppearance(slot.id, {chart_live:live.checked}); slotGeneration++; await refreshActiveSlots(); }
+    catch (_) { live.checked = slot.chart_live !== false; status.textContent = 'Could not save live-candle setting.'; }
+    finally { live.disabled = false; }
+  });
+  let busy = false;
+  async function refresh() {
+    const bridge = window.dashboardModuleState;
+    if (!bridge?.ready() || busy) return;
+    busy = true;
+    try {
+      const data = await bridge.marketIndicator(type, period, live.checked);
+      if (!body.isConnected || !bridge.ready()) return;
+      const point = data.points[data.points.length - 1];
+      if (!point) { value.textContent = 'Insufficient candles'; status.textContent = data.collector_error || 'Waiting for indicator data.'; detail.textContent = ''; return; }
+      value.textContent = type === 'rsi' ? `RSI ${period}: ${point.value.toFixed(2)}` : `MACD: ${point.macd.toFixed(5)}`;
+      detail.textContent = type === 'macd' ? `Signal ${point.signal.toFixed(5)} · Histogram ${point.histogram.toFixed(5)} · 12/26/9` : 'Wilder RSI';
+      const stale = !data.last_success || Date.now()/1000 - data.last_success > 30;
+      status.textContent = `${point.is_open ? 'Live candle · provisional' : 'Closed candle'}${stale ? ' · data may be stale' : ''}${data.collector_error ? ' · source unavailable' : ''}`;
+    } catch (_) { if (body.isConnected) status.textContent = 'Indicator data is unavailable.'; }
     finally { busy = false; }
   }
   body.addEventListener('slot-refresh', refresh);
@@ -716,6 +882,7 @@ function renderModuleContent(body, slot, moduleId) {
     renderMarketModule(body, slot, module);
     return;
   }
+  if (module.type === 'market-indicator') { renderIndicator(body, slot, module); return; }
 
   if (module.type === "host-monitor") {
     const output = makeElement("div", "module-detail", "No result yet.");
@@ -1098,10 +1265,11 @@ function attachSavedResult(body, slot, moduleId) {
 
 function makeSlot(row, area) {
   const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
-    chart_period:row.chart_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
+    chart_period:row.chart_period, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
   const card = makeElement('article', 'slot');
   card.dataset.slotId = slot.id;
   card.dataset.area = area;
+  card.dataset.slotType = row.slot_type || 'standard';
   card.dataset.displayTheme = slot.display_theme;
   if (row.frame_color) card.style.borderColor = row.frame_color;
   if (area === 'overview' && row.layout) {
@@ -1126,6 +1294,17 @@ function makeSlot(row, area) {
   menu.setAttribute('aria-label', `Settings for ${slot.id}`);
   menu.setAttribute('aria-expanded', 'false'); menu.title = 'Slot settings';
   const actions = makeElement('div', 'slot-menu-actions'); actions.hidden = true;
+  const typeLabel = makeElement('label', '', 'Slot type ');
+  const slotType = makeElement('select', 'slot-display-theme');
+  [['standard','Standard'],['chart','Chart']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
+  slotType.value = row.slot_type || 'standard';
+  slotType.addEventListener('change', async () => {
+    slotType.disabled = true;
+    try { await window.dashboardModuleState.setSlotAppearance(slot.id, {slot_type:slotType.value}); slotGeneration++; await refreshActiveSlots(); }
+    catch (_) { slotType.value = row.slot_type || 'standard'; notice.textContent = 'Could not change slot type.'; }
+    finally { slotType.disabled = false; }
+  });
+  typeLabel.append(slotType);
   menu.addEventListener('click', () => { actions.hidden = !actions.hidden; menu.setAttribute('aria-expanded', String(!actions.hidden)); });
   const colorLabel = makeElement('label', '', 'Frame color ');
   const color = makeElement('input', 'slot-color'); color.type = 'color';
@@ -1181,7 +1360,7 @@ function makeSlot(row, area) {
       slotGeneration++; await refreshActiveSlots();
     } catch (_) { notice.textContent = 'Could not delete slot. Refresh and check its state.'; remove.disabled = false; }
   });
-  actions.append(pinMenu, displayLabel, colorLabel, resetColor, remove);
+  actions.append(pinMenu, typeLabel, displayLabel, colorLabel, resetColor, remove);
   const controls = makeElement('div', 'slot-controls');
   const searchLabel = makeElement('label', '', 'Find module');
   const search = makeElement('input', 'module-search');
@@ -1212,7 +1391,9 @@ function makeSlot(row, area) {
   const examples = {'calculator':'{"a":5,"b":3,"operation":"add"}', 'dice-roller':'{"count":1,"sides":6}',
     'service-monitor':'{"service":"nginx.service"}', 'disk-usage':'{"path":"/"}',
     'network-monitor':'{"interface":"eth0"}', 'process-monitor':'{"name":"nginx"}',
-    'log-viewer':'{"path":"/var/log/example.log","lines":20}', 'alerts':'{"disk_used_percent":90}'};
+    'log-viewer':'{"path":"/var/log/example.log","lines":20}', 'alerts':'{"disk_used_percent":90}',
+    'gold-chart':'{"period":20}', 'moving-average':'{"period":20,"latest":true}',
+    'rsi':'{"period":14,"latest":true}', 'macd':'{"fast":12,"slow":26,"signal":9,"latest":true}'};
   input.placeholder = 'Example: ' + (examples[row.module_id] || '{}');
   inputDrawer.append(makeElement('h4', '', 'Input settings (JSON)'), input);
   const terminalDrawer = makeElement('div', 'slot-drawer'); terminalDrawer.hidden = true;
@@ -1240,7 +1421,7 @@ function makeSlot(row, area) {
   const workerForm = makeElement('div', 'slot-worker-form');
   const kindLabel = makeElement('label', '', 'Worker type');
   const kind = makeElement('select', ''); kind.setAttribute('aria-label', `Worker type for ${slot.id}`);
-  const monitorModules = ['clock','dashboard-health','system-monitor','service-monitor','disk-usage','network-monitor','process-monitor','log-viewer','docker-monitor','alerts','gold-chart','moving-average'];
+  const monitorModules = ['clock','dashboard-health','system-monitor','service-monitor','disk-usage','network-monitor','process-monitor','log-viewer','docker-monitor','alerts','gold-chart','moving-average','rsi','macd'];
   [['monitor', 'Monitor · read-only modules'], ['task', 'Task · run module']].forEach(([value, title]) => {
     const option = makeElement('option', '', title); option.value = value;
     if (value === 'monitor' && !monitorModules.includes(row.module_id)) option.disabled = true;
@@ -1308,7 +1489,7 @@ function makeSlot(row, area) {
       const result = await bridge.execute(slot.id, row.module_id, data);
       if (!card.isConnected || !bridge.ready()) return;
       notice.textContent = '';
-      if (['host-monitor','gold-chart','moving-average'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
+      if (['host-monitor','gold-chart','moving-average','market-indicator'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
       else if (!['clock', 'counter', 'slot-note', 'empty', 'dashboard-health', 'theme-summary'].includes(row.module_id)) {
         let resultView = body.querySelector('.slot-quick-result');
         if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
@@ -1337,7 +1518,7 @@ function makeSlot(row, area) {
   card.append(head, name, actions, inputDrawer, terminalDrawer, workerDrawer, notice, body, resize);
   attachLayoutControls(card, name, resize, row, notice);
   renderModuleContent(body, slot, selectedModule);
-  if (!['host-monitor','gold-chart','moving-average'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
+  if (!['host-monitor','gold-chart','moving-average','market-indicator'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 
@@ -1346,6 +1527,7 @@ function renderSlots() {
   grid.replaceChildren(); overview.replaceChildren();
   const ready = Boolean(window.dashboardModuleState?.ready());
   document.getElementById('add-slot').disabled = !ready;
+  document.getElementById('add-chart-slot').disabled = !ready;
   document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
   const pinned = activeSlots.filter(row => row.overview);
   document.getElementById('overview-empty').textContent = !ready ? 'Sign in to view pinned slots.' : pinned.length ? '' : 'No slots added to Overview yet.';
@@ -1422,6 +1604,12 @@ document.getElementById('add-slot').addEventListener('click', async event => {
     await window.dashboardModuleState.createSlot();
     slotGeneration++; await refreshActiveSlots();
   } catch (_) { document.getElementById('slots-message').textContent = 'Could not add slot. Refresh and check its state.'; }
+  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+});
+document.getElementById('add-chart-slot').addEventListener('click', async event => {
+  event.currentTarget.disabled = true;
+  try { await window.dashboardModuleState.createSlot('chart'); slotGeneration++; await refreshActiveSlots(); }
+  catch (_) { document.getElementById('slots-message').textContent = 'Could not add chart slot. Refresh and check its state.'; }
   finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
 });
 async function pollSlots() {

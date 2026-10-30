@@ -7,6 +7,7 @@ import sqlite3
 from pathlib import Path
 import threading
 import time
+from datetime import datetime, timezone
 
 import httpx
 from . import data
@@ -15,9 +16,11 @@ LOG = logging.getLogger(__name__)
 URL = 'https://biquote.io/api/XAUUSD/ohlc'
 
 
-def fetch_bars(limit):
+def fetch_bars(limit, before=None):
+    params = {'interval':'1m', 'limit':limit}
+    if before is not None: params['to'] = datetime.fromtimestamp(before, timezone.utc).isoformat().replace('+00:00','Z')
     with httpx.Client(timeout=10, follow_redirects=False, trust_env=False) as client:
-        with client.stream('GET', URL, params={'interval':'1m', 'limit':limit}, headers={'Accept':'application/json'}) as response:
+        with client.stream('GET', URL, params=params, headers={'Accept':'application/json'}) as response:
             response.raise_for_status()
             body = bytearray()
             for chunk in response.iter_bytes():
@@ -45,6 +48,7 @@ class GoldCollector:
 
     def _loop(self):
         lock = None
+        next_backfill = 0
         while not self.stop_event.is_set():
             try:
                 if lock is None:
@@ -59,6 +63,17 @@ class GoldCollector:
                 last_success = previous['last_success']
                 count = 300 if not previous['candles'] or not last_success or time.time() - last_success > 90 else 3
                 data.save_bars(fetch_bars(count))
+                if time.monotonic() >= next_backfill:
+                    oldest, state = data.backfill_state()
+                    if oldest is not None and state != 'no_older_data':
+                        try:
+                            data.set_backfill_state('running')
+                            data.save_bars(fetch_bars(300, before=oldest - 60), historical=True)
+                            current, _ = data.backfill_state()
+                            data.set_backfill_state('pending' if current is not None and current < oldest else 'no_older_data')
+                        except (OSError, ValueError, TypeError, KeyError, OverflowError, sqlite3.Error, httpx.HTTPError):
+                            data.set_backfill_state('error')
+                    next_backfill = time.monotonic() + 60
             except (OSError, ValueError, TypeError, KeyError, OverflowError, sqlite3.Error, httpx.HTTPError):
                 LOG.warning('Gold collector could not fetch or store data')
                 try: data.set_collector_error()

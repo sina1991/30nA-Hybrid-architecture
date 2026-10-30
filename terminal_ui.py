@@ -197,6 +197,10 @@ class Terminal:
             'process-monitor': '{"name":"nginx"}',
             'log-viewer': '{"path":"/var/log/example.log","lines":20}',
             'docker-monitor': '{}', 'alerts': '{"disk_used_percent":90}',
+            'gold-chart': '{"limit":100,"period":20}',
+            'moving-average': '{"period":20,"latest":true}',
+            'rsi': '{"period":14,"latest":true}',
+            'macd': '{"fast":12,"slow":26,"signal":9,"latest":true}',
         }
         if module_id in examples:
             raw = self.ask('Input JSON object (example: ' + examples[module_id] + ')', '{}')

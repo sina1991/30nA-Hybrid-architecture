@@ -258,10 +258,16 @@ PANEL = r'''
       }
     },
     async listSlots() { const result = await this.slotRequest('slots/active'); slotOwner = result.owner; return result.slots; },
-    async marketData(limit, period, includeOpen) {
-      return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen));
+    async marketData(limit, period, includeOpen, endTime = null) {
+      return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen) + (endTime === null ? '' : '&end_time=' + encodeURIComponent(endTime)));
     },
-    async createSlot() { return (await this.slotRequest('slots', {})).slot; },
+    async marketIndicator(name, period, includeOpen) {
+      return this.slotRequest('market/indicators/' + encodeURIComponent(name) + '?limit=200&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen));
+    },
+    async marketTable(table, limit, offset, candleState, indicatorName) {
+      return this.slotRequest('market/database/' + encodeURIComponent(table) + '?limit=' + encodeURIComponent(limit) + '&offset=' + encodeURIComponent(offset) + '&candle_state=' + encodeURIComponent(candleState) + '&indicator_name=' + encodeURIComponent(indicatorName));
+    },
+    async createSlot(type = 'standard') { return (await this.slotRequest('slots', {type})).slot; },
     async setOverview(slot, visible) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/overview', {visible}); },
     async setSlotAppearance(slot, updates) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/appearance', updates); },
     async configureSlotWorker(slot, worker) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/worker', worker); },

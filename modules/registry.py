@@ -22,6 +22,7 @@ SUPPORTED_TYPES = {
     "host-monitor",
     "gold-chart",
     "moving-average",
+    "market-indicator",
 }
 
 

@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import sqlite3
 import time
+from . import indicators
 
 SYMBOL = 'XAUUSD'
 INTERVAL = '1m'
@@ -25,6 +26,19 @@ def connect():
         low REAL NOT NULL, close REAL NOT NULL, tick_volume INTEGER,
         is_open INTEGER NOT NULL CHECK(is_open IN (0,1)))''')
     db.execute('CREATE TABLE IF NOT EXISTS collector_status (key TEXT PRIMARY KEY, value TEXT NOT NULL)')
+    db.execute('''CREATE TABLE IF NOT EXISTS indicator_specs (
+        name TEXT NOT NULL, parameters TEXT NOT NULL, computed_revision INTEGER NOT NULL DEFAULT -1,
+        PRIMARY KEY(name,parameters))''')
+    db.execute('''CREATE TABLE IF NOT EXISTS indicator_values (
+        name TEXT NOT NULL, parameters TEXT NOT NULL, time INTEGER NOT NULL,
+        value_json TEXT NOT NULL, is_open INTEGER NOT NULL CHECK(is_open IN (0,1)),
+        PRIMARY KEY(name,parameters,time))''')
+    if db.execute("SELECT 1 FROM collector_status WHERE key='candle_revision'").fetchone() is None:
+        db.execute("INSERT OR IGNORE INTO collector_status(key,value) VALUES('candle_revision','0')")
+        for name, params in indicators.DEFAULTS.items():
+            db.execute('INSERT OR IGNORE INTO indicator_specs(name,parameters) VALUES(?,?)',
+                       (name, json.dumps(params, sort_keys=True, separators=(',', ':'))))
+        db.commit()
     return db
 
 
@@ -63,29 +77,73 @@ def parse_bar(bar):
             'tick_volume':volume, 'is_open':bar['isOpen']}
 
 
-def save_bars(bars):
+def save_bars(bars, historical=False):
     if not isinstance(bars, list) or len(bars) > 301:
         raise ValueError('invalid candle collection')
     parsed = [parse_bar(bar) for bar in bars]
+    if historical: parsed = [bar for bar in parsed if not bar['is_open']]
     latest_open = max((bar['time'] for bar in parsed if bar['is_open']), default=None)
     db = connect()
     try:
         with db:
+            changed = False
+            dirty_from = None
             for bar in parsed:
                 if bar['is_open'] and bar['time'] != latest_open: continue
-                db.execute('''INSERT INTO candles(time,open,high,low,close,tick_volume,is_open)
+                cursor = db.execute('''INSERT INTO candles(time,open,high,low,close,tick_volume,is_open)
                     VALUES(:time,:open,:high,:low,:close,:tick_volume,:is_open)
                     ON CONFLICT(time) DO UPDATE SET open=excluded.open,high=excluded.high,
                     low=excluded.low,close=excluded.close,tick_volume=excluded.tick_volume,is_open=excluded.is_open
-                    WHERE candles.is_open=1 OR excluded.is_open=0''', bar)
-            if latest_open is not None:
-                db.execute('DELETE FROM candles WHERE is_open=1 AND time != ?', (latest_open,))
+                    WHERE (candles.is_open=1 OR excluded.is_open=0) AND
+                    (candles.open IS NOT excluded.open OR candles.high IS NOT excluded.high OR
+                     candles.low IS NOT excluded.low OR candles.close IS NOT excluded.close OR
+                     candles.tick_volume IS NOT excluded.tick_volume OR candles.is_open IS NOT excluded.is_open)''', bar)
+                if cursor.rowcount > 0:
+                    changed = True
+                    dirty_from = bar['time'] if dirty_from is None else min(dirty_from, bar['time'])
+            old_open = [row[0] for row in db.execute('SELECT time FROM candles WHERE is_open=1').fetchall()]
+            if historical:
+                removed = 0
+            elif latest_open is not None:
+                removed = db.execute('DELETE FROM candles WHERE is_open=1 AND time != ?', (latest_open,)).rowcount
             elif parsed:
-                db.execute('DELETE FROM candles WHERE is_open=1')
-            db.execute("INSERT INTO collector_status(key,value) VALUES('last_success',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (str(time.time()),))
-            db.execute("INSERT INTO collector_status(key,value) VALUES('error','') ON CONFLICT(key) DO UPDATE SET value='' ")
+                removed = db.execute('DELETE FROM candles WHERE is_open=1').rowcount
+            else: removed = 0
+            if changed or removed:
+                if removed and old_open:
+                    dirty_from = min(old_open) if dirty_from is None else min(dirty_from, *old_open)
+                db.execute("UPDATE collector_status SET value=CAST(CAST(value AS INTEGER)+1 AS TEXT) WHERE key='candle_revision'")
+                previous_dirty = db.execute("SELECT value FROM collector_status WHERE key='indicator_dirty_from'").fetchone()
+                if previous_dirty and previous_dirty[0]: dirty_from = min(dirty_from, int(previous_dirty[0]))
+                db.execute("INSERT INTO collector_status(key,value) VALUES('indicator_dirty_from',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (str(dirty_from),))
+            if not historical:
+                db.execute("INSERT INTO collector_status(key,value) VALUES('last_success',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (str(time.time()),))
+                db.execute("INSERT INTO collector_status(key,value) VALUES('error','') ON CONFLICT(key) DO UPDATE SET value='' ")
     finally: db.close()
+    try: refresh_indicators()
+    except (ValueError, OSError, sqlite3.Error):
+        db = connect()
+        try:
+            with db: db.execute("INSERT INTO collector_status(key,value) VALUES('indicators_error','Indicator update failed') ON CONFLICT(key) DO UPDATE SET value=excluded.value")
+        finally: db.close()
     return len(parsed)
+
+
+def backfill_state():
+    db = connect()
+    try:
+        oldest = db.execute('SELECT MIN(time) FROM candles WHERE is_open=0').fetchone()[0]
+        row = db.execute("SELECT value FROM collector_status WHERE key='backfill_state'").fetchone()
+        return oldest, row[0] if row else 'pending'
+    finally: db.close()
+
+
+def set_backfill_state(value):
+    if value not in ('pending', 'running', 'no_older_data', 'error'): raise ValueError('invalid backfill status')
+    db = connect()
+    try:
+        with db: db.execute("INSERT INTO collector_status(key,value) VALUES('backfill_state',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (value,))
+    finally: db.close()
 
 
 def set_collector_error():
@@ -96,13 +154,16 @@ def set_collector_error():
     finally: db.close()
 
 
-def snapshot(limit=200, include_open=True):
-    if type(limit) is not int or not 1 <= limit <= 1000 or type(include_open) is not bool:
+def snapshot(limit=200, include_open=True, end_time=None):
+    if type(limit) is not int or not 1 <= limit <= 1000 or type(include_open) is not bool or (end_time is not None and (type(end_time) is not int or end_time < 0)):
         raise ValueError('invalid candle query')
     db = connect()
     try:
+        conditions, args = [], []
+        if not include_open: conditions.append('is_open=0')
+        if end_time is not None: conditions.append('time<=?'); args.append(end_time)
         rows = db.execute('SELECT time,open,high,low,close,tick_volume,is_open FROM candles ' +
-                          ('' if include_open else 'WHERE is_open=0 ') + 'ORDER BY time DESC LIMIT ?', (limit,)).fetchall()
+                          ('WHERE ' + ' AND '.join(conditions) + ' ' if conditions else '') + 'ORDER BY time DESC LIMIT ?', (*args, limit)).fetchall()
         status = dict(db.execute('SELECT key,value FROM collector_status').fetchall())
     finally: db.close()
     candles = [{**dict(row), 'is_open':bool(row['is_open'])} for row in reversed(rows)]
@@ -112,18 +173,116 @@ def snapshot(limit=200, include_open=True):
 
 
 def moving_average(candles, period=20):
-    if type(period) is not int or not 1 <= period <= 500:
-        raise ValueError('period must be between 1 and 500')
-    result, running = [], 0.0
-    for index, candle in enumerate(candles):
-        running += candle['close']
-        if index >= period: running -= candles[index - period]['close']
-        if index >= period - 1:
-            result.append({'time':candle['time'], 'value':running / period, 'is_open':candle['is_open']})
-    return result
+    return indicators.calculate('sma', candles, {'period':period})
 
 
-def chart(limit=200, period=20, include_open=True):
-    data = snapshot(limit=limit, include_open=include_open)
-    data['moving_average'] = {'type':'SMA', 'period':period, 'points':moving_average(data['candles'], period)}
+def refresh_indicators():
+    db = connect()
+    try:
+        db.execute('BEGIN IMMEDIATE')
+        revision = int(db.execute("SELECT value FROM collector_status WHERE key='candle_revision'").fetchone()[0])
+        specs = db.execute('SELECT name,parameters,computed_revision FROM indicator_specs WHERE computed_revision != ?', (revision,)).fetchall()
+        if not specs:
+            db.commit(); return
+        rows = db.execute('SELECT time,open,high,low,close,tick_volume,is_open FROM candles ORDER BY time').fetchall()
+        candles = [{**dict(row), 'is_open':bool(row['is_open'])} for row in rows]
+        dirty_row = db.execute("SELECT value FROM collector_status WHERE key='indicator_dirty_from'").fetchone()
+        dirty = int(dirty_row[0]) if dirty_row and dirty_row[0] else None
+        for spec in specs:
+            name, parameters = spec['name'], spec['parameters']
+            points = indicators.calculate(name, candles, json.loads(parameters))
+            cutoff = dirty if spec['computed_revision'] >= 0 else None
+            for point in points:
+                if cutoff is not None and point['time'] < cutoff: continue
+                value = {key:item for key,item in point.items() if key not in ('time', 'is_open')}
+                db.execute('''INSERT INTO indicator_values(name,parameters,time,value_json,is_open) VALUES(?,?,?,?,?)
+                    ON CONFLICT(name,parameters,time) DO UPDATE SET value_json=excluded.value_json,is_open=excluded.is_open
+                    WHERE indicator_values.value_json != excluded.value_json OR indicator_values.is_open != excluded.is_open''',
+                    (name, parameters, point['time'], json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False), int(point['is_open'])))
+            db.execute('''DELETE FROM indicator_values WHERE name=? AND parameters=? AND (? IS NULL OR time>=?) AND time NOT IN (SELECT time FROM candles)''', (name, parameters, cutoff, cutoff))
+            if points and cutoff is None:
+                db.execute('DELETE FROM indicator_values WHERE name=? AND parameters=? AND time<?', (name, parameters, points[0]['time']))
+            elif not points:
+                db.execute('DELETE FROM indicator_values WHERE name=? AND parameters=?', (name, parameters))
+            db.execute('UPDATE indicator_specs SET computed_revision=? WHERE name=? AND parameters=?', (revision, name, parameters))
+        db.execute("INSERT INTO collector_status(key,value) VALUES('indicators_error','') ON CONFLICT(key) DO UPDATE SET value=''")
+        db.execute("INSERT INTO collector_status(key,value) VALUES('indicator_dirty_from','') ON CONFLICT(key) DO UPDATE SET value=''")
+        db.commit()
+    finally: db.close()
+
+
+def indicator(name, parameters, limit=200, include_open=True, end_time=None):
+    if type(limit) is not int or not 1 <= limit <= 1000 or type(include_open) is not bool or (end_time is not None and (type(end_time) is not int or end_time < 0)):
+        raise ValueError('invalid indicator query')
+    params = indicators.normalize(name, parameters)
+    encoded = json.dumps(params, sort_keys=True, separators=(',', ':'))
+    db = connect()
+    try:
+        db.execute('BEGIN IMMEDIATE')
+        count = db.execute('SELECT count(*) FROM indicator_specs').fetchone()[0]
+        exists = db.execute('SELECT 1 FROM indicator_specs WHERE name=? AND parameters=?', (name, encoded)).fetchone()
+        if not exists and count >= 32: raise ValueError('indicator configuration limit reached')
+        db.execute('INSERT OR IGNORE INTO indicator_specs(name,parameters) VALUES(?,?)', (name, encoded))
+        db.commit()
+    finally: db.close()
+    refresh_indicators()
+    db = connect()
+    try:
+        suffix = ('' if include_open else 'AND is_open=0 ') + ('AND time<=? ' if end_time is not None else '')
+        args = [name, encoded] + ([end_time] if end_time is not None else []) + [limit]
+        rows = db.execute('SELECT time,value_json,is_open FROM indicator_values WHERE name=? AND parameters=? ' + suffix + 'ORDER BY time DESC LIMIT ?', args).fetchall()
+        status = dict(db.execute('SELECT key,value FROM collector_status').fetchall())
+    finally: db.close()
+    points = [{'time':row['time'], **json.loads(row['value_json']), 'is_open':bool(row['is_open'])} for row in reversed(rows)]
+    return {'symbol':SYMBOL, 'interval':INTERVAL, 'type':name.upper(), 'parameters':params, 'points':points,
+            'last_success':float(status['last_success']) if status.get('last_success') else None,
+            'collector_error':status.get('error') or None, 'indicator_error':status.get('indicators_error') or None}
+
+
+def database_table(table, limit=50, offset=0, candle_state="all", indicator_name="all"):
+    queries = {
+        'candles_with_indicators': ('''SELECT c.time,c.open,c.high,c.low,c.close,c.tick_volume,c.is_open,
+            s.value_json AS sma_json,r.value_json AS rsi_json,m.value_json AS macd_json
+            FROM candles c
+            LEFT JOIN indicator_values s ON s.time=c.time AND s.name='sma' AND s.parameters='{"period":20}'
+            LEFT JOIN indicator_values r ON r.time=c.time AND r.name='rsi' AND r.parameters='{"period":14}'
+            LEFT JOIN indicator_values m ON m.time=c.time AND m.name='macd' AND m.parameters='{"fast":12,"signal":9,"slow":26}'
+            ORDER BY c.time DESC LIMIT ? OFFSET ?''', 'candles'),
+        'candles': ('SELECT time,open,high,low,close,tick_volume,is_open FROM candles ORDER BY time DESC LIMIT ? OFFSET ?', 'candles'),
+        'indicator_values': ('SELECT name,parameters,time,value_json,is_open FROM indicator_values ORDER BY time DESC,name,parameters LIMIT ? OFFSET ?', 'indicator_values'),
+        'indicator_specs': ('SELECT name,parameters,computed_revision FROM indicator_specs ORDER BY name,parameters LIMIT ? OFFSET ?', 'indicator_specs'),
+        'collector_status': ('SELECT key,value FROM collector_status ORDER BY key LIMIT ? OFFSET ?', 'collector_status'),
+    }
+    if table not in queries or type(limit) is not int or not 1 <= limit <= 200 or type(offset) is not int or not 0 <= offset <= 1000000:
+        raise ValueError('invalid database query')
+    if candle_state not in ('all', 'open', 'closed') or indicator_name not in ('all', 'sma', 'rsi', 'macd'):
+        raise ValueError('invalid database filter')
+    query, count_table = queries[table]
+    conditions, args = [], []
+    if candle_state != 'all' and table in ('candles_with_indicators', 'candles', 'indicator_values'):
+        conditions.append(('c.is_open' if table == 'candles_with_indicators' else 'is_open') + '=?')
+        args.append(1 if candle_state == 'open' else 0)
+    if indicator_name != 'all' and table in ('indicator_values', 'indicator_specs'):
+        conditions.append('name=?'); args.append(indicator_name)
+    query, order = query.rsplit('ORDER BY ', 1)
+    where = ' WHERE ' + ' AND '.join(conditions) if conditions else ''
+    count_where = where.replace('c.is_open', 'is_open')
+    query += where + ' ORDER BY ' + order
+    db = connect()
+    try:
+        rows = [dict(row) for row in db.execute(query, (*args, limit, offset)).fetchall()]
+        count = db.execute('SELECT count(*) FROM ' + count_table + count_where, args).fetchone()[0]
+    finally: db.close()
+    if table == 'candles_with_indicators':
+        for row in rows:
+            sma = json.loads(row.pop('sma_json') or '{}'); rsi = json.loads(row.pop('rsi_json') or '{}'); macd = json.loads(row.pop('macd_json') or '{}')
+            row.update(sma_20=sma.get('value'), rsi_14=rsi.get('value'), macd=macd.get('macd'),
+                       macd_signal=macd.get('signal'), macd_histogram=macd.get('histogram'))
+    return {'table':table, 'rows':rows, 'count':count, 'limit':limit, 'offset':offset}
+
+
+def chart(limit=200, period=20, include_open=True, end_time=None):
+    data = snapshot(limit=limit, include_open=include_open, end_time=end_time)
+    result = indicator('sma', {'period':period}, limit=limit, include_open=include_open, end_time=end_time)
+    data['moving_average'] = {'type':'SMA', 'period':period, 'points':result['points']}
     return data
