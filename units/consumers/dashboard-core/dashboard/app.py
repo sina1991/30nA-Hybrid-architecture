@@ -200,10 +200,12 @@ body:not([data-view="overview"]) #edit-layout {display:none}
   gap: 9px; align-items: stretch;
 }
 #grid .slot {grid-column:span 2}
-#grid .slot[data-slot-type="small"] {grid-column:span 1}
+#grid .slot[data-slot-type="small"],#grid .slot[data-slot-type="minimal"] {grid-column:span 1}
+#grid .slot[data-slot-type="minimal"] {min-height:80px;height:100px;align-self:start;overflow:auto}
 #overview-grid {grid-template-columns:repeat(12,minmax(0,1fr));grid-auto-rows:56px;grid-auto-flow:row;}
 #overview-grid .slot {grid-column:span 4;grid-row:span 5;overflow:auto;position:relative;}
 #overview-grid .slot[data-slot-type="small"] {grid-column:span 3;grid-row:span 3;min-height:0}
+#overview-grid .slot[data-slot-type="minimal"] {grid-column:span 2;grid-row:span 2;min-height:0}
 #overview-grid .slot[data-slot-type="chart"],#overview-grid .slot[data-slot-type="fix-chart"] {grid-column:span 8;grid-row:span 8}
 #grid .slot[data-slot-type="fix-chart"],#grid .slot[data-slot-type="chart"] {grid-column:1 / -1}
 .slot[data-slot-type="chart"] .market-chart {height:clamp(240px,45vh,520px)}
@@ -267,6 +269,7 @@ body:not([data-view="overview"]) #edit-layout {display:none}
   box-shadow:0 8px 24px #0002;
 }
 .slot[data-slot-type="small"] {min-height:140px}
+.slot[data-slot-type="minimal"] {min-height:0;padding:5px;gap:3px}.slot[data-slot-type="minimal"] .module-body {gap:3px;font-size:12px}
 .slot-gear {position:absolute;z-index:3;top:5px;right:5px;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--field);color:var(--muted);font-size:17px;line-height:1;cursor:pointer}
 .slot-gear:hover,.slot-gear:focus-visible {color:var(--accent);border-color:var(--accent)}
 .slot-gear.worker-active::after,.slot-gear.worker-inactive::after {content:'';position:absolute;right:-2px;bottom:-2px;width:7px;height:7px;border:1px solid var(--field);border-radius:50%;background:#dc2626}
@@ -425,6 +428,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <h2 class="view-heading">Slots</h2><p class="view-description">Assign modules and inspect their output.</p>
   <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
   <button type="button" class="dice-roll-button" id="add-small-slot" disabled>+ Small slot</button>
+  <button type="button" class="dice-roll-button" id="add-minimal-slot" disabled>+ Minimal slot</button>
   <button type="button" class="dice-roll-button" id="add-chart-slot" disabled>+ Chart slot</button>
   <button type="button" class="dice-roll-button" id="add-fixed-chart-slot" disabled>+ Fix Chart slot</button>
   <p class="slots-message" id="slots-message">Sign in to manage slots.</p>
@@ -1471,7 +1475,7 @@ function attachLayoutControls(card, handle, resize, row, notice) {
     const boxFor = element => {
       const r = element.getBoundingClientRect();
       return {x:Math.round((r.left - rect.left) / column), y:Math.round((r.top - rect.top) / rowHeight),
-              w:Math.max(2, Math.round((r.width + gapX) / column)), h:Math.max(element.dataset.slotType === 'small' ? 3 : 4, Math.round((r.height + gapY) / rowHeight))};
+              w:Math.max(element.dataset.slotType === 'minimal' ? 1 : 2, Math.round((r.width + gapX) / column)), h:Math.max(element.dataset.slotType === 'minimal' ? 1 : element.dataset.slotType === 'small' ? 3 : 4, Math.round((r.height + gapY) / rowHeight))};
     };
     const original = boxFor(card), others = [...container.querySelectorAll('.slot')].filter(item => item !== card).map(boxFor);
     const oldColumn = card.style.gridColumn, oldRow = card.style.gridRow;
@@ -1481,7 +1485,7 @@ function attachLayoutControls(card, handle, resize, row, notice) {
       const dx = Math.round((moveEvent.clientX - event.clientX) / column), dy = Math.round((moveEvent.clientY - event.clientY) / rowHeight);
       const next = mode === 'move' ?
         {x:Math.max(0, Math.min(12-original.w, original.x + dx)), y:Math.max(0, Math.min(500, original.y + dy)), w:original.w, h:original.h} :
-        {x:original.x, y:original.y, w:Math.max(2, Math.min(12-original.x, original.w + dx)), h:Math.max(row.slot_type === 'small' ? 3 : 4, Math.min(40, original.h + dy))};
+        {x:original.x, y:original.y, w:Math.max(row.slot_type === 'minimal' ? 1 : 2, Math.min(12-original.x, original.w + dx)), h:Math.max(row.slot_type === 'minimal' ? 1 : row.slot_type === 'small' ? 3 : 4, Math.min(40, original.h + dy))};
       const collision = others.some(other => next.x < other.x + other.w && next.x + next.w > other.x && next.y < other.y + other.h && next.y + next.h > other.y);
       if (collision) { notice.textContent = 'Choose a free area for this slot.'; return; }
       notice.textContent = ''; candidate = next;
@@ -1604,7 +1608,7 @@ function makeSlot(row, area) {
   const actions = makeElement('div', 'slot-menu-actions');
   const typeLabel = makeElement('label', '', 'Slot type ');
   const slotType = makeElement('select', 'slot-display-theme');
-  [['standard','Standard'],['small','Small'],['chart','Chart'],['fix-chart','Fix Chart']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
+  [['standard','Standard'],['small','Small'],['minimal','Minimal'],['chart','Chart'],['fix-chart','Fix Chart']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
   slotType.value = row.slot_type || 'standard';
   slotType.addEventListener('change', async () => {
     slotType.disabled = true;
@@ -1852,6 +1856,7 @@ function renderSlots() {
   document.getElementById('add-slot').disabled = !ready;
   document.getElementById('add-chart-slot').disabled = !ready;
   document.getElementById('add-small-slot').disabled = !ready;
+  document.getElementById('add-minimal-slot').disabled = !ready;
   document.getElementById('add-fixed-chart-slot').disabled = !ready;
   document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
   const pinned = activeSlots.filter(row => row.overview);
@@ -1939,6 +1944,12 @@ document.getElementById('add-slot').addEventListener('click', async event => {
     await window.dashboardModuleState.createSlot();
     slotGeneration++; await refreshActiveSlots();
   } catch (_) { document.getElementById('slots-message').textContent = 'Could not add slot. Refresh and check its state.'; }
+  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+});
+document.getElementById('add-minimal-slot').addEventListener('click', async event => {
+  event.currentTarget.disabled = true;
+  try { await window.dashboardModuleState.createSlot('minimal'); slotGeneration++; await refreshActiveSlots(); }
+  catch (_) { document.getElementById('slots-message').textContent = 'Could not add minimal slot.'; }
   finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
 });
 document.getElementById('add-small-slot').addEventListener('click', async event => {
