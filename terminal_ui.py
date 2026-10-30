@@ -4,6 +4,7 @@ import math
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import sys
 
 
@@ -15,6 +16,7 @@ class Terminal:
         self.program = str(Path(__file__).resolve().parent / '30na')
         self.slot_rows, self.module_rows, self.worker_rows = None, None, None
         self.health = None
+        self.notice = None
 
     def ask(self, label, default=None):
         suffix = f' [{default}]' if default is not None else ''
@@ -22,19 +24,21 @@ class Terminal:
         return value if value else (str(default) if default is not None else '')
 
     def choose(self, title, rows, label, default=0):
-        if not rows:
-            print('No items available.')
-            return None
-        print('\n' + title)
-        for index, row in enumerate(rows, 1):
-            print(f'  {index}. {label(row)}')
-        print('  0. Back')
         while True:
+            self.screen(title)
+            current_rows = rows() if callable(rows) else rows
+            if not current_rows:
+                print('No items available.')
+                self.ask('Press Enter to continue')
+                return None
+            for index, row in enumerate(current_rows, 1):
+                print(f'  {index}. {label(row)}')
+            print('  0. Back')
             value = self.ask('Select a number', str(default))
             if value == '0': return None
-            if value.isascii() and value.isdigit() and 1 <= int(value) <= len(rows):
-                return rows[int(value) - 1]
-            print('Enter a number from the list.')
+            if value.isascii() and value.isdigit() and 1 <= int(value) <= len(current_rows):
+                return current_rows[int(value) - 1]
+            self.notice = 'Enter a number from the list.'
 
     def call(self, args, *, state=False, quiet=False):
         command = [sys.executable, self.program, *args]
@@ -43,23 +47,31 @@ class Terminal:
         try:
             completed = subprocess.run(command, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=False)
         except OSError:
-            if not quiet: print('Could not start the command.', file=sys.stderr)
+            if not quiet: self.notice = 'Could not start the command.'
             return None
         if completed.returncode:
             if not quiet:
-                print(completed.stderr.rstrip() or 'Operation failed.', file=sys.stderr)
+                self.notice = completed.stderr.rstrip() or 'Operation failed.'
             return None
         if completed.stderr and not quiet:
-            print(completed.stderr.rstrip(), file=sys.stderr)
+            self.notice = completed.stderr.rstrip()
         try:
             return json.loads(completed.stdout)
         except ValueError:
-            if not quiet: print('Invalid response from command.', file=sys.stderr)
+            if not quiet: self.notice = 'Invalid response from command.'
             return None
 
     def show(self, value):
         if value is not None:
-            print(json.dumps(value, ensure_ascii=False, indent=2))
+            self.screen('Result')
+            if isinstance(value, dict) and 'slot' in value and 'module_id' in value and 'result' in value:
+                print(f"Slot: {value['slot']}  |  Module: {value['module_id']}")
+                if value.get('context'):
+                    print('Context: ' + json.dumps(value['context'], ensure_ascii=False))
+                print(json.dumps(value['result'], ensure_ascii=False, indent=2))
+            else:
+                print(json.dumps(value, ensure_ascii=False, indent=2))
+            self.ask('Press Enter to continue')
 
     def slot_args(self, *args):
         return ['slots', '--owner', self.owner, *args]
@@ -69,7 +81,6 @@ class Terminal:
                 '--ca-file', self.ca_file, *args]
 
     def refresh(self):
-        print('\nLoading status...')
         slots = self.call(self.slot_args('list'), state=True, quiet=True)
         modules = self.call(['modules', 'list'], quiet=True)
         workers = self.call(self.worker_args('list'), quiet=True)
@@ -79,14 +90,50 @@ class Terminal:
         self.worker_rows = workers.get('workers', []) if isinstance(workers, dict) else None
         self.health = health.get('status', 'unknown') if isinstance(health, dict) else 'unavailable'
 
-    def overview(self):
-        def count(value): return str(len(value)) if value is not None else 'unavailable'
+    def screen(self, title=None):
+        self.refresh()
+        if sys.stdout.isatty() and os.environ.get('TERM') != 'dumb':
+            sys.stdout.write('\033[2J\033[H')
+            sys.stdout.flush()
+        else:
+            print('\n')
+        width = max(20, min(shutil.get_terminal_size((100, 24)).columns, 160))
+        count = lambda value: str(len(value)) if value is not None else 'unavailable'
         enabled = sum(row.get('lifecycle') == 'enabled' for row in (self.worker_rows or []))
-        print('\n' + '=' * 48)
-        print('30nA  |  Owner: ' + self.owner)
-        print(f'Dashboard: {self.health}  |  Slots: {count(self.slot_rows)}  |  Modules: {count(self.module_rows)}')
-        print(f'Workers: {count(self.worker_rows)}' + (f' ({enabled} enabled)' if self.worker_rows is not None else ''))
-        print('=' * 48)
+        print('=' * width)
+        print('30nA STATUS  |  Owner: ' + self.owner)
+        print(f'Dashboard: {self.health}  |  Slots: {count(self.slot_rows)}  |  Modules: {count(self.module_rows)}  |  Workers: {count(self.worker_rows)}' + (f' ({enabled} enabled)' if self.worker_rows is not None else ''))
+        print('-' * width)
+        print('SLOTS')
+        if self.slot_rows is None:
+            print('  Unavailable')
+        elif not self.slot_rows:
+            print('  No slots registered. Sign in to the Dashboard first.')
+        else:
+            items = [f"{i}. {row['slot']} | {row['module_id']}" for i, row in enumerate(self.slot_rows, 1)]
+            cell = max(len(item) for item in items) + 3
+            columns = max(1, min(3, width // cell))
+            for offset in range(0, len(items), columns):
+                group = items[offset:offset + columns]
+                print(''.join(item.ljust(cell) if i < len(group) - 1 else item for i, item in enumerate(group)))
+        print('-' * width)
+        print('WORKERS')
+        if self.worker_rows is None:
+            print('  Unavailable')
+        elif not self.worker_rows:
+            print('  No Workers registered.')
+        else:
+            for index, worker in enumerate(self.worker_rows, 1):
+                print(f"  {index}. {worker['definition']['worker_id']} | {worker['lifecycle']}")
+        print('=' * width)
+        if title:
+            print('\n' + title)
+        if self.notice:
+            print(self.notice)
+            self.notice = None
+
+    def overview(self):
+        self.screen('MAIN MENU')
         print('  1. Slots')
         print('  2. Modules')
         print('  3. Workers and executions')
@@ -95,11 +142,12 @@ class Terminal:
         print('  0. Exit')
 
     def input_for(self, module_id):
+        self.screen('INPUT - ' + module_id)
         if module_id == 'calculator':
             a = self.number('First number', 0)
             b = self.number('Second number', 1)
             operations = ['add', 'subtract', 'multiply', 'divide']
-            operation = self.choose('Operation', operations, lambda x: x, default=1)
+            operation = self.choose(f'Operation for {a} and {b}', operations, lambda x: x, default=1)
             return None if operation is None else {'a': a, 'b': b, 'operation': operation}
         if module_id == 'dice-roller':
             return {'count': self.integer('Dice count', 1, 1, 100),
@@ -110,7 +158,10 @@ class Terminal:
         if module_id == 'slot-note':
             action = self.choose('Note action', ['get', 'set'], lambda x: x, default=1)
             if action is None: return None
-            return {'action':'set', 'text':input('Note text: ')} if action == 'set' else {'action':'get'}
+            if action == 'set':
+                self.screen('SET NOTE')
+                return {'action':'set', 'text':input('Note text: ')}
+            return {'action':'get'}
         if module_id == 'clock':
             return {}
         if module_id == 'theme-summary':
@@ -147,19 +198,18 @@ class Terminal:
         if result is None: return
         self.slot_rows = result.get('slots', [])
         if not self.slot_rows:
-            print('No slots are registered. Sign in to the Dashboard first.')
+            self.notice = 'No slots are registered. Sign in to the Dashboard first.'
             return
-        row = self.choose('Select a slot', self.slot_rows, lambda x: x['slot'] + '  |  ' + x['module_id'])
+        row = self.choose('Select a slot', lambda: self.slot_rows or [], lambda x: x['slot'] + '  |  ' + x['module_id'])
         if row is None: return
         slot, module = row['slot'], row['module_id']
-        print(f'\n{slot}  |  {module}')
-        action = self.choose('Slot actions', ['Read current value', 'Run module', 'Bind another module'], lambda x:x)
+        action = self.choose('SLOT ACTIONS - ' + slot + ' | ' + module, ['Read current value', 'Run module', 'Bind another module'], lambda x:x)
         if action == 'Read current value':
             self.show(self.call(self.slot_args('read', slot), state=True))
         elif action == 'Run module':
             data = self.input_for(module)
             if data is not None:
-                self.show(self.call(self.slot_args('run', slot, '--input', json.dumps(data, ensure_ascii=False)), state=True))
+                self.show(self.call(self.slot_args('run', slot, '--input', json.dumps(data, ensure_ascii=False), '--expect-module', module), state=True))
         elif action == 'Bind another module':
             result = self.call(['modules', 'list'])
             if result is None: return
@@ -167,6 +217,7 @@ class Terminal:
             if selected is None: return
             context = {}
             if selected['id'] == 'clock':
+                self.screen('BIND MODULE - ' + selected['id'])
                 zone = self.ask('Time zone; leave blank for server time zone')
                 if zone: context['timezone'] = zone
             elif selected['id'] == 'theme-summary':
@@ -182,15 +233,14 @@ class Terminal:
         result = self.call(['modules', 'list'])
         if result is None: return
         self.module_rows = result.get('modules', [])
-        row = self.choose('Select a module', self.module_rows, lambda x:x['id'] + '  |  ' + x['name'])
+        row = self.choose('Select a module', lambda: self.module_rows or [], lambda x:x['id'] + '  |  ' + x['name'])
         if row is None: return
         module = row['id']
-        print('\n' + row.get('description', ''))
-        action = self.choose('Module actions', ['Run independently', 'Run with shared slot state'], lambda x:x)
+        action = self.choose('MODULE ACTIONS - ' + module, ['Run independently', 'Run with shared slot state'], lambda x:x)
         if action is None: return
         if action == 'Run with shared slot state':
             if module not in ('counter', 'slot-note'):
-                print('Shared state is available for counter and slot-note. Use Slots to run other bound modules.')
+                self.notice = 'Shared state is available for counter and slot-note. Use Slots to run other bound modules.'
                 return
             result = self.call(self.slot_args('list'), state=True)
             if result is None: return
@@ -210,7 +260,7 @@ class Terminal:
         rows = result.get('executions', [])
         row = self.choose('Recent executions', rows, lambda x:x.get('worker_id', '?') + '  |  ' + x.get('status', '?') + '  |  ' + x.get('execution_id', '?'))
         if row is None: return
-        action = self.choose('Execution actions', ['Show details', 'Request cancellation'], lambda x:x)
+        action = self.choose('EXECUTION ACTIONS - ' + row['execution_id'], ['Show details', 'Request cancellation'], lambda x:x)
         if action:
             self.show(self.call(self.worker_args('status' if action == 'Show details' else 'cancel', row['execution_id'])))
 
@@ -222,13 +272,14 @@ class Terminal:
         result = self.call(self.worker_args('list'))
         if result is None: return
         self.worker_rows = result.get('workers', [])
-        row = self.choose('Select a Worker', self.worker_rows, lambda x:x['definition']['worker_id'] + '  |  ' + x['lifecycle'])
+        row = self.choose('Select a Worker', lambda: self.worker_rows or [], lambda x:x['definition']['worker_id'] + '  |  ' + x['lifecycle'])
         if row is None: return
         worker = row['definition']['worker_id']
-        action = self.choose('Worker actions', ['Show details', 'Run Worker', 'Enable', 'Disable'], lambda x:x)
+        action = self.choose('WORKER ACTIONS - ' + worker, ['Show details', 'Run Worker', 'Enable', 'Disable'], lambda x:x)
         if action == 'Show details':
             self.show(self.call(self.worker_args('get', worker)))
         elif action == 'Run Worker':
+            self.screen('RUN WORKER - ' + worker)
             default = '{"values":[10,20,30]}' if worker == 'demo-summary' else '{}'
             raw = self.ask('Input JSON object', default)
             try:
@@ -236,7 +287,7 @@ class Terminal:
                 if not isinstance(data, dict): raise ValueError()
                 data = json.dumps(data, ensure_ascii=False, allow_nan=False)
             except (TypeError, ValueError):
-                print('Input must be a valid JSON object.', file=sys.stderr); return
+                self.notice = 'Input must be a valid JSON object.'; return
             timeout = self.integer('Timeout in seconds', 30, 1, 300)
             print('A new idempotency key will be displayed. Keep it if the outcome is unknown.')
             self.show(self.call(self.worker_args('run', worker, '--input', data, '--timeout', str(timeout))))
@@ -247,7 +298,6 @@ class Terminal:
 
     def run(self):
         try:
-            self.refresh()
             while True:
                 self.overview()
                 choice = self.ask('Select a number', '0')
@@ -256,17 +306,18 @@ class Terminal:
                     if choice == '1': self.slots_menu()
                     elif choice == '2': self.modules_menu()
                     elif choice == '3': self.workers_menu()
-                    elif choice == '4': self.refresh()
+                    elif choice == '4': pass
                     elif choice == '5':
+                        self.screen('ACCOUNT AND CONNECTION')
                         print('Slot owner and Worker token must refer to the same account.')
                         self.owner = self.ask('Slot owner', self.owner)
                         self.manager_url = self.ask('Manager HTTPS URL', self.manager_url)
                         self.token_file = self.ask('Private token file path', self.token_file)
                         self.ca_file = self.ask('CA bundle path', self.ca_file)
                         self.refresh()
-                    else: print('Enter a number from the list.')
+                    else: self.notice = 'Enter a number from the list.'
                 except ValueError as error:
-                    print(str(error), file=sys.stderr)
+                    self.notice = str(error)
         except (EOFError, KeyboardInterrupt):
             print('\nExiting 30nA')
             return 0

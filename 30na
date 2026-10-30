@@ -101,7 +101,9 @@ def main():
     for name in ('read', 'run'):
         command = slot_commands.add_parser(name)
         command.add_argument('slot_id')
-        if name == 'run': command.add_argument('--input', type=json_object, default={})
+        if name == 'run':
+            command.add_argument('--input', type=json_object, default={})
+            command.add_argument('--expect-module')
     bind = slot_commands.add_parser('bind')
     bind.add_argument('slot_id')
     bind.add_argument('module_id')
@@ -162,7 +164,7 @@ def main():
         elif args.category == 'slots':
             if args.action == 'list': result = {'slots':slots.list_slots(args.owner)}
             elif args.action == 'read': result = slots.read(args.owner, args.slot_id)
-            elif args.action == 'run': result = slots.execute(args.owner, args.slot_id, args.input)
+            elif args.action == 'run': result = slots.execute(args.owner, args.slot_id, args.input, expected_module=args.expect_module)
             else: result = {'slot':args.slot_id, **slots.binding(args.owner, args.slot_id, args.module_id, args.context)}
         elif args.action == 'list':
             result = worker_request(args, 'GET', '/api/v1/workers')
