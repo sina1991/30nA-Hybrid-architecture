@@ -83,7 +83,7 @@ def list_active(owner):
         for slot, value, raw_meta in rows:
             meta = json.loads(raw_meta)
             result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
-                           'layout': meta.get('layout'), 'frame_color': meta.get('frame_color'),
+                           'layout': meta.get('layout'), 'minimized': bool(meta.get('minimized', False)), 'output_settings':meta.get('output_settings', {'mode':'full','label':'','field':''}), 'frame_color': meta.get('frame_color'),
                            'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker'),
                            'slot_type': meta.get('slot_type', 'standard'),
                            'chart_period': meta.get('chart_period', 20), 'chart_interval': meta.get('chart_interval', '1m'), 'indicator_period': meta.get('indicator_period', 14), 'chart_overlay': meta.get('chart_overlay', True),
@@ -108,6 +108,33 @@ def create(owner, slot_type='standard'):
         return {'slot': slot, **config, 'overview': False, 'slot_type':slot_type}
     finally:
         db.close()
+
+
+def duplicate(owner, slot):
+    """Copy slot configuration and state without starting its worker."""
+    db = _layout_db(owner)
+    try:
+        row = db.execute("""SELECT b.value,m.value FROM module_state b JOIN module_state m
+            ON m.owner=b.owner AND m.slot=b.slot AND m.module='slot-meta'
+            WHERE b.owner=? AND b.slot=? AND b.module='slot-binding'""", (owner, slot)).fetchone()
+        if row is None: raise LookupError('slot is not active')
+        if db.execute("SELECT count(*) FROM module_state WHERE owner=? AND module='slot-meta'", (owner,)).fetchone()[0] >= 100:
+            raise ValueError('slot limit reached')
+        config, meta = json.loads(row[0]), json.loads(row[1])
+        new_slot = 'slot-' + uuid4().hex[:12]
+        config['revision'] = str(uuid4())
+        meta.pop('layout', None); meta['minimized'] = False
+        worker = meta.get('worker')
+        if worker:
+            worker.update(enabled=False, status='stopped', next_due=None, last_error=None,
+                          last_started=None, last_finished=None, revision=str(uuid4()), binding_revision=config['revision'])
+        db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-binding',?,?)", (owner,new_slot,json.dumps(config)))
+        db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-meta',?,?)", (owner,new_slot,json.dumps(meta)))
+        for module, value in db.execute("SELECT module,value FROM module_state WHERE owner=? AND slot=? AND module IN ('counter','slot-note')", (owner,slot)).fetchall():
+            db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,?,?,?)", (owner,module,new_slot,value))
+        db.commit()
+        return {'slot':new_slot, **config, 'overview':bool(meta.get('overview'))}
+    finally: db.close()
 
 
 def bind_active(owner, slot, module_id, context, only_if_missing=False):
@@ -149,8 +176,19 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators', 'minimized', 'output_settings'}:
         raise ValueError('invalid slot appearance')
+    if 'minimized' in updates and type(updates['minimized']) is not bool:
+        raise ValueError('invalid minimized state')
+    if 'output_settings' in updates:
+        output = updates['output_settings']
+        if not isinstance(output, dict) or set(output) != {'mode', 'label', 'field'}:
+            raise ValueError('invalid output settings')
+        if output['mode'] not in ('full', 'summary') or not isinstance(output['label'], str) or len(output['label']) > 32:
+            raise ValueError('invalid output settings')
+        field = output['field']
+        if not isinstance(field, str) or len(field) > 160 or (field and not re.fullmatch(r'[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*', field)) or (output['mode'] == 'summary' and not field):
+            raise ValueError('invalid output field')
     if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'small', 'minimal', 'chart', 'fix-chart'):
         raise ValueError('invalid slot type')
     if 'chart_indicators' in updates and (not isinstance(updates['chart_indicators'], list) or len(updates['chart_indicators']) > len(CHART_DEFAULTS) or any(not isinstance(item, str) or item not in CHART_DEFAULTS for item in updates['chart_indicators']) or len(set(updates['chart_indicators'])) != len(updates['chart_indicators'])):

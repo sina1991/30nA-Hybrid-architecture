@@ -249,7 +249,7 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .market-indicator-pane svg {display:block;width:100%;height:68px}.market-indicator-label {position:absolute;top:3px;left:8px;font-size:10px;color:var(--muted)}
 .market-indicator-empty {display:block;font-size:11px;color:var(--muted);padding:24px 8px 8px}
 .chart-slot {position:relative;min-height:400px;overflow:visible}
-.chart-slot .module-body {min-height:0}.chart-slot .market-toolbar {padding-right:30px}.chart-slot .market-graph {flex:1;min-height:180px}.chart-slot .market-chart {height:100%;min-height:180px}
+.chart-slot .module-body {min-height:0}.chart-slot .market-toolbar {padding-left:24px;padding-right:30px}.chart-slot .market-graph {flex:1;min-height:180px}.chart-slot .market-chart {height:100%;min-height:180px}
 .signal-conditions {display:grid;gap:7px}.signal-condition {display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:4px}.signal-condition button {font:inherit;color:var(--text);background:var(--field);border:1px solid var(--border);border-radius:6px;cursor:pointer}
 .indicator-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:10px}.indicator-card {background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:12px;display:grid;gap:7px}.indicator-card label {display:grid;gap:3px;font-size:12px}.indicator-card input,.indicator-card select {width:100%;padding:6px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:6px;font:inherit}.indicator-card input[type="checkbox"] {width:auto}.indicator-card-actions {display:flex;flex-wrap:wrap;gap:6px}.indicator-card-actions button {padding:6px 9px;background:var(--field);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer}
 .chart-context {position:absolute;top:8px;right:8px;z-index:6;display:grid;gap:4px;min-width:165px;padding:6px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 5px 20px #0007}
@@ -268,6 +268,20 @@ body:not([data-view="overview"]) #edit-layout {display:none}
   padding: 9px; display: flex; flex-direction: column; gap: 6px;
   box-shadow:0 8px 24px #0002;
 }
+#grid {display:flex;flex-direction:column;gap:6px;align-items:stretch}
+#grid .slot[data-slot-type] {width:100%;height:auto;min-height:42px;display:flex;flex-direction:row;align-items:center;gap:8px;padding:7px 9px;overflow:visible}
+#grid .slot-gear,#grid .slot-pin-toggle {position:relative;inset:auto;flex:none}
+.slot-list-label {flex:1;min-width:0;color:var(--text);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot-list-label span {color:var(--muted);font-size:11px;margin-left:8px}
+.slot-pin-toggle {position:absolute;z-index:3;top:4px;left:4px;display:grid;place-items:center;width:21px;height:21px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--field);cursor:pointer;font-size:13px}
+#overview-grid .slot[data-minimized="true"] {grid-row:span 1;min-height:0;padding:5px 35px}
+#overview-grid .slot[data-minimized="true"] .module-body,#overview-grid .slot[data-minimized="true"] .slot-resize,#overview-grid .slot[data-minimized="true"] .chart-move-handle {display:none!important}
+.slot-min-label {font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#overview-grid .slot:not(.chart-slot)[data-output-mode="full"] .module-body {padding-top:22px}
+.slot-summary {height:100%;min-height:0;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:5px 26px;font-variant-numeric:tabular-nums}
+.slot-summary-name {font-size:12px;color:var(--muted);font-weight:600;overflow-wrap:anywhere}.slot-summary-value {font-size:clamp(13px,1.5vw,20px);font-weight:700;color:var(--text);overflow-wrap:anywhere}
+.output-form {display:grid;gap:7px;padding:10px;margin-top:8px;background:var(--field);border:1px solid var(--border);border-radius:8px}
+.output-form label {display:grid;gap:4px;font-size:12px}.output-form input,.output-form select {width:100%;padding:6px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;font:inherit}
 .slot[data-slot-type="small"] {min-height:140px}
 .slot[data-slot-type="minimal"] {min-height:0;padding:5px;gap:3px}.slot[data-slot-type="minimal"] .module-body {gap:3px;font-size:12px}
 .slot-gear {position:absolute;z-index:3;top:5px;right:5px;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--field);color:var(--muted);font-size:17px;line-height:1;cursor:pointer}
@@ -425,7 +439,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <div id="overview-grid" aria-label="Pinned slots"></div>
   </section>
   <section class="page-view" data-page="slots" hidden>
-  <h2 class="view-heading">Slots</h2><p class="view-description">Assign modules and inspect their output.</p>
+  <h2 class="view-heading">Slots</h2><p class="view-description">Unpinned slots. Use the pin to show a slot on Overview.</p>
   <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
   <button type="button" class="dice-roll-button" id="add-small-slot" disabled>+ Small slot</button>
   <button type="button" class="dice-roll-button" id="add-minimal-slot" disabled>+ Minimal slot</button>
@@ -1457,7 +1471,8 @@ sidebarResize.addEventListener('keydown', event => {
 
 document.getElementById('edit-layout').addEventListener('click', () => {
   layoutEditing = !layoutEditing;
-  if (!layoutEditing) unlockedSlots.clear();
+  unlockedSlots.clear();
+  if (layoutEditing) activeSlots.filter(row => row.overview).forEach(row => unlockedSlots.add(row.slot));
   syncLayoutControls();
 });
 
@@ -1465,7 +1480,7 @@ function attachLayoutControls(card, handle, resize, row, notice) {
   if (card.dataset.area !== 'overview') return;
   const container = document.getElementById('overview-grid');
   function begin(event, mode) {
-    if (mode === 'resize' && row.slot_type === 'fix-chart') return;
+    if (row.minimized || (mode === 'resize' && row.slot_type === 'fix-chart')) return;
     if (!layoutEditing || !unlockedSlots.has(row.slot) || event.button !== 0 || window.matchMedia('(max-width: 760px)').matches) return;
     event.preventDefault();
     const rect = container.getBoundingClientRect();
@@ -1567,6 +1582,66 @@ function attachSavedResult(body, slot, moduleId) {
   setTimeout(tick, 0);
 }
 
+function numericFields(value) {
+  const fields = [];
+  function visit(item, path, depth) {
+    if (fields.length >= 120 || depth > 8) return;
+    if (typeof item === 'number' && Number.isFinite(item)) { if (path) fields.push(path); return; }
+    if (Array.isArray(item)) { if (item.length) visit(item[item.length - 1], path ? path + '.-1' : '-1', depth + 1); return; }
+    if (!item || typeof item !== 'object') return;
+    Object.entries(item).forEach(([key, child]) => {
+      if (/^[A-Za-z0-9_-]+$/.test(key)) visit(child, path ? path + '.' + key : key, depth + 1);
+    });
+  }
+  visit(value, '', 0); return fields;
+}
+
+function numericValue(value, path) {
+  for (const key of path.split('.')) {
+    if (Array.isArray(value) && key === '-1') value = value.length ? value[value.length - 1] : undefined;
+    else if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, key)) value = value[key];
+    else return null;
+  }
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function renderSlotSummary(body, row, moduleInfo) {
+  const settings = row.output_settings, wrap = makeElement('div', 'slot-summary');
+  const name = makeElement('span', 'slot-summary-name', settings.label || moduleInfo?.name || row.module_id);
+  const value = makeElement('span', 'slot-summary-value', '—');
+  value.title = `Field: ${settings.field}`; wrap.append(name, value); body.append(wrap);
+  let busy = false;
+  async function refresh() {
+    const bridge = window.dashboardModuleState;
+    if (!bridge?.ready() || busy) return;
+    busy = true;
+    try {
+      const result = await bridge.read(row.slot, row.module_id);
+      if (!body.isConnected || !bridge.ready()) return;
+      const number = numericValue(result, settings.field);
+      value.textContent = number === null ? '—' : new Intl.NumberFormat('en-US', {maximumFractionDigits:8}).format(number);
+      value.title = number === null ? `Field ${settings.field} has no numeric value` : `Field: ${settings.field}`;
+    } catch (_) { if (body.isConnected) { value.textContent = '—'; value.title = 'Could not read this slot'; } }
+    finally { busy = false; }
+  }
+  body.addEventListener('slot-refresh', refresh);
+  function tick() { if (!body.isConnected) return; refresh(); setTimeout(tick, 5000); }
+  setTimeout(tick, 0);
+}
+
+function canRestoreSlot(card, layout) {
+  const container = document.getElementById('overview-grid'), rect = container.getBoundingClientRect();
+  const style = getComputedStyle(container), gapX = parseFloat(style.columnGap) || 0, gapY = parseFloat(style.rowGap) || 0;
+  const column = (rect.width - gapX * 11) / 12 + gapX, rowHeight = 56 + gapY;
+  if (column <= 0 || window.matchMedia('(max-width: 760px)').matches) return true;
+  return ![...container.querySelectorAll('.slot')].filter(item => item !== card).some(item => {
+    const r = item.getBoundingClientRect();
+    const other = {x:Math.round((r.left - rect.left) / column), y:Math.round((r.top - rect.top) / rowHeight),
+      w:Math.max(1, Math.round((r.width + gapX) / column)), h:Math.max(1, Math.round((r.height + gapY) / rowHeight))};
+    return layout.x < other.x + other.w && layout.x + layout.w > other.x && layout.y < other.y + other.h && layout.y + layout.h > other.y;
+  });
+}
+
 function makeSlot(row, area) {
   const isChartSlot = ['chart','fix-chart'].includes(row.slot_type) && row.module_id === 'gold-chart';
   const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
@@ -1576,10 +1651,12 @@ function makeSlot(row, area) {
   card.dataset.area = area;
   card.dataset.slotType = row.slot_type || 'standard';
   card.dataset.displayTheme = slot.display_theme;
+  card.dataset.minimized = String(Boolean(row.minimized));
+  card.dataset.outputMode = row.output_settings?.mode || 'full';
   if (row.frame_color) card.style.borderColor = row.frame_color;
   if (area === 'overview' && row.layout) {
     card.style.gridColumn = `${row.layout.x + 1} / span ${row.layout.w}`;
-    card.style.gridRow = `${row.layout.y + 1} / span ${row.layout.h}`;
+    card.style.gridRow = `${row.layout.y + 1} / span ${row.minimized ? 1 : row.layout.h}`;
   }
   const notice = makeElement('div', 'module-detail'); notice.setAttribute('role', 'status');
   const head = makeElement('div', 'slot-head');
@@ -1648,9 +1725,9 @@ function makeSlot(row, area) {
     finally { displaySelect.disabled = false; }
   });
   displayLabel.append(displaySelect);
-  const pin = makeElement('button', 'slot-icon slot-pin', row.overview ? '📌' : '＋');
+  const pin = makeElement('button', 'slot-pin-toggle', '📌');
   pin.title = row.overview ? 'Remove from Overview' : 'Pin to Overview';
-  pin.setAttribute('aria-label', pin.title);
+  pin.setAttribute('aria-label', pin.title); pin.setAttribute('aria-pressed', String(Boolean(row.overview)));
   const pinMenu = makeElement('button', '', row.overview ? 'Remove from Overview' : 'Add to Overview');
   pin.type = 'button';
   pinMenu.type = 'button';
@@ -1658,6 +1735,8 @@ function makeSlot(row, area) {
     pin.disabled = true; pinMenu.disabled = true;
     try {
       await window.dashboardModuleState.setOverview(slot.id, !row.overview);
+      if (layoutEditing && !row.overview) unlockedSlots.add(slot.id);
+      if (row.overview) unlockedSlots.delete(slot.id);
       slotGeneration++; await refreshActiveSlots();
     } catch (_) { notice.textContent = 'Could not update Overview. Refresh and check its state.'; pin.disabled = false; pinMenu.disabled = false; }
   }
@@ -1673,7 +1752,25 @@ function makeSlot(row, area) {
       slotGeneration++; await refreshActiveSlots();
     } catch (_) { notice.textContent = 'Could not delete slot. Refresh and check its state.'; remove.disabled = false; }
   });
-  actions.append(pinMenu, typeLabel, displayLabel, colorLabel, resetColor, remove);
+  const duplicate = makeElement('button', '', '⧉ Duplicate'); duplicate.type = 'button'; duplicate.title = 'Duplicate slot';
+  duplicate.addEventListener('click', async () => {
+    duplicate.disabled = true;
+    try {
+      const copy = await window.dashboardModuleState.duplicateSlot(slot.id);
+      if (layoutEditing && copy.overview) unlockedSlots.add(copy.slot);
+      slotGeneration++; await refreshActiveSlots();
+    } catch (_) { notice.textContent = 'Could not duplicate slot. Check its state before retrying.'; duplicate.disabled = false; }
+  });
+  const minimize = makeElement('button', '', row.minimized ? '▢ Restore' : '— Minimize'); minimize.type = 'button';
+  minimize.addEventListener('click', async () => {
+    if (row.minimized && row.layout && area === 'overview' && !canRestoreSlot(card, row.layout)) {
+      notice.textContent = 'Move other slots away from the original position before restoring.'; return;
+    }
+    minimize.disabled = true;
+    try { await window.dashboardModuleState.setSlotAppearance(slot.id, {minimized:!row.minimized}); slotGeneration++; await refreshActiveSlots(); }
+    catch (_) { notice.textContent = 'Could not change minimized state.'; minimize.disabled = false; }
+  });
+  actions.append(pinMenu, duplicate, minimize, typeLabel, displayLabel, colorLabel, resetColor, remove);
   const controls = makeElement('div', 'slot-controls');
   const searchLabel = makeElement('label', '', 'Find module');
   const search = makeElement('input', 'module-search');
@@ -1824,6 +1921,36 @@ function makeSlot(row, area) {
     } finally { select.disabled = false; search.disabled = false; }
   });
   searchLabel.textContent = 'Find module'; searchLabel.append(search); label.append(select); controls.append(searchLabel, searchHint, label);
+  const outputDetails = makeElement('details', 'output-form');
+  outputDetails.append(makeElement('summary', '', 'Output settings'));
+  const outputSettings = row.output_settings || {mode:'full', label:'', field:''};
+  const outputModeLabel = makeElement('label', '', 'Display'); const outputMode = makeElement('select', '');
+  [['full','Full output'], ['summary','Name and key number']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value=value; outputMode.append(option); });
+  outputMode.value = outputSettings.mode; outputModeLabel.append(outputMode);
+  const outputNameLabel = makeElement('label', '', 'Short name'); const outputName = makeElement('input', ''); outputName.maxLength=32; outputName.placeholder='Example: CPU'; outputName.value=outputSettings.label; outputNameLabel.append(outputName);
+  const fieldLabel = makeElement('label', '', 'Available numeric fields'); const fieldSelect=makeElement('select',''); fieldLabel.append(fieldSelect);
+  const pathLabel=makeElement('label','','Field path'); const fieldPath=makeElement('input',''); fieldPath.placeholder='Example: memory.used_percent'; fieldPath.maxLength=160; fieldPath.value=outputSettings.field; pathLabel.append(fieldPath);
+  const outputStatus=makeElement('p','market-status'); const refreshFields=makeElement('button','chart-options-button','Refresh fields'); refreshFields.type='button';
+  const saveOutput=makeElement('button','chart-options-button','Save output settings'); saveOutput.type='button';
+  fieldSelect.addEventListener('change', () => { if (fieldSelect.value) fieldPath.value=fieldSelect.value; });
+  async function loadNumericFields() {
+    fieldSelect.replaceChildren(); const placeholder=makeElement('option','','Select a numeric field'); placeholder.value=''; fieldSelect.append(placeholder);
+    try {
+      const result=await window.dashboardModuleState.read(slot.id,row.module_id);
+      const fields=numericFields(result);
+      fields.forEach(path => { const option=makeElement('option','',path); option.value=path; fieldSelect.append(option); });
+      if (fields.includes(fieldPath.value)) fieldSelect.value=fieldPath.value;
+      outputStatus.textContent=fields.length ? 'Choose a field, or enter its path.' : 'No numeric fields available yet. Run the module or enter a path.';
+    } catch (_) { outputStatus.textContent='Could not load fields. Enter a field path.'; }
+  }
+  outputDetails.addEventListener('toggle', () => { if (outputDetails.open) loadNumericFields(); });
+  refreshFields.addEventListener('click', loadNumericFields);
+  saveOutput.addEventListener('click', async () => {
+    saveOutput.disabled=true;
+    try { await window.dashboardModuleState.setSlotAppearance(slot.id,{output_settings:{mode:outputMode.value,label:outputName.value.trim(),field:fieldPath.value.trim()}}); slotGeneration++; await refreshActiveSlots(); }
+    catch (_) { outputStatus.textContent='Choose a numeric field or enter a valid path before saving.'; saveOutput.disabled=false; }
+  });
+  outputDetails.append(outputModeLabel,outputNameLabel,fieldLabel,pathLabel,refreshFields,saveOutput,outputStatus);
   actions.prepend(controls);
   lock.classList.add('slot-icon');
   headActions.append(run, inputButton, terminalButton, workerButton, lock); head.append(headActions);
@@ -1831,12 +1958,20 @@ function makeSlot(row, area) {
   resize.setAttribute('aria-label', `Resize ${slot.id}`); resize.title = 'Drag to resize';
   const moveHandle = makeElement('div', 'chart-move-handle', 'Drag to move');
   const layoutNotice = makeElement('div', 'market-status'); layoutNotice.setAttribute('role', 'status');
-  settingsDialog.append(closeSettings, name, head, actions, inputDrawer, terminalDrawer, workerDrawer, notice);
-  card.append(menu, moveHandle, settingsDialog, layoutNotice, body, resize);
+  settingsDialog.append(closeSettings, name, head, actions, outputDetails, inputDrawer, terminalDrawer, workerDrawer, notice);
+  if (area === 'slots') {
+    const listLabel = makeElement('div', 'slot-list-label', moduleInfo?.name || row.module_id);
+    listLabel.append(makeElement('span', '', slot.id));
+    card.append(listLabel, pin, menu, settingsDialog);
+    return card;
+  }
+  if (row.minimized) card.append(makeElement('div','slot-min-label', row.output_settings?.label || moduleInfo?.name || row.module_id));
+  card.append(pin, menu, moveHandle, settingsDialog, layoutNotice, body, resize);
   attachLayoutControls(card, moveHandle, resize, row, layoutNotice);
-  if (isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
-  else renderModuleContent(body, slot, selectedModule);
-  if (!isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
+  if (!row.minimized && row.output_settings?.mode === 'summary') renderSlotSummary(body, row, moduleInfo);
+  else if (!row.minimized && isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
+  else if (!row.minimized) renderModuleContent(body, slot, selectedModule);
+  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 
@@ -1858,7 +1993,7 @@ function renderSlots() {
   document.getElementById('add-small-slot').disabled = !ready;
   document.getElementById('add-minimal-slot').disabled = !ready;
   document.getElementById('add-fixed-chart-slot').disabled = !ready;
-  document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.length ? '' : 'No active slots. Add a slot to get started.';
+  document.getElementById('slots-message').textContent = !ready ? 'Sign in to manage slots.' : activeSlots.some(row => !row.overview) ? '' : 'No unpinned slots. Add a slot to get started.';
   const pinned = activeSlots.filter(row => row.overview);
   document.getElementById('overview-empty').textContent = !ready ? 'Sign in to view pinned slots.' : pinned.length ? '' : 'No slots added to Overview yet.';
   if (!ready) { grid.replaceChildren(); overview.replaceChildren(); renderSlotWorkerList(); return; }
@@ -1872,7 +2007,7 @@ function renderSlots() {
     });
     old.forEach(card => card.remove());
   }
-  reconcile(grid, activeSlots, 'slots'); reconcile(overview, pinned, 'overview');
+  reconcile(grid, activeSlots.filter(row => !row.overview), 'slots'); reconcile(overview, pinned, 'overview');
   syncLayoutControls(); renderSlotWorkerList();
 }
 
@@ -1890,8 +2025,9 @@ function renderSlotWorkerList() {
     button.append(title, details);
     if (row.worker.last_error) button.append(makeElement('small', '', row.worker.last_error));
     button.addEventListener('click', () => {
-      openView('slots');
-      const card = [...grid.querySelectorAll('.slot')].find(item => item.dataset.slotId === row.slot);
+      openView(row.overview ? 'overview' : 'slots');
+      const container = row.overview ? document.getElementById('overview-grid') : grid;
+      const card = [...container.querySelectorAll('.slot')].find(item => item.dataset.slotId === row.slot);
       if (!card) return;
       const control = card.querySelector('[data-slot-worker]');
       const settings = card.querySelector('.slot-options-dialog');
@@ -1996,7 +2132,8 @@ async function loadTheme(themeId) {
     // Only the appearance changes; slot bindings and list stay intact.
     document.querySelectorAll('.slot').forEach(card => {
       const row = activeSlots.find(item => item.slot === card.dataset.slotId);
-      if (row?.module_id === 'theme-summary') renderModuleContent(card.querySelector('.module-body'), {id:row.slot}, row.module_id);
+      const body = card.querySelector('.module-body');
+      if (body && !row?.minimized && row?.output_settings?.mode !== 'summary' && row?.module_id === 'theme-summary') renderModuleContent(body, {id:row.slot}, row.module_id);
     });
   } catch (error) { statusText.textContent = `Could not load theme: ${error.message}`; }
 }

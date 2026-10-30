@@ -279,6 +279,7 @@ PANEL = r'''
       return this.slotRequest('market/database/' + encodeURIComponent(table) + '?limit=' + encodeURIComponent(limit) + '&offset=' + encodeURIComponent(offset) + '&candle_state=' + encodeURIComponent(candleState) + '&indicator_name=' + encodeURIComponent(indicatorName));
     },
     async createSlot(type = 'standard') { return (await this.slotRequest('slots', {type})).slot; },
+    async duplicateSlot(slot) { return (await this.slotRequest('slots/' + encodeURIComponent(slot) + '/duplicate', {})).slot; },
     async setOverview(slot, visible) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/overview', {visible}); },
     async setSlotAppearance(slot, updates) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/appearance', updates); },
     async configureSlotWorker(slot, worker) { return this.slotRequest('slots/' + encodeURIComponent(slot) + '/worker', worker); },

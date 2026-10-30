@@ -253,6 +253,15 @@ def create_router(credential_path, upstream_factory):
         response.headers['Vary'] = 'Authorization'
         return response
 
+    @router.post('/slots/{slot_id}/duplicate')
+    def duplicate_slot(slot_id: str, identity=Depends(owner)):
+        try: value = slots.duplicate(identity, slot_id)
+        except LookupError: raise HTTPException(404, 'Slot not found') from None
+        except ValueError: raise HTTPException(422, 'Cannot duplicate slot') from None
+        response = JSONResponse(envelope({'slot':value}))
+        response.headers['Cache-Control'] = 'no-store'; response.headers['Vary'] = 'Authorization'
+        return response
+
     @router.post('/slots/{slot_id}/overview')
     def update_slot_overview(slot_id: str, body: dict, identity=Depends(owner)):
         if set(body) != {'visible'} or type(body['visible']) is not bool:
