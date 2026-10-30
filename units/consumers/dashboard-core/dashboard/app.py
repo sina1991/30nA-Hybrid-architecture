@@ -7,9 +7,9 @@ from pathlib import Path
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 
-from .modules.registry import list_modules
-from .modules.execution import UnknownModule, run_module
-from .modules.packages.clock.clock import current_time
+from modules.registry import list_modules
+from modules.execution import UnknownModule, run_module
+from modules.clock.clock import current_time
 from zoneinfo import ZoneInfoNotFoundError
 
 BASE_DIR = Path(__file__).resolve().parent

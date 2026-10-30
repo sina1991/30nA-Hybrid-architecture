@@ -87,7 +87,7 @@ if s != dict(version=1,domain=sys.argv[1],email=sys.argv[2],ref=sys.argv[3]):
     raise SystemExit('تنظیمات با نصب قبلی متفاوت است؛ upgrade/domain change خودکار پشتیبانی نمی‌شود.')
 PY
     else
-        for target in /etc/30na /opt/30na /var/lib/30na /var/lib/30na-sandbox /etc/nginx /etc/docker /var/lib/docker /etc/letsencrypt /etc/apt/sources.list.d/30na-docker.list /etc/apt/keyrings/30na-docker.asc /etc/apparmor.d/30na-rootlesskit /etc/systemd/system/30na-dashboard.service /etc/systemd/system/30na-code-manager.service /etc/systemd/system/30na-worker-manager.service /etc/systemd/system/30na-worker-runtime.service; do
+        for target in /etc/30na /opt/30na /var/lib/30na /var/lib/30na-sandbox /etc/nginx /etc/docker /var/lib/docker /etc/letsencrypt /etc/apt/sources.list.d/30na-docker.list /etc/apt/keyrings/30na-docker.asc /etc/apparmor.d/30na-rootlesskit /etc/systemd/system/30na-dashboard.service /etc/systemd/system/30na-code-manager.service /etc/systemd/system/30na-worker-manager.service /etc/systemd/system/30na-worker-runtime.service /usr/local/bin/30na; do
             [[ ! -e $target ]] || die "مسیر موجود است: $target؛ سرور خالی لازم است"
         done
         for account in 30na 30na-sandbox; do
@@ -230,6 +230,10 @@ certificates() {
 }
 start_and_verify() {
     install -m 0755 "$APP/deployment/30na-review" /usr/local/sbin/30na-review
+    if [[ -e /usr/local/bin/30na ]] && ! grep -Fxq "# 30na managed CLI launcher v1" /usr/local/bin/30na; then
+        die "فرمان /usr/local/bin/30na متعلق به نصب دیگری است"
+    fi
+    install -m 0755 "$APP/deployment/30na-cli" /usr/local/bin/30na
     install -m 0644 "$APP"/deployment/systemd/30na-*.service /etc/systemd/system/
     systemctl daemon-reload
     systemctl enable --now 30na-code-manager 30na-worker-runtime 30na-worker-manager 30na-dashboard

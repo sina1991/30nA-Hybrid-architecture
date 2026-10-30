@@ -13,7 +13,12 @@ DROPIN=/etc/systemd/system/30na-dashboard.service.d/99-30na-release.conf
 [[ ! -e $LINK || -L $LINK ]] || { echo 'Dashboard path is not a managed symlink.' >&2; exit 1; }
 [[ ! -e $DROPIN || -f /etc/30na/dashboard-release ]] || { echo 'Existing unowned Dashboard override; review it before updating.' >&2; exit 1; }
 BACKUP=$(mktemp -d /tmp/30na-dashboard-update.XXXXXXXX)
-HAD_LINK=0 HAD_DROPIN=0 CHANGED=0
+HAD_LINK=0 HAD_DROPIN=0 HAD_CLI=0 CHANGED=0
+CLI_LAUNCHER=/usr/local/bin/30na
+if [[ -e $CLI_LAUNCHER ]]; then
+    grep -Fxq "# 30na managed CLI launcher v1" "$CLI_LAUNCHER" || { echo "Existing unowned 30na command; review before updating." >&2; exit 1; }
+    HAD_CLI=1; cp "$CLI_LAUNCHER" "$BACKUP/cli"
+fi
 if [[ -L $LINK ]]; then HAD_LINK=1; readlink "$LINK" >"$BACKUP/link"; fi
 if [[ -f $DROPIN ]]; then HAD_DROPIN=1; cp "$DROPIN" "$BACKUP/dropin"; fi
 rollback() {
@@ -22,6 +27,7 @@ rollback() {
     if [[ $CHANGED == 1 ]]; then
         if [[ $HAD_LINK == 1 ]]; then ln -sfn "$(cat "$BACKUP/link")" "$LINK"; else rm -f "$LINK"; fi
         if [[ $HAD_DROPIN == 1 ]]; then cp "$BACKUP/dropin" "$DROPIN"; else rm -f "$DROPIN"; fi
+        if [[ $HAD_CLI == 1 ]]; then install -m 0755 "$BACKUP/cli" "$CLI_LAUNCHER"; else rm -f "$CLI_LAUNCHER"; fi
         systemctl daemon-reload
         systemctl restart 30na-dashboard
         echo 'Update failed; previous Dashboard configuration restored. Check 30na-review status.' >&2
@@ -61,7 +67,7 @@ cat >"$DROPIN" <<'UNIT'
 [Service]
 ReadWritePaths=/var/lib/30na/dashboard
 WorkingDirectory=/opt/30na/dashboard-current/units/consumers/dashboard-core
-Environment=PYTHONPATH=/opt/30na/dashboard-current/units/worker-manager:/opt/30na/dashboard-current/units/consumers/dashboard-core
+Environment=PYTHONPATH=/opt/30na/dashboard-current:/opt/30na/dashboard-current/units/worker-manager:/opt/30na/dashboard-current/units/consumers/dashboard-core
 ExecStart=
 ExecStart=/opt/30na/dashboard-current/.venv/bin/python -m uvicorn dashboard.production:create_app --factory --workers 1 --host 127.0.0.1 --port 8020 --no-access-log --no-proxy-headers --limit-concurrency 64 --timeout-keep-alive 5
 UNIT
@@ -75,6 +81,7 @@ for ((attempt=0;attempt<30;attempt++)); do
     sleep 1
 done
 [[ $READY == 1 ]]
+install -m 0755 "$RELEASE/deployment/30na-cli" "$CLI_LAUNCHER"
 printf '%s\n' "$SHA" >/etc/30na/dashboard-release
 CHANGED=0
 trap - ERR INT TERM

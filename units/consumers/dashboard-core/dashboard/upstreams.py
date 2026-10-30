@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from worker_manager.api import RegisterBody, ConfigureBody
 from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, owner_dependency
 from public_api import ConsumerAPIError, _identifier
-from .modules.execution import run_module
+from modules.execution import run_module
 
 
 class RunRequest(BaseModel):

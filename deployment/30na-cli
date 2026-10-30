@@ -1,0 +1,7 @@
+#!/bin/sh
+# 30na managed CLI launcher v1
+set -eu
+if [ -x /opt/30na/dashboard-current/30na ]; then
+    exec /opt/30na/dashboard-current/30na "$@"
+fi
+exec /opt/30na/current/30na "$@"

@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""Command-line access to trusted modules and the owner-scoped Worker API."""
+import argparse
+import json
+from pathlib import Path
+import ssl
+import sqlite3
+import re
+import math
+import stat
+import sys
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote, urlsplit
+from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
+from uuid import UUID, uuid4
+
+from modules.execution import UnknownModule, run_module
+from modules.registry import list_modules
+
+
+class NoRedirect(HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def json_object(value):
+    try:
+        if value == "-":
+            value = sys.stdin.read(1000001)
+            if len(value.encode("utf-8")) > 1000000:
+                raise ValueError("input too large")
+        obj = json.loads(value)
+    except (ValueError, TypeError) as error:
+        raise argparse.ArgumentTypeError('Expected a JSON object') from error
+    if not isinstance(obj, dict) or any(str(key).startswith('_') for key in obj):
+        raise argparse.ArgumentTypeError('Expected a JSON object without reserved fields')
+    return obj
+
+
+def read_token(path):
+    path = Path(path)
+    mode = path.stat().st_mode
+    if not stat.S_ISREG(mode) or stat.S_IMODE(mode) & 0o077:
+        raise ValueError('Token file must be a private regular file (0400 or 0600)')
+    value = path.read_text(encoding='utf-8').strip()
+    if not value or not value.isascii() or any(c.isspace() for c in value):
+        raise ValueError('Invalid token file')
+    return value
+
+
+def worker_request(args, method, path, payload=None):
+    url = urlsplit(args.manager_url)
+    if url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment or url.path not in ('', '/'):
+        raise ValueError('Manager URL must be an HTTPS origin')
+    token = read_token(args.token_file)
+    context = ssl.create_default_context(cafile=args.ca_file)
+    opener = build_opener(NoRedirect(), HTTPSHandler(context=context))
+    data = None if payload is None else json.dumps(payload, allow_nan=False).encode('utf-8')
+    if data is not None and len(data) > 1000000:
+        raise ValueError('Input too large')
+    headers = {'Accept':'application/json', 'Authorization':'Bearer '+token}
+    if data is not None:
+        headers['Content-Type'] = 'application/json'
+    request = Request(args.manager_url.rstrip('/') + path, data=data, headers=headers, method=method)
+    try:
+        with opener.open(request, timeout=15) as response:
+            body = response.read(2000001)
+            if len(body) > 2000000:
+                raise ValueError('Response too large')
+    except HTTPError as error:
+        raise ValueError('Manager returned HTTP ' + str(error.code)) from None
+    except (URLError, TimeoutError, OSError):
+        raise ValueError('Manager request did not complete; inspect history before retrying') from None
+    result = json.loads(body)
+    if not isinstance(result, dict) or not str(result.get('contract_version', '')).startswith('1.') or not isinstance(result.get('payload'), dict):
+        raise ValueError('Invalid Manager response')
+    return result['payload']
+
+
+def main():
+    parser = argparse.ArgumentParser(prog='30na')
+    categories = parser.add_subparsers(dest='category', required=True)
+    modules = categories.add_parser('modules')
+    module_commands = modules.add_subparsers(dest='action', required=True)
+    module_commands.add_parser('list')
+    run = module_commands.add_parser('run')
+    run.add_argument('module_id')
+    run.add_argument('--input', type=json_object, default={})
+    run.add_argument('--owner')
+    run.add_argument('--slot')
+    workers = categories.add_parser('workers')
+    workers.add_argument('--manager-url', default='https://localhost:18444')
+    workers.add_argument('--token-file', default='/etc/30na/customer-token')
+    workers.add_argument('--ca-file', default='/etc/30na/ca/trust.pem')
+    commands = workers.add_subparsers(dest='action', required=True)
+    commands.add_parser('list')
+    for name in ('get','enable','disable'):
+        commands.add_parser(name).add_argument('worker_id')
+    remove = commands.add_parser('delete')
+    remove.add_argument('worker_id')
+    remove.add_argument('--confirm-worker', required=True)
+    register = commands.add_parser('register')
+    register.add_argument('worker_id')
+    register.add_argument('--artifact-id', required=True)
+    register.add_argument('--artifact-hash', required=True)
+    register.add_argument('--entrypoint', required=True)
+    register.add_argument('--configuration', type=json_object, default={})
+    register.add_argument('--schedule', choices=('manual','interval'), default='manual')
+    register.add_argument('--interval', type=int)
+    configure = commands.add_parser('configure')
+    configure.add_argument('worker_id')
+    configure.add_argument('--configuration', type=json_object)
+    configure.add_argument('--schedule', choices=('manual','interval'))
+    configure.add_argument('--interval', type=int)
+    submit = commands.add_parser('run')
+    submit.add_argument('worker_id')
+    submit.add_argument('--input', type=json_object, default={})
+    submit.add_argument('--timeout', type=float, default=30)
+    submit.add_argument('--idempotency-key')
+    for name in ('status','cancel'):
+        commands.add_parser(name).add_argument('execution_id', type=UUID)
+    args = parser.parse_args()
+    try:
+        if args.category == 'modules':
+            if args.action == 'list':
+                result = {'modules': list_modules()}
+            else:
+                if bool(args.owner) != bool(args.slot):
+                    raise ValueError('--owner and --slot must be supplied together')
+                data = dict(args.input)
+                if args.owner and args.module_id not in ('counter','slot-note'):
+                    raise ValueError('Shared state is supported for counter and slot-note')
+                if args.owner:
+                    data.update(_state_owner=args.owner, _state_slot=args.slot)
+                result = run_module(args.module_id, data)
+        elif args.action == 'list':
+            result = worker_request(args, 'GET', '/api/v1/workers')
+        elif args.action in ('get','enable','disable','delete','register','configure','run'):
+            if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._:-]{0,127}', args.worker_id) or '..' in args.worker_id:
+                raise ValueError('Invalid worker ID')
+            path = '/api/v1/workers/' + quote(args.worker_id, safe='')
+            if args.action == 'get':
+                result = worker_request(args, 'GET', path)
+            elif args.action in ('enable','disable'):
+                result = worker_request(args, 'POST', path + '/' + args.action, {})
+            elif args.action == 'delete':
+                if args.confirm_worker != args.worker_id:
+                    raise ValueError('--confirm-worker must exactly match worker ID')
+                result = worker_request(args, 'DELETE', path)
+            elif args.action in ('register','configure'):
+                body = {}
+                if args.configuration is not None:
+                    body['configuration'] = args.configuration
+                if args.schedule is not None:
+                    if args.schedule == 'interval' and (args.interval is None or args.interval <= 0):
+                        raise ValueError('interval schedule requires a positive --interval')
+                    if args.schedule == 'manual' and args.interval is not None:
+                        raise ValueError('manual schedule does not accept --interval')
+                    body['schedule'] = {'kind':args.schedule, 'interval_seconds':args.interval}
+                elif args.interval is not None:
+                    raise ValueError('--interval requires --schedule interval')
+                if args.action == 'register':
+                    body.update(worker_id=args.worker_id, artifact_id=args.artifact_id,
+                                artifact_hash=args.artifact_hash, entrypoint=args.entrypoint)
+                    result = worker_request(args, 'POST', '/api/v1/workers', body)
+                else:
+                    if not body:
+                        raise ValueError('At least one configuration or schedule is required')
+                    result = worker_request(args, 'PATCH', path, body)
+            else:
+                if not math.isfinite(args.timeout) or not 0 < args.timeout <= 300:
+                    raise ValueError('Timeout must be greater than 0 and at most 300')
+                key = args.idempotency_key or str(uuid4())
+                if not key.strip() or len(key) > 256:
+                    raise ValueError('Invalid idempotency key')
+                print('Idempotency key: ' + key, file=sys.stderr)
+                result = worker_request(args, 'POST', path + '/executions',
+                    {'input_payload':args.input, 'timeout_seconds':args.timeout, 'idempotency_key':key})
+        else:
+            path = '/api/v1/executions/' + str(args.execution_id)
+            result = worker_request(args, 'POST', path + '/cancel', {}) if args.action == 'cancel' else worker_request(args, 'GET', path)
+        print(json.dumps(result, ensure_ascii=False, allow_nan=False))
+        return 0
+    except (ValueError, TypeError, KeyError, UnknownModule, OSError, sqlite3.Error) as error:
+        print('30na: ' + str(error), file=sys.stderr)
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

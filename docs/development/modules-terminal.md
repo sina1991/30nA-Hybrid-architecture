@@ -1,6 +1,6 @@
 # اجرای ماژول‌ها در ترمینال
 
-ماژول‌های trusted زیر مستقل از مرورگر و با Python اجرا می‌شوند. Dashboard برای عملیات آن‌ها، همان تابع `run` سمت سرور را از مسیر محدود `POST /api/modules/{module_id}/run` فراخوانی می‌کند. این مسیر فقط module IDهای صریح در `dashboard/modules/execution.py` را می‌پذیرد؛ اجرای فایل یا script دلخواه از طریق HTTP فراهم نشده است. Workerهای منتشرشده از مسیر جداگانه Manager/Runtime و Sandbox اجرا می‌شوند.
+ماژول‌های trusted زیر مستقل از مرورگر و با Python اجرا می‌شوند. Dashboard برای عملیات آن‌ها، همان تابع `run` سمت سرور را از مسیر محدود `POST /api/modules/{module_id}/run` فراخوانی می‌کند. این مسیر فقط module IDهای صریح در `modules/execution.py` را می‌پذیرد؛ اجرای فایل یا script دلخواه از طریق HTTP فراهم نشده است. Workerهای منتشرشده از مسیر جداگانه Manager/Runtime و Sandbox اجرا می‌شوند.
 
 روی سرور نصب‌شده ابتدا branch توسعه فعلی را با updater Dashboard منتقل کنید:
 
@@ -8,10 +8,10 @@
 bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-architecture/feat/dashboard-v0.1.1/scripts/deployment/update_dashboard.sh) feat/dashboard-v0.1.1
 ```
 
-ریشه فایل‌ها `/opt/30na/dashboard-current/units/consumers/dashboard-core/dashboard/modules/packages` است. متغیر زیر صرفاً برای کوتاه‌شدن فرمان‌های همین ترمینال است:
+ریشه فایل‌ها `/opt/30na/dashboard-current/modules` است. متغیر زیر صرفاً برای کوتاه‌شدن فرمان‌های همین ترمینال است:
 
 ```bash
-modules_dir=/opt/30na/dashboard-current/units/consumers/dashboard-core/dashboard/modules/packages
+modules_dir=/opt/30na/dashboard-current/modules
 python3 "$modules_dir/clock/clock.py" --timezone Asia/Tehran
 python3 "$modules_dir/calculator/module.py" --input '{"a":10,"b":5,"operation":"add"}'
 python3 "$modules_dir/counter/module.py" --input '{"value":4,"action":"increment"}'
@@ -23,6 +23,31 @@ python3 "$modules_dir/empty/module.py"
 ```
 
 ساعت متن ساده و سایر نمونه‌ها JSON برمی‌گردانند؛ خطای input با exit code غیرصفر و خطا در stderr است. `Dashboard Health` به `127.0.0.1:8020/health` وصل می‌شود و در صورت عدم دسترسی `unavailable` می‌دهد. برای برنامه‌نویسی، می‌توان تابع `run(data)` را در هر فایل فراخوانی کرد؛ `clock.py` علاوه بر `run` تابع `current_time` دارد.
+
+## CLI مشترک
+
+پس از update روی VPS، launcher با نام `30na` نصب می‌شود. ماژول‌ها و Workerها از همان منطق و API مشترک Dashboard استفاده می‌کنند:
+
+```bash
+30na modules list
+30na modules run clock --input '{"timezone":"Asia/Tehran"}'
+30na modules run calculator --input '{"a":10,"b":5,"operation":"add"}'
+30na workers list
+30na workers run demo-summary --input '{"values":[10,20,30]}'
+30na workers status EXECUTION_UUID
+30na workers cancel EXECUTION_UUID
+```
+
+CLI خروجی JSON می‌دهد. کلید idempotency اجرای Worker در stderr نمایش داده می‌شود؛ در نتیجه نامعلوم، پس از بررسی history می‌توان همان درخواست را با `--idempotency-key` و همان کلید تکرار کرد. برای ثبت Worker از `30na workers register --help` و برای configuration/lifecycle از `30na workers configure|enable|disable|delete --help` استفاده کنید. حذف به `--confirm-worker` برابر شناسه نیاز دارد. تنظیمات اتصال اختیاری `--manager-url`، `--token-file` و `--ca-file` پس از `workers` و پیش از زیر‌فرمان می‌آیند؛ مقدار token در argument قرار نمی‌گیرد. برای داده JSON از stdin می‌توان `--input -` استفاده کرد.
+
+برای state مشترک، CLI باید به فایل state متعلق به حساب سرویس دسترسی داشته باشد:
+
+```bash
+runuser -u 30na -- 30na modules run counter --owner customer --slot slot-04 --input '{"action":"increment"}'
+runuser -u 30na -- 30na modules run slot-note --owner customer --slot slot-04 --input '{"action":"get"}'
+```
+
+مسیرهای قدیمی `dashboard/modules/packages` به پوشه اصلی `modules/` اشاره می‌کنند تا دستورهای قبلی قابل استفاده بمانند؛ منطق و registry اصلی در ریشه مخزن قرار دارند.
 
 ## مثال ترکیب در اسکریپت
 
