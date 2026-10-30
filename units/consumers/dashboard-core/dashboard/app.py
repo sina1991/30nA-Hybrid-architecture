@@ -208,7 +208,7 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .slot[data-slot-type="fix-chart"] .market-graph {flex:1;min-height:200px}
 .slot[data-slot-type="fix-chart"] .market-chart {height:100%;min-height:200px}
 .slot[data-slot-type="fix-chart"] .market-price {font-size:15px}
-.slot[data-slot-type="fix-chart"] .market-legend {display:none}
+.slot[data-slot-type="fix-chart"] .market-legend {display:block;font-size:10px}
 .slot[data-slot-type="fix-chart"] .market-status:empty {display:none}
 #overview-grid .slot.layout-unlocked {outline:2px dashed var(--accent);outline-offset:2px}
 .slot-lock {border:1px solid var(--border);background:var(--field);color:var(--text);border-radius:7px;padding:5px 7px;cursor:pointer;font:inherit}
@@ -245,8 +245,10 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .market-indicator-empty {display:block;font-size:11px;color:var(--muted);padding:24px 8px 8px}
 .chart-slot {position:relative;min-height:400px;overflow:visible}
 .chart-slot .module-body {min-height:0}.chart-slot .market-graph {flex:1;min-height:180px}.chart-slot .market-chart {height:100%;min-height:180px}
+.signal-conditions {display:grid;gap:7px}.signal-condition {display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:4px}.signal-condition button {font:inherit;color:var(--text);background:var(--field);border:1px solid var(--border);border-radius:6px;cursor:pointer}
+.indicator-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:10px}.indicator-card {background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:12px;display:grid;gap:7px}.indicator-card label {display:grid;gap:3px;font-size:12px}.indicator-card input,.indicator-card select {width:100%;padding:6px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:6px;font:inherit}.indicator-card input[type="checkbox"] {width:auto}.indicator-card-actions {display:flex;flex-wrap:wrap;gap:6px}.indicator-card-actions button {padding:6px 9px;background:var(--field);border:1px solid var(--border);border-radius:6px;color:var(--text);cursor:pointer}
 .chart-context {position:absolute;top:8px;right:8px;z-index:6;display:grid;gap:4px;min-width:165px;padding:6px;background:var(--panel);border:1px solid var(--border);border-radius:8px;box-shadow:0 5px 20px #0007}
-.chart-context button {padding:7px 9px;background:var(--field);border:1px solid var(--border);border-radius:5px;color:var(--text);text-align:left;cursor:pointer;font:inherit}
+.chart-options-button {font:inherit;padding:4px 8px;border:1px solid var(--border);border-radius:6px;color:var(--text);background:var(--field);cursor:pointer}.chart-context button {padding:7px 9px;background:var(--field);border:1px solid var(--border);border-radius:5px;color:var(--text);text-align:left;cursor:pointer;font:inherit}
 .chart-move-handle {display:none;position:absolute;z-index:5;top:2px;left:50%;transform:translateX(-50%);background:var(--field);color:var(--accent);border:1px solid var(--accent);padding:3px 10px;border-radius:5px;font-size:11px;touch-action:none;cursor:grab}
 .chart-slot.layout-unlocked .chart-move-handle {display:block}
 .db-controls {display:flex;align-items:end;gap:8px;flex-wrap:wrap;margin-bottom:12px}
@@ -383,6 +385,8 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <button class="nav-button" type="button" data-nav="modules">Modules</button>
     <button class="nav-button" type="button" data-nav="workers">Workers</button>
     <button class="nav-button" type="button" data-nav="executions">Executions</button>
+    <button class="nav-button" type="button" data-nav="indicators">Indicators</button>
+    <button class="nav-button" type="button" data-nav="signals">Signal Scripts</button>
     <button class="nav-button" type="button" data-nav="database">Database</button>
     <button class="nav-button" type="button" data-nav="project">Project Info</button>
     <button class="nav-button" type="button" data-nav="account">Account &amp; Settings</button>
@@ -427,6 +431,15 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   </section>
   <section class="page-view" data-page="workers" hidden><h2 class="view-heading">Workers</h2><p class="view-description">Manage and run registered Workers.</p><p class="workspace-note" data-auth-note>Sign in to manage Workers.</p></section>
   <section class="page-view" data-page="executions" hidden><h2 class="view-heading">Executions</h2><p class="view-description">Review execution history and results.</p><p class="workspace-note" data-auth-note>Sign in to view executions.</p></section>
+  <section class="page-view" data-page="indicators" hidden>
+    <h2 class="view-heading">Indicators</h2><p class="view-description">Configure independent indicator instances for your charts and signals.</p>
+    <div class="db-controls"><label>Indicator<select id="indicator-new-type"><option value="sma">SMA</option><option value="rsi">RSI</option><option value="macd">MACD</option></select></label><button type="button" id="indicator-add">Add indicator</button><button type="button" id="indicator-refresh">Refresh</button></div>
+    <p id="indicator-status" class="market-status">Sign in to manage indicators.</p><div id="indicator-list" class="indicator-grid"></div>
+  </section>
+  <section class="page-view" data-page="signals" hidden>
+    <h2 class="view-heading">Signal Scripts</h2><p class="view-description">Build rules or run a published Python Worker with indicator inputs.</p>
+    <div id="signals-content"></div>
+  </section>
   <section class="page-view" data-page="database" hidden>
     <h2 class="view-heading">Market Database</h2><p class="view-description">Read-only view of XAUUSD candles and saved indicators.</p>
     <div class="db-controls"><label>Table<select id="db-table"><option value="candles_with_indicators">Candles + indicators</option><option value="candles">Candles</option><option value="indicator_values">Indicator values</option><option value="indicator_specs">Indicator settings</option><option value="collector_status">Collector status</option></select></label>
@@ -469,6 +482,8 @@ function openView(name) {
   document.body.classList.remove('nav-open');
   document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
   if (name === 'database') refreshDatabase();
+  if (name === 'indicators') refreshIndicatorProfiles();
+  if (name === 'signals') refreshSignals();
 }
 document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => openView(button.dataset.nav)));
 document.getElementById('account-shortcut').addEventListener('click', () => openView('account'));
@@ -529,6 +544,121 @@ document.getElementById('db-table').addEventListener('change', () => { databaseO
 document.getElementById('db-refresh').addEventListener('click', refreshDatabase);
 document.getElementById('db-prev').addEventListener('click', () => { databaseOffset = Math.max(0, databaseOffset - Number(document.getElementById('db-limit').value)); refreshDatabase(); });
 document.getElementById('db-next').addEventListener('click', () => { databaseOffset += Number(document.getElementById('db-limit').value); refreshDatabase(); });
+const indicatorDefaults = {sma:{period:20}, rsi:{period:14}, macd:{fast:12,slow:26,signal:9}};
+let indicatorProfiles = [];
+async function refreshIndicatorProfiles() {
+  const bridge = window.dashboardModuleState, status = document.getElementById('indicator-status');
+  if (!bridge?.ready()) { indicatorProfiles = []; document.getElementById('indicator-list').replaceChildren(); status.textContent = 'Sign in to manage indicators.'; return; }
+  try { indicatorProfiles = await bridge.listIndicatorProfiles(); if (!bridge.ready()) return; renderIndicatorProfiles(); status.textContent = `${indicatorProfiles.length} indicator instances`; }
+  catch (_) { status.textContent = 'Could not load indicator settings.'; }
+}
+function renderIndicatorProfiles() {
+  const list = document.getElementById('indicator-list'); list.replaceChildren();
+  indicatorProfiles.forEach(profile => {
+    const card = makeElement('article','indicator-card');
+    card.append(makeElement('strong','',profile.type.toUpperCase()));
+    const nameLabel = makeElement('label','','Name'); const name = makeElement('input',''); name.value = profile.name; name.maxLength = 80; nameLabel.append(name); card.append(nameLabel);
+    const inputs = {};
+    Object.entries(profile.parameters).forEach(([key,value]) => { const label = makeElement('label','',key.charAt(0).toUpperCase() + key.slice(1)); const input = makeElement('input',''); input.type = 'number'; input.min = '1'; input.max = '500'; input.step = '1'; input.value = String(value); label.append(input); card.append(label); inputs[key] = input; });
+    const enabledLabel = makeElement('label','','Enabled for charts and signals'); const enabled = makeElement('input',''); enabled.type = 'checkbox'; enabled.checked = profile.enabled; enabledLabel.prepend(enabled); card.append(enabledLabel);
+    const message = makeElement('div','market-status'); const actions = makeElement('div','indicator-card-actions');
+    const save = makeElement('button','','Save'); const duplicate = makeElement('button','','Duplicate'); const remove = makeElement('button','','Delete');
+    [save,duplicate,remove].forEach(button => { button.type = 'button'; actions.append(button); });
+    const values = () => ({name:name.value, type:profile.type, parameters:Object.fromEntries(Object.entries(inputs).map(([key,input]) => [key, Number(input.value)])), enabled:enabled.checked});
+    save.addEventListener('click', async () => { save.disabled = true; try { await window.dashboardModuleState.saveIndicatorProfile(profile.id, values()); await refreshIndicatorProfiles(); } catch (_) { message.textContent = 'Could not save. Check name and parameter values.'; } finally { save.disabled = false; } });
+    duplicate.addEventListener('click', async () => { duplicate.disabled = true; try { const config = values(); config.name += ' copy'; config.enabled = false; await window.dashboardModuleState.createIndicatorProfile(config); await refreshIndicatorProfiles(); } catch (_) { message.textContent = 'Could not duplicate indicator.'; } finally { duplicate.disabled = false; } });
+    remove.addEventListener('click', async () => { if (!window.confirm(`Delete ${profile.name}?`)) return; remove.disabled = true; try { await window.dashboardModuleState.deleteIndicatorProfile(profile.id); await refreshIndicatorProfiles(); } catch (_) { message.textContent = 'Could not delete indicator.'; } finally { remove.disabled = false; } });
+    card.append(actions,message); list.append(card);
+  });
+}
+document.getElementById('indicator-add').addEventListener('click', async () => {
+  const kind = document.getElementById('indicator-new-type').value;
+  try { await window.dashboardModuleState.createIndicatorProfile({name:kind.toUpperCase(),type:kind,parameters:{...indicatorDefaults[kind]},enabled:false}); await refreshIndicatorProfiles(); }
+  catch (_) { document.getElementById('indicator-status').textContent = 'Could not add indicator. Check account and instance limit.'; }
+});
+document.getElementById('indicator-refresh').addEventListener('click', refreshIndicatorProfiles);
+
+let signalRules = [];
+async function refreshSignals() {
+  const bridge = window.dashboardModuleState, root = document.getElementById('signals-content');
+  if (!bridge?.ready()) { root.textContent = 'Sign in to manage signal scripts.'; return; }
+  try {
+    const [profiles, rules, workers] = await Promise.all([bridge.listIndicatorProfiles(), bridge.listSignalRules(), bridge.signalWorkers().catch(() => ({workers:[]}))]);
+    if (!bridge.ready()) return;
+    indicatorProfiles = profiles; signalRules = rules; renderSignals(workers.workers || []);
+  } catch (_) { root.textContent = 'Could not load signal scripts or Workers.'; }
+}
+function renderSignals(workers) {
+  const root = document.getElementById('signals-content'); root.replaceChildren();
+  const section = makeElement('section','info-card'); section.append(makeElement('h3','','Rule Builder'));
+  section.append(makeElement('p','market-status','Enabled rules are evaluated about once a minute on closed candles. All conditions must match. No orders are placed.'));
+  const add = makeElement('button','chart-options-button','+ Add signal rule'); add.type = 'button';
+  const refresh = makeElement('button','chart-options-button','Refresh'); refresh.type = 'button'; refresh.addEventListener('click', refreshSignals);
+  const globalStatus = makeElement('p','market-status'); section.append(add, document.createTextNode(' '), refresh, globalStatus);
+  add.addEventListener('click', async () => {
+    const profile = indicatorProfiles[0]; if (!profile) { globalStatus.textContent = 'Add an indicator first.'; return; }
+    const field = profile.type === 'macd' ? 'macd' : 'value';
+    const rule = {name:'New signal',interval:'1m',enabled:false,signal:'BUY',conditions:[{left:profile.id,field,op:'gt',right_kind:'number',right:0,right_field:''}]};
+    try { await window.dashboardModuleState.createSignalRule(rule); await refreshSignals(); }
+    catch (_) { globalStatus.textContent = 'Could not add signal rule.'; }
+  });
+  const list = makeElement('div','indicator-grid');
+  const fieldsFor = profile => profile?.type === 'macd' ? ['macd','signal','histogram'] : ['value'];
+  const selectOptions = (select, values, value) => { select.replaceChildren(); values.forEach(([id,label]) => { const option = makeElement('option','',label); option.value = id; select.append(option); }); if (value !== undefined) select.value = value; };
+  signalRules.forEach(rule => {
+    const card = makeElement('article','indicator-card');
+    const nameLabel = makeElement('label','','Name'); const name = makeElement('input',''); name.value = rule.name; name.maxLength = 80; nameLabel.append(name); card.append(nameLabel);
+    const intervalLabel = makeElement('label','','Timeframe'); const interval = makeElement('select',''); selectOptions(interval,[['1m','1 minute'],['5m','5 minutes'],['15m','15 minutes']],rule.interval); intervalLabel.append(interval); card.append(intervalLabel);
+    const signalLabel = makeElement('label','','Signal when all conditions match'); const signal = makeElement('select',''); selectOptions(signal,[['BUY','BUY'],['SELL','SELL']],rule.signal); signalLabel.append(signal); card.append(signalLabel);
+    const enabledLabel = makeElement('label','','Enabled'); const enabled = makeElement('input',''); enabled.type='checkbox'; enabled.checked=rule.enabled; enabledLabel.prepend(enabled); card.append(enabledLabel);
+    const conditions = makeElement('div','signal-conditions'), conditionRows = [];
+    function addCondition(initial) {
+      const row = makeElement('div','signal-condition');
+      const left = makeElement('select',''), leftField = makeElement('select',''), op = makeElement('select',''), rightKind = makeElement('select',''), right = makeElement('select',''), rightField = makeElement('select',''), number = makeElement('input',''), remove = makeElement('button','','Remove condition');
+      number.type='number'; number.step='any'; number.value=initial?.right_kind === 'number' ? String(initial.right) : '0'; remove.type='button';
+      const options = indicatorProfiles.map(item => [item.id, item.name + (item.enabled ? '' : ' (disabled)')]);
+      selectOptions(left, options, initial?.left); selectOptions(right, options, initial?.right_kind === 'indicator' ? initial.right : undefined);
+      function fieldOptions(select, profileId, selected) { const profile = indicatorProfiles.find(item => item.id === profileId); selectOptions(select, fieldsFor(profile).map(field => [field,field]), selected); }
+      fieldOptions(leftField, left.value, initial?.field); fieldOptions(rightField, right.value, initial?.right_field);
+      left.addEventListener('change', () => fieldOptions(leftField,left.value)); right.addEventListener('change', () => fieldOptions(rightField,right.value));
+      selectOptions(op,[['gt','>'],['lt','<'],['gte','≥'],['lte','≤'],['crosses_above','crosses above'],['crosses_below','crosses below']],initial?.op);
+      selectOptions(rightKind,[['number','Number'],['indicator','Indicator']],initial?.right_kind);
+      function visibility() { number.hidden = rightKind.value !== 'number'; right.hidden = rightKind.value !== 'indicator'; rightField.hidden = right.hidden; }
+      rightKind.addEventListener('change', visibility); visibility();
+      remove.addEventListener('click', () => { row.remove(); const index=conditionRows.indexOf(read); if(index>=0) conditionRows.splice(index,1); });
+      const read = () => ({left:left.value,field:leftField.value,op:op.value,right_kind:rightKind.value,right:rightKind.value === 'number' ? Number(number.value) : right.value,right_field:rightKind.value === 'number' ? '' : rightField.value});
+      conditionRows.push(read); row.append(left,leftField,op,rightKind,number,right,rightField,remove); conditions.append(row);
+    }
+    rule.conditions.forEach(addCondition);
+    const addConditionButton = makeElement('button','chart-options-button','+ Condition'); addConditionButton.type='button'; addConditionButton.addEventListener('click', () => { if(conditionRows.length < 8) addCondition({op:'gt',right_kind:'number',right:0}); });
+    card.append(conditions,addConditionButton);
+    const result = makeElement('p','market-status',rule.latest ? `${rule.latest.signal} · ${rule.latest.reason || 'Conditions evaluated'} · ${new Date(rule.latest.evaluated_at * 1000).toLocaleString()}` : 'Awaiting evaluation'); card.append(result);
+    const actions = makeElement('div','indicator-card-actions'), save = makeElement('button','','Save'), evaluate = makeElement('button','','Evaluate now'), remove = makeElement('button','','Delete');
+    [save,evaluate,remove].forEach(button => {button.type='button';actions.append(button);}); card.append(actions);
+    save.addEventListener('click', async () => { save.disabled=true; try { await window.dashboardModuleState.saveSignalRule(rule.id,{name:name.value,interval:interval.value,enabled:enabled.checked,signal:signal.value,conditions:conditionRows.map(read => read())}); await refreshSignals(); } catch (_) { result.textContent='Could not save. Check the conditions.'; } finally { save.disabled=false; } });
+    evaluate.addEventListener('click', async () => { evaluate.disabled=true; try { const response=await window.dashboardModuleState.evaluateSignalRule(rule.id); result.textContent=JSON.stringify(response.result); } catch (_) { result.textContent='Could not evaluate signal.'; } finally { evaluate.disabled=false; } });
+    remove.addEventListener('click', async () => { if (!window.confirm(`Delete ${rule.name}?`)) return; try { await window.dashboardModuleState.deleteSignalRule(rule.id); await refreshSignals(); } catch (_) { result.textContent='Could not delete signal.'; } });
+    list.append(card);
+  });
+  section.append(list); root.append(section);
+  const python = makeElement('section','info-card'); python.style.marginTop='12px'; python.append(makeElement('h3','','Python Worker'));
+  python.append(makeElement('p','market-status','Run an enabled published Worker on demand in Sandbox with the latest closed candles and enabled indicator points. Manage Worker source and publication through the existing Worker workflow.'));
+  const example = makeElement('pre','module-json',`def run(input_payload, configuration):
+    indicators = input_payload["indicators"]
+    # Each item has id, name, type, parameters and points.
+    return {"signal": "WAIT", "indicators": len(indicators)}`); python.append(example);
+  const controls = makeElement('div','db-controls'), workerLabel = makeElement('label','','Enabled Worker'), worker = makeElement('select','');
+  selectOptions(worker, workers.filter(row => row.lifecycle === 'enabled').map(row => [row.definition.worker_id,row.definition.worker_id])); workerLabel.append(worker);
+  const tfLabel=makeElement('label','','Timeframe'), tf=makeElement('select',''); selectOptions(tf,[['1m','1 minute'],['5m','5 minutes'],['15m','15 minutes']]); tfLabel.append(tf);
+  const run=makeElement('button','','Run Python Worker'); run.type='button'; run.disabled=!worker.options.length;
+  const status=makeElement('p','market-status'); controls.append(workerLabel,tfLabel,run); python.append(controls,status);
+  run.addEventListener('click', async () => { run.disabled=true; status.textContent='Submitting…';
+    try { const response=await window.dashboardModuleState.executeSignalWorker(worker.value,tf.value,crypto.randomUUID()); status.textContent='Submitted. Review execution status in Executions: ' + JSON.stringify(response); }
+    catch (_) { status.textContent='Submission failed or outcome is unknown. Check Executions before retrying.'; }
+    finally { run.disabled=!worker.options.length; }
+  }); root.append(python);
+}
+
 function renderCatalog() {
   const catalog = document.getElementById('module-catalog');
   const query = document.getElementById('catalog-search').value.trim().toLowerCase();
@@ -701,14 +831,18 @@ function renderMarketModule(body, slot, module) {
   let shownIndicators = new Set(slot.chart_indicators || []), selectedTime = null, requestVersion = 0, pendingRefresh = false;
   let overlay = slot.chart_overlay !== false, includeOpen = slot.chart_live !== false, busy = false;
   let viewCount = 80, endOffset = 0, cachedData = null, olderCandles = [], olderPoints = [], olderBusy = false, noOlder = false;
-  let olderIndicators = {rsi:[], macd:[]};
+  let olderIndicators = {rsi:[], macd:[]}, olderSeries = {}, seriesSignature = null;
   function mergeHistory(data) {
+    const signature = JSON.stringify((data.series || []).map(item => [item.id,item.type,item.parameters]));
+    if (seriesSignature !== null && seriesSignature !== signature) { olderCandles = []; olderPoints = []; olderSeries = {}; olderIndicators = {rsi:[],macd:[]}; endOffset = 0; }
+    seriesSignature = signature;
     const merge = (older, newer) => {
       const byTime = new Map(); older.forEach(item => byTime.set(item.time, item)); newer.forEach(item => byTime.set(item.time, item));
       return [...byTime.values()].sort((a,b) => a.time - b.time);
     };
     return {...data, candles:merge(olderCandles, data.candles),
       indicators:Object.fromEntries(['rsi','macd'].map(name => [name, {...data.indicators?.[name], points:merge(olderIndicators[name], data.indicators?.[name]?.points || [])}])),
+      series:(data.series || []).map(item => ({...item, points:merge(olderSeries[item.id] || [], item.points)})),
       moving_average:{...data.moving_average, points:merge(olderPoints, data.moving_average?.points || [])}};
   }
   async function loadOlder() {
@@ -716,17 +850,19 @@ function renderMarketModule(body, slot, module) {
     if (!cachedData?.candles.length || !bridge?.ready() || olderBusy || noOlder) return;
     olderBusy = true; const version = requestVersion;
     try {
-      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1, interval, shownIndicators.size > 0);
+      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1, interval, module.type === 'gold-chart');
       if (version !== requestVersion || !body.isConnected || !bridge.ready()) return;
       const newCandles = data.candles.filter(item => item.time < oldest);
       if (!newCandles.length) { noOlder = true; status.textContent = 'No older candles in the local database.'; return; }
       olderCandles = [...newCandles, ...olderCandles]; olderPoints = [...(data.moving_average?.points || []), ...olderPoints];
       ['rsi','macd'].forEach(name => { olderIndicators[name] = [...(data.indicators?.[name]?.points || []), ...olderIndicators[name]]; });
+      (data.series || []).forEach(item => { olderSeries[item.id] = [...item.points, ...(olderSeries[item.id] || [])]; });
       endOffset += Math.max(1, Math.floor(viewCount / 3)); plot(mergeHistory(cachedData));
     } catch (_) { status.textContent = 'Could not load older candles.'; }
     finally { olderBusy = false; }
   }
   const toolbar = makeElement('div', 'market-toolbar');
+  if (slot.openOptions) { const options = makeElement('button', 'chart-options-button', 'Slot options'); options.type = 'button'; options.addEventListener('click', slot.openOptions); toolbar.append(options); }
   if (module.type === 'gold-chart') {
     const intervalLabel = makeElement('label', '', 'Timeframe');
     const intervalSelect = makeElement('select', ''); intervalSelect.setAttribute('aria-label', 'Chart timeframe');
@@ -743,17 +879,12 @@ function renderMarketModule(body, slot, module) {
   const overlayInput = makeElement('input', ''); overlayInput.type = 'checkbox'; overlayInput.checked = overlay; overlayLabel.prepend(overlayInput);
   const liveLabel = makeElement('label', '', 'Live candle');
   const liveInput = makeElement('input', ''); liveInput.type = 'checkbox'; liveInput.checked = includeOpen; liveLabel.prepend(liveInput);
-  toolbar.append(periodLabel);
-  if (module.type === 'gold-chart') toolbar.append(overlayLabel);
+  if (module.type !== 'gold-chart') toolbar.append(periodLabel);
   toolbar.append(liveLabel);
   const indicatorChecks = {};
   if (module.type === 'gold-chart') {
-    ['rsi','macd'].forEach(name => {
-      const label = makeElement('label', '', name.toUpperCase());
-      const input = makeElement('input', ''); input.type = 'checkbox'; input.checked = shownIndicators.has(name);
-      label.prepend(input); toolbar.append(label); indicatorChecks[name] = input;
-      input.addEventListener('change', () => saveOptions({chart_indicators:Object.keys(indicatorChecks).filter(key => indicatorChecks[key].checked)}));
-    });
+    const button = makeElement('button', 'chart-options-button', 'Indicators'); button.type = 'button';
+    button.addEventListener('click', () => openView('indicators')); toolbar.append(button);
   }
   if (module.type === 'gold-chart') {
     [['−','Zoom out'],['+','Zoom in'],['←','Older candles'],['→','Newer candles']].forEach(([symbol, title]) => {
@@ -807,7 +938,7 @@ function renderMarketModule(body, slot, module) {
     const selector = toolbar.querySelector('[aria-label="Chart timeframe"]'); if (selector) selector.value = interval;
     Object.keys(indicatorChecks).forEach(name => { indicatorChecks[name].checked = shownIndicators.has(name); });
     if (changed) {
-      requestVersion++; olderCandles = []; olderPoints = []; olderIndicators = {rsi:[], macd:[]}; noOlder = false; endOffset = 0;
+      requestVersion++; olderCandles = []; olderPoints = []; olderIndicators = {rsi:[], macd:[]}; olderSeries = {}; noOlder = false; endOffset = 0;
       status.textContent = cachedData ? 'Updating chart · showing previous data' : 'Loading market data…';
       refresh();
     } else if (overlayChanged && cachedData) plot(cachedData);
@@ -838,7 +969,9 @@ function renderMarketModule(body, slot, module) {
     const ns = 'http://www.w3.org/2000/svg', svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('viewBox', '0 0 800 260'); svg.setAttribute('preserveAspectRatio', 'none');
     svg.setAttribute('class', 'market-chart'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', `XAUUSD ${interval} candlestick chart`);
-    let low = Math.min(...candles.map(item => item.low)), high = Math.max(...candles.map(item => item.high));
+    const visibleTimes = new Set(candles.map(item => item.time));
+    const averageValues = (data.series || []).filter(item => item.type === 'sma').flatMap(item => item.points.filter(point => visibleTimes.has(point.time) && Number.isFinite(point.value)).map(point => point.value));
+    let low = Math.min(...candles.map(item => item.low), ...averageValues), high = Math.max(...candles.map(item => item.high), ...averageValues);
     const actualLow = low, actualHigh = high;
     if (high === low) { high += 1; low -= 1; }
     const padding = (high - low) * .06; high += padding; low -= padding;
@@ -862,11 +995,18 @@ function renderMarketModule(body, slot, module) {
       const title = document.createElementNS(ns, 'title'); title.textContent = `${new Date(candle.time * 1000).toISOString()} O ${candle.open} H ${candle.high} L ${candle.low} C ${candle.close}${candle.is_open ? ' (live)' : ''}`;
       rect.append(title); svg.append(wick, rect);
     });
-    if (overlay && points.length) {
+    if (module.type !== 'gold-chart' && overlay && points.length) {
       const positions = new Map(candles.map((candle, index) => [candle.time, index]));
       const coords = points.filter(point => positions.has(point.time) && Number.isFinite(point.value)).map(point => `${x(positions.get(point.time))},${y(point.value)}`).join(' ');
       const line = document.createElementNS(ns, 'polyline'); line.setAttribute('points', coords); line.setAttribute('fill', 'none'); line.setAttribute('stroke', '#f59e0b'); line.setAttribute('stroke-width', '2'); svg.append(line);
     }
+    const colors = ['#f59e0b','#38bdf8','#e879f9','#a3e635','#fb7185','#f97316'];
+    (data.series || []).filter(item => item.type === 'sma').forEach((series, index) => {
+      const positions = new Map(candles.map((candle, i) => [candle.time, i]));
+      const line = document.createElementNS(ns, 'polyline');
+      line.setAttribute('points', series.points.filter(point => positions.has(point.time) && Number.isFinite(point.value)).map(point => `${x(positions.get(point.time))},${y(point.value)}`).join(' '));
+      line.setAttribute('fill','none'); line.setAttribute('stroke',colors[index % colors.length]); line.setAttribute('stroke-width','2'); svg.append(line);
+    });
     [0, Math.floor((candles.length - 1) / 2), candles.length - 1].forEach((index, position) => {
       const label = document.createElementNS(ns, 'text'); label.setAttribute('x', x(index)); label.setAttribute('y', '247');
       label.setAttribute('text-anchor', position === 0 ? 'start' : position === 2 ? 'end' : 'middle'); label.setAttribute('fill', 'var(--muted)'); label.setAttribute('font-size', '10');
@@ -897,26 +1037,26 @@ function renderMarketModule(body, slot, module) {
     graph.replaceChildren(svg);
     renderPanes(data, candles);
     showCandle(candles.find(item => item.time === selectedTime) || last, data);
-    legend.textContent = `${interval} · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${overlay ? ` · SMA ${period} (orange)` : ''} · Live candle outlined`;
+    legend.textContent = `${interval} · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${(data.series || []).filter(item => item.type === 'sma').length ? ' · SMA: ' + (data.series || []).filter(item => item.type === 'sma').map((item,index) => item.name + ' (' + colors[index % colors.length] + ')').join(', ') : ''} · Live candle outlined`;
   }
   function showCandle(candle, data) {
     const stamp = new Date(candle.time * 1000).toISOString().replace('T', ' ').replace('.000Z', ' UTC');
-    const extra = [...shownIndicators].map(name => {
-      const point = data.indicators?.[name]?.points?.find(item => item.time === candle.time);
-      if (!point) return `${name.toUpperCase()} —`;
-      return name === 'rsi' ? `RSI ${Number(point.value).toFixed(2)}` : `MACD ${Number(point.macd).toFixed(3)} / Signal ${Number(point.signal).toFixed(3)} / Hist ${Number(point.histogram).toFixed(3)}`;
+    const extra = (data.series || []).map(series => {
+      const point = series.points.find(item => item.time === candle.time);
+      if (!point) return `${series.name} —`;
+      return series.type === 'macd' ? `${series.name} ${Number(point.macd).toFixed(3)} / Signal ${Number(point.signal).toFixed(3)} / Hist ${Number(point.histogram).toFixed(3)}` : `${series.name} ${Number(point.value).toFixed(2)}`;
     }).join(' · ');
-    const smaPoint = overlay ? data.moving_average?.points?.find(item => item.time === candle.time) : null;
-    candleInfo.textContent = `${stamp} · O ${candle.open}  H ${candle.high}  L ${candle.low}  C ${candle.close} · Vol ${candle.tick_volume ?? '—'}${candle.is_open ? ' · LIVE' : ''}${smaPoint ? ` · SMA ${Number(smaPoint.value).toFixed(2)}` : ''}${extra ? ' · ' + extra : ''}`;
+    candleInfo.textContent = `${stamp} · O ${candle.open}  H ${candle.high}  L ${candle.low}  C ${candle.close} · Vol ${candle.tick_volume ?? '—'}${candle.is_open ? ' · LIVE' : ''}${extra ? ' · ' + extra : ''}`;
   }
   function renderPanes(data, candles) {
     panes.replaceChildren();
     const ns = 'http://www.w3.org/2000/svg';
-    for (const name of shownIndicators) {
+    for (const series of (data.series || []).filter(item => item.type !== 'sma')) {
+      const name = series.type;
       const section = makeElement('div', 'market-indicator-pane');
-      section.append(makeElement('span', 'market-indicator-label', name === 'rsi' ? 'RSI 14' : 'MACD 12, 26, 9'));
+      section.append(makeElement('span', 'market-indicator-label', series.name));
       const svg = document.createElementNS(ns, 'svg'); svg.setAttribute('viewBox','0 0 800 90'); svg.setAttribute('preserveAspectRatio','none'); svg.setAttribute('role','img'); svg.setAttribute('aria-label', name.toUpperCase() + ' indicator');
-      const indexed = new Map((data.indicators?.[name]?.points || []).map(item => [item.time, item]));
+      const indexed = new Map((series.points || []).map(item => [item.time, item]));
       const points = candles.map((candle, index) => ({point:indexed.get(candle.time), index})).filter(item => item.point);
       if (!points.length) { section.append(makeElement('span', 'market-indicator-empty', 'Insufficient candles for this indicator')); panes.append(section); continue; }
       const values = name === 'rsi' ? [0,100] : points.flatMap(({point}) => [point.macd, point.signal, point.histogram, 0]).filter(Number.isFinite);
@@ -937,7 +1077,7 @@ function renderMarketModule(body, slot, module) {
     if (busy) { pendingRefresh = true; return; }
     busy = true; const version = requestVersion;
     try {
-      const data = await bridge.marketData(Math.max(500, period), period, includeOpen, null, interval, shownIndicators.size > 0);
+      const data = await bridge.marketData(Math.max(500, period), period, includeOpen, null, interval, module.type === 'gold-chart');
       if (version === requestVersion && body.isConnected && bridge.ready()) { noOlder = false; plot(mergeHistory(data)); }
     } catch (_) { if (version === requestVersion && body.isConnected) status.textContent = cachedData ? 'Update failed · showing previous data' : 'Market data is unavailable.'; }
     finally { busy = false; if (pendingRefresh && body.isConnected) { pendingRefresh = false; refresh(); } }
@@ -1419,6 +1559,7 @@ function makeChartSlot(row, area) {
   }
   const notice = makeElement('div', 'market-status'); notice.setAttribute('role', 'status');
   const menu = makeElement('div', 'chart-context'); menu.hidden = true;
+  slot.openOptions = () => { menu.hidden = !menu.hidden; };
   const pin = makeElement('button', '', row.overview ? 'Remove from Overview' : 'Add to Overview'); pin.type = 'button';
   pin.addEventListener('click', async () => { pin.disabled = true;
     try { await window.dashboardModuleState.setOverview(row.slot, !row.overview); slotGeneration++; await refreshActiveSlots(); }
@@ -1929,19 +2070,23 @@ def create_app(*, credential_path=None, upstream_factory=None):
         from .upstreams import create_router
         from .upstream_panel import ACCESS, PANEL
         from modules.slot_workers import SlotWorkerScheduler
+        from modules.signal_rules import SignalScheduler
         from market_data.collector import GoldCollector
         scheduler = SlotWorkerScheduler()
         gold_collector = GoldCollector()
+        signal_scheduler = SignalScheduler()
 
         @instance.on_event('startup')
         def start_slot_workers():
             scheduler.start()
             gold_collector.start()
+            signal_scheduler.start()
 
         @instance.on_event('shutdown')
         def stop_slot_workers():
             scheduler.stop()
             gold_collector.stop()
+            signal_scheduler.stop()
 
         instance.include_router(create_router(credential_path, upstream_factory))
 

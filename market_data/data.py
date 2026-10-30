@@ -239,6 +239,26 @@ def indicator(name, parameters, limit=200, include_open=True, end_time=None):
             'collector_error':status.get('error') or None, 'indicator_error':status.get('indicators_error') or None}
 
 
+def profile_series(profile, limit, include_open, end_time):
+    """Prefer stored indicator values; calculate on demand if the cache is full."""
+    try:
+        result = indicator(profile['type'], profile['parameters'], limit, include_open, end_time)
+        return {**profile, 'points':result['points'], 'storage':'database'}
+    except ValueError as exc:
+        if str(exc) != 'indicator configuration limit reached': raise
+    db = connect()
+    try:
+        conditions, args = [], []
+        if not include_open: conditions.append('is_open=0')
+        if end_time is not None: conditions.append('time<=?'); args.append(end_time)
+        rows = db.execute('SELECT time,open,high,low,close,tick_volume,is_open FROM candles ' +
+                          ('WHERE ' + ' AND '.join(conditions) + ' ' if conditions else '') + 'ORDER BY time', args)
+        candles = [{**dict(row), 'is_open':bool(row['is_open'])} for row in rows]
+    finally: db.close()
+    points = indicators.calculate(profile['type'], candles, profile['parameters'])
+    return {**profile, 'points':points[-limit:], 'storage':'on-demand'}
+
+
 def database_table(table, limit=50, offset=0, candle_state="all", indicator_name="all"):
     queries = {
         'candles_with_indicators': ('''SELECT c.time,c.open,c.high,c.low,c.close,c.tick_volume,c.is_open,
@@ -281,8 +301,10 @@ def database_table(table, limit=50, offset=0, candle_state="all", indicator_name
     return {'table':table, 'rows':rows, 'count':count, 'limit':limit, 'offset':offset}
 
 
-def chart(limit=200, period=20, include_open=True, end_time=None, interval='1m', include_indicators=False):
+def chart(limit=200, period=20, include_open=True, end_time=None, interval='1m', include_indicators=False, profiles=None):
     if type(include_indicators) is not bool: raise ValueError('invalid indicator option')
+    profiles = profiles or []
+    if not isinstance(profiles, list) or len(profiles) > 24: raise ValueError('invalid indicator profiles')
     if interval not in ('1m', '5m', '15m'):
         raise ValueError('invalid chart interval')
     if interval != '1m':
@@ -310,7 +332,7 @@ def chart(limit=200, period=20, include_open=True, end_time=None, interval='1m',
             where = 'WHERE time<=?' if end_time is not None else ''
             args = [end_time] if end_time is not None else []
             columns = 'time,open,high,low,close,tick_volume,is_open'
-            if include_indicators:
+            if include_indicators or profiles:
                 query = f'SELECT {columns} FROM candles {where} ORDER BY time'
             else:
                 query = f'SELECT * FROM (SELECT {columns} FROM candles {where} ORDER BY time DESC LIMIT ?) ORDER BY time'
@@ -334,6 +356,8 @@ def chart(limit=200, period=20, include_open=True, end_time=None, interval='1m',
         if include_indicators:
             result['indicators'] = {name:{'parameters':params, 'points':[point for point in indicators.calculate(name, bars, params) if point['time'] in times]}
                                     for name, params in indicators.CHART_DEFAULTS.items()}
+        if profiles:
+            result['series'] = [{**profile, 'points':[point for point in indicators.calculate(profile['type'], bars, profile['parameters']) if point['time'] in times]} for profile in profiles]
         return result
     data = snapshot(limit=limit, include_open=include_open, end_time=end_time)
     result = indicator('sma', {'period':period}, limit=limit, include_open=include_open, end_time=end_time)
@@ -341,4 +365,6 @@ def chart(limit=200, period=20, include_open=True, end_time=None, interval='1m',
     if include_indicators:
         data['indicators'] = {name:indicator(name, params, limit, include_open, end_time)
                               for name, params in indicators.CHART_DEFAULTS.items()}
+    if profiles:
+        data['series'] = [profile_series(profile, limit, include_open, end_time) for profile in profiles]
     return data

@@ -10,7 +10,7 @@ from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, ow
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
 from modules import slots
-from modules import slot_workers
+from modules import slot_workers, indicator_profiles, signal_rules
 from market_data.data import chart as gold_chart
 from market_data.data import indicator as market_indicator, database_table
 
@@ -54,13 +54,6 @@ def create_router(credential_path, upstream_factory):
         response.headers['Vary'] = 'Authorization'
         return response
 
-    @router.get('/{operation}')
-    def read(operation: str, request: Request, identity=Depends(owner)):
-        if operation not in routes:
-            raise HTTPException(404, 'Unsupported upstream operation')
-        name, path = routes[operation]
-        return forward(request, identity, name, 'GET', path)
-
     def worker_path(worker_id):
         try:
             identifier(worker_id)
@@ -75,13 +68,91 @@ def create_router(credential_path, upstream_factory):
                        include_open: bool = True, end_time: int | None = Query(default=None, ge=0),
                        interval: str = '1m', include_indicators: bool = False, identity=Depends(owner)):
         try:
-            result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time, interval=interval, include_indicators=include_indicators)
+            profiles = [profile for profile in indicator_profiles.list_profiles(identity) if profile['enabled']]
+            result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time, interval=interval, include_indicators=include_indicators, profiles=profiles if include_indicators else None)
         except (ValueError, OSError, sqlite3.Error):
             raise HTTPException(503, 'Market data is unavailable') from None
         response = JSONResponse(envelope(result))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
         return response
+
+    @router.get('/indicator-profiles')
+    def profile_list(identity=Depends(owner)):
+        return envelope({'profiles': indicator_profiles.list_profiles(identity)})
+
+    @router.post('/indicator-profiles')
+    def profile_create(body: dict, identity=Depends(owner)):
+        try: result = indicator_profiles.save(identity, body)
+        except (ValueError, TypeError): raise HTTPException(422, 'Invalid indicator configuration') from None
+        return envelope({'profile':result})
+
+    @router.put('/indicator-profiles/{profile_id}')
+    def profile_save(profile_id: str, body: dict, identity=Depends(owner)):
+        try: result = indicator_profiles.save(identity, body, profile_id)
+        except LookupError: raise HTTPException(404, 'Indicator not found') from None
+        except (ValueError, TypeError): raise HTTPException(422, 'Invalid indicator configuration') from None
+        return envelope({'profile':result})
+
+    @router.delete('/indicator-profiles/{profile_id}')
+    def profile_delete(profile_id: str, identity=Depends(owner)):
+        try: indicator_profiles.delete(identity, profile_id)
+        except LookupError: raise HTTPException(404, 'Indicator not found') from None
+        return envelope({'deleted':True})
+
+    @router.get('/signal-rules')
+    def signal_list(identity=Depends(owner)):
+        return envelope({'rules':[{**rule, 'latest':signal_rules.latest(identity, rule['id'])} for rule in signal_rules.list_rules(identity)]})
+
+    @router.post('/signal-rules')
+    def signal_create(body: dict, identity=Depends(owner)):
+        try: result = signal_rules.save(identity, body)
+        except (ValueError, TypeError, KeyError): raise HTTPException(422, 'Invalid signal rule') from None
+        return envelope({'rule':result})
+
+    @router.put('/signal-rules/{rule_id}')
+    def signal_save(rule_id: str, body: dict, identity=Depends(owner)):
+        try: result = signal_rules.save(identity, body, rule_id)
+        except LookupError: raise HTTPException(404, 'Signal not found') from None
+        except (ValueError, TypeError, KeyError): raise HTTPException(422, 'Invalid signal rule') from None
+        return envelope({'rule':result})
+
+    @router.delete('/signal-rules/{rule_id}')
+    def signal_delete(rule_id: str, identity=Depends(owner)):
+        try: signal_rules.delete(identity, rule_id)
+        except LookupError: raise HTTPException(404, 'Signal not found') from None
+        return envelope({'deleted':True})
+
+    @router.post('/signal-rules/{rule_id}/evaluate')
+    def signal_evaluate(rule_id: str, identity=Depends(owner)):
+        try: result = signal_rules.evaluate_and_save(identity, rule_id)
+        except LookupError: raise HTTPException(404, 'Signal not found') from None
+        except (ValueError, OSError, sqlite3.Error): raise HTTPException(503, 'Signal data unavailable') from None
+        return envelope({'result':result})
+
+    @router.post('/signal-workers/{worker_id}/executions', status_code=202)
+    def signal_worker(worker_id: str, body: dict, request: Request, identity=Depends(owner)):
+        if set(body) != {'interval', 'idempotency_key'} or body['interval'] not in ('1m','5m','15m') or not isinstance(body['idempotency_key'], str) or not 1 <= len(body['idempotency_key']) <= 256:
+            raise HTTPException(422, 'Invalid signal worker request')
+        try:
+            payload = signal_rules.market_input(identity, body['interval'])
+            latest_time = payload['candles'][-1]['time']
+            if any(not any(point['time'] == latest_time for point in item['points']) for item in payload['indicators']):
+                raise ValueError('indicator data is incomplete')
+            path = worker_path(worker_id) + '/executions'
+        except ValueError:
+            raise HTTPException(409, 'Indicator data unavailable') from None
+        except (OSError, sqlite3.Error):
+            raise HTTPException(503, 'Indicator data unavailable') from None
+        return forward(request, identity, 'worker-manager', 'POST', path,
+                       {'input_payload':payload, 'timeout_seconds':30, 'idempotency_key':body['idempotency_key']}, status=202)
+
+    @router.get('/{operation}')
+    def read(operation: str, request: Request, identity=Depends(owner)):
+        if operation not in routes:
+            raise HTTPException(404, 'Unsupported upstream operation')
+        name, path = routes[operation]
+        return forward(request, identity, name, 'GET', path)
 
     @router.get('/market/indicators/sma')
     def market_sma(limit: int = Query(default=200, ge=1, le=1000),

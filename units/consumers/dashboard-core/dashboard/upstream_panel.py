@@ -257,6 +257,17 @@ PANEL = r'''
         throw error;
       }
     },
+    async listIndicatorProfiles() { return (await this.slotRequest('indicator-profiles')).profiles; },
+    async createIndicatorProfile(profile) { return this.slotRequest('indicator-profiles', profile); },
+    async saveIndicatorProfile(id, profile) { return this.slotRequest('indicator-profiles/' + encodeURIComponent(id), profile, 'PUT'); },
+    async deleteIndicatorProfile(id) { return this.slotRequest('indicator-profiles/' + encodeURIComponent(id), undefined, 'DELETE'); },
+    async listSignalRules() { return (await this.slotRequest('signal-rules')).rules; },
+    async createSignalRule(rule) { return this.slotRequest('signal-rules', rule); },
+    async saveSignalRule(id, rule) { return this.slotRequest('signal-rules/' + encodeURIComponent(id), rule, 'PUT'); },
+    async deleteSignalRule(id) { return this.slotRequest('signal-rules/' + encodeURIComponent(id), undefined, 'DELETE'); },
+    async evaluateSignalRule(id) { return this.slotRequest('signal-rules/' + encodeURIComponent(id) + '/evaluate', {}); },
+    async signalWorkers() { return this.slotRequest('workers'); },
+    async executeSignalWorker(id, interval, key) { return this.slotRequest('signal-workers/' + encodeURIComponent(id) + '/executions', {interval, idempotency_key:key}); },
     async listSlots() { const result = await this.slotRequest('slots/active'); slotOwner = result.owner; return result.slots; },
     async marketData(limit, period, includeOpen, endTime = null, interval = '1m', indicators = false) {
       return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen) + '&interval=' + encodeURIComponent(interval) + '&include_indicators=' + String(indicators) + (endTime === null ? '' : '&end_time=' + encodeURIComponent(endTime)));

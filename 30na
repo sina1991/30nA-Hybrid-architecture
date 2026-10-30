@@ -18,6 +18,8 @@ from modules.execution import UnknownModule, run_module
 from modules.registry import list_modules
 from modules import slots
 from modules import slot_workers
+from modules import indicator_profiles, signal_rules
+from market_data.data import chart as market_chart
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -115,6 +117,21 @@ def main():
     slot_worker.add_argument('--kind', choices=('monitor', 'task'), default='task')
     slot_worker.add_argument('--interval', type=int, default=60)
     slot_worker.add_argument('--input', type=json_object, default={})
+    indicators = categories.add_parser('indicators')
+    indicators.add_argument('--owner', required=True)
+    indicator_commands = indicators.add_subparsers(dest='action', required=True)
+    indicator_commands.add_parser('list')
+    indicator_run = indicator_commands.add_parser('run')
+    indicator_run.add_argument('indicator_id')
+    indicator_run.add_argument('--interval', choices=('1m','5m','15m'), default='1m')
+    indicator_run.add_argument('--limit', type=int, default=200)
+    indicator_run.add_argument('--closed', action='store_true')
+    signals = categories.add_parser('signals')
+    signals.add_argument('--owner', required=True)
+    signal_commands = signals.add_subparsers(dest='action', required=True)
+    signal_commands.add_parser('list')
+    signal_evaluate = signal_commands.add_parser('evaluate'); signal_evaluate.add_argument('rule_id')
+    signal_input = signal_commands.add_parser('input'); signal_input.add_argument('--interval', choices=('1m','5m','15m'), default='1m')
     workers = categories.add_parser('workers')
     workers.add_argument('--manager-url', default='https://localhost:18444')
     workers.add_argument('--token-file', default='/etc/30na/customer-token')
@@ -168,6 +185,18 @@ def main():
                 if args.owner:
                     data.update(_state_owner=args.owner, _state_slot=args.slot)
                 result = run_module(args.module_id, data)
+        elif args.category == 'indicators':
+            if args.action == 'list': result = {'indicators':indicator_profiles.list_profiles(args.owner)}
+            else:
+                profile = next((item for item in indicator_profiles.list_profiles(args.owner) if item['id'] == args.indicator_id), None)
+                if profile is None: raise LookupError('indicator not found')
+                data = market_chart(interval=args.interval, limit=args.limit, include_open=not args.closed, profiles=[profile])
+                result = {'symbol':data['symbol'], 'interval':data['interval'], **data['series'][0],
+                          'last_success':data['last_success'], 'collector_error':data['collector_error']}
+        elif args.category == 'signals':
+            if args.action == 'list': result = {'rules':signal_rules.list_rules(args.owner)}
+            elif args.action == 'input': result = signal_rules.market_input(args.owner, args.interval)
+            else: result = signal_rules.evaluate_and_save(args.owner, args.rule_id)
         elif args.category == 'slots':
             if args.action == 'list': result = {'slots':slots.list_slots(args.owner)}
             elif args.action == 'read': result = slots.read(args.owner, args.slot_id)
