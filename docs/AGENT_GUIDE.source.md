@@ -142,6 +142,13 @@ node scripts/documentation/render_pdf.cjs
 
 DATA direct envelope، provisioning children در HTTP و propagation سرتاسری correlation هنوز کامل نیستند. OIDC/RBAC/MFA، quota مستقل owner، HA/distributed scheduling، automatic ambiguous retry، full pagination/retention/GC و native dependency در scope فعلی نیستند. نیاز تازه را قبل از implementation به معیار پذیرش روشن تبدیل کنید؛ در اصلاح کوچک، این مرزها را بی‌دلیل بازطراحی نکنید.
 
+## حساب‌های چندکاربره و Chat در شاخه توسعه
+
+- `modules/accounts.py` مالک account، Hash رمز با `scrypt`، محدودسازی ورود، Session و ابطال آن است. عملیات مدیریتی این لایه مجوز را خودش از HTTP استخراج نمی‌کند؛ `dashboard/upstreams.py` باید هویت و نقش Admin را اعمال کند. Token حساب `customer` موجود به همان owner قبلی متصل می‌ماند.
+- `modules/chat_store.py` گفت‌وگوی عمومی، درخواست خصوصی، پذیرش و کنترل عضویت را مستقل از مرورگر نگه می‌دارد. `modules/chat-box/module.py` و APIهای `/api/upstreams/chat/...` از همین منطق استفاده می‌کنند. صاحب پیام هرگز از body HTTP دریافت نمی‌شود.
+- `scripts/deployment/sync_account_credentials.py`، به‌وسیله `30na-account-sync.timer` با دسترسی root، برای هر owner Credential جدا در فایل‌های Manager/Runtime/CODE ایجاد می‌کند. Dashboard فقط Credential همان owner را به upstream می‌فرستد. غیرفعال‌کردن Session فوری است؛ ابطال Credential داخلی تا نوبت بعدی timer تأخیر دارد و اجرای در حال انجام ممکن است ادامه یابد.
+- تأیید محلی: `tests/test_accounts_chat.py`، `tests/test_account_chat_api.py`، `tests/test_account_provisioning.py` و `tests/test_account_chat_browser.py`. پذیرش واقعی Installer، timer و Sandbox روی VPS آزمایشی جداگانه لازم است. [راهنمای راه‌اندازی](deployment/multiuser-chat.md).
+
 ## پیوست تولیدشده: قراردادها و مرجع کامل کد
 
 بخش بعد تمام YAMLهای قرارداد، موجودی فایل، SHA-256، lookupهای env، CLIها، literal errorها، DDLها، class/function/method signatureها و HTTP schemaها را از همین checkout در خود دارد. پیاده‌سازی JavaScript و shell در inventory مشخص است؛ AST توابع مربوط به Python است. این index تحلیل dynamic dispatch، reflection، runtime value و semantic approval قرارداد نیست.

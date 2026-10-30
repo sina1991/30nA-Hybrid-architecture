@@ -102,3 +102,29 @@ python3 /opt/30na/dashboard-current/modules/disk-usage/module.py --input '{"path
 Replace `system-monitor` in the direct path with any module ID listed above. Network figures are cumulative interface counters; CPU is sampled briefly. Process counts, CPU and memory cover only processes visible to the executing user. A container or systemd sandbox may restrict what the service can see. Alerts are evaluated only when the module runs; they do not schedule background checks or send notifications.
 
 Dashboard slot execution runs under the Dashboard service account. Its host monitor owners are restricted by `THIRTYNA_MONITOR_OWNERS` (comma-separated, default `customer`). `THIRTYNA_MONITOR_DISK_PATHS` is a colon-separated exact-path allowlist (default `/`); `THIRTYNA_MONITOR_SERVICES` is a comma-separated list (default `nginx.service,docker.service`). Log Viewer requires an administrator-controlled colon-separated `THIRTYNA_MONITOR_LOG_PATHS` allowlist and ordinary read permission; it reads at most the last 256 KiB. Docker Monitor is disabled unless `THIRTYNA_MONITOR_DOCKER=1` is set for the executing environment, and it uses only that user's existing Docker access. Docker socket access can grant broad control of the daemon; do not grant it merely to make monitoring work. These variables must be configured separately for the Dashboard service and terminal process if both need the same access. Use trusted, administrator-controlled paths; never add credential or secret files to the log allowlist.
+
+## Chat Box و حساب کاربری (شاخه توسعه)
+
+این بخش در شاخه `feat/multiuser-chat` در حال توسعه است و هنوز برای انتشار روی VPS تأیید نشده است. پس از راه‌اندازی حساب، ورود Terminal بدون قرار دادن Password در command history انجام می‌شود:
+
+```bash
+30na account login --username alice
+30na chat rooms
+30na chat users
+30na chat requests
+30na chat messages public
+30na chat send public --text 'Hello'
+30na chat invite user-USER_ID
+30na chat respond request-REQUEST_ID accept
+30na account logout
+```
+
+`login`، Password را بدون نمایش دریافت می‌کند و Session را در فایل خصوصی `~/.config/30na/session-token` ذخیره می‌کند. برای سرور محلی از آدرس `https://localhost:18446` و CA نصب‌شده استفاده می‌شود؛ گزینه‌های `--dashboard-url`، `--ca-file` و `--token-file` پیش از نام عملیات قابل تنظیم هستند. شناسه واقعی دریافت‌کننده و درخواست را از خروجی `users` و `requests` بردارید.
+
+Module مستقل نیز برای استفاده توسط اپراتور مورد اعتماد سیستم و با مجوز فایل‌های state قابل اجراست:
+
+```bash
+python3 /opt/30na/dashboard-current/modules/chat-box/module.py --owner USER_ID --slot SLOT_ID --input '{"action":"read","room":"public"}'
+```
+
+این مسیر محلی به دسترسی سیستم‌عامل به state متکی است؛ برای استفاده کاربران از Terminal، دستورات `30na account` و `30na chat` از API احراز هویت‌شده استفاده می‌کنند. Chat خصوصی فقط پس از پذیرش درخواست و برای اعضای همان اتاق قابل خواندن است. پیام‌ها در سرور ذخیره می‌شوند و End-to-End Encryption ندارند.

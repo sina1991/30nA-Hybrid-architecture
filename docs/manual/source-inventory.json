@@ -61,6 +61,21 @@
       "--manager-token-file"
     ],
     [
+      "scripts/deployment/seed_sample_workers.py",
+      61,
+      "--code-url"
+    ],
+    [
+      "scripts/deployment/seed_sample_workers.py",
+      62,
+      "--manager-url"
+    ],
+    [
+      "scripts/deployment/seed_sample_workers.py",
+      63,
+      "--token-file"
+    ],
+    [
       "scripts/development/data_manager_server.py",
       13,
       "--database"
@@ -236,14 +251,74 @@
     ],
     [
       "DASHBOARD_MODULE_STATE_DIR",
+      "market_data/data.py",
+      16,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/accounts.py",
+      22,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/accounts.py",
+      191,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/chat_store.py",
+      20,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
       "modules/module_state.py",
       14,
       "optional lookup"
     ],
     [
       "DASHBOARD_MODULE_STATE_DIR",
+      "modules/signal_rules.py",
+      128,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/signal_rules.py",
+      170,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/slot_workers.py",
+      79,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/slot_workers.py",
+      146,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
       "modules/slots.py",
-      37,
+      50,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/slots.py",
+      61,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      49,
       "optional lookup"
     ],
     [
@@ -333,13 +408,13 @@
     [
       "TERM",
       "terminal_ui.py",
-      22,
+      26,
       "optional lookup"
     ],
     [
       "TERM",
       "terminal_ui.py",
-      104,
+      108,
       "optional lookup"
     ],
     [
@@ -363,7 +438,7 @@
     [
       "THIRTYNA_MONITOR_OWNERS",
       "modules/slots.py",
-      14,
+      16,
       "optional lookup"
     ],
     [
@@ -999,9 +1074,9 @@
       "sha256": "0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e"
     },
     {
-      "bytes": 11649,
+      "bytes": 20177,
       "path": "30na",
-      "sha256": "5b0d2274cb1ba60f3394927e908a29c5bdcf25bf51ad1c6053eca07c5e00d9e6"
+      "sha256": "273a9019ec0a2dd1b8ecb555604ef892cab994c0705692217885368f526e29dd"
     },
     {
       "bytes": 2124,
@@ -1027,6 +1102,11 @@
       "bytes": 1866,
       "path": "SECURITY.md",
       "sha256": "341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655"
+    },
+    {
+      "bytes": 10,
+      "path": "VERSION",
+      "sha256": "7525ba28ee62a019271ebef84a089438f0487030bcba611022f6bed9dee1b40e"
     },
     {
       "bytes": 4234,
@@ -1249,6 +1329,16 @@
       "sha256": "d491bfd8a98c9fb7ace8a825043775129c5db9b193f83ec4260586a8c71b0802"
     },
     {
+      "bytes": 655,
+      "path": "deployment/systemd/30na-account-sync.service",
+      "sha256": "cd2defd98c3272dcb46b1e67aeb801877bae5de8ceb49e742b1e9d6b24a48166"
+    },
+    {
+      "bytes": 210,
+      "path": "deployment/systemd/30na-account-sync.timer",
+      "sha256": "dcfeb8816598de7cbb8bd8c05e6329476a2bf0d986503566bfad1097eb6e46ba"
+    },
+    {
       "bytes": 840,
       "path": "deployment/systemd/30na-code-manager.service",
       "sha256": "595bb8311728b0f10aa4695992cad683ca78847d8dfa4c09e551d7035f001488"
@@ -1284,14 +1374,99 @@
       "sha256": "17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f"
     },
     {
-      "bytes": 15266,
+      "bytes": 0,
+      "path": "examples/sample-clock/tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 282,
+      "path": "examples/sample-clock/tests/test_worker.py",
+      "sha256": "f6a14ee7ee2347ec068b5340d0869e311a299a95dbf05b21ef0befc2bc2aef19"
+    },
+    {
+      "bytes": 279,
+      "path": "examples/sample-clock/worker.py",
+      "sha256": "fbd09ea03d53339d0bc56dc52d8981321ee74c68436d880fbcd25271100ad414"
+    },
+    {
+      "bytes": 0,
+      "path": "examples/sample-math/tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 338,
+      "path": "examples/sample-math/tests/test_worker.py",
+      "sha256": "dfa3f07fb7aabf1c6dedcc97ccece5d9835386ad42cdf59eff2aca274a783fbf"
+    },
+    {
+      "bytes": 856,
+      "path": "examples/sample-math/worker.py",
+      "sha256": "2b4817cb68dfc0f30da5d97e2a7c9961214186c9549b71779f4170a99434eab6"
+    },
+    {
+      "bytes": 0,
+      "path": "examples/sample-text/tests/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 335,
+      "path": "examples/sample-text/tests/test_worker.py",
+      "sha256": "faca1d30bf7b472fa9b7d63189aeea25556edb8573fec9de09fc6bbeaf5eccfa"
+    },
+    {
+      "bytes": 570,
+      "path": "examples/sample-text/worker.py",
+      "sha256": "cef255818e1e6fb58a36ab09e135390b4f0d07c24617b1f314addfaaebf64276"
+    },
+    {
+      "bytes": 15408,
       "path": "install.sh",
-      "sha256": "834aff84e6ea0366d782f902b9bcda057b2d7f290b6c1c2b48cd8888bac39b52"
+      "sha256": "5622bffacee91d3262bb66bc171a401dceed51ba692d3c20b2ebb7025d0a8ad7"
+    },
+    {
+      "bytes": 53,
+      "path": "market_data/__init__.py",
+      "sha256": "3817c4d1ed64d67f252f75fdfa0abb3fa353a503620f170a34fd0a117e69d334"
+    },
+    {
+      "bytes": 3684,
+      "path": "market_data/collector.py",
+      "sha256": "0a747940fdaec46f3b8349a2f2d3d069cb1154ebbca5d2f4d7bda111026b222b"
+    },
+    {
+      "bytes": 22654,
+      "path": "market_data/data.py",
+      "sha256": "ed54271d5c581b52617377f867a8d3a9c3c48ef1f33e57cfa61cbcbd42e1ced7"
+    },
+    {
+      "bytes": 616,
+      "path": "market_data/indicators/__init__.py",
+      "sha256": "0ba4f37390e51fc6ad37f8784c339e2a897ffa3bad6aaa6800d9307be4336191"
+    },
+    {
+      "bytes": 1592,
+      "path": "market_data/indicators/macd.py",
+      "sha256": "c817cdb5290b2692ca7c1decc2b422c4c73643560d77f2208471a7c19cf44fb9"
+    },
+    {
+      "bytes": 1205,
+      "path": "market_data/indicators/rsi.py",
+      "sha256": "0790e829cd8aed8c0e3699de300b97e5a44a261feb85c3546227e440ef646696"
+    },
+    {
+      "bytes": 1017,
+      "path": "market_data/indicators/sma.py",
+      "sha256": "c7c8abef1358c3bb19425fa43328fc4c927049100d864212e6f15917c50111e6"
     },
     {
       "bytes": 55,
       "path": "modules/__init__.py",
       "sha256": "884e080626de6c419827b873df812d991d6b73c2c2fd5419a5b019583eb8e059"
+    },
+    {
+      "bytes": 9969,
+      "path": "modules/accounts.py",
+      "sha256": "3a6b2b60afa549b1291e2594e21a3f0d857756715d071b22e66d4046cc674227"
     },
     {
       "bytes": 160,
@@ -1312,6 +1487,21 @@
       "bytes": 1033,
       "path": "modules/calculator/module.py",
       "sha256": "88256927623eec9529c986f7543aa179e55349b517574d44dc8f818836de18c8"
+    },
+    {
+      "bytes": 150,
+      "path": "modules/chat-box/manifest.json",
+      "sha256": "10429340f56d582794adc6f252cc7235cf862023a773dfd98b270d4acb33ff58"
+    },
+    {
+      "bytes": 1122,
+      "path": "modules/chat-box/module.py",
+      "sha256": "41df328162f831e882e9592bbc6fa24d883e795e3112745d4c4d7b7d2a906969"
+    },
+    {
+      "bytes": 7264,
+      "path": "modules/chat_store.py",
+      "sha256": "d821d3cf7aaedb47aff533894a06a941dcc2114517eefcb234e54f5ebccaf1a2"
     },
     {
       "bytes": 794,
@@ -1384,14 +1574,29 @@
       "sha256": "18663f5ed9b09efec95efd6aa3a632844f076aea9e3cbeb3fc15da3f6ca961c9"
     },
     {
-      "bytes": 1834,
+      "bytes": 2085,
       "path": "modules/execution.py",
-      "sha256": "097566eae47b40809755551145abe3c1a0ea4d7493b5685263430db0b08e7df9"
+      "sha256": "e6c5a916b2c286668abd8c9721211af67a78d8bcfe811a3e26a22e9bc9d4f0cd"
+    },
+    {
+      "bytes": 198,
+      "path": "modules/gold-chart/manifest.json",
+      "sha256": "9be1ef05655de7dc910270785e2c0b0f82b1d6a65f5e0795326ebb2df1f48942"
+    },
+    {
+      "bytes": 822,
+      "path": "modules/gold-chart/module.py",
+      "sha256": "08a0986abc0636ad38b4bf58859088816f9b29a918a6ed7fe47522dbea27bed4"
     },
     {
       "bytes": 8410,
       "path": "modules/host_monitor.py",
       "sha256": "cc76c577110d8acc5a0e7c30b8fa759e96be91812cfbaedfaff0e49a727e12a6"
+    },
+    {
+      "bytes": 2161,
+      "path": "modules/indicator_profiles.py",
+      "sha256": "1688916f16d805cda4b9ee5d90de1c76054388329a6cdd2d7588cfd3efe302b7"
     },
     {
       "bytes": 163,
@@ -1404,6 +1609,16 @@
       "sha256": "0a490f3a6644d9f158b7abd2adad4f63baec04b17b0f19680671e4480f18efc3"
     },
     {
+      "bytes": 151,
+      "path": "modules/macd/manifest.json",
+      "sha256": "42049c3fb84c9e437ff67c79a1657971a43dc6e1b427217e76f5b845199379a9"
+    },
+    {
+      "bytes": 967,
+      "path": "modules/macd/module.py",
+      "sha256": "8ff6c9b3fcd17e247fd9e9f52a610404fd9880bfad2e633e378e86839faabe42"
+    },
+    {
       "bytes": 1543,
       "path": "modules/module_state.py",
       "sha256": "0b24fbd1ea8fe464e1bed8a9833e4351762644e2eb5de71a2b48f7035edce93a"
@@ -1412,6 +1627,16 @@
       "bytes": 1349,
       "path": "modules/module_support.py",
       "sha256": "0c670fd5d6e6900321909f5af8bebcb8cdb8db747696eebc42ca1358942b1431"
+    },
+    {
+      "bytes": 198,
+      "path": "modules/moving-average/manifest.json",
+      "sha256": "77490e0affb550cc4e4a722cd34c02005ba6b8a780ef5e93b3f64b40657f3c5b"
+    },
+    {
+      "bytes": 933,
+      "path": "modules/moving-average/module.py",
+      "sha256": "cb4426dfd02522e3db5ddb775db16120cf870eaad46c616261051daed6ecc671"
     },
     {
       "bytes": 177,
@@ -1434,9 +1659,19 @@
       "sha256": "a6d553bad61ab7fb92bfeca8383aabd131dacd1ecbd5233bbc72f54c2f48378b"
     },
     {
-      "bytes": 3412,
+      "bytes": 3488,
       "path": "modules/registry.py",
-      "sha256": "b18b7cda2a1678f41a5fc2abc569b5e8a171b6b74604c75d7df403570ff295ba"
+      "sha256": "408d4e2a8679be6f7858b13cc6585edabdb6286f5da52e6d8949b71dc61fd7bc"
+    },
+    {
+      "bytes": 144,
+      "path": "modules/rsi/manifest.json",
+      "sha256": "9a37fdba13fba5890becb0d02bf13c3ab3354a04dd2e6de10a3571bc5fd434c9"
+    },
+    {
+      "bytes": 930,
+      "path": "modules/rsi/module.py",
+      "sha256": "ab2fb19594580420b9616415700960cf107b56d679adbf6c4357b1a752ecdc70"
     },
     {
       "bytes": 187,
@@ -1449,6 +1684,11 @@
       "sha256": "57d93d44f8007d8e7816453f1d47f7388527e53f94eabb67f400b8b2fb5aa676"
     },
     {
+      "bytes": 9666,
+      "path": "modules/signal_rules.py",
+      "sha256": "7a74b9fbc599f183a4a62bc72fd82df4e974a574d2e26960c3456e045f74497c"
+    },
+    {
       "bytes": 186,
       "path": "modules/slot-note/manifest.json",
       "sha256": "f4b599ff9d1ca2a7e6175cfec3d779ed9ae8d26d4ee4ff30861d38fb41e659cf"
@@ -1459,9 +1699,14 @@
       "sha256": "3cdc5fe1b4abf488de8aa800c4f81259bb28f2706e5ae18499ed07b1b61a9355"
     },
     {
-      "bytes": 3916,
+      "bytes": 9406,
+      "path": "modules/slot_workers.py",
+      "sha256": "0ed77c14d28a223c61bec5e9014c997de0929d6087abacd61ed95b29f903c190"
+    },
+    {
+      "bytes": 20179,
       "path": "modules/slots.py",
-      "sha256": "29a81f53821ab6253c056225a958043f2983b301f1b3188748bd4e96fa6763d4"
+      "sha256": "0184c5d09772136d0483303098d29d26019b6123f93868ece663ee179983bf3a"
     },
     {
       "bytes": 182,
@@ -1479,24 +1724,24 @@
       "sha256": "1c9e029abcc9f1dd8236d68d45356599ba085a4c362bd0b57884f605115374d0"
     },
     {
-      "bytes": 842,
+      "bytes": 907,
       "path": "modules/theme-summary/module.py",
-      "sha256": "310834952e466f96553fb014e0b8d45e551757a3baecb4433598f8e2cea52890"
+      "sha256": "3816fa9e8d789d856faf2ca612ad2f0804377d42cd47b98b7ea523c3a1baaa79"
     },
     {
-      "bytes": 701,
-      "path": "modules/theme-summary/themes/compact-6.json",
-      "sha256": "ae0ea5e577c3455e1e5186426078b92ba4a71c2c4407c28c426ae14e1c1e5475"
+      "bytes": 367,
+      "path": "modules/theme-summary/themes/daylight.json",
+      "sha256": "82eae6ddc20bb89125cfb1b30f482a065c09fca054c9d5033f53f58dc1215179"
     },
     {
-      "bytes": 897,
-      "path": "modules/theme-summary/themes/standard-8.json",
-      "sha256": "5eca7faeff243bd66d0d543f9abd3cf8cb546d3ba9a0255fe6be2fc25962861a"
+      "bytes": 362,
+      "path": "modules/theme-summary/themes/forest.json",
+      "sha256": "50c438dcf6a4fe9a021f24e5796ab825237c61908c7fa108725f29267be543a2"
     },
     {
-      "bytes": 1284,
-      "path": "modules/theme-summary/themes/wide-12.json",
-      "sha256": "10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048"
+      "bytes": 366,
+      "path": "modules/theme-summary/themes/midnight.json",
+      "sha256": "7781c016ac10996f7b69340c1b50fd6e1ddee61e9cc322c6fe1b6ceb10538850"
     },
     {
       "bytes": 191,
@@ -1549,9 +1794,19 @@
       "sha256": "f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20"
     },
     {
-      "bytes": 4523,
+      "bytes": 3711,
+      "path": "scripts/deployment/seed_sample_workers.py",
+      "sha256": "6fb96d6dc0423a2db716142a2461d5590745d6fdf15d52ae8c8cb7a3721d84ba"
+    },
+    {
+      "bytes": 9728,
+      "path": "scripts/deployment/sync_account_credentials.py",
+      "sha256": "cec67692dc01cedb413d443e599e139702a7d89a7c7c22f6f3b67ec942c99fa5"
+    },
+    {
+      "bytes": 6167,
       "path": "scripts/deployment/update_dashboard.sh",
-      "sha256": "40fa85bd7e4886a9a5b2ab7b93eec98ab0e743ae8120b39d09439cad63732eb6"
+      "sha256": "b165da6cceb04b6fb8eda606308c3f414de073bb1beb1baf98ee27c149b126e7"
     },
     {
       "bytes": 3205,
@@ -1604,9 +1859,29 @@
       "sha256": "e456246359b97e4c27138eba8ebace0b81a838d30600ef0b4e867173eab2afa2"
     },
     {
-      "bytes": 21800,
+      "bytes": 22223,
       "path": "terminal_ui.py",
-      "sha256": "f106f9ba8568fc0830770cc169244510acc3984e2daa891548c0d67d4c1ca9db"
+      "sha256": "80e21fb985fdf4e8a622ff6384182dc9a81d0d9118e15ddb9d1bff00c61f4db3"
+    },
+    {
+      "bytes": 8755,
+      "path": "tests/test_account_chat_api.py",
+      "sha256": "34f36c514334a35b1438b1f33e8a696a9f86f279741911bed02c6ecffc4616aa"
+    },
+    {
+      "bytes": 923,
+      "path": "tests/test_account_chat_browser.py",
+      "sha256": "eeaf3a954269fcbcf57000dc645362090f30fb6cadf7fbbf2e8e161a8a3b79c6"
+    },
+    {
+      "bytes": 11536,
+      "path": "tests/test_account_provisioning.py",
+      "sha256": "662e4d2ed7de4fda8bdd53325ffa3c8b28ddff88ecf2abc36121c6031acb87d4"
+    },
+    {
+      "bytes": 5328,
+      "path": "tests/test_accounts_chat.py",
+      "sha256": "aa209ce5608616ee6f918f35723e2614c9c757b1491a511594a0ff42b24f9f6e"
     },
     {
       "bytes": 2220,
@@ -1759,14 +2034,19 @@
       "sha256": "f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496"
     },
     {
-      "bytes": 10421,
-      "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "fa6857b22aa71029f936334b83d2073c08088dec6bd9c4af85f0d6680d91b68e"
+      "bytes": 5477,
+      "path": "units/consumers/dashboard-core/browser-tests/accounts_chat.cjs",
+      "sha256": "fca4c960cd1a538ffe54a47ab757e7e76719266868b07354547e6c1bad177fc0"
     },
     {
-      "bytes": 1610,
+      "bytes": 11423,
+      "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
+      "sha256": "827955fd672363a90ea467576e7d234fa6798d08ab3fe77c8459382d47525191"
+    },
+    {
+      "bytes": 1242,
       "path": "units/consumers/dashboard-core/browser-tests/layout.cjs",
-      "sha256": "0eea28bbe25519a5668c8e2ef224d1b934c3d769d4060b44c824809a444c6547"
+      "sha256": "399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc"
     },
     {
       "bytes": 3475,
@@ -1789,9 +2069,9 @@
       "sha256": "df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048"
     },
     {
-      "bytes": 33442,
+      "bytes": 172468,
       "path": "units/consumers/dashboard-core/dashboard/app.py",
-      "sha256": "03e5c09b9e376b6a212e08129f8cc81402c818c280a2728ac1f94deb1b4c223b"
+      "sha256": "e6f687316c6674a1ffa581ec60903dbfa5afe577499c23c1c4d907ba2c7b9bea"
     },
     {
       "bytes": 41,
@@ -1824,19 +2104,19 @@
       "sha256": "3cb7072b852490b9539315bc26d695448049bd26e946226a4655d4b0d98b44fd"
     },
     {
-      "bytes": 29256,
+      "bytes": 55255,
       "path": "units/consumers/dashboard-core/dashboard/upstream_panel.py",
-      "sha256": "07392440bc1a41cbb39187e69c7f5f4c1c4512fb616bdb8a2d3d19113d2a9dd1"
+      "sha256": "2d77a2472c5027243626b4d3f20de722deabfc28f532c5e1ffbd31decbbab11d"
     },
     {
-      "bytes": 9086,
+      "bytes": 31440,
       "path": "units/consumers/dashboard-core/dashboard/upstreams.py",
-      "sha256": "e3751bbc891823fccdfeec31f1fabb981ecaa91c920cc0ee411ca01e687ce044"
+      "sha256": "b8be5fa8ea99c1e9d73eb4c8f1d0dfa79cd815554b2cfec9510b2b8d076fda64"
     },
     {
-      "bytes": 2080,
+      "bytes": 2075,
       "path": "units/consumers/dashboard-core/legacy-tests/test_dashboard.py",
-      "sha256": "e34085021222909575d449a8ba5bc9618db2a13b3cd0719a5c1dd4c8c5aa2742"
+      "sha256": "989cab754c511a6474dbfdb45763a22d957229624715f67c9cca892ed9ce423f"
     },
     {
       "bytes": 3954,
@@ -1879,9 +2159,9 @@
       "sha256": "1b67e3fefd4e42704c0622569e569878e5af1142a01caf57e7107aaf3b4ca2ff"
     },
     {
-      "bytes": 3183,
+      "bytes": 3563,
       "path": "units/consumers/dashboard-core/tests/test_monitor_modules.py",
-      "sha256": "81d8bf6af1a329c181f4da2574b169d1d0f8eb948943e5253dbb91c9ebc3e2c2"
+      "sha256": "7408ae953c596b3f6e857f07829de3f7d240854428d5aa92d421175ebb8f265b"
     },
     {
       "bytes": 5718,
@@ -2323,10 +2603,406 @@
       "(self)"
     ],
     [
+      "examples/sample-clock/tests/test_worker.py",
+      5,
+      "ClockWorkerTests",
+      "class"
+    ],
+    [
+      "examples/sample-clock/tests/test_worker.py",
+      6,
+      "ClockWorkerTests.test_output_has_utc_and_integer_timestamp",
+      "(self)"
+    ],
+    [
+      "examples/sample-clock/worker.py",
+      5,
+      "run",
+      "(data, configuration)"
+    ],
+    [
+      "examples/sample-math/tests/test_worker.py",
+      5,
+      "MathWorkerTests",
+      "class"
+    ],
+    [
+      "examples/sample-math/tests/test_worker.py",
+      6,
+      "MathWorkerTests.test_summary_and_configuration",
+      "(self)"
+    ],
+    [
+      "examples/sample-math/tests/test_worker.py",
+      9,
+      "MathWorkerTests.test_invalid_value",
+      "(self)"
+    ],
+    [
+      "examples/sample-math/worker.py",
+      5,
+      "run",
+      "(data, configuration)"
+    ],
+    [
+      "examples/sample-text/tests/test_worker.py",
+      5,
+      "TextWorkerTests",
+      "class"
+    ],
+    [
+      "examples/sample-text/tests/test_worker.py",
+      6,
+      "TextWorkerTests.test_transform",
+      "(self)"
+    ],
+    [
+      "examples/sample-text/tests/test_worker.py",
+      9,
+      "TextWorkerTests.test_rejects_non_string",
+      "(self)"
+    ],
+    [
+      "examples/sample-text/worker.py",
+      4,
+      "run",
+      "(data, configuration)"
+    ],
+    [
+      "market_data/collector.py",
+      19,
+      "fetch_bars",
+      "(limit, before=None)"
+    ],
+    [
+      "market_data/collector.py",
+      35,
+      "GoldCollector",
+      "class"
+    ],
+    [
+      "market_data/collector.py",
+      36,
+      "GoldCollector.__init__",
+      "(self)"
+    ],
+    [
+      "market_data/collector.py",
+      40,
+      "GoldCollector.start",
+      "(self)"
+    ],
+    [
+      "market_data/collector.py",
+      45,
+      "GoldCollector.stop",
+      "(self)"
+    ],
+    [
+      "market_data/collector.py",
+      49,
+      "GoldCollector._loop",
+      "(self)"
+    ],
+    [
+      "market_data/data.py",
+      15,
+      "database_path",
+      "()"
+    ],
+    [
+      "market_data/data.py",
+      19,
+      "connect",
+      "()"
+    ],
+    [
+      "market_data/data.py",
+      45,
+      "parse_bar",
+      "(bar)"
+    ],
+    [
+      "market_data/data.py",
+      80,
+      "save_bars",
+      "(bars, historical=False)"
+    ],
+    [
+      "market_data/data.py",
+      132,
+      "backfill_state",
+      "()"
+    ],
+    [
+      "market_data/data.py",
+      141,
+      "set_backfill_state",
+      "(value)"
+    ],
+    [
+      "market_data/data.py",
+      149,
+      "set_collector_error",
+      "()"
+    ],
+    [
+      "market_data/data.py",
+      157,
+      "snapshot",
+      "(limit=200, include_open=True, end_time=None)"
+    ],
+    [
+      "market_data/data.py",
+      175,
+      "moving_average",
+      "(candles, period=20)"
+    ],
+    [
+      "market_data/data.py",
+      179,
+      "refresh_indicators",
+      "()"
+    ],
+    [
+      "market_data/data.py",
+      214,
+      "indicator",
+      "(name, parameters, limit=200, include_open=True, end_time=None)"
+    ],
+    [
+      "market_data/data.py",
+      242,
+      "profile_series",
+      "(profile, limit, include_open, end_time)"
+    ],
+    [
+      "market_data/data.py",
+      262,
+      "database_table",
+      "(table, limit=50, offset=0, candle_state='all', indicator_name='all')"
+    ],
+    [
+      "market_data/data.py",
+      304,
+      "chart",
+      "(limit=200, period=20, include_open=True, end_time=None, interval='1m', include_indicators=False, profiles=None)"
+    ],
+    [
+      "market_data/data.py",
+      318,
+      "chart.append_group",
+      "(bucket, group)"
+    ],
+    [
+      "market_data/indicators/__init__.py",
+      10,
+      "normalize",
+      "(name, options)"
+    ],
+    [
+      "market_data/indicators/__init__.py",
+      16,
+      "calculate",
+      "(name, candles, options)"
+    ],
+    [
+      "market_data/indicators/macd.py",
+      5,
+      "normalize",
+      "(options)"
+    ],
+    [
+      "market_data/indicators/macd.py",
+      13,
+      "ema",
+      "(values, period)"
+    ],
+    [
+      "market_data/indicators/macd.py",
+      25,
+      "calculate",
+      "(candles, options)"
+    ],
+    [
+      "market_data/indicators/rsi.py",
+      5,
+      "normalize",
+      "(options)"
+    ],
+    [
+      "market_data/indicators/rsi.py",
+      12,
+      "calculate",
+      "(candles, options)"
+    ],
+    [
+      "market_data/indicators/sma.py",
+      6,
+      "normalize",
+      "(options)"
+    ],
+    [
+      "market_data/indicators/sma.py",
+      13,
+      "calculate",
+      "(candles, options)"
+    ],
+    [
+      "modules/accounts.py",
+      21,
+      "_connect",
+      "()"
+    ],
+    [
+      "modules/accounts.py",
+      41,
+      "_username",
+      "(value)"
+    ],
+    [
+      "modules/accounts.py",
+      48,
+      "_password",
+      "(value)"
+    ],
+    [
+      "modules/accounts.py",
+      55,
+      "_hash",
+      "(password, salt)"
+    ],
+    [
+      "modules/accounts.py",
+      59,
+      "_user",
+      "(row)"
+    ],
+    [
+      "modules/accounts.py",
+      63,
+      "bootstrap_admin",
+      "(username, password)"
+    ],
+    [
+      "modules/accounts.py",
+      78,
+      "create_user",
+      "(username, password, role='user')"
+    ],
+    [
+      "modules/accounts.py",
+      97,
+      "get_user",
+      "(user_id)"
+    ],
+    [
+      "modules/accounts.py",
+      105,
+      "list_users",
+      "()"
+    ],
+    [
+      "modules/accounts.py",
+      111,
+      "login",
+      "(username, password)"
+    ],
+    [
+      "modules/accounts.py",
+      148,
+      "is_session_token",
+      "(token)"
+    ],
+    [
+      "modules/accounts.py",
+      152,
+      "authenticate",
+      "(token)"
+    ],
+    [
+      "modules/accounts.py",
+      163,
+      "logout",
+      "(token)"
+    ],
+    [
+      "modules/accounts.py",
+      170,
+      "set_enabled",
+      "(user_id, enabled)"
+    ],
+    [
+      "modules/accounts.py",
+      187,
+      "upstream_credential",
+      "(user_id)"
+    ],
+    [
       "modules/calculator/module.py",
       11,
       "run",
       "(data)"
+    ],
+    [
+      "modules/chat-box/module.py",
+      10,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/chat_store.py",
+      19,
+      "_connect",
+      "()"
+    ],
+    [
+      "modules/chat_store.py",
+      43,
+      "_active_user",
+      "(owner)"
+    ],
+    [
+      "modules/chat_store.py",
+      50,
+      "_authorize",
+      "(db, owner, room)"
+    ],
+    [
+      "modules/chat_store.py",
+      57,
+      "request_private",
+      "(owner, recipient)"
+    ],
+    [
+      "modules/chat_store.py",
+      75,
+      "respond",
+      "(owner, request_id, accept)"
+    ],
+    [
+      "modules/chat_store.py",
+      97,
+      "list_rooms",
+      "(owner)"
+    ],
+    [
+      "modules/chat_store.py",
+      106,
+      "list_requests",
+      "(owner)"
+    ],
+    [
+      "modules/chat_store.py",
+      114,
+      "send",
+      "(owner, room, text)"
+    ],
+    [
+      "modules/chat_store.py",
+      130,
+      "messages",
+      "(owner, room, limit=50, before=None)"
     ],
     [
       "modules/clock/clock.py",
@@ -2378,21 +3054,27 @@
     ],
     [
       "modules/execution.py",
-      21,
+      24,
       "UnknownModule",
       "class"
     ],
     [
       "modules/execution.py",
-      26,
+      29,
       "_load",
       "(module_id)"
     ],
     [
       "modules/execution.py",
-      33,
+      36,
       "run_module",
       "(module_id, data)"
+    ],
+    [
+      "modules/gold-chart/module.py",
+      12,
+      "run",
+      "(data)"
     ],
     [
       "modules/host_monitor.py",
@@ -2461,6 +3143,42 @@
       "(data)"
     ],
     [
+      "modules/indicator_profiles.py",
+      13,
+      "list_profiles",
+      "(owner)"
+    ],
+    [
+      "modules/indicator_profiles.py",
+      17,
+      "save",
+      "(owner, data, profile_id=None)"
+    ],
+    [
+      "modules/indicator_profiles.py",
+      27,
+      "save.update",
+      "(old)"
+    ],
+    [
+      "modules/indicator_profiles.py",
+      40,
+      "delete",
+      "(owner, profile_id)"
+    ],
+    [
+      "modules/indicator_profiles.py",
+      41,
+      "delete.update",
+      "(old)"
+    ],
+    [
+      "modules/macd/module.py",
+      10,
+      "run",
+      "(data)"
+    ],
+    [
       "modules/module_state.py",
       9,
       "change",
@@ -2473,28 +3191,142 @@
       "(run)"
     ],
     [
+      "modules/moving-average/module.py",
+      10,
+      "run",
+      "(data)"
+    ],
+    [
       "modules/registry.py",
-      26,
+      30,
       "ModuleManifestError",
       "class"
     ],
     [
       "modules/registry.py",
-      30,
+      34,
       "load_modules",
       "()"
     ],
     [
       "modules/registry.py",
-      104,
+      108,
       "list_modules",
       "()"
     ],
     [
       "modules/registry.py",
-      109,
+      113,
       "get_module",
       "(module_id: str)"
+    ],
+    [
+      "modules/rsi/module.py",
+      10,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/signal_rules.py",
+      14,
+      "list_rules",
+      "(owner)"
+    ],
+    [
+      "modules/signal_rules.py",
+      18,
+      "save",
+      "(owner, data, rule_id=None)"
+    ],
+    [
+      "modules/signal_rules.py",
+      36,
+      "save.update",
+      "(old)"
+    ],
+    [
+      "modules/signal_rules.py",
+      48,
+      "delete",
+      "(owner, rule_id)"
+    ],
+    [
+      "modules/signal_rules.py",
+      49,
+      "delete.update",
+      "(old)"
+    ],
+    [
+      "modules/signal_rules.py",
+      56,
+      "market_input",
+      "(owner, interval='1m')"
+    ],
+    [
+      "modules/signal_rules.py",
+      68,
+      "evaluate",
+      "(owner, rule_id)"
+    ],
+    [
+      "modules/signal_rules.py",
+      77,
+      "evaluate.value",
+      "(profile_id, field, stamp)"
+    ],
+    [
+      "modules/signal_rules.py",
+      98,
+      "_fingerprint",
+      "(owner, rule_id)"
+    ],
+    [
+      "modules/signal_rules.py",
+      105,
+      "latest",
+      "(owner, rule_id)"
+    ],
+    [
+      "modules/signal_rules.py",
+      113,
+      "evaluate_and_save",
+      "(owner, rule_id)"
+    ],
+    [
+      "modules/signal_rules.py",
+      123,
+      "evaluate_enabled_rules",
+      "()"
+    ],
+    [
+      "modules/signal_rules.py",
+      142,
+      "SignalScheduler",
+      "class"
+    ],
+    [
+      "modules/signal_rules.py",
+      144,
+      "SignalScheduler.__init__",
+      "(self)"
+    ],
+    [
+      "modules/signal_rules.py",
+      149,
+      "SignalScheduler.start",
+      "(self)"
+    ],
+    [
+      "modules/signal_rules.py",
+      155,
+      "SignalScheduler.stop",
+      "(self)"
+    ],
+    [
+      "modules/signal_rules.py",
+      159,
+      "SignalScheduler._loop",
+      "(self)"
     ],
     [
       "modules/slot-note/module.py",
@@ -2503,38 +3335,158 @@
       "(data)"
     ],
     [
+      "modules/slot_workers.py",
+      24,
+      "configure",
+      "(owner, slot, payload)"
+    ],
+    [
+      "modules/slot_workers.py",
+      64,
+      "SlotWorkerScheduler",
+      "class"
+    ],
+    [
+      "modules/slot_workers.py",
+      65,
+      "SlotWorkerScheduler.__init__",
+      "(self)"
+    ],
+    [
+      "modules/slot_workers.py",
+      69,
+      "SlotWorkerScheduler.start",
+      "(self)"
+    ],
+    [
+      "modules/slot_workers.py",
+      74,
+      "SlotWorkerScheduler.stop",
+      "(self)"
+    ],
+    [
+      "modules/slot_workers.py",
+      78,
+      "SlotWorkerScheduler._connect",
+      "(self)"
+    ],
+    [
+      "modules/slot_workers.py",
+      85,
+      "SlotWorkerScheduler._recover",
+      "(self)"
+    ],
+    [
+      "modules/slot_workers.py",
+      98,
+      "SlotWorkerScheduler._claim",
+      "(self)"
+    ],
+    [
+      "modules/slot_workers.py",
+      124,
+      "SlotWorkerScheduler._finish",
+      "(self, owner, slot, revision, error)"
+    ],
+    [
+      "modules/slot_workers.py",
+      141,
+      "SlotWorkerScheduler._loop",
+      "(self)"
+    ],
+    [
       "modules/slots.py",
-      12,
+      14,
       "_authorize_host_monitor",
       "(owner, module_id)"
     ],
     [
       "modules/slots.py",
-      19,
+      21,
       "binding",
       "(owner, slot, module_id=None, context=None, only_if_missing=False)"
     ],
     [
       "modules/slots.py",
-      27,
+      29,
       "binding.update",
       "(previous)"
     ],
     [
       "modules/slots.py",
-      34,
+      35,
+      "binding.update_meta",
+      "(old)"
+    ],
+    [
+      "modules/slots.py",
+      47,
       "list_slots",
       "(owner)"
     ],
     [
       "modules/slots.py",
-      46,
-      "execute",
-      "(owner, slot, data, expected_module=None)"
+      59,
+      "_layout_db",
+      "(owner)"
     ],
     [
       "modules/slots.py",
-      65,
+      76,
+      "list_active",
+      "(owner)"
+    ],
+    [
+      "modules/slots.py",
+      97,
+      "create",
+      "(owner, slot_type='standard')"
+    ],
+    [
+      "modules/slots.py",
+      114,
+      "duplicate",
+      "(owner, slot)"
+    ],
+    [
+      "modules/slots.py",
+      141,
+      "bind_active",
+      "(owner, slot, module_id, context, only_if_missing=False)"
+    ],
+    [
+      "modules/slots.py",
+      165,
+      "set_overview",
+      "(owner, slot, visible)"
+    ],
+    [
+      "modules/slots.py",
+      179,
+      "update_appearance",
+      "(owner, slot, updates)"
+    ],
+    [
+      "modules/slots.py",
+      263,
+      "delete",
+      "(owner, slot)"
+    ],
+    [
+      "modules/slots.py",
+      274,
+      "_market_preferences",
+      "(owner, slot, module_id)"
+    ],
+    [
+      "modules/slots.py",
+      283,
+      "execute",
+      "(owner, slot, data, expected_module=None, expected_revision=None)"
+    ],
+    [
+      "modules/slots.py",
+      308,
       "read",
       "(owner, slot)"
     ],
@@ -2603,6 +3555,54 @@
       74,
       "main",
       "()"
+    ],
+    [
+      "scripts/deployment/seed_sample_workers.py",
+      24,
+      "archive_for",
+      "(worker_id)"
+    ],
+    [
+      "scripts/deployment/seed_sample_workers.py",
+      36,
+      "register_sample",
+      "(code, manager, worker_id)"
+    ],
+    [
+      "scripts/deployment/seed_sample_workers.py",
+      59,
+      "main",
+      "()"
+    ],
+    [
+      "scripts/deployment/sync_account_credentials.py",
+      23,
+      "_read",
+      "(path)"
+    ],
+    [
+      "scripts/deployment/sync_account_credentials.py",
+      32,
+      "_atomic",
+      "(path, data, uid, gid, mode)"
+    ],
+    [
+      "scripts/deployment/sync_account_credentials.py",
+      51,
+      "sync",
+      "(config, state, dashboard_uid, dashboard_gid)"
+    ],
+    [
+      "scripts/deployment/sync_account_credentials.py",
+      139,
+      "main",
+      "()"
+    ],
+    [
+      "scripts/deployment/sync_account_credentials.py",
+      145,
+      "main.open_lock",
+      "(path)"
     ],
     [
       "scripts/deployment/verify_install.py",
@@ -2834,111 +3834,357 @@
     ],
     [
       "terminal_ui.py",
-      24,
+      28,
       "Terminal.style",
       "(self, text, *codes)"
     ],
     [
       "terminal_ui.py",
-      29,
+      33,
       "Terminal.ask",
       "(self, label, default=None)"
     ],
     [
       "terminal_ui.py",
-      34,
+      38,
       "Terminal.choose",
       "(self, title, rows, label, default=0)"
     ],
     [
       "terminal_ui.py",
-      52,
+      56,
       "Terminal.call",
       "(self, args, *, state=False, quiet=False)"
     ],
     [
       "terminal_ui.py",
-      73,
+      77,
       "Terminal.show",
       "(self, value)"
     ],
     [
       "terminal_ui.py",
-      85,
+      89,
       "Terminal.slot_args",
       "(self, *args)"
     ],
     [
       "terminal_ui.py",
-      88,
+      92,
       "Terminal.worker_args",
       "(self, *args)"
     ],
     [
       "terminal_ui.py",
-      92,
+      96,
       "Terminal.refresh",
       "(self)"
     ],
     [
       "terminal_ui.py",
-      102,
+      106,
       "Terminal.screen",
       "(self, title=None)"
     ],
     [
       "terminal_ui.py",
-      153,
+      157,
       "Terminal.overview",
       "(self)"
     ],
     [
       "terminal_ui.py",
-      159,
+      163,
       "Terminal.input_for",
       "(self, module_id)"
     ],
     [
       "terminal_ui.py",
-      215,
+      223,
       "Terminal.number",
       "(self, label, default)"
     ],
     [
       "terminal_ui.py",
-      223,
+      231,
       "Terminal.integer",
       "(self, label, default, minimum, maximum)"
     ],
     [
       "terminal_ui.py",
-      231,
+      239,
       "Terminal.slots_menu",
       "(self)"
     ],
     [
       "terminal_ui.py",
-      277,
+      285,
       "Terminal.modules_menu",
       "(self)"
     ],
     [
       "terminal_ui.py",
-      307,
+      315,
       "Terminal.executions_menu",
       "(self)"
     ],
     [
       "terminal_ui.py",
-      323,
+      331,
       "Terminal.workers_menu",
       "(self)"
     ],
     [
       "terminal_ui.py",
-      363,
+      371,
       "Terminal.run",
       "(self)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      10,
+      "client",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      20,
+      "client.Adapter",
+      "class"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      21,
+      "client.Adapter.get",
+      "(self, path)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      25,
+      "auth",
+      "(token)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      28,
+      "create_accounts",
+      "(client)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      42,
+      "test_bootstrap_user_access_and_worker_fail_closed",
+      "(client)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      54,
+      "test_chat_requires_acceptance_and_isolates_participants",
+      "(client)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      71,
+      "test_session_can_create_and_use_owner_scoped_chat_slot",
+      "(client)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      84,
+      "test_legacy_token_with_session_prefix_remains_valid",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      89,
+      "test_legacy_token_with_session_prefix_remains_valid.Adapter",
+      "class"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      90,
+      "test_legacy_token_with_session_prefix_remains_valid.Adapter.get",
+      "(self, path)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      97,
+      "test_provisioned_session_can_use_its_worker_credential",
+      "(client, tmp_path)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      111,
+      "test_forwarded_credentials_never_cross_accounts",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      116,
+      "test_forwarded_credentials_never_cross_accounts.Adapter",
+      "class"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      117,
+      "test_forwarded_credentials_never_cross_accounts.Adapter.__init__",
+      "(self, owner, credential)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      118,
+      "test_forwarded_credentials_never_cross_accounts.Adapter.get",
+      "(self, path)"
+    ],
+    [
+      "tests/test_account_chat_api.py",
+      129,
+      "test_disabling_customer_revokes_legacy_dashboard_access",
+      "(client)"
+    ],
+    [
+      "tests/test_account_chat_browser.py",
+      8,
+      "test_password_login_and_public_chat",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      15,
+      "token",
+      "()"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      16,
+      "digest",
+      "(value)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      19,
+      "test_provision_is_owner_scoped_stable_and_revocable",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      61,
+      "test_rejects_symlinked_account_db",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      67,
+      "test_rejects_symlinked_output_before_touching_configuration",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      75,
+      "test_refuses_to_replace_unmanaged_owner_binding",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      91,
+      "test_provisioned_accounts_flow_through_separate_manager_identities",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      109,
+      "test_provisioned_accounts_flow_through_separate_manager_identities.list_workers",
+      "(owner=Depends(manager_owner))"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      111,
+      "test_provisioned_accounts_flow_through_separate_manager_identities.Adapter",
+      "class"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      112,
+      "test_provisioned_accounts_flow_through_separate_manager_identities.Adapter.__init__",
+      "(self, credential)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      113,
+      "test_provisioned_accounts_flow_through_separate_manager_identities.Adapter.get",
+      "(self, path)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      125,
+      "test_new_sessions_use_isolated_real_worker_manager",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      147,
+      "test_new_sessions_use_isolated_real_worker_manager.factory",
+      "(owner, credential)"
+    ],
+    [
+      "tests/test_account_provisioning.py",
+      148,
+      "test_new_sessions_use_isolated_real_worker_manager.factory.transport",
+      "(request, timeout)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      8,
+      "users",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      16,
+      "test_sessions_are_owner_bound_and_revoked",
+      "(users)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      29,
+      "test_private_room_requires_acceptance_and_membership",
+      "(users)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      45,
+      "test_public_messages_pagination_and_disabled_accounts",
+      "(users)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      56,
+      "test_rejected_request_does_not_grant_access",
+      "(users)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      64,
+      "test_session_expires_and_logout_is_independent",
+      "(users, monkeypatch)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      76,
+      "test_existing_customer_workspace_cannot_be_rebootstrapped",
+      "(users)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      84,
+      "test_chat_module_slot_obeys_room_membership",
+      "(users)"
+    ],
+    [
+      "tests/test_accounts_chat.py",
+      95,
+      "test_login_throttle_expires",
+      "(users, monkeypatch)"
     ],
     [
       "tests_support/code_manager.py",
@@ -4616,61 +5862,79 @@
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      26,
+      28,
       "load_themes",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      61,
+      66,
       "health",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      66,
+      71,
+      "project_info",
+      "()"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      88,
       "list_themes",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      83,
+      104,
       "get_theme",
       "(theme_id: str)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      95,
+      116,
       "clock_time",
       "(timezone: str | None=None)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      105,
+      126,
       "execute_module",
       "(module_id: str, data: dict)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      120,
+      141,
       "api_modules",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      126,
+      147,
       "dashboard",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      778,
+      2375,
       "create_app",
       "(*, credential_path=None, upstream_factory=None)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      798,
+      2400,
+      "create_app.start_slot_workers",
+      "()"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      2406,
+      "create_app.stop_slot_workers",
+      "()"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      2414,
       "create_app.connected_dashboard",
       "()"
     ],
@@ -4688,109 +5952,337 @@
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      14,
+      18,
       "RunRequest",
       "class"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      21,
+      25,
       "create_router",
       "(credential_path, upstream_factory)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      33,
+      34,
+      "create_router.owner",
+      "(request: Request)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      58,
+      "create_router.admin_identity",
+      "(request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      68,
       "create_router.forward",
       "(request, identity, name, method, path, payload=None, status=200)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      54,
-      "create_router.read",
-      "(operation: str, request: Request, identity=Depends(owner))"
-    ],
-    [
-      "units/consumers/dashboard-core/dashboard/upstreams.py",
-      60,
+      91,
       "create_router.worker_path",
       "(worker_id)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      69,
+      100,
+      "create_router.account_bootstrap",
+      "(body: dict, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      109,
+      "create_router.account_login",
+      "(body: dict)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      117,
+      "create_router.account_me",
+      "(request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      125,
+      "create_router.account_logout",
+      "(request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      131,
+      "create_router.account_users",
+      "(identity=Depends(admin_identity))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      135,
+      "create_router.account_create",
+      "(body: dict, identity=Depends(admin_identity))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      142,
+      "create_router.account_enable",
+      "(user_id: str, body: dict, identity=Depends(admin_identity))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      150,
+      "create_router.chat_users",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      156,
+      "create_router.chat_rooms",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      162,
+      "create_router.chat_requests",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      168,
+      "create_router.chat_request",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      176,
+      "create_router.chat_respond",
+      "(request_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      185,
+      "create_router.chat_messages",
+      "(room_id: str, limit: int=Query(default=50, ge=1, le=200), before: int | None=Query(default=None, gt=0), identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      192,
+      "create_router.chat_send",
+      "(room_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      200,
+      "create_router.market_candles",
+      "(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, end_time: int | None=Query(default=None, ge=0), interval: str='1m', include_indicators: bool=False, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      215,
+      "create_router.profile_list",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      219,
+      "create_router.profile_create",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      225,
+      "create_router.profile_save",
+      "(profile_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      232,
+      "create_router.profile_delete",
+      "(profile_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      238,
+      "create_router.signal_list",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      242,
+      "create_router.signal_create",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      248,
+      "create_router.signal_save",
+      "(rule_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      255,
+      "create_router.signal_delete",
+      "(rule_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      261,
+      "create_router.signal_evaluate",
+      "(rule_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      268,
+      "create_router.signal_worker",
+      "(worker_id: str, body: dict, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      285,
+      "create_router.read",
+      "(operation: str, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      292,
+      "create_router.market_sma",
+      "(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      307,
+      "create_router.indicators_endpoint",
+      "(name: str, limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=14, ge=1, le=500), fast: int=Query(default=12, ge=1, le=500), slow: int=Query(default=26, ge=1, le=500), signal: int=Query(default=9, ge=1, le=500), include_open: bool=True, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      325,
+      "create_router.market_database",
+      "(table: str, limit: int=Query(default=50, ge=1, le=200), offset: int=Query(default=0, ge=0, le=1000000), candle_state: str='all', indicator_name: str='all', identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      339,
       "create_router.module_state",
       "(module_id: str, body: dict, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      85,
+      355,
+      "create_router.run_independent_module",
+      "(module_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      372,
+      "create_router.list_active_slots",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      379,
+      "create_router.create_slot",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      391,
+      "create_router.duplicate_slot",
+      "(slot_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      400,
+      "create_router.update_slot_overview",
+      "(slot_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      413,
+      "create_router.delete_slot",
+      "(slot_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      424,
+      "create_router.update_slot_appearance",
+      "(slot_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      439,
+      "create_router.configure_slot_worker",
+      "(slot_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      452,
       "create_router.bind_slot",
       "(slot_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      98,
+      467,
       "create_router.read_slot",
       "(slot_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      115,
+      486,
       "create_router.execute_slot",
       "(slot_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      130,
+      503,
       "create_router.register",
       "(body: RegisterBody, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      135,
+      508,
       "create_router.worker",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      139,
+      512,
       "create_router.configure",
       "(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      145,
+      518,
       "create_router.remove",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      149,
+      522,
       "create_router.enable",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      153,
+      526,
       "create_router.disable",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      157,
+      530,
       "create_router.run",
       "(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      168,
+      541,
       "create_router.execution",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      172,
+      545,
       "create_router.cancel",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
@@ -4809,7 +6301,7 @@
     [
       "units/consumers/dashboard-core/legacy-tests/test_dashboard.py",
       32,
-      "test_each_theme_has_slots",
+      "test_each_theme_has_colors",
       "()"
     ],
     [
@@ -5198,13 +6690,13 @@
     ],
     [
       "units/consumers/dashboard-core/tests/test_monitor_modules.py",
-      42,
+      45,
       "test_log_and_disk_paths_require_explicit_permission",
       "(tmp_path, monkeypatch)"
     ],
     [
       "units/consumers/dashboard-core/tests/test_monitor_modules.py",
-      55,
+      58,
       "test_rebinding_invalidates_saved_slot_output",
       "(tmp_path, monkeypatch)"
     ],
@@ -7863,8 +9355,74 @@
   ],
   "tables": [
     [
+      "market_data/data.py",
+      24,
+      "candles",
+      "CREATE TABLE IF NOT EXISTS candles (\n        time INTEGER PRIMARY KEY, open REAL NOT NULL, high REAL NOT NULL,\n        low REAL NOT NULL, close REAL NOT NULL, tick_volume INTEGER,\n        is_open INTEGER NOT NULL CHECK(is_open IN (0,1)))"
+    ],
+    [
+      "market_data/data.py",
+      28,
+      "collector_status",
+      "CREATE TABLE IF NOT EXISTS collector_status (key TEXT PRIMARY KEY, value TEXT NOT NULL)"
+    ],
+    [
+      "market_data/data.py",
+      29,
+      "indicator_specs",
+      "CREATE TABLE IF NOT EXISTS indicator_specs (\n        name TEXT NOT NULL, parameters TEXT NOT NULL, computed_revision INTEGER NOT NULL DEFAULT -1,\n        PRIMARY KEY(name,parameters))"
+    ],
+    [
+      "market_data/data.py",
+      32,
+      "indicator_values",
+      "CREATE TABLE IF NOT EXISTS indicator_values (\n        name TEXT NOT NULL, parameters TEXT NOT NULL, time INTEGER NOT NULL,\n        value_json TEXT NOT NULL, is_open INTEGER NOT NULL CHECK(is_open IN (0,1)),\n        PRIMARY KEY(name,parameters,time))"
+    ],
+    [
+      "modules/accounts.py",
+      29,
+      "users",
+      "CREATE TABLE IF NOT EXISTS users (\n        id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, role TEXT NOT NULL CHECK(role IN ('admin','user')),\n        salt BLOB NOT NULL, password_hash BLOB NOT NULL, enabled INTEGER NOT NULL CHECK(enabled IN (0,1)),\n        created_at INTEGER NOT NULL)"
+    ],
+    [
+      "modules/accounts.py",
+      33,
+      "sessions",
+      "CREATE TABLE IF NOT EXISTS sessions (\n        token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,\n        expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)"
+    ],
+    [
+      "modules/accounts.py",
+      36,
+      "login_limits",
+      "CREATE TABLE IF NOT EXISTS login_limits (\n        key TEXT PRIMARY KEY, window_start INTEGER NOT NULL, attempts INTEGER NOT NULL)"
+    ],
+    [
+      "modules/chat_store.py",
+      27,
+      "rooms",
+      "CREATE TABLE IF NOT EXISTS rooms (\n        id TEXT PRIMARY KEY, member_a TEXT NOT NULL, member_b TEXT NOT NULL,\n        created_at INTEGER NOT NULL, UNIQUE(member_a,member_b))"
+    ],
+    [
+      "modules/chat_store.py",
+      30,
+      "invitations",
+      "CREATE TABLE IF NOT EXISTS invitations (\n        id TEXT PRIMARY KEY, sender TEXT NOT NULL, recipient TEXT NOT NULL,\n        status TEXT NOT NULL CHECK(status IN ('pending','accepted','rejected')),\n        room_id TEXT REFERENCES rooms(id), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)"
+    ],
+    [
+      "modules/chat_store.py",
+      35,
+      "messages",
+      "CREATE TABLE IF NOT EXISTS messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT, room_id TEXT NOT NULL, author TEXT NOT NULL,\n        body TEXT NOT NULL, created_at INTEGER NOT NULL)"
+    ],
+    [
       "modules/module_state.py",
       19,
+      "module_state",
+      "CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))"
+    ],
+    [
+      "modules/slot_workers.py",
+      82,
       "module_state",
       "CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))"
     ],

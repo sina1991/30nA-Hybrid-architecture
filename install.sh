@@ -235,6 +235,7 @@ start_and_verify() {
     fi
     install -m 0755 "$APP/deployment/30na-cli" /usr/local/bin/30na
     install -m 0644 "$APP"/deployment/systemd/30na-*.service /etc/systemd/system/
+    install -m 0644 "$APP/deployment/systemd/30na-account-sync.timer" /etc/systemd/system/
     systemctl daemon-reload
     systemctl enable --now 30na-code-manager 30na-worker-runtime 30na-worker-manager 30na-dashboard
     local ready=0
@@ -249,6 +250,7 @@ start_and_verify() {
         --code-url https://localhost:18443 --manager-url https://localhost:18444 \
         --code-token-file "$CONFIG/customer-token" --manager-token-file "$CONFIG/customer-token" >"$CONFIG/demo.json"
     SSL_CERT_FILE="$CONFIG/ca/trust.pem" "$APP/.venv/bin/python" "$APP/scripts/deployment/verify_install.py"
+    systemctl enable --now 30na-account-sync.timer
     printf '%s\n' "$RELEASE" >"$CONFIG/installed-release"
     say "Installation and demo execution succeeded. Dashboard URL: https://$DOMAIN"
     say 'Sign in with the installation token in /etc/30na/customer-token (root only). Keep it out of chat and Git.'

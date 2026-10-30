@@ -1,0 +1,17 @@
+# 30na-managed-account-sync-v1
+[Unit]
+Description=30nA owner-scoped account credential synchronization
+After=local-fs.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/etc/30na /var/lib/30na/dashboard /run/lock
+RestrictAddressFamilies=AF_UNIX
+ExecStart=/bin/sh -c 'if [ -f /opt/30na/dashboard-current/scripts/deployment/sync_account_credentials.py ]; then exec /usr/bin/python3 /opt/30na/dashboard-current/scripts/deployment/sync_account_credentials.py; else exec /usr/bin/python3 /opt/30na/current/scripts/deployment/sync_account_credentials.py; fi'

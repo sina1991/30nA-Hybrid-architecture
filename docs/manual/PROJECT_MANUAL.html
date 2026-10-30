@@ -1438,7 +1438,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <h1 id="_46">مرجع ماشینی و پوشش فایل‌ها</h1>
 <p>این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.</p>
-<p>تعداد فایل‌های فنی و پشتیبان: <strong>238</strong>؛ تعداد نمادهای Python: <strong>950</strong>.</p>
+<p>تعداد فایل‌های فنی و پشتیبان: <strong>279</strong>؛ تعداد نمادهای Python: <strong>1152</strong>.</p>
 <h2 id="_47">موجودی کامل فایل‌های فنی</h2>
 <table>
 <thead>
@@ -1481,8 +1481,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/30na">30na</a></td>
-<td style="text-align: right;">11649</td>
-<td><code>5b0d2274cb1ba60f3394927e908a29c5bdcf25bf51ad1c6053eca07c5e00d9e6</code></td>
+<td style="text-align: right;">20177</td>
+<td><code>273a9019ec0a2dd1b8ecb555604ef892cab994c0705692217885368f526e29dd</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/AGENTS.md">AGENTS.md</a></td>
@@ -1508,6 +1508,11 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/SECURITY.md">SECURITY.md</a></td>
 <td style="text-align: right;">1866</td>
 <td><code>341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/VERSION">VERSION</a></td>
+<td style="text-align: right;">10</td>
+<td><code>7525ba28ee62a019271ebef84a089438f0487030bcba611022f6bed9dee1b40e</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/agents/README.md">agents/README.md</a></td>
@@ -1730,6 +1735,16 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>d491bfd8a98c9fb7ace8a825043775129c5db9b193f83ec4260586a8c71b0802</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/deployment/systemd/30na-account-sync.service">deployment/systemd/30na-account-sync.service</a></td>
+<td style="text-align: right;">655</td>
+<td><code>cd2defd98c3272dcb46b1e67aeb801877bae5de8ceb49e742b1e9d6b24a48166</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/deployment/systemd/30na-account-sync.timer">deployment/systemd/30na-account-sync.timer</a></td>
+<td style="text-align: right;">210</td>
+<td><code>dcfeb8816598de7cbb8bd8c05e6329476a2bf0d986503566bfad1097eb6e46ba</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/deployment/systemd/30na-code-manager.service">deployment/systemd/30na-code-manager.service</a></td>
 <td style="text-align: right;">840</td>
 <td><code>595bb8311728b0f10aa4695992cad683ca78847d8dfa4c09e551d7035f001488</code></td>
@@ -1765,14 +1780,99 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-clock/tests/__init__.py">examples/sample-clock/tests/<strong>init</strong>.py</a></td>
+<td style="text-align: right;">0</td>
+<td><code>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-clock/tests/test_worker.py">examples/sample-clock/tests/test_worker.py</a></td>
+<td style="text-align: right;">282</td>
+<td><code>f6a14ee7ee2347ec068b5340d0869e311a299a95dbf05b21ef0befc2bc2aef19</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-clock/worker.py">examples/sample-clock/worker.py</a></td>
+<td style="text-align: right;">279</td>
+<td><code>fbd09ea03d53339d0bc56dc52d8981321ee74c68436d880fbcd25271100ad414</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-math/tests/__init__.py">examples/sample-math/tests/<strong>init</strong>.py</a></td>
+<td style="text-align: right;">0</td>
+<td><code>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-math/tests/test_worker.py">examples/sample-math/tests/test_worker.py</a></td>
+<td style="text-align: right;">338</td>
+<td><code>dfa3f07fb7aabf1c6dedcc97ccece5d9835386ad42cdf59eff2aca274a783fbf</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-math/worker.py">examples/sample-math/worker.py</a></td>
+<td style="text-align: right;">856</td>
+<td><code>2b4817cb68dfc0f30da5d97e2a7c9961214186c9549b71779f4170a99434eab6</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-text/tests/__init__.py">examples/sample-text/tests/<strong>init</strong>.py</a></td>
+<td style="text-align: right;">0</td>
+<td><code>e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-text/tests/test_worker.py">examples/sample-text/tests/test_worker.py</a></td>
+<td style="text-align: right;">335</td>
+<td><code>faca1d30bf7b472fa9b7d63189aeea25556edb8573fec9de09fc6bbeaf5eccfa</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-text/worker.py">examples/sample-text/worker.py</a></td>
+<td style="text-align: right;">570</td>
+<td><code>cef255818e1e6fb58a36ab09e135390b4f0d07c24617b1f314addfaaebf64276</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/install.sh">install.sh</a></td>
-<td style="text-align: right;">15266</td>
-<td><code>834aff84e6ea0366d782f902b9bcda057b2d7f290b6c1c2b48cd8888bac39b52</code></td>
+<td style="text-align: right;">15408</td>
+<td><code>5622bffacee91d3262bb66bc171a401dceed51ba692d3c20b2ebb7025d0a8ad7</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/__init__.py">market_data/<strong>init</strong>.py</a></td>
+<td style="text-align: right;">53</td>
+<td><code>3817c4d1ed64d67f252f75fdfa0abb3fa353a503620f170a34fd0a117e69d334</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/collector.py">market_data/collector.py</a></td>
+<td style="text-align: right;">3684</td>
+<td><code>0a747940fdaec46f3b8349a2f2d3d069cb1154ebbca5d2f4d7bda111026b222b</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py">market_data/data.py</a></td>
+<td style="text-align: right;">22654</td>
+<td><code>ed54271d5c581b52617377f867a8d3a9c3c48ef1f33e57cfa61cbcbd42e1ced7</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/__init__.py">market_data/indicators/<strong>init</strong>.py</a></td>
+<td style="text-align: right;">616</td>
+<td><code>0ba4f37390e51fc6ad37f8784c339e2a897ffa3bad6aaa6800d9307be4336191</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/macd.py">market_data/indicators/macd.py</a></td>
+<td style="text-align: right;">1592</td>
+<td><code>c817cdb5290b2692ca7c1decc2b422c4c73643560d77f2208471a7c19cf44fb9</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/rsi.py">market_data/indicators/rsi.py</a></td>
+<td style="text-align: right;">1205</td>
+<td><code>0790e829cd8aed8c0e3699de300b97e5a44a261feb85c3546227e440ef646696</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/sma.py">market_data/indicators/sma.py</a></td>
+<td style="text-align: right;">1017</td>
+<td><code>c7c8abef1358c3bb19425fa43328fc4c927049100d864212e6f15917c50111e6</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/__init__.py">modules/<strong>init</strong>.py</a></td>
 <td style="text-align: right;">55</td>
 <td><code>884e080626de6c419827b873df812d991d6b73c2c2fd5419a5b019583eb8e059</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py">modules/accounts.py</a></td>
+<td style="text-align: right;">9969</td>
+<td><code>3a6b2b60afa549b1291e2594e21a3f0d857756715d071b22e66d4046cc674227</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/alerts/manifest.json">modules/alerts/manifest.json</a></td>
@@ -1793,6 +1893,21 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/calculator/module.py">modules/calculator/module.py</a></td>
 <td style="text-align: right;">1033</td>
 <td><code>88256927623eec9529c986f7543aa179e55349b517574d44dc8f818836de18c8</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat-box/manifest.json">modules/chat-box/manifest.json</a></td>
+<td style="text-align: right;">150</td>
+<td><code>10429340f56d582794adc6f252cc7235cf862023a773dfd98b270d4acb33ff58</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat-box/module.py">modules/chat-box/module.py</a></td>
+<td style="text-align: right;">1122</td>
+<td><code>41df328162f831e882e9592bbc6fa24d883e795e3112745d4c4d7b7d2a906969</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py">modules/chat_store.py</a></td>
+<td style="text-align: right;">7264</td>
+<td><code>d821d3cf7aaedb47aff533894a06a941dcc2114517eefcb234e54f5ebccaf1a2</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/clock/clock.py">modules/clock/clock.py</a></td>
@@ -1866,13 +1981,28 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/execution.py">modules/execution.py</a></td>
-<td style="text-align: right;">1834</td>
-<td><code>097566eae47b40809755551145abe3c1a0ea4d7493b5685263430db0b08e7df9</code></td>
+<td style="text-align: right;">2085</td>
+<td><code>e6c5a916b2c286668abd8c9721211af67a78d8bcfe811a3e26a22e9bc9d4f0cd</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/gold-chart/manifest.json">modules/gold-chart/manifest.json</a></td>
+<td style="text-align: right;">198</td>
+<td><code>9be1ef05655de7dc910270785e2c0b0f82b1d6a65f5e0795326ebb2df1f48942</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/gold-chart/module.py">modules/gold-chart/module.py</a></td>
+<td style="text-align: right;">822</td>
+<td><code>08a0986abc0636ad38b4bf58859088816f9b29a918a6ed7fe47522dbea27bed4</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/host_monitor.py">modules/host_monitor.py</a></td>
 <td style="text-align: right;">8410</td>
 <td><code>cc76c577110d8acc5a0e7c30b8fa759e96be91812cfbaedfaff0e49a727e12a6</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/indicator_profiles.py">modules/indicator_profiles.py</a></td>
+<td style="text-align: right;">2161</td>
+<td><code>1688916f16d805cda4b9ee5d90de1c76054388329a6cdd2d7588cfd3efe302b7</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/log-viewer/manifest.json">modules/log-viewer/manifest.json</a></td>
@@ -1885,6 +2015,16 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>0a490f3a6644d9f158b7abd2adad4f63baec04b17b0f19680671e4480f18efc3</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/macd/manifest.json">modules/macd/manifest.json</a></td>
+<td style="text-align: right;">151</td>
+<td><code>42049c3fb84c9e437ff67c79a1657971a43dc6e1b427217e76f5b845199379a9</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/macd/module.py">modules/macd/module.py</a></td>
+<td style="text-align: right;">967</td>
+<td><code>8ff6c9b3fcd17e247fd9e9f52a610404fd9880bfad2e633e378e86839faabe42</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/module_state.py">modules/module_state.py</a></td>
 <td style="text-align: right;">1543</td>
 <td><code>0b24fbd1ea8fe464e1bed8a9833e4351762644e2eb5de71a2b48f7035edce93a</code></td>
@@ -1893,6 +2033,16 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/module_support.py">modules/module_support.py</a></td>
 <td style="text-align: right;">1349</td>
 <td><code>0c670fd5d6e6900321909f5af8bebcb8cdb8db747696eebc42ca1358942b1431</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/moving-average/manifest.json">modules/moving-average/manifest.json</a></td>
+<td style="text-align: right;">198</td>
+<td><code>77490e0affb550cc4e4a722cd34c02005ba6b8a780ef5e93b3f64b40657f3c5b</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/moving-average/module.py">modules/moving-average/module.py</a></td>
+<td style="text-align: right;">933</td>
+<td><code>cb4426dfd02522e3db5ddb775db16120cf870eaad46c616261051daed6ecc671</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/network-monitor/manifest.json">modules/network-monitor/manifest.json</a></td>
@@ -1916,8 +2066,18 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py">modules/registry.py</a></td>
-<td style="text-align: right;">3412</td>
-<td><code>b18b7cda2a1678f41a5fc2abc569b5e8a171b6b74604c75d7df403570ff295ba</code></td>
+<td style="text-align: right;">3488</td>
+<td><code>408d4e2a8679be6f7858b13cc6585edabdb6286f5da52e6d8949b71dc61fd7bc</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/rsi/manifest.json">modules/rsi/manifest.json</a></td>
+<td style="text-align: right;">144</td>
+<td><code>9a37fdba13fba5890becb0d02bf13c3ab3354a04dd2e6de10a3571bc5fd434c9</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/rsi/module.py">modules/rsi/module.py</a></td>
+<td style="text-align: right;">930</td>
+<td><code>ab2fb19594580420b9616415700960cf107b56d679adbf6c4357b1a752ecdc70</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/service-monitor/manifest.json">modules/service-monitor/manifest.json</a></td>
@@ -1930,6 +2090,11 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>57d93d44f8007d8e7816453f1d47f7388527e53f94eabb67f400b8b2fb5aa676</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py">modules/signal_rules.py</a></td>
+<td style="text-align: right;">9666</td>
+<td><code>7a74b9fbc599f183a4a62bc72fd82df4e974a574d2e26960c3456e045f74497c</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot-note/manifest.json">modules/slot-note/manifest.json</a></td>
 <td style="text-align: right;">186</td>
 <td><code>f4b599ff9d1ca2a7e6175cfec3d779ed9ae8d26d4ee4ff30861d38fb41e659cf</code></td>
@@ -1940,9 +2105,14 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>3cdc5fe1b4abf488de8aa800c4f81259bb28f2706e5ae18499ed07b1b61a9355</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py">modules/slot_workers.py</a></td>
+<td style="text-align: right;">9406</td>
+<td><code>0ed77c14d28a223c61bec5e9014c997de0929d6087abacd61ed95b29f903c190</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py">modules/slots.py</a></td>
-<td style="text-align: right;">3916</td>
-<td><code>29a81f53821ab6253c056225a958043f2983b301f1b3188748bd4e96fa6763d4</code></td>
+<td style="text-align: right;">20179</td>
+<td><code>0184c5d09772136d0483303098d29d26019b6123f93868ece663ee179983bf3a</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/system-monitor/manifest.json">modules/system-monitor/manifest.json</a></td>
@@ -1961,23 +2131,23 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/theme-summary/module.py">modules/theme-summary/module.py</a></td>
-<td style="text-align: right;">842</td>
-<td><code>310834952e466f96553fb014e0b8d45e551757a3baecb4433598f8e2cea52890</code></td>
+<td style="text-align: right;">907</td>
+<td><code>3816fa9e8d789d856faf2ca612ad2f0804377d42cd47b98b7ea523c3a1baaa79</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/theme-summary/themes/compact-6.json">modules/theme-summary/themes/compact-6.json</a></td>
-<td style="text-align: right;">701</td>
-<td><code>ae0ea5e577c3455e1e5186426078b92ba4a71c2c4407c28c426ae14e1c1e5475</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/theme-summary/themes/daylight.json">modules/theme-summary/themes/daylight.json</a></td>
+<td style="text-align: right;">367</td>
+<td><code>82eae6ddc20bb89125cfb1b30f482a065c09fca054c9d5033f53f58dc1215179</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/theme-summary/themes/standard-8.json">modules/theme-summary/themes/standard-8.json</a></td>
-<td style="text-align: right;">897</td>
-<td><code>5eca7faeff243bd66d0d543f9abd3cf8cb546d3ba9a0255fe6be2fc25962861a</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/theme-summary/themes/forest.json">modules/theme-summary/themes/forest.json</a></td>
+<td style="text-align: right;">362</td>
+<td><code>50c438dcf6a4fe9a021f24e5796ab825237c61908c7fa108725f29267be543a2</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/theme-summary/themes/wide-12.json">modules/theme-summary/themes/wide-12.json</a></td>
-<td style="text-align: right;">1284</td>
-<td><code>10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/theme-summary/themes/midnight.json">modules/theme-summary/themes/midnight.json</a></td>
+<td style="text-align: right;">366</td>
+<td><code>7781c016ac10996f7b69340c1b50fd6e1ddee61e9cc322c6fe1b6ceb10538850</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/requirements-dev.txt">requirements-dev.txt</a></td>
@@ -2030,9 +2200,19 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_sample_workers.py">scripts/deployment/seed_sample_workers.py</a></td>
+<td style="text-align: right;">3711</td>
+<td><code>6fb96d6dc0423a2db716142a2461d5590745d6fdf15d52ae8c8cb7a3721d84ba</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/sync_account_credentials.py">scripts/deployment/sync_account_credentials.py</a></td>
+<td style="text-align: right;">9728</td>
+<td><code>cec67692dc01cedb413d443e599e139702a7d89a7c7c22f6f3b67ec942c99fa5</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/update_dashboard.sh">scripts/deployment/update_dashboard.sh</a></td>
-<td style="text-align: right;">4523</td>
-<td><code>40fa85bd7e4886a9a5b2ab7b93eec98ab0e743ae8120b39d09439cad63732eb6</code></td>
+<td style="text-align: right;">6167</td>
+<td><code>b165da6cceb04b6fb8eda606308c3f414de073bb1beb1baf98ee27c149b126e7</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/verify_install.py">scripts/deployment/verify_install.py</a></td>
@@ -2086,8 +2266,28 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py">terminal_ui.py</a></td>
-<td style="text-align: right;">21800</td>
-<td><code>f106f9ba8568fc0830770cc169244510acc3984e2daa891548c0d67d4c1ca9db</code></td>
+<td style="text-align: right;">22223</td>
+<td><code>80e21fb985fdf4e8a622ff6384182dc9a81d0d9118e15ddb9d1bff00c61f4db3</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py">tests/test_account_chat_api.py</a></td>
+<td style="text-align: right;">8755</td>
+<td><code>34f36c514334a35b1438b1f33e8a696a9f86f279741911bed02c6ecffc4616aa</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_browser.py">tests/test_account_chat_browser.py</a></td>
+<td style="text-align: right;">923</td>
+<td><code>eeaf3a954269fcbcf57000dc645362090f30fb6cadf7fbbf2e8e161a8a3b79c6</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py">tests/test_account_provisioning.py</a></td>
+<td style="text-align: right;">11536</td>
+<td><code>662e4d2ed7de4fda8bdd53325ffa3c8b28ddff88ecf2abc36121c6031acb87d4</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py">tests/test_accounts_chat.py</a></td>
+<td style="text-align: right;">5328</td>
+<td><code>aa209ce5608616ee6f918f35723e2614c9c757b1491a511594a0ff42b24f9f6e</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests_support/code_manager.py">tests_support/code_manager.py</a></td>
@@ -2240,14 +2440,19 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/browser-tests/accounts_chat.cjs">units/consumers/dashboard-core/browser-tests/accounts_chat.cjs</a></td>
+<td style="text-align: right;">5477</td>
+<td><code>fca4c960cd1a538ffe54a47ab757e7e76719266868b07354547e6c1bad177fc0</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/browser-tests/check.cjs">units/consumers/dashboard-core/browser-tests/check.cjs</a></td>
-<td style="text-align: right;">10421</td>
-<td><code>fa6857b22aa71029f936334b83d2073c08088dec6bd9c4af85f0d6680d91b68e</code></td>
+<td style="text-align: right;">11423</td>
+<td><code>827955fd672363a90ea467576e7d234fa6798d08ab3fe77c8459382d47525191</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/browser-tests/layout.cjs">units/consumers/dashboard-core/browser-tests/layout.cjs</a></td>
-<td style="text-align: right;">1610</td>
-<td><code>0eea28bbe25519a5668c8e2ef224d1b934c3d769d4060b44c824809a444c6547</code></td>
+<td style="text-align: right;">1242</td>
+<td><code>399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/browser-tests/management.cjs">units/consumers/dashboard-core/browser-tests/management.cjs</a></td>
@@ -2271,8 +2476,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py">units/consumers/dashboard-core/dashboard/app.py</a></td>
-<td style="text-align: right;">33442</td>
-<td><code>03e5c09b9e376b6a212e08129f8cc81402c818c280a2728ac1f94deb1b4c223b</code></td>
+<td style="text-align: right;">172468</td>
+<td><code>e6f687316c6674a1ffa581ec60903dbfa5afe577499c23c1c4d907ba2c7b9bea</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/modules/__init__.py">units/consumers/dashboard-core/dashboard/modules/<strong>init</strong>.py</a></td>
@@ -2306,18 +2511,18 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstream_panel.py">units/consumers/dashboard-core/dashboard/upstream_panel.py</a></td>
-<td style="text-align: right;">29256</td>
-<td><code>07392440bc1a41cbb39187e69c7f5f4c1c4512fb616bdb8a2d3d19113d2a9dd1</code></td>
+<td style="text-align: right;">55255</td>
+<td><code>2d77a2472c5027243626b4d3f20de722deabfc28f532c5e1ffbd31decbbab11d</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
-<td style="text-align: right;">9086</td>
-<td><code>e3751bbc891823fccdfeec31f1fabb981ecaa91c920cc0ee411ca01e687ce044</code></td>
+<td style="text-align: right;">31440</td>
+<td><code>b8be5fa8ea99c1e9d73eb4c8f1d0dfa79cd815554b2cfec9510b2b8d076fda64</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/legacy-tests/test_dashboard.py">units/consumers/dashboard-core/legacy-tests/test_dashboard.py</a></td>
-<td style="text-align: right;">2080</td>
-<td><code>e34085021222909575d449a8ba5bc9618db2a13b3cd0719a5c1dd4c8c5aa2742</code></td>
+<td style="text-align: right;">2075</td>
+<td><code>989cab754c511a6474dbfdb45763a22d957229624715f67c9cca892ed9ce423f</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/legacy-tests/test_registry.py">units/consumers/dashboard-core/legacy-tests/test_registry.py</a></td>
@@ -2361,8 +2566,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/tests/test_monitor_modules.py">units/consumers/dashboard-core/tests/test_monitor_modules.py</a></td>
-<td style="text-align: right;">3183</td>
-<td><code>81d8bf6af1a329c181f4da2574b169d1d0f8eb948943e5253dbb91c9ebc3e2c2</code></td>
+<td style="text-align: right;">3563</td>
+<td><code>7408ae953c596b3f6e857f07829de3f7d240854428d5aa92d421175ebb8f265b</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/tests/test_public_api.py">units/consumers/dashboard-core/tests/test_public_api.py</a></td>
@@ -2764,12 +2969,62 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L16">market_data/data.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L22">modules/accounts.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L191">modules/accounts.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L20">modules/chat_store.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/module_state.py#L14">modules/module_state.py</a></td>
 <td>optional lookup</td>
 </tr>
 <tr>
 <td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L37">modules/slots.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L128">modules/signal_rules.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L170">modules/signal_rules.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L79">modules/slot_workers.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L146">modules/slot_workers.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L50">modules/slots.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L61">modules/slots.py</a></td>
+<td>optional lookup</td>
+</tr>
+<tr>
+<td><code>DASHBOARD_MODULE_STATE_DIR</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L49">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td>optional lookup</td>
 </tr>
 <tr>
@@ -2844,12 +3099,12 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><code>TERM</code></td>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L22">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L26">terminal_ui.py</a></td>
 <td>optional lookup</td>
 </tr>
 <tr>
 <td><code>TERM</code></td>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L104">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L108">terminal_ui.py</a></td>
 <td>optional lookup</td>
 </tr>
 <tr>
@@ -2869,7 +3124,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><code>THIRTYNA_MONITOR_OWNERS</code></td>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L14">modules/slots.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L16">modules/slots.py</a></td>
 <td>optional lookup</td>
 </tr>
 <tr>
@@ -3045,6 +3300,18 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_demo.py#L79">scripts/deployment/seed_demo.py</a></td>
 <td><code>--manager-token-file</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_sample_workers.py#L61">scripts/deployment/seed_sample_workers.py</a></td>
+<td><code>--code-url</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_sample_workers.py#L62">scripts/deployment/seed_sample_workers.py</a></td>
+<td><code>--manager-url</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_sample_workers.py#L63">scripts/deployment/seed_sample_workers.py</a></td>
+<td><code>--token-file</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/development/data_manager_server.py#L13">scripts/development/data_manager_server.py</a></td>
@@ -3462,8 +3729,73 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </table>
 <h2 id="ddl">DDL موجود در کد</h2>
 <p>این SQLها مرجع ساختارند، دستور migration دستی نیستند. یک نام جدول در چند store مستقل می‌تواند معنای متفاوت داشته باشد.</p>
+<h3 id="candles-market_datadatapy">جدول candles در market_data/data.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L24">market_data/data.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS candles (
+        time INTEGER PRIMARY KEY, open REAL NOT NULL, high REAL NOT NULL,
+        low REAL NOT NULL, close REAL NOT NULL, tick_volume INTEGER,
+        is_open INTEGER NOT NULL CHECK(is_open IN (0,1)))
+</code></pre>
+<h3 id="collector_status-market_datadatapy">جدول collector_status در market_data/data.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L28">market_data/data.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS collector_status (key TEXT PRIMARY KEY, value TEXT NOT NULL)
+</code></pre>
+<h3 id="indicator_specs-market_datadatapy">جدول indicator_specs در market_data/data.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L29">market_data/data.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS indicator_specs (
+        name TEXT NOT NULL, parameters TEXT NOT NULL, computed_revision INTEGER NOT NULL DEFAULT -1,
+        PRIMARY KEY(name,parameters))
+</code></pre>
+<h3 id="indicator_values-market_datadatapy">جدول indicator_values در market_data/data.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L32">market_data/data.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS indicator_values (
+        name TEXT NOT NULL, parameters TEXT NOT NULL, time INTEGER NOT NULL,
+        value_json TEXT NOT NULL, is_open INTEGER NOT NULL CHECK(is_open IN (0,1)),
+        PRIMARY KEY(name,parameters,time))
+</code></pre>
+<h3 id="users-modulesaccountspy">جدول users در modules/accounts.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L29">modules/accounts.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, role TEXT NOT NULL CHECK(role IN ('admin','user')),
+        salt BLOB NOT NULL, password_hash BLOB NOT NULL, enabled INTEGER NOT NULL CHECK(enabled IN (0,1)),
+        created_at INTEGER NOT NULL)
+</code></pre>
+<h3 id="sessions-modulesaccountspy">جدول sessions در modules/accounts.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L33">modules/accounts.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS sessions (
+        token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)
+</code></pre>
+<h3 id="login_limits-modulesaccountspy">جدول login_limits در modules/accounts.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L36">modules/accounts.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS login_limits (
+        key TEXT PRIMARY KEY, window_start INTEGER NOT NULL, attempts INTEGER NOT NULL)
+</code></pre>
+<h3 id="rooms-moduleschat_storepy">جدول rooms در modules/chat_store.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L27">modules/chat_store.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS rooms (
+        id TEXT PRIMARY KEY, member_a TEXT NOT NULL, member_b TEXT NOT NULL,
+        created_at INTEGER NOT NULL, UNIQUE(member_a,member_b))
+</code></pre>
+<h3 id="invitations-moduleschat_storepy">جدول invitations در modules/chat_store.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L30">modules/chat_store.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS invitations (
+        id TEXT PRIMARY KEY, sender TEXT NOT NULL, recipient TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN ('pending','accepted','rejected')),
+        room_id TEXT REFERENCES rooms(id), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)
+</code></pre>
+<h3 id="messages-moduleschat_storepy">جدول messages در modules/chat_store.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L35">modules/chat_store.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, room_id TEXT NOT NULL, author TEXT NOT NULL,
+        body TEXT NOT NULL, created_at INTEGER NOT NULL)
+</code></pre>
 <h3 id="module_state-modulesmodule_statepy">جدول module_state در modules/module_state.py</h3>
 <p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/module_state.py#L19">modules/module_state.py</a></p>
+<pre><code class="language-sql">CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))
+</code></pre>
+<h3 id="module_state-modulesslot_workerspy">جدول module_state در modules/slot_workers.py</h3>
+<p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L82">modules/slot_workers.py</a></p>
 <pre><code class="language-sql">CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))
 </code></pre>
 <h3 id="build_history-unitscode-managercode_managerbuild_pipelinepy">جدول build_history در units/code-manager/code_manager/build_pipeline.py</h3>
@@ -3733,9 +4065,339 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(self)</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-clock/tests/test_worker.py#L5">examples/sample-clock/tests/test_worker.py</a></td>
+<td><code>ClockWorkerTests</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-clock/tests/test_worker.py#L6">examples/sample-clock/tests/test_worker.py</a></td>
+<td><code>ClockWorkerTests.test_output_has_utc_and_integer_timestamp</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-clock/worker.py#L5">examples/sample-clock/worker.py</a></td>
+<td><code>run</code></td>
+<td><code>(data, configuration)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-math/tests/test_worker.py#L5">examples/sample-math/tests/test_worker.py</a></td>
+<td><code>MathWorkerTests</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-math/tests/test_worker.py#L6">examples/sample-math/tests/test_worker.py</a></td>
+<td><code>MathWorkerTests.test_summary_and_configuration</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-math/tests/test_worker.py#L9">examples/sample-math/tests/test_worker.py</a></td>
+<td><code>MathWorkerTests.test_invalid_value</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-math/worker.py#L5">examples/sample-math/worker.py</a></td>
+<td><code>run</code></td>
+<td><code>(data, configuration)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-text/tests/test_worker.py#L5">examples/sample-text/tests/test_worker.py</a></td>
+<td><code>TextWorkerTests</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-text/tests/test_worker.py#L6">examples/sample-text/tests/test_worker.py</a></td>
+<td><code>TextWorkerTests.test_transform</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-text/tests/test_worker.py#L9">examples/sample-text/tests/test_worker.py</a></td>
+<td><code>TextWorkerTests.test_rejects_non_string</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/examples/sample-text/worker.py#L4">examples/sample-text/worker.py</a></td>
+<td><code>run</code></td>
+<td><code>(data, configuration)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/collector.py#L19">market_data/collector.py</a></td>
+<td><code>fetch_bars</code></td>
+<td><code>(limit, before=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/collector.py#L35">market_data/collector.py</a></td>
+<td><code>GoldCollector</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/collector.py#L36">market_data/collector.py</a></td>
+<td><code>GoldCollector.__init__</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/collector.py#L40">market_data/collector.py</a></td>
+<td><code>GoldCollector.start</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/collector.py#L45">market_data/collector.py</a></td>
+<td><code>GoldCollector.stop</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/collector.py#L49">market_data/collector.py</a></td>
+<td><code>GoldCollector._loop</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L15">market_data/data.py</a></td>
+<td><code>database_path</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L19">market_data/data.py</a></td>
+<td><code>connect</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L45">market_data/data.py</a></td>
+<td><code>parse_bar</code></td>
+<td><code>(bar)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L80">market_data/data.py</a></td>
+<td><code>save_bars</code></td>
+<td><code>(bars, historical=False)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L132">market_data/data.py</a></td>
+<td><code>backfill_state</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L141">market_data/data.py</a></td>
+<td><code>set_backfill_state</code></td>
+<td><code>(value)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L149">market_data/data.py</a></td>
+<td><code>set_collector_error</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L157">market_data/data.py</a></td>
+<td><code>snapshot</code></td>
+<td><code>(limit=200, include_open=True, end_time=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L175">market_data/data.py</a></td>
+<td><code>moving_average</code></td>
+<td><code>(candles, period=20)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L179">market_data/data.py</a></td>
+<td><code>refresh_indicators</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L214">market_data/data.py</a></td>
+<td><code>indicator</code></td>
+<td><code>(name, parameters, limit=200, include_open=True, end_time=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L242">market_data/data.py</a></td>
+<td><code>profile_series</code></td>
+<td><code>(profile, limit, include_open, end_time)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L262">market_data/data.py</a></td>
+<td><code>database_table</code></td>
+<td><code>(table, limit=50, offset=0, candle_state='all', indicator_name='all')</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L304">market_data/data.py</a></td>
+<td><code>chart</code></td>
+<td><code>(limit=200, period=20, include_open=True, end_time=None, interval='1m', include_indicators=False, profiles=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/data.py#L318">market_data/data.py</a></td>
+<td><code>chart.append_group</code></td>
+<td><code>(bucket, group)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/__init__.py#L10">market_data/indicators/<strong>init</strong>.py</a></td>
+<td><code>normalize</code></td>
+<td><code>(name, options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/__init__.py#L16">market_data/indicators/<strong>init</strong>.py</a></td>
+<td><code>calculate</code></td>
+<td><code>(name, candles, options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/macd.py#L5">market_data/indicators/macd.py</a></td>
+<td><code>normalize</code></td>
+<td><code>(options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/macd.py#L13">market_data/indicators/macd.py</a></td>
+<td><code>ema</code></td>
+<td><code>(values, period)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/macd.py#L25">market_data/indicators/macd.py</a></td>
+<td><code>calculate</code></td>
+<td><code>(candles, options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/rsi.py#L5">market_data/indicators/rsi.py</a></td>
+<td><code>normalize</code></td>
+<td><code>(options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/rsi.py#L12">market_data/indicators/rsi.py</a></td>
+<td><code>calculate</code></td>
+<td><code>(candles, options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/sma.py#L6">market_data/indicators/sma.py</a></td>
+<td><code>normalize</code></td>
+<td><code>(options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/market_data/indicators/sma.py#L13">market_data/indicators/sma.py</a></td>
+<td><code>calculate</code></td>
+<td><code>(candles, options)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L21">modules/accounts.py</a></td>
+<td><code>_connect</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L41">modules/accounts.py</a></td>
+<td><code>_username</code></td>
+<td><code>(value)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L48">modules/accounts.py</a></td>
+<td><code>_password</code></td>
+<td><code>(value)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L55">modules/accounts.py</a></td>
+<td><code>_hash</code></td>
+<td><code>(password, salt)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L59">modules/accounts.py</a></td>
+<td><code>_user</code></td>
+<td><code>(row)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L63">modules/accounts.py</a></td>
+<td><code>bootstrap_admin</code></td>
+<td><code>(username, password)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L78">modules/accounts.py</a></td>
+<td><code>create_user</code></td>
+<td><code>(username, password, role='user')</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L97">modules/accounts.py</a></td>
+<td><code>get_user</code></td>
+<td><code>(user_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L105">modules/accounts.py</a></td>
+<td><code>list_users</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L111">modules/accounts.py</a></td>
+<td><code>login</code></td>
+<td><code>(username, password)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L148">modules/accounts.py</a></td>
+<td><code>is_session_token</code></td>
+<td><code>(token)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L152">modules/accounts.py</a></td>
+<td><code>authenticate</code></td>
+<td><code>(token)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L163">modules/accounts.py</a></td>
+<td><code>logout</code></td>
+<td><code>(token)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L170">modules/accounts.py</a></td>
+<td><code>set_enabled</code></td>
+<td><code>(user_id, enabled)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/accounts.py#L187">modules/accounts.py</a></td>
+<td><code>upstream_credential</code></td>
+<td><code>(user_id)</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/calculator/module.py#L11">modules/calculator/module.py</a></td>
 <td><code>run</code></td>
 <td><code>(data)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat-box/module.py#L10">modules/chat-box/module.py</a></td>
+<td><code>run</code></td>
+<td><code>(data)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L19">modules/chat_store.py</a></td>
+<td><code>_connect</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L43">modules/chat_store.py</a></td>
+<td><code>_active_user</code></td>
+<td><code>(owner)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L50">modules/chat_store.py</a></td>
+<td><code>_authorize</code></td>
+<td><code>(db, owner, room)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L57">modules/chat_store.py</a></td>
+<td><code>request_private</code></td>
+<td><code>(owner, recipient)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L75">modules/chat_store.py</a></td>
+<td><code>respond</code></td>
+<td><code>(owner, request_id, accept)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L97">modules/chat_store.py</a></td>
+<td><code>list_rooms</code></td>
+<td><code>(owner)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L106">modules/chat_store.py</a></td>
+<td><code>list_requests</code></td>
+<td><code>(owner)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L114">modules/chat_store.py</a></td>
+<td><code>send</code></td>
+<td><code>(owner, room, text)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/chat_store.py#L130">modules/chat_store.py</a></td>
+<td><code>messages</code></td>
+<td><code>(owner, room, limit=50, before=None)</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/clock/clock.py#L7">modules/clock/clock.py</a></td>
@@ -3778,19 +4440,24 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(data)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/execution.py#L21">modules/execution.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/execution.py#L24">modules/execution.py</a></td>
 <td><code>UnknownModule</code></td>
 <td><code>class</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/execution.py#L26">modules/execution.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/execution.py#L29">modules/execution.py</a></td>
 <td><code>_load</code></td>
 <td><code>(module_id)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/execution.py#L33">modules/execution.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/execution.py#L36">modules/execution.py</a></td>
 <td><code>run_module</code></td>
 <td><code>(module_id, data)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/gold-chart/module.py#L12">modules/gold-chart/module.py</a></td>
+<td><code>run</code></td>
+<td><code>(data)</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/host_monitor.py#L12">modules/host_monitor.py</a></td>
@@ -3848,6 +4515,36 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(data)</code></td>
 </tr>
 <tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/indicator_profiles.py#L13">modules/indicator_profiles.py</a></td>
+<td><code>list_profiles</code></td>
+<td><code>(owner)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/indicator_profiles.py#L17">modules/indicator_profiles.py</a></td>
+<td><code>save</code></td>
+<td><code>(owner, data, profile_id=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/indicator_profiles.py#L27">modules/indicator_profiles.py</a></td>
+<td><code>save.update</code></td>
+<td><code>(old)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/indicator_profiles.py#L40">modules/indicator_profiles.py</a></td>
+<td><code>delete</code></td>
+<td><code>(owner, profile_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/indicator_profiles.py#L41">modules/indicator_profiles.py</a></td>
+<td><code>delete.update</code></td>
+<td><code>(old)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/macd/module.py#L10">modules/macd/module.py</a></td>
+<td><code>run</code></td>
+<td><code>(data)</code></td>
+</tr>
+<tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/module_state.py#L9">modules/module_state.py</a></td>
 <td><code>change</code></td>
 <td><code>(owner, module, slot, default, operation)</code></td>
@@ -3858,24 +4555,119 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(run)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L26">modules/registry.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/moving-average/module.py#L10">modules/moving-average/module.py</a></td>
+<td><code>run</code></td>
+<td><code>(data)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L30">modules/registry.py</a></td>
 <td><code>ModuleManifestError</code></td>
 <td><code>class</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L30">modules/registry.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L34">modules/registry.py</a></td>
 <td><code>load_modules</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L104">modules/registry.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L108">modules/registry.py</a></td>
 <td><code>list_modules</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L109">modules/registry.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/registry.py#L113">modules/registry.py</a></td>
 <td><code>get_module</code></td>
 <td><code>(module_id: str)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/rsi/module.py#L10">modules/rsi/module.py</a></td>
+<td><code>run</code></td>
+<td><code>(data)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L14">modules/signal_rules.py</a></td>
+<td><code>list_rules</code></td>
+<td><code>(owner)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L18">modules/signal_rules.py</a></td>
+<td><code>save</code></td>
+<td><code>(owner, data, rule_id=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L36">modules/signal_rules.py</a></td>
+<td><code>save.update</code></td>
+<td><code>(old)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L48">modules/signal_rules.py</a></td>
+<td><code>delete</code></td>
+<td><code>(owner, rule_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L49">modules/signal_rules.py</a></td>
+<td><code>delete.update</code></td>
+<td><code>(old)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L56">modules/signal_rules.py</a></td>
+<td><code>market_input</code></td>
+<td><code>(owner, interval='1m')</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L68">modules/signal_rules.py</a></td>
+<td><code>evaluate</code></td>
+<td><code>(owner, rule_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L77">modules/signal_rules.py</a></td>
+<td><code>evaluate.value</code></td>
+<td><code>(profile_id, field, stamp)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L98">modules/signal_rules.py</a></td>
+<td><code>_fingerprint</code></td>
+<td><code>(owner, rule_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L105">modules/signal_rules.py</a></td>
+<td><code>latest</code></td>
+<td><code>(owner, rule_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L113">modules/signal_rules.py</a></td>
+<td><code>evaluate_and_save</code></td>
+<td><code>(owner, rule_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L123">modules/signal_rules.py</a></td>
+<td><code>evaluate_enabled_rules</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L142">modules/signal_rules.py</a></td>
+<td><code>SignalScheduler</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L144">modules/signal_rules.py</a></td>
+<td><code>SignalScheduler.__init__</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L149">modules/signal_rules.py</a></td>
+<td><code>SignalScheduler.start</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L155">modules/signal_rules.py</a></td>
+<td><code>SignalScheduler.stop</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/signal_rules.py#L159">modules/signal_rules.py</a></td>
+<td><code>SignalScheduler._loop</code></td>
+<td><code>(self)</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot-note/module.py#L10">modules/slot-note/module.py</a></td>
@@ -3883,32 +4675,132 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(data)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L12">modules/slots.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L24">modules/slot_workers.py</a></td>
+<td><code>configure</code></td>
+<td><code>(owner, slot, payload)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L64">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L65">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler.__init__</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L69">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler.start</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L74">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler.stop</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L78">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler._connect</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L85">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler._recover</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L98">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler._claim</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L124">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler._finish</code></td>
+<td><code>(self, owner, slot, revision, error)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slot_workers.py#L141">modules/slot_workers.py</a></td>
+<td><code>SlotWorkerScheduler._loop</code></td>
+<td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L14">modules/slots.py</a></td>
 <td><code>_authorize_host_monitor</code></td>
 <td><code>(owner, module_id)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L19">modules/slots.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L21">modules/slots.py</a></td>
 <td><code>binding</code></td>
 <td><code>(owner, slot, module_id=None, context=None, only_if_missing=False)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L27">modules/slots.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L29">modules/slots.py</a></td>
 <td><code>binding.update</code></td>
 <td><code>(previous)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L34">modules/slots.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L35">modules/slots.py</a></td>
+<td><code>binding.update_meta</code></td>
+<td><code>(old)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L47">modules/slots.py</a></td>
 <td><code>list_slots</code></td>
 <td><code>(owner)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L46">modules/slots.py</a></td>
-<td><code>execute</code></td>
-<td><code>(owner, slot, data, expected_module=None)</code></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L59">modules/slots.py</a></td>
+<td><code>_layout_db</code></td>
+<td><code>(owner)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L65">modules/slots.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L76">modules/slots.py</a></td>
+<td><code>list_active</code></td>
+<td><code>(owner)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L97">modules/slots.py</a></td>
+<td><code>create</code></td>
+<td><code>(owner, slot_type='standard')</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L114">modules/slots.py</a></td>
+<td><code>duplicate</code></td>
+<td><code>(owner, slot)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L141">modules/slots.py</a></td>
+<td><code>bind_active</code></td>
+<td><code>(owner, slot, module_id, context, only_if_missing=False)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L165">modules/slots.py</a></td>
+<td><code>set_overview</code></td>
+<td><code>(owner, slot, visible)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L179">modules/slots.py</a></td>
+<td><code>update_appearance</code></td>
+<td><code>(owner, slot, updates)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L263">modules/slots.py</a></td>
+<td><code>delete</code></td>
+<td><code>(owner, slot)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L274">modules/slots.py</a></td>
+<td><code>_market_preferences</code></td>
+<td><code>(owner, slot, module_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L283">modules/slots.py</a></td>
+<td><code>execute</code></td>
+<td><code>(owner, slot, data, expected_module=None, expected_revision=None)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/modules/slots.py#L308">modules/slots.py</a></td>
 <td><code>read</code></td>
 <td><code>(owner, slot)</code></td>
 </tr>
@@ -3966,6 +4858,46 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_demo.py#L74">scripts/deployment/seed_demo.py</a></td>
 <td><code>main</code></td>
 <td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_sample_workers.py#L24">scripts/deployment/seed_sample_workers.py</a></td>
+<td><code>archive_for</code></td>
+<td><code>(worker_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_sample_workers.py#L36">scripts/deployment/seed_sample_workers.py</a></td>
+<td><code>register_sample</code></td>
+<td><code>(code, manager, worker_id)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/seed_sample_workers.py#L59">scripts/deployment/seed_sample_workers.py</a></td>
+<td><code>main</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/sync_account_credentials.py#L23">scripts/deployment/sync_account_credentials.py</a></td>
+<td><code>_read</code></td>
+<td><code>(path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/sync_account_credentials.py#L32">scripts/deployment/sync_account_credentials.py</a></td>
+<td><code>_atomic</code></td>
+<td><code>(path, data, uid, gid, mode)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/sync_account_credentials.py#L51">scripts/deployment/sync_account_credentials.py</a></td>
+<td><code>sync</code></td>
+<td><code>(config, state, dashboard_uid, dashboard_gid)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/sync_account_credentials.py#L139">scripts/deployment/sync_account_credentials.py</a></td>
+<td><code>main</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/sync_account_credentials.py#L145">scripts/deployment/sync_account_credentials.py</a></td>
+<td><code>main.open_lock</code></td>
+<td><code>(path)</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/scripts/deployment/verify_install.py#L18">scripts/deployment/verify_install.py</a></td>
@@ -4158,94 +5090,299 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(self, owner='customer', manager_url='https://localhost:18444', token_file='/etc/30na/customer-token', ca_file='/etc/30na/ca/trust.pem')</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L24">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L28">terminal_ui.py</a></td>
 <td><code>Terminal.style</code></td>
 <td><code>(self, text, *codes)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L29">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L33">terminal_ui.py</a></td>
 <td><code>Terminal.ask</code></td>
 <td><code>(self, label, default=None)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L34">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L38">terminal_ui.py</a></td>
 <td><code>Terminal.choose</code></td>
 <td><code>(self, title, rows, label, default=0)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L52">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L56">terminal_ui.py</a></td>
 <td><code>Terminal.call</code></td>
 <td><code>(self, args, *, state=False, quiet=False)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L73">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L77">terminal_ui.py</a></td>
 <td><code>Terminal.show</code></td>
 <td><code>(self, value)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L85">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L89">terminal_ui.py</a></td>
 <td><code>Terminal.slot_args</code></td>
 <td><code>(self, *args)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L88">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L92">terminal_ui.py</a></td>
 <td><code>Terminal.worker_args</code></td>
 <td><code>(self, *args)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L92">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L96">terminal_ui.py</a></td>
 <td><code>Terminal.refresh</code></td>
 <td><code>(self)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L102">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L106">terminal_ui.py</a></td>
 <td><code>Terminal.screen</code></td>
 <td><code>(self, title=None)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L153">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L157">terminal_ui.py</a></td>
 <td><code>Terminal.overview</code></td>
 <td><code>(self)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L159">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L163">terminal_ui.py</a></td>
 <td><code>Terminal.input_for</code></td>
 <td><code>(self, module_id)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L215">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L223">terminal_ui.py</a></td>
 <td><code>Terminal.number</code></td>
 <td><code>(self, label, default)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L223">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L231">terminal_ui.py</a></td>
 <td><code>Terminal.integer</code></td>
 <td><code>(self, label, default, minimum, maximum)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L231">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L239">terminal_ui.py</a></td>
 <td><code>Terminal.slots_menu</code></td>
 <td><code>(self)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L277">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L285">terminal_ui.py</a></td>
 <td><code>Terminal.modules_menu</code></td>
 <td><code>(self)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L307">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L315">terminal_ui.py</a></td>
 <td><code>Terminal.executions_menu</code></td>
 <td><code>(self)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L323">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L331">terminal_ui.py</a></td>
 <td><code>Terminal.workers_menu</code></td>
 <td><code>(self)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L363">terminal_ui.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/terminal_ui.py#L371">terminal_ui.py</a></td>
 <td><code>Terminal.run</code></td>
 <td><code>(self)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L10">tests/test_account_chat_api.py</a></td>
+<td><code>client</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L20">tests/test_account_chat_api.py</a></td>
+<td><code>client.Adapter</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L21">tests/test_account_chat_api.py</a></td>
+<td><code>client.Adapter.get</code></td>
+<td><code>(self, path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L25">tests/test_account_chat_api.py</a></td>
+<td><code>auth</code></td>
+<td><code>(token)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L28">tests/test_account_chat_api.py</a></td>
+<td><code>create_accounts</code></td>
+<td><code>(client)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L42">tests/test_account_chat_api.py</a></td>
+<td><code>test_bootstrap_user_access_and_worker_fail_closed</code></td>
+<td><code>(client)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L54">tests/test_account_chat_api.py</a></td>
+<td><code>test_chat_requires_acceptance_and_isolates_participants</code></td>
+<td><code>(client)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L71">tests/test_account_chat_api.py</a></td>
+<td><code>test_session_can_create_and_use_owner_scoped_chat_slot</code></td>
+<td><code>(client)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L84">tests/test_account_chat_api.py</a></td>
+<td><code>test_legacy_token_with_session_prefix_remains_valid</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L89">tests/test_account_chat_api.py</a></td>
+<td><code>test_legacy_token_with_session_prefix_remains_valid.Adapter</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L90">tests/test_account_chat_api.py</a></td>
+<td><code>test_legacy_token_with_session_prefix_remains_valid.Adapter.get</code></td>
+<td><code>(self, path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L97">tests/test_account_chat_api.py</a></td>
+<td><code>test_provisioned_session_can_use_its_worker_credential</code></td>
+<td><code>(client, tmp_path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L111">tests/test_account_chat_api.py</a></td>
+<td><code>test_forwarded_credentials_never_cross_accounts</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L116">tests/test_account_chat_api.py</a></td>
+<td><code>test_forwarded_credentials_never_cross_accounts.Adapter</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L117">tests/test_account_chat_api.py</a></td>
+<td><code>test_forwarded_credentials_never_cross_accounts.Adapter.__init__</code></td>
+<td><code>(self, owner, credential)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L118">tests/test_account_chat_api.py</a></td>
+<td><code>test_forwarded_credentials_never_cross_accounts.Adapter.get</code></td>
+<td><code>(self, path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_api.py#L129">tests/test_account_chat_api.py</a></td>
+<td><code>test_disabling_customer_revokes_legacy_dashboard_access</code></td>
+<td><code>(client)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_chat_browser.py#L8">tests/test_account_chat_browser.py</a></td>
+<td><code>test_password_login_and_public_chat</code></td>
+<td><code>(tmp_path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L15">tests/test_account_provisioning.py</a></td>
+<td><code>token</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L16">tests/test_account_provisioning.py</a></td>
+<td><code>digest</code></td>
+<td><code>(value)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L19">tests/test_account_provisioning.py</a></td>
+<td><code>test_provision_is_owner_scoped_stable_and_revocable</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L61">tests/test_account_provisioning.py</a></td>
+<td><code>test_rejects_symlinked_account_db</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L67">tests/test_account_provisioning.py</a></td>
+<td><code>test_rejects_symlinked_output_before_touching_configuration</code></td>
+<td><code>(tmp_path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L75">tests/test_account_provisioning.py</a></td>
+<td><code>test_refuses_to_replace_unmanaged_owner_binding</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L91">tests/test_account_provisioning.py</a></td>
+<td><code>test_provisioned_accounts_flow_through_separate_manager_identities</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L109">tests/test_account_provisioning.py</a></td>
+<td><code>test_provisioned_accounts_flow_through_separate_manager_identities.list_workers</code></td>
+<td><code>(owner=Depends(manager_owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L111">tests/test_account_provisioning.py</a></td>
+<td><code>test_provisioned_accounts_flow_through_separate_manager_identities.Adapter</code></td>
+<td><code>class</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L112">tests/test_account_provisioning.py</a></td>
+<td><code>test_provisioned_accounts_flow_through_separate_manager_identities.Adapter.__init__</code></td>
+<td><code>(self, credential)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L113">tests/test_account_provisioning.py</a></td>
+<td><code>test_provisioned_accounts_flow_through_separate_manager_identities.Adapter.get</code></td>
+<td><code>(self, path)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L125">tests/test_account_provisioning.py</a></td>
+<td><code>test_new_sessions_use_isolated_real_worker_manager</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L147">tests/test_account_provisioning.py</a></td>
+<td><code>test_new_sessions_use_isolated_real_worker_manager.factory</code></td>
+<td><code>(owner, credential)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_account_provisioning.py#L148">tests/test_account_provisioning.py</a></td>
+<td><code>test_new_sessions_use_isolated_real_worker_manager.factory.transport</code></td>
+<td><code>(request, timeout)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L8">tests/test_accounts_chat.py</a></td>
+<td><code>users</code></td>
+<td><code>(tmp_path, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L16">tests/test_accounts_chat.py</a></td>
+<td><code>test_sessions_are_owner_bound_and_revoked</code></td>
+<td><code>(users)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L29">tests/test_accounts_chat.py</a></td>
+<td><code>test_private_room_requires_acceptance_and_membership</code></td>
+<td><code>(users)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L45">tests/test_accounts_chat.py</a></td>
+<td><code>test_public_messages_pagination_and_disabled_accounts</code></td>
+<td><code>(users)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L56">tests/test_accounts_chat.py</a></td>
+<td><code>test_rejected_request_does_not_grant_access</code></td>
+<td><code>(users)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L64">tests/test_accounts_chat.py</a></td>
+<td><code>test_session_expires_and_logout_is_independent</code></td>
+<td><code>(users, monkeypatch)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L76">tests/test_accounts_chat.py</a></td>
+<td><code>test_existing_customer_workspace_cannot_be_rebootstrapped</code></td>
+<td><code>(users)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L84">tests/test_accounts_chat.py</a></td>
+<td><code>test_chat_module_slot_obeys_room_membership</code></td>
+<td><code>(users)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests/test_accounts_chat.py#L95">tests/test_accounts_chat.py</a></td>
+<td><code>test_login_throttle_expires</code></td>
+<td><code>(users, monkeypatch)</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/tests_support/code_manager.py#L5">tests_support/code_manager.py</a></td>
@@ -5643,52 +6780,67 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(tmp_path)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L26">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L28">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>load_themes</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L61">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L66">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>health</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L66">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L71">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><code>project_info</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L88">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>list_themes</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L83">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L104">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>get_theme</code></td>
 <td><code>(theme_id: str)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L95">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L116">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>clock_time</code></td>
 <td><code>(timezone: str \| None=None)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L105">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L126">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>execute_module</code></td>
 <td><code>(module_id: str, data: dict)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L120">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L141">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>api_modules</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L126">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L147">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>dashboard</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L778">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L2375">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>create_app</code></td>
 <td><code>(*, credential_path=None, upstream_factory=None)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L798">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L2400">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><code>create_app.start_slot_workers</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L2406">units/consumers/dashboard-core/dashboard/app.py</a></td>
+<td><code>create_app.stop_slot_workers</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/app.py#L2414">units/consumers/dashboard-core/dashboard/app.py</a></td>
 <td><code>create_app.connected_dashboard</code></td>
 <td><code>()</code></td>
 </tr>
@@ -5703,92 +6855,282 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(owner, token)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L14">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L18">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>RunRequest</code></td>
 <td><code>class</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L21">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L25">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router</code></td>
 <td><code>(credential_path, upstream_factory)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L33">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L34">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.owner</code></td>
+<td><code>(request: Request)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L58">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.admin_identity</code></td>
+<td><code>(request: Request, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L68">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.forward</code></td>
 <td><code>(request, identity, name, method, path, payload=None, status=200)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L54">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
-<td><code>create_router.read</code></td>
-<td><code>(operation: str, request: Request, identity=Depends(owner))</code></td>
-</tr>
-<tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L60">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L91">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.worker_path</code></td>
 <td><code>(worker_id)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L69">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L100">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.account_bootstrap</code></td>
+<td><code>(body: dict, request: Request, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L109">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.account_login</code></td>
+<td><code>(body: dict)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L117">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.account_me</code></td>
+<td><code>(request: Request, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L125">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.account_logout</code></td>
+<td><code>(request: Request, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L131">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.account_users</code></td>
+<td><code>(identity=Depends(admin_identity))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L135">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.account_create</code></td>
+<td><code>(body: dict, identity=Depends(admin_identity))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L142">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.account_enable</code></td>
+<td><code>(user_id: str, body: dict, identity=Depends(admin_identity))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L150">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.chat_users</code></td>
+<td><code>(identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L156">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.chat_rooms</code></td>
+<td><code>(identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L162">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.chat_requests</code></td>
+<td><code>(identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L168">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.chat_request</code></td>
+<td><code>(body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L176">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.chat_respond</code></td>
+<td><code>(request_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L185">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.chat_messages</code></td>
+<td><code>(room_id: str, limit: int=Query(default=50, ge=1, le=200), before: int \| None=Query(default=None, gt=0), identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L192">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.chat_send</code></td>
+<td><code>(room_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L200">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.market_candles</code></td>
+<td><code>(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, end_time: int \| None=Query(default=None, ge=0), interval: str='1m', include_indicators: bool=False, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L215">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.profile_list</code></td>
+<td><code>(identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L219">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.profile_create</code></td>
+<td><code>(body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L225">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.profile_save</code></td>
+<td><code>(profile_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L232">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.profile_delete</code></td>
+<td><code>(profile_id: str, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L238">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.signal_list</code></td>
+<td><code>(identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L242">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.signal_create</code></td>
+<td><code>(body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L248">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.signal_save</code></td>
+<td><code>(rule_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L255">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.signal_delete</code></td>
+<td><code>(rule_id: str, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L261">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.signal_evaluate</code></td>
+<td><code>(rule_id: str, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L268">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.signal_worker</code></td>
+<td><code>(worker_id: str, body: dict, request: Request, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L285">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.read</code></td>
+<td><code>(operation: str, request: Request, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L292">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.market_sma</code></td>
+<td><code>(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L307">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.indicators_endpoint</code></td>
+<td><code>(name: str, limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=14, ge=1, le=500), fast: int=Query(default=12, ge=1, le=500), slow: int=Query(default=26, ge=1, le=500), signal: int=Query(default=9, ge=1, le=500), include_open: bool=True, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L325">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.market_database</code></td>
+<td><code>(table: str, limit: int=Query(default=50, ge=1, le=200), offset: int=Query(default=0, ge=0, le=1000000), candle_state: str='all', indicator_name: str='all', identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L339">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.module_state</code></td>
 <td><code>(module_id: str, body: dict, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L85">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L355">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.run_independent_module</code></td>
+<td><code>(module_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L372">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.list_active_slots</code></td>
+<td><code>(identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L379">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.create_slot</code></td>
+<td><code>(body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L391">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.duplicate_slot</code></td>
+<td><code>(slot_id: str, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L400">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.update_slot_overview</code></td>
+<td><code>(slot_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L413">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.delete_slot</code></td>
+<td><code>(slot_id: str, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L424">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.update_slot_appearance</code></td>
+<td><code>(slot_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L439">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><code>create_router.configure_slot_worker</code></td>
+<td><code>(slot_id: str, body: dict, identity=Depends(owner))</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L452">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.bind_slot</code></td>
 <td><code>(slot_id: str, body: dict, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L98">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L467">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.read_slot</code></td>
 <td><code>(slot_id: str, body: dict, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L115">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L486">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.execute_slot</code></td>
 <td><code>(slot_id: str, body: dict, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L130">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L503">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.register</code></td>
 <td><code>(body: RegisterBody, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L135">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L508">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.worker</code></td>
 <td><code>(worker_id: str, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L139">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L512">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.configure</code></td>
 <td><code>(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L145">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L518">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.remove</code></td>
 <td><code>(worker_id: str, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L149">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L522">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.enable</code></td>
 <td><code>(worker_id: str, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L153">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L526">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.disable</code></td>
 <td><code>(worker_id: str, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L157">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L530">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.run</code></td>
 <td><code>(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L168">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L541">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.execution</code></td>
 <td><code>(execution_id: UUID, request: Request, identity=Depends(owner))</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L172">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/dashboard/upstreams.py#L545">units/consumers/dashboard-core/dashboard/upstreams.py</a></td>
 <td><code>create_router.cancel</code></td>
 <td><code>(execution_id: UUID, request: Request, identity=Depends(owner))</code></td>
 </tr>
@@ -5804,7 +7146,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L32">units/consumers/dashboard-core/legacy-tests/test_dashboard.py</a></td>
-<td><code>test_each_theme_has_slots</code></td>
+<td><code>test_each_theme_has_colors</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>
@@ -6128,12 +7470,12 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <td><code>(tmp_path, monkeypatch)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/tests/test_monitor_modules.py#L42">units/consumers/dashboard-core/tests/test_monitor_modules.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/tests/test_monitor_modules.py#L45">units/consumers/dashboard-core/tests/test_monitor_modules.py</a></td>
 <td><code>test_log_and_disk_paths_require_explicit_permission</code></td>
 <td><code>(tmp_path, monkeypatch)</code></td>
 </tr>
 <tr>
-<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/tests/test_monitor_modules.py#L55">units/consumers/dashboard-core/tests/test_monitor_modules.py</a></td>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/main/units/consumers/dashboard-core/tests/test_monitor_modules.py#L58">units/consumers/dashboard-core/tests/test_monitor_modules.py</a></td>
 <td><code>test_rebinding_invalidates_saved_slot_output</code></td>
 <td><code>(tmp_path, monkeypatch)</code></td>
 </tr>

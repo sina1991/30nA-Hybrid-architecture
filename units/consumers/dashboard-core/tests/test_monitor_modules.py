@@ -23,9 +23,10 @@ def test_slot_monitor_result_is_owner_scoped_and_binding_checked(tmp_path, monke
     client = TestClient(create_app(credential_path=creds, upstream_factory=lambda *_: {}))
     alice = {'Authorization': 'Bearer alice-token'}
     bob = {'Authorization': 'Bearer bob-token'}
-    bind = '/api/upstreams/slots/slot-01/binding'
-    execute = '/api/upstreams/slots/slot-01/execute'
-    read = '/api/upstreams/slots/slot-01/read'
+    slot = client.post('/api/upstreams/slots', headers=alice, json={}).json()['payload']['slot']['slot']
+    bind = f'/api/upstreams/slots/{slot}/binding'
+    execute = f'/api/upstreams/slots/{slot}/execute'
+    read = f'/api/upstreams/slots/{slot}/read'
     assert client.post(read, json={'module_id': 'disk-usage'}).status_code == 401
     assert client.post(bind, headers=alice, json={'module_id': 'disk-usage'}).status_code == 200
     response = client.post(execute, headers=alice, json={'module_id': 'disk-usage', 'input': {}})
@@ -35,8 +36,10 @@ def test_slot_monitor_result_is_owner_scoped_and_binding_checked(tmp_path, monke
     assert client.post(read, headers=alice, json={'module_id': 'disk-usage'}).json()['payload']['result'] == result
     assert client.post(read, headers=alice, json={'module_id': 'system-monitor'}).status_code == 422
     assert client.post(read, headers=bob, json={'module_id': 'disk-usage'}).status_code == 404
-    assert client.post(bind, headers=bob, json={'module_id': 'disk-usage'}).status_code == 200
-    assert client.post(execute, headers=bob, json={'module_id': 'disk-usage', 'input': {}}).status_code == 422
+    assert client.post(bind, headers=bob, json={'module_id': 'disk-usage'}).status_code == 404
+    bob_slot = client.post('/api/upstreams/slots', headers=bob, json={}).json()['payload']['slot']['slot']
+    assert client.post(f'/api/upstreams/slots/{bob_slot}/binding', headers=bob, json={'module_id': 'disk-usage'}).status_code == 200
+    assert client.post(f'/api/upstreams/slots/{bob_slot}/execute', headers=bob, json={'module_id': 'disk-usage', 'input': {}}).status_code == 422
 
 
 def test_log_and_disk_paths_require_explicit_permission(tmp_path, monkeypatch):

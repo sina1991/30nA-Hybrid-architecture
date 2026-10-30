@@ -278,11 +278,13 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 #overview-grid .slot[data-minimized="true"] .module-body,#overview-grid .slot[data-minimized="true"] .slot-resize,#overview-grid .slot[data-minimized="true"] .chart-move-handle {display:none!important}
 .slot-min-label {font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #overview-grid .slot:not(.chart-slot)[data-output-mode="full"] .module-body {padding-right:25px}
+.chat-box {display:flex;flex-direction:column;gap:6px;min-height:0;flex:1;padding-right:24px}.chat-box select,.chat-box textarea {width:100%;font:inherit;color:var(--text);background:var(--field);border:1px solid var(--border);border-radius:6px;padding:6px}.chat-box textarea {min-height:45px;resize:vertical}.chat-box button {font:inherit;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px 8px;cursor:pointer}.chat-messages {flex:1;min-height:60px;max-height:300px;overflow:auto;display:grid;align-content:start;gap:5px}.chat-message {border:1px solid var(--border);border-radius:7px;padding:6px;background:var(--field);white-space:pre-wrap;overflow-wrap:anywhere}.chat-message small {display:block;color:var(--muted);font-size:10px}.chat-invitation {display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:5px 0}.chat-invitation span {flex:1}
 .slot-summary {height:100%;min-height:0;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:5px 32px 5px 8px;font-variant-numeric:tabular-nums}
 .slot-summary-name {font-size:12px;color:var(--muted);font-weight:600;overflow-wrap:anywhere}.slot-summary-value {font-size:clamp(13px,1.5vw,20px);font-weight:700;color:var(--text);overflow-wrap:anywhere}
 #overview-grid .slot[data-custom-output-size="true"] .module-body :is(.module-title,.module-detail,.metric-label,.metric-value,.metric-group,.market-price,.market-status,.market-candle-info,.market-legend,.dice-result,.module-json,.slot-quick-result) {font-size:var(--output-font-size)}
 #overview-grid .slot[data-custom-output-weight="true"] .module-body :is(.module-title,.module-detail,.metric-label,.metric-value,.metric-group,.market-price,.market-status,.market-candle-info,.market-legend,.dice-result,.module-json,.slot-quick-result) {font-weight:var(--output-font-weight)}
 #overview-grid .slot[data-custom-output-color="true"] .module-body :is(.module-title,.module-detail,.metric-label,.metric-value,.metric-group,.market-price,.market-status,.market-candle-info,.market-legend,.dice-result,.module-json,.slot-quick-result) {color:var(--output-text-color)}
+.account-users {display:grid;gap:6px}.account-user {display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px;border-bottom:1px solid var(--border)}
 .slot-menu-actions {display:grid!important;gap:10px!important}.slot-section {display:grid;gap:7px;padding:10px;background:var(--field);border:1px solid var(--border);border-radius:9px;margin-top:8px}.slot-section h4 {margin:0;font-size:12px;color:var(--muted)}
 .slot-section-actions,.slot-appearance-controls {display:flex;align-items:center;gap:7px;flex-wrap:wrap}.slot-section-actions button,.slot-appearance-controls button {font:inherit;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer}.slot-section-actions .delete-slot {color:#e05a5a}
 .output-style-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px}.output-preview {padding:10px;border:1px solid var(--border);border-radius:7px;min-height:42px}.output-color-controls {display:flex;align-items:center;gap:7px}.output-color-controls input[type="color"] {width:50px;height:30px;padding:2px}
@@ -449,6 +451,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
   <button type="button" class="dice-roll-button" id="add-small-slot" disabled>+ Small slot</button>
   <button type="button" class="dice-roll-button" id="add-minimal-slot" disabled>+ Minimal slot</button>
+  <button type="button" class="dice-roll-button" id="add-chat-slot" disabled>+ Chat slot</button>
   <button type="button" class="dice-roll-button" id="add-chart-slot" disabled>+ Chart slot</button>
   <button type="button" class="dice-roll-button" id="add-fixed-chart-slot" disabled>+ Fix Chart slot</button>
   <p class="slots-message" id="slots-message">Sign in to manage slots.</p>
@@ -491,7 +494,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     </div><p id="db-status" class="market-status" role="status">Sign in to view market data.</p><div class="db-scroll"><table class="db-table" id="db-output"></table></div>
   </section>
   <section class="page-view" data-page="project" hidden><h2 class="view-heading">Project Info</h2><p class="view-description">Version and deployment information.</p><div class="info-card"><p>Project: <strong>30nA Hybrid Architecture</strong></p><p>Version: <strong id="project-version">Loading…</strong></p><p>Installed commit: <code id="project-commit">Loading…</code></p><p>Dashboard: <strong id="project-health">Checking</strong></p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/tree/main/docs" target="_blank" rel="noopener noreferrer">Project documentation ↗</a></div></section>
-  <section class="page-view" data-page="account" hidden><h2 class="view-heading">Account &amp; Settings</h2><p class="view-description">Sign in and choose the dashboard appearance.</p><div class="info-card"><div id="account-access-mount"></div><p>The access token stays in memory for this browser session.</p><label for="theme">Dashboard theme</label> <select id="theme" aria-label="Select dashboard theme"></select></div></section>
+  <section class="page-view" data-page="account" hidden><h2 class="view-heading">Account &amp; Settings</h2><p class="view-description">Sign in and choose the dashboard appearance.</p><div class="info-card"><div id="account-access-mount"></div><p>The access token stays in memory for this browser session.</p><div id="account-administration"></div><label for="theme">Dashboard theme</label> <select id="theme" aria-label="Select dashboard theme"></select></div></section>
   <div id="worker-panel-mount"></div>
 </main>
 <footer>30nA · Server workspace</footer>
@@ -522,6 +525,7 @@ function openView(name) {
   });
   document.body.classList.remove('nav-open');
   document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
+  if (name === 'account') refreshAccountAdministration();
   if (name === 'database') refreshDatabase();
   if (name === 'indicators') refreshIndicatorProfiles();
   if (name === 'signals') refreshSignals();
@@ -540,7 +544,9 @@ document.addEventListener('click', event => {
 document.addEventListener('dashboard-account-state', event => {
   document.getElementById('account-shortcut').textContent = event.detail.ready ? 'Account' : 'Sign in';
   document.querySelectorAll('[data-auth-note]').forEach(note => { note.hidden = event.detail.ready; });
+  if (event.detail.ready && document.body.dataset.view === 'account') refreshAccountAdministration();
   if (!event.detail.ready) {
+    document.getElementById('account-administration').replaceChildren();
     document.getElementById('runner-output').textContent = '';
     document.getElementById('runner-status').textContent = '';
     document.getElementById('runner-input').value = '{}';
@@ -698,6 +704,36 @@ function renderSignals(workers) {
     catch (_) { status.textContent='Submission failed or outcome is unknown. Check Executions before retrying.'; }
     finally { run.disabled=!worker.options.length; }
   }); root.append(python);
+}
+
+async function refreshAccountAdministration() {
+  const root=document.getElementById('account-administration'), bridge=window.dashboardModuleState;
+  root.replaceChildren(); if (!bridge?.ready()) return;
+  try {
+    const info=await bridge.accountMe(); if (!bridge.ready() || info.user.role !== 'admin') return;
+    const data=await bridge.listAccounts(); if (!bridge.ready()) return;
+    const section=makeElement('section','slot-section'); section.append(makeElement('h4','','User administration'));
+    const form=document.createElement('form'); form.className='slot-worker-form';
+    const userLabel=makeElement('label','','Username'), username=makeElement('input',''); username.required=true; username.autocomplete='off'; username.placeholder='Example: alice'; userLabel.append(username);
+    const passwordLabel=makeElement('label','','Password (at least 12 UTF-8 bytes)'), password=makeElement('input',''); password.type='password'; password.autocomplete='new-password'; password.required=true; passwordLabel.append(password);
+    const roleLabel=makeElement('label','','Role'), role=makeElement('select','');
+    [['user','User'],['admin','Admin']].forEach(([value,title]) => {const option=makeElement('option','',title);option.value=value;role.append(option);});roleLabel.append(role);
+    const submit=makeElement('button','chart-options-button', data.users.length ? 'Create user' : 'Initialize administrator'); submit.type='submit';
+    const status=makeElement('p','market-status');
+    if (!data.users.length) { roleLabel.hidden=true; section.append(makeElement('p','market-status','Initialize the existing customer account before using password login or chat.')); }
+    form.append(userLabel,passwordLabel,roleLabel,submit,status); section.append(form);
+    form.addEventListener('submit', async event => { event.preventDefault(); submit.disabled=true;
+      try { if (!data.users.length) await bridge.accountBootstrap(username.value,password.value); else await bridge.createAccount(username.value,password.value,role.value); password.value=''; await refreshAccountAdministration(); }
+      catch (_) { password.value=''; status.textContent='Could not save account. Check username and password.'; submit.disabled=false; }
+    });
+    const list=makeElement('div','account-users');
+    data.users.forEach(user => {
+      const line=makeElement('div','account-user'); line.append(makeElement('span','',`${user.username} · ${user.role} · ${user.enabled ? 'Enabled' : 'Disabled'}`));
+      const toggle=makeElement('button','chart-options-button',user.enabled ? 'Disable' : 'Enable');toggle.type='button';
+      toggle.addEventListener('click', async () => {toggle.disabled=true;try {await bridge.setAccountEnabled(user.id,!user.enabled);await refreshAccountAdministration();}catch (_) {status.textContent='Could not change account status.';toggle.disabled=false;}});
+      line.append(toggle); list.append(line);
+    });section.append(list);root.append(section);
+  } catch (_) { root.textContent='User administration is unavailable.'; }
 }
 
 function renderCatalog() {
@@ -1175,6 +1211,48 @@ function renderIndicator(body, slot, module) {
   setTimeout(tick, 0);
 }
 
+function renderChat(body, slot) {
+  const box=makeElement('div','chat-box'), status=makeElement('div','market-status','Loading chat…');
+  const room=makeElement('select','');room.setAttribute('aria-label','Public or private conversation');
+  const messages=makeElement('div','chat-messages'); messages.setAttribute('aria-live','polite');
+  const form=document.createElement('form'), input=makeElement('textarea','');input.maxLength=4000;input.placeholder='Write a message';input.setAttribute('aria-label','Message');
+  const send=makeElement('button','','Send');send.type='submit';form.append(input,send);
+  const details=makeElement('details','');details.append(makeElement('summary','','Private chat requests'));
+  const users=makeElement('select',''), invite=makeElement('button','','Request private chat');invite.type='button';
+  const requests=makeElement('div',''); details.append(users,invite,requests);
+  box.append(room,status,messages,form,details);body.append(box);
+  let busy=false, lastMessages='', userNames=new Map(), roomIds=new Set();
+  async function refresh() {
+    const bridge=window.dashboardModuleState;if(!bridge?.ready() || busy)return;busy=true;
+    try {
+      const [roomData,userData,requestData]=await Promise.all([bridge.chatRooms(),bridge.chatUsers(),bridge.chatRequests()]);
+      if(!body.isConnected || !bridge.ready())return;
+      userNames=new Map(userData.users.map(user=>[user.id,user.username])); roomIds=new Set(roomData.rooms.map(item=>item.id));
+      const current=slot.chat_room || 'public';room.replaceChildren();
+      roomData.rooms.forEach(item=>{const option=makeElement('option','',item.kind === 'public' ? 'Public chat' : 'Private · '+(userNames.get(item.peer) || item.peer));option.value=item.id;room.append(option);});
+      room.value=roomIds.has(current) ? current : 'public';
+      users.replaceChildren();userData.users.forEach(user=>{const option=makeElement('option','',user.username);option.value=user.id;users.append(option);});invite.disabled=!users.options.length;
+      requests.replaceChildren();
+      requestData.requests.filter(item=>item.status==='pending').forEach(item=>{
+        const row=makeElement('div','chat-invitation'), incoming=item.recipient===bridge.owner();
+        row.append(makeElement('span','',incoming ? `From ${userNames.get(item.sender) || item.sender}` : `Pending: ${userNames.get(item.recipient) || item.recipient}`));
+        if(incoming) [ [true,'Accept'],[false,'Reject'] ].forEach(([accept,label])=>{const button=makeElement('button','',label);button.type='button';button.addEventListener('click',async()=>{button.disabled=true;try{await bridge.chatRespond(item.id,accept);await refresh();}catch(_){status.textContent='Could not resolve request.';button.disabled=false;}});row.append(button);});
+        requests.append(row);
+      });
+      const response=await bridge.chatMessages(room.value);if(!body.isConnected || !bridge.ready())return;
+      const serialized=JSON.stringify(response.messages);
+      if(serialized!==lastMessages){messages.replaceChildren();response.messages.forEach(item=>{const entry=makeElement('div','chat-message');entry.append(makeElement('small','',(userNames.get(item.author) || (item.author === bridge.owner() ? 'You' : item.author))+' · '+new Date(item.created_at*1000).toLocaleString()),document.createTextNode(item.body));messages.append(entry);});messages.scrollTop=messages.scrollHeight;lastMessages=serialized;}
+      status.textContent=room.value==='public' ? 'Public chat · visible to signed-in users' : 'Private chat · accepted participants only';
+    }catch(_){if(body.isConnected) status.textContent='Chat unavailable. An administrator must initialize accounts.';}
+    finally{busy=false;}
+  }
+  room.addEventListener('change',async()=>{room.disabled=true;try{await window.dashboardModuleState.setSlotAppearance(slot.id,{chat_room:room.value});slotGeneration++;await refreshActiveSlots();}catch(_){room.value=slot.chat_room || 'public';status.textContent='Could not save conversation.';room.disabled=false;}});
+  invite.addEventListener('click',async()=>{invite.disabled=true;try{await window.dashboardModuleState.chatInvite(users.value);await refresh();}catch(_){status.textContent='Could not send request; check for an existing request.';}finally{invite.disabled=!users.options.length;}});
+  form.addEventListener('submit',async event=>{event.preventDefault();if(!input.value.trim())return;send.disabled=true;try{await window.dashboardModuleState.chatSend(room.value,input.value);input.value='';await refresh();}catch(_){status.textContent='Message outcome unknown. Refresh before retrying.';}finally{send.disabled=false;}});
+  body.addEventListener('slot-refresh',refresh);
+  function tick(){if(!body.isConnected)return;refresh();setTimeout(tick,5000);}setTimeout(tick,0);
+}
+
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
   const module = availableModules.find(item => item.id === moduleId);
@@ -1189,6 +1267,7 @@ function renderModuleContent(body, slot, moduleId) {
     return;
   }
   if (module.type === 'market-indicator') { renderIndicator(body, slot, module); return; }
+  if (module.type === 'chat') { renderChat(body, slot); return; }
 
   if (module.type === "host-monitor") {
     const output = makeElement("div", "module-detail", "No result yet.");
@@ -1673,7 +1752,7 @@ function canRestoreSlot(card, layout) {
 function makeSlot(row, area) {
   const isChartSlot = ['chart','fix-chart'].includes(row.slot_type) && row.module_id === 'gold-chart';
   const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
-    chart_period:row.chart_period, chart_interval:row.chart_interval, chart_indicators:row.chart_indicators, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
+    chat_room:row.chat_room, chart_period:row.chart_period, chart_interval:row.chart_interval, chart_indicators:row.chart_indicators, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
   const card = makeElement('article', isChartSlot ? 'slot chart-slot' : 'slot');
   card.dataset.slotId = slot.id;
   card.dataset.area = area;
@@ -1713,7 +1792,7 @@ function makeSlot(row, area) {
   const actions = makeElement('div', 'slot-menu-actions');
   const typeLabel = makeElement('label', '', 'Slot type ');
   const slotType = makeElement('select', 'slot-display-theme');
-  [['standard','Standard'],['small','Small'],['minimal','Minimal'],['chart','Chart'],['fix-chart','Fix Chart']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
+  [['standard','Standard'],['small','Small'],['minimal','Minimal'],['chart','Chart'],['fix-chart','Fix Chart'],['chat','Chat']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
   slotType.value = row.slot_type || 'standard';
   slotType.addEventListener('change', async () => {
     slotType.disabled = true;
@@ -1930,7 +2009,7 @@ function makeSlot(row, area) {
       if (!card.isConnected || !bridge.ready()) return;
       notice.textContent = '';
       if (settingsDialog.open) settingsDialog.close();
-      if (['host-monitor','gold-chart','moving-average','market-indicator'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
+      if (['host-monitor','gold-chart','moving-average','market-indicator','chat'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
       else if (!['clock', 'counter', 'slot-note', 'empty', 'dashboard-health', 'theme-summary'].includes(row.module_id)) {
         let resultView = body.querySelector('.slot-quick-result');
         if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
@@ -2063,7 +2142,7 @@ function makeSlot(row, area) {
   if (!row.minimized && row.output_settings?.mode === 'summary') renderSlotSummary(body, row, moduleInfo);
   else if (!row.minimized && isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
   else if (!row.minimized) renderModuleContent(body, slot, selectedModule);
-  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
+  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 
@@ -2082,6 +2161,7 @@ function renderSlots() {
   const ready = Boolean(window.dashboardModuleState?.ready());
   document.getElementById('add-slot').disabled = !ready;
   document.getElementById('add-chart-slot').disabled = !ready;
+  document.getElementById('add-chat-slot').disabled = !ready;
   document.getElementById('add-small-slot').disabled = !ready;
   document.getElementById('add-minimal-slot').disabled = !ready;
   document.getElementById('add-fixed-chart-slot').disabled = !ready;
@@ -2184,6 +2264,12 @@ document.getElementById('add-small-slot').addEventListener('click', async event 
   event.currentTarget.disabled = true;
   try { await window.dashboardModuleState.createSlot('small'); slotGeneration++; await refreshActiveSlots(); }
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add small slot.'; }
+  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+});
+document.getElementById('add-chat-slot').addEventListener('click', async event => {
+  event.currentTarget.disabled = true;
+  try { await window.dashboardModuleState.createSlot('chat'); slotGeneration++; await refreshActiveSlots(); }
+  catch (_) { document.getElementById('slots-message').textContent = 'Could not add chat slot.'; }
   finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
 });
 document.getElementById('add-chart-slot').addEventListener('click', async event => {

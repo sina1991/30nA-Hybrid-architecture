@@ -1103,7 +1103,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **238**؛ تعداد نمادهای Python: **950**.
+تعداد فایل‌های فنی و پشتیبان: **279**؛ تعداد نمادهای Python: **1152**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -1115,12 +1115,13 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
 | [.github/workflows/release.yml](../../.github/workflows/release.yml) | 2995 | `3bd849d3a5468419d50a6d21ac431f9d552580595629e5cdfdcbf6206843f8f1` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
-| [30na](../../30na) | 11649 | `5b0d2274cb1ba60f3394927e908a29c5bdcf25bf51ad1c6053eca07c5e00d9e6` |
+| [30na](../../30na) | 20177 | `273a9019ec0a2dd1b8ecb555604ef892cab994c0705692217885368f526e29dd` |
 | [AGENTS.md](../../AGENTS.md) | 2124 | `abff7ec1d833f288225af6ad93ec95436b0187fd05c0a1f953d7e53e5ddbea2c` |
 | [CHANGELOG.md](../../CHANGELOG.md) | 4956 | `a96af343d5e228ccaf07d1e7c425f8e362b8941ec6a55a0901aa7c743690ca88` |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
 | [README.md](../../README.md) | 7363 | `1e5461f0565f1a5cf1c46d61c39d5f0cfc42df35bb3f800670dd59dcf9da8628` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
+| [VERSION](../../VERSION) | 10 | `7525ba28ee62a019271ebef84a089438f0487030bcba611022f6bed9dee1b40e` |
 | [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
 | [agents/base-prompt.md](../../agents/base-prompt.md) | 5002 | `967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a` |
 | [agents/tasks/01-core.md](../../agents/tasks/01-core.md) | 2178 | `246f884a492333b17d4cbcebb0435776f0eb4546f6e887cbafd57a294438692e` |
@@ -1165,6 +1166,8 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [contracts/worker/runtime.openapi.json](../../contracts/worker/runtime.openapi.json) | 33671 | `61be22996ffde6955a58f7665f691f3411a0caf8126cd6187ccb486e69ac16f9` |
 | [deployment/30na-cli](../../deployment/30na-cli) | 181 | `233864675e420c7c102c05a90bbd7b5b45626ed50cba0a7a5196eae259356e6c` |
 | [deployment/30na-review](../../deployment/30na-review) | 709 | `d491bfd8a98c9fb7ace8a825043775129c5db9b193f83ec4260586a8c71b0802` |
+| [deployment/systemd/30na-account-sync.service](../../deployment/systemd/30na-account-sync.service) | 655 | `cd2defd98c3272dcb46b1e67aeb801877bae5de8ceb49e742b1e9d6b24a48166` |
+| [deployment/systemd/30na-account-sync.timer](../../deployment/systemd/30na-account-sync.timer) | 210 | `dcfeb8816598de7cbb8bd8c05e6329476a2bf0d986503566bfad1097eb6e46ba` |
 | [deployment/systemd/30na-code-manager.service](../../deployment/systemd/30na-code-manager.service) | 840 | `595bb8311728b0f10aa4695992cad683ca78847d8dfa4c09e551d7035f001488` |
 | [deployment/systemd/30na-dashboard.service](../../deployment/systemd/30na-dashboard.service) | 819 | `4208a90b065f01c6ee967b14e85a8fed09233de712c822cb1bf3dc4204e972f5` |
 | [deployment/systemd/30na-worker-manager.service](../../deployment/systemd/30na-worker-manager.service) | 734 | `0051999306cf9921f50d1078b729231bb9660b42d534cdbcc895e683a07e7a36` |
@@ -1172,12 +1175,32 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [examples/demo-summary/demo_worker.py](../../examples/demo-summary/demo_worker.py) | 691 | `339e8d841d6a233bba5d48cd5373d03a96bd68db1f9ec486cacb63c92e303a0f` |
 | [examples/demo-summary/tests/__init__.py](../../examples/demo-summary/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [examples/demo-summary/tests/test_demo.py](../../examples/demo-summary/tests/test_demo.py) | 463 | `17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f` |
-| [install.sh](../../install.sh) | 15266 | `834aff84e6ea0366d782f902b9bcda057b2d7f290b6c1c2b48cd8888bac39b52` |
+| [examples/sample-clock/tests/__init__.py](../../examples/sample-clock/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| [examples/sample-clock/tests/test_worker.py](../../examples/sample-clock/tests/test_worker.py) | 282 | `f6a14ee7ee2347ec068b5340d0869e311a299a95dbf05b21ef0befc2bc2aef19` |
+| [examples/sample-clock/worker.py](../../examples/sample-clock/worker.py) | 279 | `fbd09ea03d53339d0bc56dc52d8981321ee74c68436d880fbcd25271100ad414` |
+| [examples/sample-math/tests/__init__.py](../../examples/sample-math/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| [examples/sample-math/tests/test_worker.py](../../examples/sample-math/tests/test_worker.py) | 338 | `dfa3f07fb7aabf1c6dedcc97ccece5d9835386ad42cdf59eff2aca274a783fbf` |
+| [examples/sample-math/worker.py](../../examples/sample-math/worker.py) | 856 | `2b4817cb68dfc0f30da5d97e2a7c9961214186c9549b71779f4170a99434eab6` |
+| [examples/sample-text/tests/__init__.py](../../examples/sample-text/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
+| [examples/sample-text/tests/test_worker.py](../../examples/sample-text/tests/test_worker.py) | 335 | `faca1d30bf7b472fa9b7d63189aeea25556edb8573fec9de09fc6bbeaf5eccfa` |
+| [examples/sample-text/worker.py](../../examples/sample-text/worker.py) | 570 | `cef255818e1e6fb58a36ab09e135390b4f0d07c24617b1f314addfaaebf64276` |
+| [install.sh](../../install.sh) | 15408 | `5622bffacee91d3262bb66bc171a401dceed51ba692d3c20b2ebb7025d0a8ad7` |
+| [market_data/__init__.py](../../market_data/__init__.py) | 53 | `3817c4d1ed64d67f252f75fdfa0abb3fa353a503620f170a34fd0a117e69d334` |
+| [market_data/collector.py](../../market_data/collector.py) | 3684 | `0a747940fdaec46f3b8349a2f2d3d069cb1154ebbca5d2f4d7bda111026b222b` |
+| [market_data/data.py](../../market_data/data.py) | 22654 | `ed54271d5c581b52617377f867a8d3a9c3c48ef1f33e57cfa61cbcbd42e1ced7` |
+| [market_data/indicators/__init__.py](../../market_data/indicators/__init__.py) | 616 | `0ba4f37390e51fc6ad37f8784c339e2a897ffa3bad6aaa6800d9307be4336191` |
+| [market_data/indicators/macd.py](../../market_data/indicators/macd.py) | 1592 | `c817cdb5290b2692ca7c1decc2b422c4c73643560d77f2208471a7c19cf44fb9` |
+| [market_data/indicators/rsi.py](../../market_data/indicators/rsi.py) | 1205 | `0790e829cd8aed8c0e3699de300b97e5a44a261feb85c3546227e440ef646696` |
+| [market_data/indicators/sma.py](../../market_data/indicators/sma.py) | 1017 | `c7c8abef1358c3bb19425fa43328fc4c927049100d864212e6f15917c50111e6` |
 | [modules/__init__.py](../../modules/__init__.py) | 55 | `884e080626de6c419827b873df812d991d6b73c2c2fd5419a5b019583eb8e059` |
+| [modules/accounts.py](../../modules/accounts.py) | 9969 | `3a6b2b60afa549b1291e2594e21a3f0d857756715d071b22e66d4046cc674227` |
 | [modules/alerts/manifest.json](../../modules/alerts/manifest.json) | 160 | `8b37b53a82afbb96cdaf1d16f01a3321671168b27ddabb961eebc7c393238e8d` |
 | [modules/alerts/module.py](../../modules/alerts/module.py) | 263 | `94bbd626fdca69c7c74d456ce328582e8d2455d91cdccd20742baef64b6af72f` |
 | [modules/calculator/manifest.json](../../modules/calculator/manifest.json) | 178 | `a1697698e2452c0165e17aedff5a11b61845740c6fcd7408cad34f90533ab423` |
 | [modules/calculator/module.py](../../modules/calculator/module.py) | 1033 | `88256927623eec9529c986f7543aa179e55349b517574d44dc8f818836de18c8` |
+| [modules/chat-box/manifest.json](../../modules/chat-box/manifest.json) | 150 | `10429340f56d582794adc6f252cc7235cf862023a773dfd98b270d4acb33ff58` |
+| [modules/chat-box/module.py](../../modules/chat-box/module.py) | 1122 | `41df328162f831e882e9592bbc6fa24d883e795e3112745d4c4d7b7d2a906969` |
+| [modules/chat_store.py](../../modules/chat_store.py) | 7264 | `d821d3cf7aaedb47aff533894a06a941dcc2114517eefcb234e54f5ebccaf1a2` |
 | [modules/clock/clock.py](../../modules/clock/clock.py) | 794 | `88595bffcae5fec638e48c6cef085160acb62fe95860cc9316f1351270693fc0` |
 | [modules/clock/manifest.json](../../modules/clock/manifest.json) | 150 | `344220c8fef4d4a771ac909b1cb4c2d8d875cebb94a09438176ca1ed5bcb7eea` |
 | [modules/counter/manifest.json](../../modules/counter/manifest.json) | 168 | `e9a24c818a815286fc4814b0b2a32b8ea6befa5c48f76b793baba96ad83917ad` |
@@ -1192,29 +1215,40 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [modules/docker-monitor/module.py](../../modules/docker-monitor/module.py) | 263 | `3deefa3ab19f99355fe88500ba6f297d3a87ad28713a2814ad4323af27c3b7e3` |
 | [modules/empty/manifest.json](../../modules/empty/manifest.json) | 150 | `2fb5fa5c447ca6edca494b8632322031604d9a2ff095c8e78d38467eff2be1a7` |
 | [modules/empty/module.py](../../modules/empty/module.py) | 364 | `18663f5ed9b09efec95efd6aa3a632844f076aea9e3cbeb3fc15da3f6ca961c9` |
-| [modules/execution.py](../../modules/execution.py) | 1834 | `097566eae47b40809755551145abe3c1a0ea4d7493b5685263430db0b08e7df9` |
+| [modules/execution.py](../../modules/execution.py) | 2085 | `e6c5a916b2c286668abd8c9721211af67a78d8bcfe811a3e26a22e9bc9d4f0cd` |
+| [modules/gold-chart/manifest.json](../../modules/gold-chart/manifest.json) | 198 | `9be1ef05655de7dc910270785e2c0b0f82b1d6a65f5e0795326ebb2df1f48942` |
+| [modules/gold-chart/module.py](../../modules/gold-chart/module.py) | 822 | `08a0986abc0636ad38b4bf58859088816f9b29a918a6ed7fe47522dbea27bed4` |
 | [modules/host_monitor.py](../../modules/host_monitor.py) | 8410 | `cc76c577110d8acc5a0e7c30b8fa759e96be91812cfbaedfaff0e49a727e12a6` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py) | 2161 | `1688916f16d805cda4b9ee5d90de1c76054388329a6cdd2d7588cfd3efe302b7` |
 | [modules/log-viewer/manifest.json](../../modules/log-viewer/manifest.json) | 163 | `a91ca1cbee3771400e9d86466688226a1313b4597bdd9887d00d7d334443e1f9` |
 | [modules/log-viewer/module.py](../../modules/log-viewer/module.py) | 261 | `0a490f3a6644d9f158b7abd2adad4f63baec04b17b0f19680671e4480f18efc3` |
+| [modules/macd/manifest.json](../../modules/macd/manifest.json) | 151 | `42049c3fb84c9e437ff67c79a1657971a43dc6e1b427217e76f5b845199379a9` |
+| [modules/macd/module.py](../../modules/macd/module.py) | 967 | `8ff6c9b3fcd17e247fd9e9f52a610404fd9880bfad2e633e378e86839faabe42` |
 | [modules/module_state.py](../../modules/module_state.py) | 1543 | `0b24fbd1ea8fe464e1bed8a9833e4351762644e2eb5de71a2b48f7035edce93a` |
 | [modules/module_support.py](../../modules/module_support.py) | 1349 | `0c670fd5d6e6900321909f5af8bebcb8cdb8db747696eebc42ca1358942b1431` |
+| [modules/moving-average/manifest.json](../../modules/moving-average/manifest.json) | 198 | `77490e0affb550cc4e4a722cd34c02005ba6b8a780ef5e93b3f64b40657f3c5b` |
+| [modules/moving-average/module.py](../../modules/moving-average/module.py) | 933 | `cb4426dfd02522e3db5ddb775db16120cf870eaad46c616261051daed6ecc671` |
 | [modules/network-monitor/manifest.json](../../modules/network-monitor/manifest.json) | 177 | `2b29dfd7b49a487ec6a7c0c4737df2ed61d1f9728231b8bfa1fdca79930bac72` |
 | [modules/network-monitor/module.py](../../modules/network-monitor/module.py) | 264 | `bd094bbe764aa10879b727b6071a964f87c8a1e916c010e9cc8e133b17c716dc` |
 | [modules/process-monitor/manifest.json](../../modules/process-monitor/manifest.json) | 182 | `f2cb4ff053526e70ce9862ec76d7e13f2c14113181eeba9a48029c1c0a115b80` |
 | [modules/process-monitor/module.py](../../modules/process-monitor/module.py) | 264 | `a6d553bad61ab7fb92bfeca8383aabd131dacd1ecbd5233bbc72f54c2f48378b` |
-| [modules/registry.py](../../modules/registry.py) | 3412 | `b18b7cda2a1678f41a5fc2abc569b5e8a171b6b74604c75d7df403570ff295ba` |
+| [modules/registry.py](../../modules/registry.py) | 3488 | `408d4e2a8679be6f7858b13cc6585edabdb6286f5da52e6d8949b71dc61fd7bc` |
+| [modules/rsi/manifest.json](../../modules/rsi/manifest.json) | 144 | `9a37fdba13fba5890becb0d02bf13c3ab3354a04dd2e6de10a3571bc5fd434c9` |
+| [modules/rsi/module.py](../../modules/rsi/module.py) | 930 | `ab2fb19594580420b9616415700960cf107b56d679adbf6c4357b1a752ecdc70` |
 | [modules/service-monitor/manifest.json](../../modules/service-monitor/manifest.json) | 187 | `c25730e3345c9c8fbc141e2d040014d780728f890f326c74adff0667c2efce24` |
 | [modules/service-monitor/module.py](../../modules/service-monitor/module.py) | 264 | `57d93d44f8007d8e7816453f1d47f7388527e53f94eabb67f400b8b2fb5aa676` |
+| [modules/signal_rules.py](../../modules/signal_rules.py) | 9666 | `7a74b9fbc599f183a4a62bc72fd82df4e974a574d2e26960c3456e045f74497c` |
 | [modules/slot-note/manifest.json](../../modules/slot-note/manifest.json) | 186 | `f4b599ff9d1ca2a7e6175cfec3d779ed9ae8d26d4ee4ff30861d38fb41e659cf` |
 | [modules/slot-note/module.py](../../modules/slot-note/module.py) | 1080 | `3cdc5fe1b4abf488de8aa800c4f81259bb28f2706e5ae18499ed07b1b61a9355` |
-| [modules/slots.py](../../modules/slots.py) | 3916 | `29a81f53821ab6253c056225a958043f2983b301f1b3188748bd4e96fa6763d4` |
+| [modules/slot_workers.py](../../modules/slot_workers.py) | 9406 | `0ed77c14d28a223c61bec5e9014c997de0929d6087abacd61ed95b29f903c190` |
+| [modules/slots.py](../../modules/slots.py) | 20179 | `0184c5d09772136d0483303098d29d26019b6123f93868ece663ee179983bf3a` |
 | [modules/system-monitor/manifest.json](../../modules/system-monitor/manifest.json) | 182 | `7869970d1d74e070d8e7d3b6a8debc6796006f1a33d28cdd367c6544036171c8` |
 | [modules/system-monitor/module.py](../../modules/system-monitor/module.py) | 263 | `50a175a66728611bd03a6355154ac6c9bd75f683f59dbd21dbf0deae690b9756` |
 | [modules/theme-summary/manifest.json](../../modules/theme-summary/manifest.json) | 184 | `1c9e029abcc9f1dd8236d68d45356599ba085a4c362bd0b57884f605115374d0` |
-| [modules/theme-summary/module.py](../../modules/theme-summary/module.py) | 842 | `310834952e466f96553fb014e0b8d45e551757a3baecb4433598f8e2cea52890` |
-| [modules/theme-summary/themes/compact-6.json](../../modules/theme-summary/themes/compact-6.json) | 701 | `ae0ea5e577c3455e1e5186426078b92ba4a71c2c4407c28c426ae14e1c1e5475` |
-| [modules/theme-summary/themes/standard-8.json](../../modules/theme-summary/themes/standard-8.json) | 897 | `5eca7faeff243bd66d0d543f9abd3cf8cb546d3ba9a0255fe6be2fc25962861a` |
-| [modules/theme-summary/themes/wide-12.json](../../modules/theme-summary/themes/wide-12.json) | 1284 | `10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048` |
+| [modules/theme-summary/module.py](../../modules/theme-summary/module.py) | 907 | `3816fa9e8d789d856faf2ca612ad2f0804377d42cd47b98b7ea523c3a1baaa79` |
+| [modules/theme-summary/themes/daylight.json](../../modules/theme-summary/themes/daylight.json) | 367 | `82eae6ddc20bb89125cfb1b30f482a065c09fca054c9d5033f53f58dc1215179` |
+| [modules/theme-summary/themes/forest.json](../../modules/theme-summary/themes/forest.json) | 362 | `50c438dcf6a4fe9a021f24e5796ab825237c61908c7fa108725f29267be543a2` |
+| [modules/theme-summary/themes/midnight.json](../../modules/theme-summary/themes/midnight.json) | 366 | `7781c016ac10996f7b69340c1b50fd6e1ddee61e9cc322c6fe1b6ceb10538850` |
 | [requirements-dev.txt](../../requirements-dev.txt) | 191 | `baa71328e392be7ddb0840fff882f389a2ee21c1d5f96cea2c87b7bdf7cae04d` |
 | [requirements-docs.lock](../../requirements-docs.lock) | 371 | `6bd1ef812562571e65c9d9e4152ff06caa9c93aa23e079f25d630fd1bf1e3876` |
 | [requirements-docs.txt](../../requirements-docs.txt) | 104 | `a5f88176f3e70130d2af9dd3f55e17a4080489288844d229d585d543a164c0b3` |
@@ -1225,7 +1259,9 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [scripts/deployment/prepare.sh](../../scripts/deployment/prepare.sh) | 266 | `b257cb69651bdb04f156083b51360ea30467afda1e598fab40322889e2cc7bc1` |
 | [scripts/deployment/provision.py](../../scripts/deployment/provision.py) | 7585 | `9aa72de47fd16b933d9cafce4204a23c66fa447c5c104abb5e7d2d2ab9dacbb3` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py) | 4454 | `f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20` |
-| [scripts/deployment/update_dashboard.sh](../../scripts/deployment/update_dashboard.sh) | 4523 | `40fa85bd7e4886a9a5b2ab7b93eec98ab0e743ae8120b39d09439cad63732eb6` |
+| [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py) | 3711 | `6fb96d6dc0423a2db716142a2461d5590745d6fdf15d52ae8c8cb7a3721d84ba` |
+| [scripts/deployment/sync_account_credentials.py](../../scripts/deployment/sync_account_credentials.py) | 9728 | `cec67692dc01cedb413d443e599e139702a7d89a7c7c22f6f3b67ec942c99fa5` |
+| [scripts/deployment/update_dashboard.sh](../../scripts/deployment/update_dashboard.sh) | 6167 | `b165da6cceb04b6fb8eda606308c3f414de073bb1beb1baf98ee27c149b126e7` |
 | [scripts/deployment/verify_install.py](../../scripts/deployment/verify_install.py) | 3205 | `c0ac64d85583279ec7d81447003f45f2c045ca84a172b1c7dfc7554901e3b8f1` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py) | 1164 | `5e9d644203ae3157224aa5742c9bd46ee52007b3607c3b43de94af32f9a38b78` |
 | [scripts/development/export_openapi.py](../../scripts/development/export_openapi.py) | 1373 | `3443bd17d389f8cd8e500ce70138239f9037a00418237d0851a25aa3145000a6` |
@@ -1236,7 +1272,11 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [scripts/security/run_sandbox_acceptance.sh](../../scripts/security/run_sandbox_acceptance.sh) | 1628 | `29e42f1387cba4a6408e47a778bef1c72ce2b7d260b1c928aab7c56c8b9d4caf` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../../scripts/security/run_sandbox_daemon_fault_injection.py) | 9281 | `2b69f43549441d92624c1e4c16f5b59a06a15dec23926b18f4c5391399f581df` |
 | [scripts/testing/run_ci.py](../../scripts/testing/run_ci.py) | 5751 | `e456246359b97e4c27138eba8ebace0b81a838d30600ef0b4e867173eab2afa2` |
-| [terminal_ui.py](../../terminal_ui.py) | 21800 | `f106f9ba8568fc0830770cc169244510acc3984e2daa891548c0d67d4c1ca9db` |
+| [terminal_ui.py](../../terminal_ui.py) | 22223 | `80e21fb985fdf4e8a622ff6384182dc9a81d0d9118e15ddb9d1bff00c61f4db3` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py) | 8755 | `34f36c514334a35b1438b1f33e8a696a9f86f279741911bed02c6ecffc4616aa` |
+| [tests/test_account_chat_browser.py](../../tests/test_account_chat_browser.py) | 923 | `eeaf3a954269fcbcf57000dc645362090f30fb6cadf7fbbf2e8e161a8a3b79c6` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py) | 11536 | `662e4d2ed7de4fda8bdd53325ffa3c8b28ddff88ecf2abc36121c6031acb87d4` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py) | 5328 | `aa209ce5608616ee6f918f35723e2614c9c757b1491a511594a0ff42b24f9f6e` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py) | 2220 | `c789173d8bf728310ecc339a4a05858017826e61b2db8c67961bd521f41aac59` |
 | [units/code-manager/README.md](../../units/code-manager/README.md) | 6974 | `a6188e8e5994c3db15537556d8968cc42ee90bb0aadaed5bfa33396d6d2cb14e` |
 | [units/code-manager/code_manager/__init__.py](../../units/code-manager/code_manager/__init__.py) | 121 | `1170efd7f23978c79fb04db74e7a7aaf5f6479a1ea97f7aa0baebe5e26049a8f` |
@@ -1267,22 +1307,23 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/code-manager/tests/test_source_registration.py](../../units/code-manager/tests/test_source_registration.py) | 3772 | `aa451da0cc27ec1d438239eba22bcb4380c4d056cd38e2f02a8bd64ca096ffae` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py) | 3829 | `6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0` |
 | [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 5199 | `f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496` |
-| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 10421 | `fa6857b22aa71029f936334b83d2073c08088dec6bd9c4af85f0d6680d91b68e` |
-| [units/consumers/dashboard-core/browser-tests/layout.cjs](../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1610 | `0eea28bbe25519a5668c8e2ef224d1b934c3d769d4060b44c824809a444c6547` |
+| [units/consumers/dashboard-core/browser-tests/accounts_chat.cjs](../../units/consumers/dashboard-core/browser-tests/accounts_chat.cjs) | 5477 | `fca4c960cd1a538ffe54a47ab757e7e76719266868b07354547e6c1bad177fc0` |
+| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11423 | `827955fd672363a90ea467576e7d234fa6798d08ab3fe77c8459382d47525191` |
+| [units/consumers/dashboard-core/browser-tests/layout.cjs](../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1242 | `399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc` |
 | [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3475 | `e50b81b1e00341e3a27623dacc5bf851bbaac7783412f1e68d6450713eba25de` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
 | [units/consumers/dashboard-core/dashboard/__init__.py](../../units/consumers/dashboard-core/dashboard/__init__.py) | 34 | `df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 33442 | `03e5c09b9e376b6a212e08129f8cc81402c818c280a2728ac1f94deb1b4c223b` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 172468 | `e6f687316c6674a1ffa581ec60903dbfa5afe577499c23c1c4d907ba2c7b9bea` |
 | [units/consumers/dashboard-core/dashboard/modules/__init__.py](../../units/consumers/dashboard-core/dashboard/modules/__init__.py) | 41 | `35ef8ebac64753121ad6a4d2e62c7c2c90b29160f0c22dbadb2faf113226622f` |
 | [units/consumers/dashboard-core/dashboard/modules/execution.py](../../units/consumers/dashboard-core/dashboard/modules/execution.py) | 169 | `5bef73ad14e3c2595302b184e0cae257303cea569d45fefa6f3b7127eb3123a2` |
 | [units/consumers/dashboard-core/dashboard/modules/module_state.py](../../units/consumers/dashboard-core/dashboard/modules/module_state.py) | 172 | `3a347ce78439f00e178fc4e49961b77ed8a56941085fdf77df7b389919a4afa8` |
 | [units/consumers/dashboard-core/dashboard/modules/module_support.py](../../units/consumers/dashboard-core/dashboard/modules/module_support.py) | 174 | `9d78e2dafa971a209de113786d8d0e138526c1121143a7cc2d4d8f38471e2266` |
 | [units/consumers/dashboard-core/dashboard/modules/registry.py](../../units/consumers/dashboard-core/dashboard/modules/registry.py) | 173 | `b920ecb3337de92010152921ce7891951d132b65330c992e015682887f3fb631` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py) | 696 | `3cb7072b852490b9539315bc26d695448049bd26e946226a4655d4b0d98b44fd` |
-| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 29256 | `07392440bc1a41cbb39187e69c7f5f4c1c4512fb616bdb8a2d3d19113d2a9dd1` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py) | 9086 | `e3751bbc891823fccdfeec31f1fabb981ecaa91c920cc0ee411ca01e687ce044` |
-| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py) | 2080 | `e34085021222909575d449a8ba5bc9618db2a13b3cd0719a5c1dd4c8c5aa2742` |
+| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 55255 | `2d77a2472c5027243626b4d3f20de722deabfc28f532c5e1ffbd31decbbab11d` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py) | 31440 | `b8be5fa8ea99c1e9d73eb4c8f1d0dfa79cd815554b2cfec9510b2b8d076fda64` |
+| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py) | 2075 | `989cab754c511a6474dbfdb45763a22d957229624715f67c9cca892ed9ce423f` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../units/consumers/dashboard-core/legacy-tests/test_registry.py) | 3954 | `aaa8da8a33038f063560bd693de4722924f8ec35121f506933ff53fc3d196d22` |
 | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py) | 7569 | `56cb6258ba13de0f6bfb586c872f9f8c915cb60cfedcf7663812b815066d1d74` |
 | [units/consumers/dashboard-core/requirements-dev.txt](../../units/consumers/dashboard-core/requirements-dev.txt) | 49 | `76d1b0013bd73822840766e68b234055b0962571813765d60b2c012dc82ec88e` |
@@ -1291,7 +1332,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/consumers/dashboard-core/tests/test_demo_seed.py](../../units/consumers/dashboard-core/tests/test_demo_seed.py) | 1782 | `689e6c3a35708d88e7ac8f3d69d0298eec5d26a71a2d7cb8c6c3c21c97cb123e` |
 | [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py) | 8578 | `12b26f91c3be9fbbbee012b54a1f2a556c99a52cc829d3afd0bdfe26213ab35d` |
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py) | 1089 | `1b67e3fefd4e42704c0622569e569878e5af1142a01caf57e7107aaf3b4ca2ff` |
-| [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py) | 3183 | `81d8bf6af1a329c181f4da2574b169d1d0f8eb948943e5253dbb91c9ebc3e2c2` |
+| [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py) | 3563 | `7408ae953c596b3f6e857f07829de3f7d240854428d5aa92d421175ebb8f265b` |
 | [units/consumers/dashboard-core/tests/test_public_api.py](../../units/consumers/dashboard-core/tests/test_public_api.py) | 5718 | `412284d0158636ec9b1241252b21a3cc8c7ed4f4e24d9f2b9304eb0af970fd25` |
 | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py) | 5974 | `4780e8e8a2c632f3e96a0fff2589f556d4b2971b25adc95145d72bdd6b4e4817` |
 | [units/consumers/dashboard-core/tests/test_worker_management.py](../../units/consumers/dashboard-core/tests/test_worker_management.py) | 4692 | `63350e22fcc54eb1ca7e7662a3b2b32eb56c28b147d243e299802d318dcaa548` |
@@ -1376,8 +1417,18 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | `CREDENTIALS_DIRECTORY` | [units/integration/agent08/agent08.py](../../units/integration/agent08/agent08.py#L68) | optional lookup |
 | `DASHBOARD_CREDENTIAL_FILE` | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L15) | required lookup |
 | `DASHBOARD_LAYOUT_SCREENSHOT` | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py#L18) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [market_data/data.py](../../market_data/data.py#L16) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/accounts.py](../../modules/accounts.py#L22) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/accounts.py](../../modules/accounts.py#L191) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/chat_store.py](../../modules/chat_store.py#L20) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/module_state.py](../../modules/module_state.py#L14) | optional lookup |
-| `DASHBOARD_MODULE_STATE_DIR` | [modules/slots.py](../../modules/slots.py#L37) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/signal_rules.py](../../modules/signal_rules.py#L128) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/signal_rules.py](../../modules/signal_rules.py#L170) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/slot_workers.py](../../modules/slot_workers.py#L79) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/slot_workers.py](../../modules/slot_workers.py#L146) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/slots.py](../../modules/slots.py#L50) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/slots.py](../../modules/slots.py#L61) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L49) | optional lookup |
 | `DASHBOARD_SCREENSHOT` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L114) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py#L12) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L110) | optional lookup |
@@ -1392,12 +1443,12 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | `DOCKER_HOST` | [scripts/security/run_sandbox_daemon_fault_injection.py](../../scripts/security/run_sandbox_daemon_fault_injection.py#L48) | optional lookup |
 | `GITHUB_ACTIONS` | [scripts/testing/run_ci.py](../../scripts/testing/run_ci.py#L72) | optional lookup |
 | `SANDBOX_FAULT_INJECTION_ACK` | [scripts/security/run_sandbox_daemon_fault_injection.py](../../scripts/security/run_sandbox_daemon_fault_injection.py#L42) | optional lookup |
-| `TERM` | [terminal_ui.py](../../terminal_ui.py#L22) | optional lookup |
-| `TERM` | [terminal_ui.py](../../terminal_ui.py#L104) | optional lookup |
+| `TERM` | [terminal_ui.py](../../terminal_ui.py#L26) | optional lookup |
+| `TERM` | [terminal_ui.py](../../terminal_ui.py#L108) | optional lookup |
 | `THIRTYNA_MONITOR_DISK_PATHS` | [modules/host_monitor.py](../../modules/host_monitor.py#L42) | optional lookup |
 | `THIRTYNA_MONITOR_DOCKER` | [modules/host_monitor.py](../../modules/host_monitor.py#L152) | optional lookup |
 | `THIRTYNA_MONITOR_LOG_PATHS` | [modules/host_monitor.py](../../modules/host_monitor.py#L129) | optional lookup |
-| `THIRTYNA_MONITOR_OWNERS` | [modules/slots.py](../../modules/slots.py#L14) | optional lookup |
+| `THIRTYNA_MONITOR_OWNERS` | [modules/slots.py](../../modules/slots.py#L16) | optional lookup |
 | `THIRTYNA_MONITOR_SERVICES` | [modules/host_monitor.py](../../modules/host_monitor.py#L69) | optional lookup |
 | `WORKER_MANAGER_CREDENTIAL_FILE` | [units/worker-manager/worker_manager/production.py](../../units/worker-manager/worker_manager/production.py#L21) | required lookup |
 | `WORKER_MANAGER_DB` | [units/worker-manager/worker_manager/production.py](../../units/worker-manager/worker_manager/production.py#L20) | required lookup |
@@ -1438,6 +1489,9 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L77) | `--manager-url` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L78) | `--code-token-file` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L79) | `--manager-token-file` |
+| [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py#L61) | `--code-url` |
+| [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py#L62) | `--manager-url` |
+| [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py#L63) | `--token-file` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py#L13) | `--database` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py#L14) | `--ready-file` |
 | [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L173) | `--check` |
@@ -1550,9 +1604,118 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 
 این SQLها مرجع ساختارند، دستور migration دستی نیستند. یک نام جدول در چند store مستقل می‌تواند معنای متفاوت داشته باشد.
 
+### جدول candles در market_data/data.py
+
+[market_data/data.py](../../market_data/data.py#L24)
+
+```sql
+CREATE TABLE IF NOT EXISTS candles (
+        time INTEGER PRIMARY KEY, open REAL NOT NULL, high REAL NOT NULL,
+        low REAL NOT NULL, close REAL NOT NULL, tick_volume INTEGER,
+        is_open INTEGER NOT NULL CHECK(is_open IN (0,1)))
+```
+
+### جدول collector_status در market_data/data.py
+
+[market_data/data.py](../../market_data/data.py#L28)
+
+```sql
+CREATE TABLE IF NOT EXISTS collector_status (key TEXT PRIMARY KEY, value TEXT NOT NULL)
+```
+
+### جدول indicator_specs در market_data/data.py
+
+[market_data/data.py](../../market_data/data.py#L29)
+
+```sql
+CREATE TABLE IF NOT EXISTS indicator_specs (
+        name TEXT NOT NULL, parameters TEXT NOT NULL, computed_revision INTEGER NOT NULL DEFAULT -1,
+        PRIMARY KEY(name,parameters))
+```
+
+### جدول indicator_values در market_data/data.py
+
+[market_data/data.py](../../market_data/data.py#L32)
+
+```sql
+CREATE TABLE IF NOT EXISTS indicator_values (
+        name TEXT NOT NULL, parameters TEXT NOT NULL, time INTEGER NOT NULL,
+        value_json TEXT NOT NULL, is_open INTEGER NOT NULL CHECK(is_open IN (0,1)),
+        PRIMARY KEY(name,parameters,time))
+```
+
+### جدول users در modules/accounts.py
+
+[modules/accounts.py](../../modules/accounts.py#L29)
+
+```sql
+CREATE TABLE IF NOT EXISTS users (
+        id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE, role TEXT NOT NULL CHECK(role IN ('admin','user')),
+        salt BLOB NOT NULL, password_hash BLOB NOT NULL, enabled INTEGER NOT NULL CHECK(enabled IN (0,1)),
+        created_at INTEGER NOT NULL)
+```
+
+### جدول sessions در modules/accounts.py
+
+[modules/accounts.py](../../modules/accounts.py#L33)
+
+```sql
+CREATE TABLE IF NOT EXISTS sessions (
+        token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        expires_at INTEGER NOT NULL, created_at INTEGER NOT NULL)
+```
+
+### جدول login_limits در modules/accounts.py
+
+[modules/accounts.py](../../modules/accounts.py#L36)
+
+```sql
+CREATE TABLE IF NOT EXISTS login_limits (
+        key TEXT PRIMARY KEY, window_start INTEGER NOT NULL, attempts INTEGER NOT NULL)
+```
+
+### جدول rooms در modules/chat_store.py
+
+[modules/chat_store.py](../../modules/chat_store.py#L27)
+
+```sql
+CREATE TABLE IF NOT EXISTS rooms (
+        id TEXT PRIMARY KEY, member_a TEXT NOT NULL, member_b TEXT NOT NULL,
+        created_at INTEGER NOT NULL, UNIQUE(member_a,member_b))
+```
+
+### جدول invitations در modules/chat_store.py
+
+[modules/chat_store.py](../../modules/chat_store.py#L30)
+
+```sql
+CREATE TABLE IF NOT EXISTS invitations (
+        id TEXT PRIMARY KEY, sender TEXT NOT NULL, recipient TEXT NOT NULL,
+        status TEXT NOT NULL CHECK(status IN ('pending','accepted','rejected')),
+        room_id TEXT REFERENCES rooms(id), created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL)
+```
+
+### جدول messages در modules/chat_store.py
+
+[modules/chat_store.py](../../modules/chat_store.py#L35)
+
+```sql
+CREATE TABLE IF NOT EXISTS messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT, room_id TEXT NOT NULL, author TEXT NOT NULL,
+        body TEXT NOT NULL, created_at INTEGER NOT NULL)
+```
+
 ### جدول module_state در modules/module_state.py
 
 [modules/module_state.py](../../modules/module_state.py#L19)
+
+```sql
+CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))
+```
+
+### جدول module_state در modules/slot_workers.py
+
+[modules/slot_workers.py](../../modules/slot_workers.py#L82)
 
 ```sql
 CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))
@@ -1759,7 +1922,73 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [examples/demo-summary/tests/test_demo.py](../../examples/demo-summary/tests/test_demo.py#L5) | `SummaryTests` | `class` |
 | [examples/demo-summary/tests/test_demo.py](../../examples/demo-summary/tests/test_demo.py#L6) | `SummaryTests.test_summary` | `(self)` |
 | [examples/demo-summary/tests/test_demo.py](../../examples/demo-summary/tests/test_demo.py#L10) | `SummaryTests.test_invalid_input_is_rejected` | `(self)` |
+| [examples/sample-clock/tests/test_worker.py](../../examples/sample-clock/tests/test_worker.py#L5) | `ClockWorkerTests` | `class` |
+| [examples/sample-clock/tests/test_worker.py](../../examples/sample-clock/tests/test_worker.py#L6) | `ClockWorkerTests.test_output_has_utc_and_integer_timestamp` | `(self)` |
+| [examples/sample-clock/worker.py](../../examples/sample-clock/worker.py#L5) | `run` | `(data, configuration)` |
+| [examples/sample-math/tests/test_worker.py](../../examples/sample-math/tests/test_worker.py#L5) | `MathWorkerTests` | `class` |
+| [examples/sample-math/tests/test_worker.py](../../examples/sample-math/tests/test_worker.py#L6) | `MathWorkerTests.test_summary_and_configuration` | `(self)` |
+| [examples/sample-math/tests/test_worker.py](../../examples/sample-math/tests/test_worker.py#L9) | `MathWorkerTests.test_invalid_value` | `(self)` |
+| [examples/sample-math/worker.py](../../examples/sample-math/worker.py#L5) | `run` | `(data, configuration)` |
+| [examples/sample-text/tests/test_worker.py](../../examples/sample-text/tests/test_worker.py#L5) | `TextWorkerTests` | `class` |
+| [examples/sample-text/tests/test_worker.py](../../examples/sample-text/tests/test_worker.py#L6) | `TextWorkerTests.test_transform` | `(self)` |
+| [examples/sample-text/tests/test_worker.py](../../examples/sample-text/tests/test_worker.py#L9) | `TextWorkerTests.test_rejects_non_string` | `(self)` |
+| [examples/sample-text/worker.py](../../examples/sample-text/worker.py#L4) | `run` | `(data, configuration)` |
+| [market_data/collector.py](../../market_data/collector.py#L19) | `fetch_bars` | `(limit, before=None)` |
+| [market_data/collector.py](../../market_data/collector.py#L35) | `GoldCollector` | `class` |
+| [market_data/collector.py](../../market_data/collector.py#L36) | `GoldCollector.__init__` | `(self)` |
+| [market_data/collector.py](../../market_data/collector.py#L40) | `GoldCollector.start` | `(self)` |
+| [market_data/collector.py](../../market_data/collector.py#L45) | `GoldCollector.stop` | `(self)` |
+| [market_data/collector.py](../../market_data/collector.py#L49) | `GoldCollector._loop` | `(self)` |
+| [market_data/data.py](../../market_data/data.py#L15) | `database_path` | `()` |
+| [market_data/data.py](../../market_data/data.py#L19) | `connect` | `()` |
+| [market_data/data.py](../../market_data/data.py#L45) | `parse_bar` | `(bar)` |
+| [market_data/data.py](../../market_data/data.py#L80) | `save_bars` | `(bars, historical=False)` |
+| [market_data/data.py](../../market_data/data.py#L132) | `backfill_state` | `()` |
+| [market_data/data.py](../../market_data/data.py#L141) | `set_backfill_state` | `(value)` |
+| [market_data/data.py](../../market_data/data.py#L149) | `set_collector_error` | `()` |
+| [market_data/data.py](../../market_data/data.py#L157) | `snapshot` | `(limit=200, include_open=True, end_time=None)` |
+| [market_data/data.py](../../market_data/data.py#L175) | `moving_average` | `(candles, period=20)` |
+| [market_data/data.py](../../market_data/data.py#L179) | `refresh_indicators` | `()` |
+| [market_data/data.py](../../market_data/data.py#L214) | `indicator` | `(name, parameters, limit=200, include_open=True, end_time=None)` |
+| [market_data/data.py](../../market_data/data.py#L242) | `profile_series` | `(profile, limit, include_open, end_time)` |
+| [market_data/data.py](../../market_data/data.py#L262) | `database_table` | `(table, limit=50, offset=0, candle_state='all', indicator_name='all')` |
+| [market_data/data.py](../../market_data/data.py#L304) | `chart` | `(limit=200, period=20, include_open=True, end_time=None, interval='1m', include_indicators=False, profiles=None)` |
+| [market_data/data.py](../../market_data/data.py#L318) | `chart.append_group` | `(bucket, group)` |
+| [market_data/indicators/__init__.py](../../market_data/indicators/__init__.py#L10) | `normalize` | `(name, options)` |
+| [market_data/indicators/__init__.py](../../market_data/indicators/__init__.py#L16) | `calculate` | `(name, candles, options)` |
+| [market_data/indicators/macd.py](../../market_data/indicators/macd.py#L5) | `normalize` | `(options)` |
+| [market_data/indicators/macd.py](../../market_data/indicators/macd.py#L13) | `ema` | `(values, period)` |
+| [market_data/indicators/macd.py](../../market_data/indicators/macd.py#L25) | `calculate` | `(candles, options)` |
+| [market_data/indicators/rsi.py](../../market_data/indicators/rsi.py#L5) | `normalize` | `(options)` |
+| [market_data/indicators/rsi.py](../../market_data/indicators/rsi.py#L12) | `calculate` | `(candles, options)` |
+| [market_data/indicators/sma.py](../../market_data/indicators/sma.py#L6) | `normalize` | `(options)` |
+| [market_data/indicators/sma.py](../../market_data/indicators/sma.py#L13) | `calculate` | `(candles, options)` |
+| [modules/accounts.py](../../modules/accounts.py#L21) | `_connect` | `()` |
+| [modules/accounts.py](../../modules/accounts.py#L41) | `_username` | `(value)` |
+| [modules/accounts.py](../../modules/accounts.py#L48) | `_password` | `(value)` |
+| [modules/accounts.py](../../modules/accounts.py#L55) | `_hash` | `(password, salt)` |
+| [modules/accounts.py](../../modules/accounts.py#L59) | `_user` | `(row)` |
+| [modules/accounts.py](../../modules/accounts.py#L63) | `bootstrap_admin` | `(username, password)` |
+| [modules/accounts.py](../../modules/accounts.py#L78) | `create_user` | `(username, password, role='user')` |
+| [modules/accounts.py](../../modules/accounts.py#L97) | `get_user` | `(user_id)` |
+| [modules/accounts.py](../../modules/accounts.py#L105) | `list_users` | `()` |
+| [modules/accounts.py](../../modules/accounts.py#L111) | `login` | `(username, password)` |
+| [modules/accounts.py](../../modules/accounts.py#L148) | `is_session_token` | `(token)` |
+| [modules/accounts.py](../../modules/accounts.py#L152) | `authenticate` | `(token)` |
+| [modules/accounts.py](../../modules/accounts.py#L163) | `logout` | `(token)` |
+| [modules/accounts.py](../../modules/accounts.py#L170) | `set_enabled` | `(user_id, enabled)` |
+| [modules/accounts.py](../../modules/accounts.py#L187) | `upstream_credential` | `(user_id)` |
 | [modules/calculator/module.py](../../modules/calculator/module.py#L11) | `run` | `(data)` |
+| [modules/chat-box/module.py](../../modules/chat-box/module.py#L10) | `run` | `(data)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L19) | `_connect` | `()` |
+| [modules/chat_store.py](../../modules/chat_store.py#L43) | `_active_user` | `(owner)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L50) | `_authorize` | `(db, owner, room)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L57) | `request_private` | `(owner, recipient)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L75) | `respond` | `(owner, request_id, accept)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L97) | `list_rooms` | `(owner)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L106) | `list_requests` | `(owner)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L114) | `send` | `(owner, room, text)` |
+| [modules/chat_store.py](../../modules/chat_store.py#L130) | `messages` | `(owner, room, limit=50, before=None)` |
 | [modules/clock/clock.py](../../modules/clock/clock.py#L7) | `current_time` | `(timezone=None)` |
 | [modules/clock/clock.py](../../modules/clock/clock.py#L12) | `run` | `(data)` |
 | [modules/clock/clock.py](../../modules/clock/clock.py#L16) | `main` | `()` |
@@ -1768,9 +1997,10 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [modules/dashboard-health/module.py](../../modules/dashboard-health/module.py#L13) | `run` | `(data)` |
 | [modules/dice-roller/module.py](../../modules/dice-roller/module.py#L11) | `run` | `(data)` |
 | [modules/empty/module.py](../../modules/empty/module.py#L9) | `run` | `(data)` |
-| [modules/execution.py](../../modules/execution.py#L21) | `UnknownModule` | `class` |
-| [modules/execution.py](../../modules/execution.py#L26) | `_load` | `(module_id)` |
-| [modules/execution.py](../../modules/execution.py#L33) | `run_module` | `(module_id, data)` |
+| [modules/execution.py](../../modules/execution.py#L24) | `UnknownModule` | `class` |
+| [modules/execution.py](../../modules/execution.py#L29) | `_load` | `(module_id)` |
+| [modules/execution.py](../../modules/execution.py#L36) | `run_module` | `(module_id, data)` |
+| [modules/gold-chart/module.py](../../modules/gold-chart/module.py#L12) | `run` | `(data)` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L12) | `_mem` | `()` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L23) | `_cpu_sample` | `()` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L28) | `system` | `(data)` |
@@ -1782,19 +2012,64 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [modules/host_monitor.py](../../modules/host_monitor.py#L110) | `alerts` | `(data)` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L127) | `logs` | `(data)` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L151) | `docker` | `(data)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L13) | `list_profiles` | `(owner)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L17) | `save` | `(owner, data, profile_id=None)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L27) | `save.update` | `(old)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L40) | `delete` | `(owner, profile_id)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L41) | `delete.update` | `(old)` |
+| [modules/macd/module.py](../../modules/macd/module.py#L10) | `run` | `(data)` |
 | [modules/module_state.py](../../modules/module_state.py#L9) | `change` | `(owner, module, slot, default, operation)` |
 | [modules/module_support.py](../../modules/module_support.py#L7) | `main` | `(run)` |
-| [modules/registry.py](../../modules/registry.py#L26) | `ModuleManifestError` | `class` |
-| [modules/registry.py](../../modules/registry.py#L30) | `load_modules` | `()` |
-| [modules/registry.py](../../modules/registry.py#L104) | `list_modules` | `()` |
-| [modules/registry.py](../../modules/registry.py#L109) | `get_module` | `(module_id: str)` |
+| [modules/moving-average/module.py](../../modules/moving-average/module.py#L10) | `run` | `(data)` |
+| [modules/registry.py](../../modules/registry.py#L30) | `ModuleManifestError` | `class` |
+| [modules/registry.py](../../modules/registry.py#L34) | `load_modules` | `()` |
+| [modules/registry.py](../../modules/registry.py#L108) | `list_modules` | `()` |
+| [modules/registry.py](../../modules/registry.py#L113) | `get_module` | `(module_id: str)` |
+| [modules/rsi/module.py](../../modules/rsi/module.py#L10) | `run` | `(data)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L14) | `list_rules` | `(owner)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L18) | `save` | `(owner, data, rule_id=None)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L36) | `save.update` | `(old)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L48) | `delete` | `(owner, rule_id)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L49) | `delete.update` | `(old)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L56) | `market_input` | `(owner, interval='1m')` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L68) | `evaluate` | `(owner, rule_id)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L77) | `evaluate.value` | `(profile_id, field, stamp)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L98) | `_fingerprint` | `(owner, rule_id)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L105) | `latest` | `(owner, rule_id)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L113) | `evaluate_and_save` | `(owner, rule_id)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L123) | `evaluate_enabled_rules` | `()` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L142) | `SignalScheduler` | `class` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L144) | `SignalScheduler.__init__` | `(self)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L149) | `SignalScheduler.start` | `(self)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L155) | `SignalScheduler.stop` | `(self)` |
+| [modules/signal_rules.py](../../modules/signal_rules.py#L159) | `SignalScheduler._loop` | `(self)` |
 | [modules/slot-note/module.py](../../modules/slot-note/module.py#L10) | `run` | `(data)` |
-| [modules/slots.py](../../modules/slots.py#L12) | `_authorize_host_monitor` | `(owner, module_id)` |
-| [modules/slots.py](../../modules/slots.py#L19) | `binding` | `(owner, slot, module_id=None, context=None, only_if_missing=False)` |
-| [modules/slots.py](../../modules/slots.py#L27) | `binding.update` | `(previous)` |
-| [modules/slots.py](../../modules/slots.py#L34) | `list_slots` | `(owner)` |
-| [modules/slots.py](../../modules/slots.py#L46) | `execute` | `(owner, slot, data, expected_module=None)` |
-| [modules/slots.py](../../modules/slots.py#L65) | `read` | `(owner, slot)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L24) | `configure` | `(owner, slot, payload)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L64) | `SlotWorkerScheduler` | `class` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L65) | `SlotWorkerScheduler.__init__` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L69) | `SlotWorkerScheduler.start` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L74) | `SlotWorkerScheduler.stop` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L78) | `SlotWorkerScheduler._connect` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L85) | `SlotWorkerScheduler._recover` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L98) | `SlotWorkerScheduler._claim` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L124) | `SlotWorkerScheduler._finish` | `(self, owner, slot, revision, error)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L141) | `SlotWorkerScheduler._loop` | `(self)` |
+| [modules/slots.py](../../modules/slots.py#L14) | `_authorize_host_monitor` | `(owner, module_id)` |
+| [modules/slots.py](../../modules/slots.py#L21) | `binding` | `(owner, slot, module_id=None, context=None, only_if_missing=False)` |
+| [modules/slots.py](../../modules/slots.py#L29) | `binding.update` | `(previous)` |
+| [modules/slots.py](../../modules/slots.py#L35) | `binding.update_meta` | `(old)` |
+| [modules/slots.py](../../modules/slots.py#L47) | `list_slots` | `(owner)` |
+| [modules/slots.py](../../modules/slots.py#L59) | `_layout_db` | `(owner)` |
+| [modules/slots.py](../../modules/slots.py#L76) | `list_active` | `(owner)` |
+| [modules/slots.py](../../modules/slots.py#L97) | `create` | `(owner, slot_type='standard')` |
+| [modules/slots.py](../../modules/slots.py#L114) | `duplicate` | `(owner, slot)` |
+| [modules/slots.py](../../modules/slots.py#L141) | `bind_active` | `(owner, slot, module_id, context, only_if_missing=False)` |
+| [modules/slots.py](../../modules/slots.py#L165) | `set_overview` | `(owner, slot, visible)` |
+| [modules/slots.py](../../modules/slots.py#L179) | `update_appearance` | `(owner, slot, updates)` |
+| [modules/slots.py](../../modules/slots.py#L263) | `delete` | `(owner, slot)` |
+| [modules/slots.py](../../modules/slots.py#L274) | `_market_preferences` | `(owner, slot, module_id)` |
+| [modules/slots.py](../../modules/slots.py#L283) | `execute` | `(owner, slot, data, expected_module=None, expected_revision=None)` |
+| [modules/slots.py](../../modules/slots.py#L308) | `read` | `(owner, slot)` |
 | [modules/theme-summary/module.py](../../modules/theme-summary/module.py#L12) | `run` | `(data)` |
 | [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L17) | `validate` | `(domain, image, sandbox_uid)` |
 | [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L27) | `atomic` | `(path, content, *, mode=416, uid=0, gid=0)` |
@@ -1806,6 +2081,14 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L33) | `seed` | `(code, manager)` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L63) | `read_token` | `(path)` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L74) | `main` | `()` |
+| [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py#L24) | `archive_for` | `(worker_id)` |
+| [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py#L36) | `register_sample` | `(code, manager, worker_id)` |
+| [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py#L59) | `main` | `()` |
+| [scripts/deployment/sync_account_credentials.py](../../scripts/deployment/sync_account_credentials.py#L23) | `_read` | `(path)` |
+| [scripts/deployment/sync_account_credentials.py](../../scripts/deployment/sync_account_credentials.py#L32) | `_atomic` | `(path, data, uid, gid, mode)` |
+| [scripts/deployment/sync_account_credentials.py](../../scripts/deployment/sync_account_credentials.py#L51) | `sync` | `(config, state, dashboard_uid, dashboard_gid)` |
+| [scripts/deployment/sync_account_credentials.py](../../scripts/deployment/sync_account_credentials.py#L139) | `main` | `()` |
+| [scripts/deployment/sync_account_credentials.py](../../scripts/deployment/sync_account_credentials.py#L145) | `main.open_lock` | `(path)` |
 | [scripts/deployment/verify_install.py](../../scripts/deployment/verify_install.py#L18) | `DashboardAPI` | `class` |
 | [scripts/deployment/verify_install.py](../../scripts/deployment/verify_install.py#L20) | `DashboardAPI.__init__` | `(self, client)` |
 | [scripts/deployment/verify_install.py](../../scripts/deployment/verify_install.py#L22) | `DashboardAPI._request` | `(self, method, path, payload=None)` |
@@ -1844,24 +2127,65 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [scripts/testing/run_ci.py](../../scripts/testing/run_ci.py#L23) | `main` | `()` |
 | [terminal_ui.py](../../terminal_ui.py#L11) | `Terminal` | `class` |
 | [terminal_ui.py](../../terminal_ui.py#L12) | `Terminal.__init__` | `(self, owner='customer', manager_url='https://localhost:18444', token_file='/etc/30na/customer-token', ca_file='/etc/30na/ca/trust.pem')` |
-| [terminal_ui.py](../../terminal_ui.py#L24) | `Terminal.style` | `(self, text, *codes)` |
-| [terminal_ui.py](../../terminal_ui.py#L29) | `Terminal.ask` | `(self, label, default=None)` |
-| [terminal_ui.py](../../terminal_ui.py#L34) | `Terminal.choose` | `(self, title, rows, label, default=0)` |
-| [terminal_ui.py](../../terminal_ui.py#L52) | `Terminal.call` | `(self, args, *, state=False, quiet=False)` |
-| [terminal_ui.py](../../terminal_ui.py#L73) | `Terminal.show` | `(self, value)` |
-| [terminal_ui.py](../../terminal_ui.py#L85) | `Terminal.slot_args` | `(self, *args)` |
-| [terminal_ui.py](../../terminal_ui.py#L88) | `Terminal.worker_args` | `(self, *args)` |
-| [terminal_ui.py](../../terminal_ui.py#L92) | `Terminal.refresh` | `(self)` |
-| [terminal_ui.py](../../terminal_ui.py#L102) | `Terminal.screen` | `(self, title=None)` |
-| [terminal_ui.py](../../terminal_ui.py#L153) | `Terminal.overview` | `(self)` |
-| [terminal_ui.py](../../terminal_ui.py#L159) | `Terminal.input_for` | `(self, module_id)` |
-| [terminal_ui.py](../../terminal_ui.py#L215) | `Terminal.number` | `(self, label, default)` |
-| [terminal_ui.py](../../terminal_ui.py#L223) | `Terminal.integer` | `(self, label, default, minimum, maximum)` |
-| [terminal_ui.py](../../terminal_ui.py#L231) | `Terminal.slots_menu` | `(self)` |
-| [terminal_ui.py](../../terminal_ui.py#L277) | `Terminal.modules_menu` | `(self)` |
-| [terminal_ui.py](../../terminal_ui.py#L307) | `Terminal.executions_menu` | `(self)` |
-| [terminal_ui.py](../../terminal_ui.py#L323) | `Terminal.workers_menu` | `(self)` |
-| [terminal_ui.py](../../terminal_ui.py#L363) | `Terminal.run` | `(self)` |
+| [terminal_ui.py](../../terminal_ui.py#L28) | `Terminal.style` | `(self, text, *codes)` |
+| [terminal_ui.py](../../terminal_ui.py#L33) | `Terminal.ask` | `(self, label, default=None)` |
+| [terminal_ui.py](../../terminal_ui.py#L38) | `Terminal.choose` | `(self, title, rows, label, default=0)` |
+| [terminal_ui.py](../../terminal_ui.py#L56) | `Terminal.call` | `(self, args, *, state=False, quiet=False)` |
+| [terminal_ui.py](../../terminal_ui.py#L77) | `Terminal.show` | `(self, value)` |
+| [terminal_ui.py](../../terminal_ui.py#L89) | `Terminal.slot_args` | `(self, *args)` |
+| [terminal_ui.py](../../terminal_ui.py#L92) | `Terminal.worker_args` | `(self, *args)` |
+| [terminal_ui.py](../../terminal_ui.py#L96) | `Terminal.refresh` | `(self)` |
+| [terminal_ui.py](../../terminal_ui.py#L106) | `Terminal.screen` | `(self, title=None)` |
+| [terminal_ui.py](../../terminal_ui.py#L157) | `Terminal.overview` | `(self)` |
+| [terminal_ui.py](../../terminal_ui.py#L163) | `Terminal.input_for` | `(self, module_id)` |
+| [terminal_ui.py](../../terminal_ui.py#L223) | `Terminal.number` | `(self, label, default)` |
+| [terminal_ui.py](../../terminal_ui.py#L231) | `Terminal.integer` | `(self, label, default, minimum, maximum)` |
+| [terminal_ui.py](../../terminal_ui.py#L239) | `Terminal.slots_menu` | `(self)` |
+| [terminal_ui.py](../../terminal_ui.py#L285) | `Terminal.modules_menu` | `(self)` |
+| [terminal_ui.py](../../terminal_ui.py#L315) | `Terminal.executions_menu` | `(self)` |
+| [terminal_ui.py](../../terminal_ui.py#L331) | `Terminal.workers_menu` | `(self)` |
+| [terminal_ui.py](../../terminal_ui.py#L371) | `Terminal.run` | `(self)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L10) | `client` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L20) | `client.Adapter` | `class` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L21) | `client.Adapter.get` | `(self, path)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L25) | `auth` | `(token)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L28) | `create_accounts` | `(client)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L42) | `test_bootstrap_user_access_and_worker_fail_closed` | `(client)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L54) | `test_chat_requires_acceptance_and_isolates_participants` | `(client)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L71) | `test_session_can_create_and_use_owner_scoped_chat_slot` | `(client)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L84) | `test_legacy_token_with_session_prefix_remains_valid` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L89) | `test_legacy_token_with_session_prefix_remains_valid.Adapter` | `class` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L90) | `test_legacy_token_with_session_prefix_remains_valid.Adapter.get` | `(self, path)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L97) | `test_provisioned_session_can_use_its_worker_credential` | `(client, tmp_path)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L111) | `test_forwarded_credentials_never_cross_accounts` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L116) | `test_forwarded_credentials_never_cross_accounts.Adapter` | `class` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L117) | `test_forwarded_credentials_never_cross_accounts.Adapter.__init__` | `(self, owner, credential)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L118) | `test_forwarded_credentials_never_cross_accounts.Adapter.get` | `(self, path)` |
+| [tests/test_account_chat_api.py](../../tests/test_account_chat_api.py#L129) | `test_disabling_customer_revokes_legacy_dashboard_access` | `(client)` |
+| [tests/test_account_chat_browser.py](../../tests/test_account_chat_browser.py#L8) | `test_password_login_and_public_chat` | `(tmp_path)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L15) | `token` | `()` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L16) | `digest` | `(value)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L19) | `test_provision_is_owner_scoped_stable_and_revocable` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L61) | `test_rejects_symlinked_account_db` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L67) | `test_rejects_symlinked_output_before_touching_configuration` | `(tmp_path)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L75) | `test_refuses_to_replace_unmanaged_owner_binding` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L91) | `test_provisioned_accounts_flow_through_separate_manager_identities` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L109) | `test_provisioned_accounts_flow_through_separate_manager_identities.list_workers` | `(owner=Depends(manager_owner))` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L111) | `test_provisioned_accounts_flow_through_separate_manager_identities.Adapter` | `class` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L112) | `test_provisioned_accounts_flow_through_separate_manager_identities.Adapter.__init__` | `(self, credential)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L113) | `test_provisioned_accounts_flow_through_separate_manager_identities.Adapter.get` | `(self, path)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L125) | `test_new_sessions_use_isolated_real_worker_manager` | `(tmp_path, monkeypatch)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L147) | `test_new_sessions_use_isolated_real_worker_manager.factory` | `(owner, credential)` |
+| [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py#L148) | `test_new_sessions_use_isolated_real_worker_manager.factory.transport` | `(request, timeout)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L8) | `users` | `(tmp_path, monkeypatch)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L16) | `test_sessions_are_owner_bound_and_revoked` | `(users)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L29) | `test_private_room_requires_acceptance_and_membership` | `(users)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L45) | `test_public_messages_pagination_and_disabled_accounts` | `(users)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L56) | `test_rejected_request_does_not_grant_access` | `(users)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L64) | `test_session_expires_and_logout_is_independent` | `(users, monkeypatch)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L76) | `test_existing_customer_workspace_cannot_be_rebootstrapped` | `(users)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L84) | `test_chat_module_slot_obeys_room_membership` | `(users)` |
+| [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L95) | `test_login_throttle_expires` | `(users, monkeypatch)` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py#L5) | `make_zip` | `()` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py#L12) | `FakeDataManager` | `class` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py#L13) | `FakeDataManager.__init__` | `(self)` |
@@ -2141,39 +2465,80 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py#L69) | `SourceRegistryTests.test_hash_metadata_mismatch_is_rejected` | `(self)` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py#L81) | `SourceRegistryTests.test_empty_owner_is_rejected` | `(self)` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py#L90) | `test_new_owner_source_list_is_empty_without_hiding_detail_not_found` | `(tmp_path)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L26) | `load_themes` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L61) | `health` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L66) | `list_themes` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L83) | `get_theme` | `(theme_id: str)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L95) | `clock_time` | `(timezone: str \| None=None)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L105) | `execute_module` | `(module_id: str, data: dict)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L120) | `api_modules` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L126) | `dashboard` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L778) | `create_app` | `(*, credential_path=None, upstream_factory=None)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L798) | `create_app.connected_dashboard` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L28) | `load_themes` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L66) | `health` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L71) | `project_info` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L88) | `list_themes` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L104) | `get_theme` | `(theme_id: str)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L116) | `clock_time` | `(timezone: str \| None=None)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L126) | `execute_module` | `(module_id: str, data: dict)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L141) | `api_modules` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L147) | `dashboard` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2375) | `create_app` | `(*, credential_path=None, upstream_factory=None)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2400) | `create_app.start_slot_workers` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2406) | `create_app.stop_slot_workers` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2414) | `create_app.connected_dashboard` | `()` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L8) | `create_app` | `()` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L12) | `create_app.upstreams` | `(owner, token)` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L14) | `RunRequest` | `class` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L21) | `create_router` | `(credential_path, upstream_factory)` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L33) | `create_router.forward` | `(request, identity, name, method, path, payload=None, status=200)` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L54) | `create_router.read` | `(operation: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L60) | `create_router.worker_path` | `(worker_id)` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L69) | `create_router.module_state` | `(module_id: str, body: dict, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L85) | `create_router.bind_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L98) | `create_router.read_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L115) | `create_router.execute_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L130) | `create_router.register` | `(body: RegisterBody, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L135) | `create_router.worker` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L139) | `create_router.configure` | `(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L145) | `create_router.remove` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L149) | `create_router.enable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L153) | `create_router.disable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L157) | `create_router.run` | `(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L168) | `create_router.execution` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L172) | `create_router.cancel` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L18) | `RunRequest` | `class` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L25) | `create_router` | `(credential_path, upstream_factory)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L34) | `create_router.owner` | `(request: Request)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L58) | `create_router.admin_identity` | `(request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L68) | `create_router.forward` | `(request, identity, name, method, path, payload=None, status=200)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L91) | `create_router.worker_path` | `(worker_id)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L100) | `create_router.account_bootstrap` | `(body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L109) | `create_router.account_login` | `(body: dict)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L117) | `create_router.account_me` | `(request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L125) | `create_router.account_logout` | `(request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L131) | `create_router.account_users` | `(identity=Depends(admin_identity))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L135) | `create_router.account_create` | `(body: dict, identity=Depends(admin_identity))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L142) | `create_router.account_enable` | `(user_id: str, body: dict, identity=Depends(admin_identity))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L150) | `create_router.chat_users` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L156) | `create_router.chat_rooms` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L162) | `create_router.chat_requests` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L168) | `create_router.chat_request` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L176) | `create_router.chat_respond` | `(request_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L185) | `create_router.chat_messages` | `(room_id: str, limit: int=Query(default=50, ge=1, le=200), before: int \| None=Query(default=None, gt=0), identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L192) | `create_router.chat_send` | `(room_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L200) | `create_router.market_candles` | `(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, end_time: int \| None=Query(default=None, ge=0), interval: str='1m', include_indicators: bool=False, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L215) | `create_router.profile_list` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L219) | `create_router.profile_create` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L225) | `create_router.profile_save` | `(profile_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L232) | `create_router.profile_delete` | `(profile_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L238) | `create_router.signal_list` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L242) | `create_router.signal_create` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L248) | `create_router.signal_save` | `(rule_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L255) | `create_router.signal_delete` | `(rule_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L261) | `create_router.signal_evaluate` | `(rule_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L268) | `create_router.signal_worker` | `(worker_id: str, body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L285) | `create_router.read` | `(operation: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L292) | `create_router.market_sma` | `(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L307) | `create_router.indicators_endpoint` | `(name: str, limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=14, ge=1, le=500), fast: int=Query(default=12, ge=1, le=500), slow: int=Query(default=26, ge=1, le=500), signal: int=Query(default=9, ge=1, le=500), include_open: bool=True, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L325) | `create_router.market_database` | `(table: str, limit: int=Query(default=50, ge=1, le=200), offset: int=Query(default=0, ge=0, le=1000000), candle_state: str='all', indicator_name: str='all', identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L339) | `create_router.module_state` | `(module_id: str, body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L355) | `create_router.run_independent_module` | `(module_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L372) | `create_router.list_active_slots` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L379) | `create_router.create_slot` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L391) | `create_router.duplicate_slot` | `(slot_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L400) | `create_router.update_slot_overview` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L413) | `create_router.delete_slot` | `(slot_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L424) | `create_router.update_slot_appearance` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L439) | `create_router.configure_slot_worker` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L452) | `create_router.bind_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L467) | `create_router.read_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L486) | `create_router.execute_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L503) | `create_router.register` | `(body: RegisterBody, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L508) | `create_router.worker` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L512) | `create_router.configure` | `(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L518) | `create_router.remove` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L522) | `create_router.enable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L526) | `create_router.disable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L530) | `create_router.run` | `(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L541) | `create_router.execution` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L545) | `create_router.cancel` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L13) | `test_health_endpoint` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L22) | `test_themes_endpoint` | `()` |
-| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L32) | `test_each_theme_has_slots` | `()` |
+| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L32) | `test_each_theme_has_colors` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L41) | `test_unknown_theme_is_not_found` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L45) | `test_module_catalog` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L54) | `test_module_catalog_endpoint` | `()` |
@@ -2238,8 +2603,8 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py#L19) | `DiceRollerModuleTests.test_dice_roller_has_bounded_accessible_controls` | `(self)` |
 | [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py#L13) | `test_monitor_is_not_exposed_by_public_module_endpoint` | `()` |
 | [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py#L18) | `test_slot_monitor_result_is_owner_scoped_and_binding_checked` | `(tmp_path, monkeypatch)` |
-| [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py#L42) | `test_log_and_disk_paths_require_explicit_permission` | `(tmp_path, monkeypatch)` |
-| [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py#L55) | `test_rebinding_invalidates_saved_slot_output` | `(tmp_path, monkeypatch)` |
+| [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py#L45) | `test_log_and_disk_paths_require_explicit_permission` | `(tmp_path, monkeypatch)` |
+| [units/consumers/dashboard-core/tests/test_monitor_modules.py](../../units/consumers/dashboard-core/tests/test_monitor_modules.py#L58) | `test_rebinding_invalidates_saved_slot_output` | `(tmp_path, monkeypatch)` |
 | [units/consumers/dashboard-core/tests/test_public_api.py](../../units/consumers/dashboard-core/tests/test_public_api.py#L14) | `Response` | `class` |
 | [units/consumers/dashboard-core/tests/test_public_api.py](../../units/consumers/dashboard-core/tests/test_public_api.py#L15) | `Response.__init__` | `(self, value)` |
 | [units/consumers/dashboard-core/tests/test_public_api.py](../../units/consumers/dashboard-core/tests/test_public_api.py#L16) | `Response.__enter__` | `(self)` |

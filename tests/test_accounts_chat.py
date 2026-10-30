@@ -79,3 +79,24 @@ def test_existing_customer_workspace_cannot_be_rebootstrapped(users):
     assert accounts.get_user('customer')['id'] == users[0]['id']
     with pytest.raises(ValueError):
         accounts.create_user('ALICE', 'another long password here')
+
+
+def test_chat_module_slot_obeys_room_membership(users):
+    from modules import slots
+    _, alice, bob = users
+    slot = slots.create(alice['id'], 'chat')
+    assert slot['module_id'] == 'chat-box'
+    sent = slots.execute(alice['id'], slot['slot'], {'action':'send', 'text':'hello'})
+    assert sent['result']['message']['body'] == 'hello'
+    assert slots.read(alice['id'], slot['slot'])['result']['messages'][0]['body'] == 'hello'
+    with pytest.raises(ValueError): slots.update_appearance(alice['id'], slot['slot'], {'chat_room':'room-'+'a'*32})
+
+
+def test_login_throttle_expires(users, monkeypatch):
+    now = int(time.time())
+    monkeypatch.setattr(accounts.time, 'time', lambda: now)
+    for _ in range(10):
+        with pytest.raises(ValueError): accounts.login('alice', 'incorrect password string')
+    with pytest.raises(ValueError): accounts.login('alice', 'alice passphrase long enough')
+    monkeypatch.setattr(accounts.time, 'time', lambda: now + 301)
+    assert accounts.login('alice', 'alice passphrase long enough')['user']['id'] == users[1]['id']

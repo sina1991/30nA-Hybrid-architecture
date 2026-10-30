@@ -19,7 +19,7 @@ if(isReal) {
 const server = http.createServer((req,res) => {
   res.setHeader('content-type', req.url === '/' ? 'text/html; charset=utf-8' : 'application/json');
   if(req.url === '/') res.end(input.html);
-  else if(req.url === '/api/themes') res.end(JSON.stringify({themes:(input.themes||[]).map(theme=>({...theme,slot_count:theme.slots.length}))}));
+  else if(req.url === '/api/themes') res.end(JSON.stringify({themes:input.themes||[]}));
   else if(req.url === '/api/modules') res.end(JSON.stringify({modules:input.modules||[]}));
   else if(req.url.startsWith('/api/themes/')) res.end(JSON.stringify((input.themes||[]).find(theme=>theme.id===req.url.split('/').pop())));
   else if(req.url === '/health') res.end('{"status":"ok"}');
@@ -51,9 +51,12 @@ async function main() {
         }
         return send({result:null});
       }
+      if(path === '/api/upstreams/account/me') return send({user:{id:'customer',username:'customer',role:'admin'},legacy:true,worker_access:true});
+      if(path === '/api/upstreams/accounts') return send({users:[]});
+      if(path === '/api/upstreams/slots/active') return send({owner:'customer',slots:[{slot:'slot-01',module_id:'empty',context:{},revision:'rev',overview:false,slot_type:'standard'}]});
       if(path === '/api/upstreams/workers') return send({workers:[
-        {definition:{worker_id:'demo-summary'},lifecycle:'enabled'},
-        {definition:{worker_id:'disabled-worker'},lifecycle:'disabled'}]});
+        {definition:{worker_id:'demo-summary'},lifecycle:'enabled',schedule:{kind:'manual'}},
+        {definition:{worker_id:'disabled-worker'},lifecycle:'disabled',schedule:{kind:'manual'}}]});
       if(path === '/api/upstreams/executions') return send({executions:completed?[{execution_id:eid,worker_id:'demo-summary',status:'succeeded'}]:[]});
       if(req.method()==='POST' && path.endsWith('/cancel')) {cancellation=true;return send({cancelled:false});}
       if(req.method()==='POST') {
@@ -70,6 +73,19 @@ async function main() {
     });
     await page.goto(base);
     await require('./layout.cjs')(page,false);
+    await page.locator('#account-shortcut').click();
+    await page.locator('#account-token').fill(isReal?input.token:'wrong');
+    await page.locator('#account-connect').click();
+    if(!isReal) {
+      await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('Invalid account credentials'));
+      assert.equal(posts.length,0);
+      await page.locator('#account-token').fill('browser-test-token');
+      await page.locator('#account-connect').click();
+    }
+    await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
+    await require('./layout.cjs')(page,true);
+    await page.locator('[data-nav="slots"]').click();
+    await page.locator('#grid .slot .slot-gear').first().click();
     const slotSearch = page.locator('.slot').first().locator('.module-search');
     const slotSelect = page.locator('.slot').first().locator('.module-select');
     const initiallySelected = await slotSelect.inputValue();
@@ -81,17 +97,10 @@ async function main() {
     assert((await page.locator('.slot').first().locator('.module-search-hint').textContent()).includes('No matching'));
     await slotSearch.fill('');
     if(input.layoutScreenshot) await page.screenshot({path:input.layoutScreenshot});
-    await page.locator('#account-token').fill(isReal?input.token:'wrong');
-    await page.locator('#account-connect').click();
-    if(!isReal) {
-      await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('Invalid account credentials'));
-      assert.equal(posts.length,0);
-      await page.locator('#account-token').fill('browser-test-token');
-      await page.locator('#account-connect').click();
-    }
-    await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
-    await require('./layout.cjs')(page,true);
+    await page.locator('.slot-options-dialog[open] .slot-dialog-close').click();
+    await page.locator('[data-nav="workers"]').click();
     await page.locator('#account-worker').selectOption('demo-summary');
+    await page.locator('#run-input-mode').selectOption('json');
     assert(!await page.locator('#account-worker').textContent().then(text=>text.includes('disabled-worker')));
     if(!isReal) {
       await page.locator('#worker-input').fill('[]');
@@ -142,6 +151,7 @@ async function main() {
     const storage=await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}));
     assert(!storage.includes(isReal?input.token:'browser-test-token'));
     assert.equal(await page.locator('#account-token').inputValue(),'');
+    await page.locator('#account-shortcut').click();
     await page.locator('#account-disconnect').click();
     assert(await page.locator('#execution-detail').isHidden());
     assert(await page.locator('#worker-editor').isHidden());
@@ -152,8 +162,11 @@ async function main() {
     if(!isReal) {
       await page.locator('#account-token').fill('browser-test-token');await page.locator('#account-connect').click();
       await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
+      await page.locator('[data-nav=workers]').click();
+      await page.locator('#run-input-mode').selectOption('json');
       block=true;
       await page.locator('#worker-run').click();await startedPromise;
+      await page.locator('#account-shortcut').click();
       await page.locator('#account-disconnect').click();release();
       await page.waitForTimeout(150);
       assert(await page.locator('#execution-detail').isHidden());

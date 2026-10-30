@@ -1,0 +1,12 @@
+# 30na-managed-account-sync-v1
+[Unit]
+Description=Synchronize 30nA account credentials
+
+[Timer]
+OnBootSec=15s
+OnUnitActiveSec=30s
+AccuracySec=5s
+Unit=30na-account-sync.service
+
+[Install]
+WantedBy=timers.target

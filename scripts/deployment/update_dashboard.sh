@@ -14,6 +14,19 @@ DROPIN=/etc/systemd/system/30na-dashboard.service.d/99-30na-release.conf
 [[ ! -e $DROPIN || -f /etc/30na/dashboard-release ]] || { echo 'Existing unowned Dashboard override; review it before updating.' >&2; exit 1; }
 BACKUP=$(mktemp -d /tmp/30na-dashboard-update.XXXXXXXX)
 HAD_LINK=0 HAD_DROPIN=0 HAD_CLI=0 CHANGED=0
+SYNC_SERVICE=/etc/systemd/system/30na-account-sync.service
+SYNC_TIMER=/etc/systemd/system/30na-account-sync.timer
+HAD_SYNC_SERVICE=0 HAD_SYNC_TIMER=0 SYNC_ENABLED=0 SYNC_ACTIVE=0
+for unit in "$SYNC_SERVICE" "$SYNC_TIMER"; do
+    [[ ! -L $unit ]] || { echo 'Account sync unit must not be a symlink.' >&2; exit 1; }
+    if [[ -e $unit ]]; then
+        [[ -f $unit ]] && grep -Fxq '# 30na-managed-account-sync-v1' "$unit" || { echo 'Existing unowned account sync unit; review before updating.' >&2; exit 1; }
+    fi
+done
+if [[ -f $SYNC_SERVICE ]]; then HAD_SYNC_SERVICE=1; cp "$SYNC_SERVICE" "$BACKUP/sync-service"; fi
+if [[ -f $SYNC_TIMER ]]; then HAD_SYNC_TIMER=1; cp "$SYNC_TIMER" "$BACKUP/sync-timer"; fi
+if systemctl is-enabled --quiet 30na-account-sync.timer; then SYNC_ENABLED=1; fi
+if systemctl is-active --quiet 30na-account-sync.timer; then SYNC_ACTIVE=1; fi
 CLI_LAUNCHER=/usr/local/bin/30na
 if [[ -e $CLI_LAUNCHER ]]; then
     grep -Fxq "# 30na managed CLI launcher v1" "$CLI_LAUNCHER" || { echo "Existing unowned 30na command; review before updating." >&2; exit 1; }
@@ -25,10 +38,16 @@ rollback() {
     trap - ERR INT TERM
     set +e
     if [[ $CHANGED == 1 ]]; then
+        systemctl stop 30na-account-sync.timer 30na-account-sync.service
+        systemctl disable 30na-account-sync.timer
+        if [[ $HAD_SYNC_SERVICE == 1 ]]; then cp "$BACKUP/sync-service" "$SYNC_SERVICE"; else rm -f "$SYNC_SERVICE"; fi
+        if [[ $HAD_SYNC_TIMER == 1 ]]; then cp "$BACKUP/sync-timer" "$SYNC_TIMER"; else rm -f "$SYNC_TIMER"; fi
         if [[ $HAD_LINK == 1 ]]; then ln -sfn "$(cat "$BACKUP/link")" "$LINK"; else rm -f "$LINK"; fi
         if [[ $HAD_DROPIN == 1 ]]; then cp "$BACKUP/dropin" "$DROPIN"; else rm -f "$DROPIN"; fi
         if [[ $HAD_CLI == 1 ]]; then install -m 0755 "$BACKUP/cli" "$CLI_LAUNCHER"; else rm -f "$CLI_LAUNCHER"; fi
         systemctl daemon-reload
+        if [[ $SYNC_ENABLED == 1 ]]; then systemctl enable 30na-account-sync.timer; fi
+        if [[ $SYNC_ACTIVE == 1 ]]; then systemctl start 30na-account-sync.timer; fi
         systemctl restart 30na-dashboard
         echo 'Update failed; previous Dashboard configuration restored. Check 30na-review status.' >&2
     fi
@@ -81,9 +100,13 @@ for ((attempt=0;attempt<30;attempt++)); do
     sleep 1
 done
 [[ $READY == 1 ]]
+install -m 0644 "$RELEASE/deployment/systemd/30na-account-sync.service" "$SYNC_SERVICE"
+install -m 0644 "$RELEASE/deployment/systemd/30na-account-sync.timer" "$SYNC_TIMER"
+systemctl daemon-reload
+systemctl enable --now 30na-account-sync.timer
 install -m 0755 "$RELEASE/deployment/30na-cli" "$CLI_LAUNCHER"
 printf '%s\n' "$SHA" >/etc/30na/dashboard-release
 CHANGED=0
 trap - ERR INT TERM
 rm -rf "$BACKUP"
-printf 'Dashboard updated to %s. Refresh your browser. Token and backend state are unchanged.\n' "$SHA"
+printf 'Dashboard updated to %s. Refresh your browser. Account credential synchronization is enabled.\n' "$SHA"

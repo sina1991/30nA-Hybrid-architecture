@@ -25,17 +25,17 @@ def test_themes_endpoint():
     payload = response.json()
     assert payload["count"] == 3
     assert {item["id"] for item in payload["themes"]} == {
-        "compact-6", "standard-8", "wide-12"
+        "daylight", "forest", "midnight"
     }
 
 
-def test_each_theme_has_slots():
-    for theme_id in ("compact-6", "standard-8", "wide-12"):
+def test_each_theme_has_colors():
+    for theme_id in ("daylight", "forest", "midnight"):
         response = client.get(f"/api/themes/{theme_id}")
         assert response.status_code == 200
         theme = response.json()
-        assert theme["slots"]
-        assert theme["grid"]["columns"] > 0
+        assert theme["colors"]["bg"]
+        assert theme["colors"]["text"]
 
 
 def test_unknown_theme_is_not_found():

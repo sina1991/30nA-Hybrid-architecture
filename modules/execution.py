@@ -14,7 +14,7 @@ MODULE_FILES = {
     'process-monitor': 'process-monitor/module.py', 'alerts': 'alerts/module.py',
     'log-viewer': 'log-viewer/module.py', 'docker-monitor': 'docker-monitor/module.py',
     'gold-chart': 'gold-chart/module.py', 'moving-average': 'moving-average/module.py',
-    'rsi': 'rsi/module.py', 'macd': 'macd/module.py',
+    'rsi': 'rsi/module.py', 'macd': 'macd/module.py', 'chat-box':'chat-box/module.py',
 }
 
 HOST_MONITORS = frozenset(('system-monitor', 'service-monitor', 'disk-usage', 'network-monitor', 'process-monitor', 'alerts', 'log-viewer', 'docker-monitor'))

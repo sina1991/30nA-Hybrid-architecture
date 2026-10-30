@@ -6,6 +6,11 @@ ACCESS = r'''
     <input id="account-token" type="password" autocomplete="off" placeholder="Access token" required>
     <button id="account-connect" type="submit">Sign in</button>
   </form>
+  <form id="account-password-form">
+    <label class="account-label" for="account-username">Username</label><input id="account-username" autocomplete="username" required>
+    <label class="account-label" for="account-password">Password</label><input id="account-password" type="password" autocomplete="current-password" required>
+    <button type="submit">Sign in with password</button>
+  </form>
   <div id="account-actions" class="account-actions" hidden>
     <a id="worker-workspace-link" href="#workers">Manage Workers</a>
     <button id="account-refresh" type="button">Refresh</button>
@@ -174,6 +179,7 @@ PANEL = r'''
   const terminal = job => ['succeeded','failed','cancelled'].includes(job.status);
   let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false, slotOwner = '';
   let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0, authenticated = false, previousReady = false;
+  let workerAccess = false, credentialTimer = null;
   let active = null, enabledWorkers = [], session = new AbortController(), previousTemplateValue = '', previousTemplateKind = null;
 
   function status(message) { el('account-status').textContent = message; }
@@ -188,19 +194,20 @@ PANEL = r'''
     el('worker-run-form').hidden = !token;
     el('worker-management').hidden = !token;
     el('worker-list').querySelectorAll('button').forEach(button => {button.disabled = managing || Boolean(pending);});
-    el('worker-create').disabled = managing || Boolean(pending);
+    el('worker-create').disabled = !workerAccess || managing || Boolean(pending);
     el('worker-edit-fields').disabled = managing || Boolean(pending);
     el('worker-confirm-submit').disabled = managing;
     el('worker-editor-close').disabled = managing;
     el('worker-confirm-close').disabled = managing;
     el('account-form').hidden = Boolean(token);
-    el('worker-run-fields').disabled = !token || managing || !enabledWorkers.length || Boolean(pending) || Boolean(active && !terminal(active));
+    el('account-password-form').hidden = Boolean(token);
+    el('worker-run-fields').disabled = !workerAccess || !token || managing || !enabledWorkers.length || Boolean(pending) || Boolean(active && !terminal(active));
     el('worker-retry').disabled = sending;
     el('execution-cancel').disabled = sending;
   }
   function disconnect(message = 'Signed out. Accepted executions continue on the server.') {
-    generation++; watcher++; clearTimeout(timer); session.abort(); session = new AbortController();
-    authenticated = false; refreshTicket++; allWorkers = []; historyRows = []; editing = null; confirmation = null; managing = false;
+    generation++; watcher++; clearTimeout(timer); clearTimeout(credentialTimer); session.abort(); session = new AbortController();
+    authenticated = false; workerAccess = false; refreshTicket++; allWorkers = []; historyRows = []; editing = null; confirmation = null; managing = false;
     el('worker-editor').close(); el('worker-confirm').close();
     el('worker-edit-form').reset(); el('worker-edit-status').textContent = '';
     el('worker-confirm-form').reset(); el('worker-confirm-status').textContent = '';
@@ -208,7 +215,7 @@ PANEL = r'''
     el('worker-list').replaceChildren(); el('history-worker').value = ''; el('history-status').value = ''; el('history-count').textContent = '';
     token = ''; slotOwner = ''; pending = null; sending = false; active = null; enabledWorkers = [];
     document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:false}}));
-    el('account-token').value = '';
+    el('account-token').value = ''; el('account-password').value = '';
     el('account-worker').replaceChildren(); el('account-executions').replaceChildren();
     el('worker-input').value = '{}'; el('run-text').value = ''; el('run-numbers').value = '';
     el('execution-output').textContent = ''; el('execution-id').textContent = '';
@@ -268,6 +275,18 @@ PANEL = r'''
     async evaluateSignalRule(id) { return this.slotRequest('signal-rules/' + encodeURIComponent(id) + '/evaluate', {}); },
     async signalWorkers() { return this.slotRequest('workers'); },
     async executeSignalWorker(id, interval, key) { return this.slotRequest('signal-workers/' + encodeURIComponent(id) + '/executions', {interval, idempotency_key:key}); },
+    async accountMe() { return this.slotRequest('account/me'); },
+    async accountBootstrap(username, password) { return this.slotRequest('account/bootstrap',{username,password}); },
+    async listAccounts() { return this.slotRequest('accounts'); },
+    async createAccount(username,password,role) { return this.slotRequest('accounts',{username,password,role}); },
+    async setAccountEnabled(id,enabled) { return this.slotRequest('accounts/'+encodeURIComponent(id)+'/enabled',{enabled}); },
+    async chatRooms() { return this.slotRequest('chat/rooms'); },
+    async chatUsers() { return this.slotRequest('chat/users'); },
+    async chatRequests() { return this.slotRequest('chat/requests'); },
+    async chatInvite(recipient) { return this.slotRequest('chat/requests',{recipient}); },
+    async chatRespond(id,accept) { return this.slotRequest('chat/requests/'+encodeURIComponent(id)+'/respond',{accept}); },
+    async chatMessages(room) { return this.slotRequest('chat/rooms/'+encodeURIComponent(room)+'/messages'); },
+    async chatSend(room,text) { return this.slotRequest('chat/rooms/'+encodeURIComponent(room)+'/messages',{text}); },
     async listSlots() { const result = await this.slotRequest('slots/active'); slotOwner = result.owner; return result.slots; },
     async marketData(limit, period, includeOpen, endTime = null, interval = '1m', indicators = false) {
       return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen) + '&interval=' + encodeURIComponent(interval) + '&include_indicators=' + String(indicators) + (endTime === null ? '' : '&end_time=' + encodeURIComponent(endTime)));
@@ -486,7 +505,9 @@ PANEL = r'''
   async function refresh() {
     const current = generation, ticket = ++refreshTicket;
     try {
-      const [workers,history] = await Promise.all([request('workers'),request('executions')]);
+      const account = await request('account/me');
+      workerAccess = Boolean(account.worker_access);
+      const [workers,history] = account.worker_access ? await Promise.all([request('workers'),request('executions')]) : [{workers:[]},{executions:[]}];
       if (current !== generation || ticket !== refreshTicket) return;
       authenticated = true; allWorkers = workers.workers; renderWorkers();
       const previous = el('account-worker').value;
@@ -505,7 +526,9 @@ PANEL = r'''
       } else setRunInputMode(false);
       renderHistory(history.executions); controls();
       document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:true,workers:allWorkers.length,enabled:enabledWorkers.length,executions:history.executions.length}}));
-      status(enabledWorkers.length ? 'Account ready. Select a Worker and input.' : 'No active Worker. Register and enable a published Worker.');
+      status(!account.worker_access ? 'Signed in. Worker credentials are being provisioned.' : enabledWorkers.length ? 'Account ready. Select a Worker and input.' : 'No active Worker. Register and enable a published Worker.');
+      clearTimeout(credentialTimer);
+      if (!account.worker_access) credentialTimer=setTimeout(() => { if (token && current === generation) refresh(); }, 10000);
     } catch (error) { if (current === generation && ticket === refreshTicket) handleError(error); }
   }
   const lifecycle = {configured:'Configured',enabled:'Enabled',disabled:'Disabled'};
@@ -709,6 +732,17 @@ PANEL = r'''
     if (!value) { status('Enter your access token.'); return; }
     disconnect('Signing in...'); token = value; controls(); await refresh();
   });
+  el('account-password-form').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (location.protocol !== 'https:' && !['localhost','127.0.0.1','[::1]'].includes(location.hostname)) { status('Sign-in requires HTTPS.'); return; }
+    const username=el('account-username').value.trim(), password=el('account-password').value;
+    disconnect('Signing in...');
+    try {
+      const response=await fetch('/api/upstreams/account/login',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({username,password}),cache:'no-store',credentials:'omit',redirect:'error'});
+      if (!response.ok) throw Error('Invalid credentials or sign-in unavailable.');
+      const data=await response.json(); token=data.payload.token; el('account-password').value=''; controls(); await refresh();
+    } catch (_) { el('account-password').value=''; disconnect('Invalid credentials or sign-in unavailable.'); }
+  });
   el('worker-run-form').addEventListener('submit', async event => {
     event.preventDefault(); if (pending || sending || (active && !terminal(active))) return;
     try {
@@ -725,7 +759,7 @@ PANEL = r'''
   });
   el('worker-retry').addEventListener('click', submitPending);
   el('account-refresh').addEventListener('click', refresh);
-  el('account-disconnect').addEventListener('click', () => disconnect());
+  el('account-disconnect').addEventListener('click', async () => { if (token.startsWith('s_') && token.length === 45) { try { await request('account/logout',{}); } catch (_) {} } disconnect(); });
   el('execution-refresh').addEventListener('click', () => { if (active) watchJob(active.execution_id); });
   el('execution-cancel').addEventListener('click', async () => {
     if (!active || terminal(active) || sending) return;

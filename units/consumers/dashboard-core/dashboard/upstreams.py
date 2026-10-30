@@ -10,7 +10,7 @@ from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, ow
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
 from modules import slots
-from modules import slot_workers, indicator_profiles, signal_rules
+from modules import slot_workers, indicator_profiles, signal_rules, accounts, chat_store
 from market_data.data import chart as gold_chart
 from market_data.data import indicator as market_indicator, database_table
 
@@ -29,13 +29,47 @@ def create_router(credential_path, upstream_factory):
     Worker metadata mutations use the Manager schemas and caller identity.
     """
     router = APIRouter(prefix='/api/upstreams', responses=ERROR_RESPONSES)
-    owner = owner_dependency(credential_path)
+    legacy_owner = owner_dependency(credential_path)
+
+    def owner(request: Request):
+        auth = request.headers.get('authorization', '')
+        token = auth[7:] if auth.startswith('Bearer ') else ''
+        try:
+            identity = legacy_owner(request)
+        except HTTPException as exc:
+            if exc.status_code != 401 or not accounts.is_session_token(token): raise
+            try: user = accounts.authenticate(token)
+            except (OSError, sqlite3.Error): raise HTTPException(503, 'Identity configuration unavailable') from None
+            if user is None: raise HTTPException(401, 'Unauthorized', headers={'WWW-Authenticate':'Bearer'})
+            request.state.account_session = True
+            return user['id']
+        if identity == 'customer':
+            import os
+            from pathlib import Path
+            database = Path(os.environ.get('DASHBOARD_MODULE_STATE_DIR', '/var/lib/30na/dashboard')) / 'accounts.sqlite3'
+            if database.exists():
+                try: existing = accounts.get_user(identity)
+                except (OSError, sqlite3.Error): raise HTTPException(503, 'Identity configuration unavailable') from None
+                if existing is not None and not existing['enabled']:
+                    raise HTTPException(401, 'Unauthorized', headers={'WWW-Authenticate':'Bearer'})
+        request.state.account_session = False
+        return identity
+
+    def admin_identity(request: Request, identity=Depends(owner)):
+        if not request.state.account_session and identity == 'customer': return identity
+        user = accounts.get_user(identity)
+        if user is None or not user['enabled'] or user['role'] != 'admin':
+            raise HTTPException(403, 'Administrator required')
+        return identity
     routes = {'workers': ('worker-manager', '/api/v1/workers'),
               'executions': ('worker-manager', '/api/v1/executions'),
               'sources': ('code-manager', '/api/v1/sources')}
 
     def forward(request, identity, name, method, path, payload=None, status=200):
-        adapters = upstream_factory(identity, request.headers['authorization'][7:])
+        credential = accounts.upstream_credential(identity) if request.state.account_session else request.headers['authorization'][7:]
+        if credential is None:
+            raise HTTPException(503, 'Separate Worker credentials are not provisioned for this account')
+        adapters = upstream_factory(identity, credential)
         adapter = adapters.get(name)
         if adapter is None:
             raise HTTPException(503, 'Upstream is not configured')
@@ -61,6 +95,106 @@ def create_router(credential_path, upstream_factory):
         except ValueError:
             raise HTTPException(422, 'Invalid worker identifier') from None
         return '/api/v1/workers/' + _identifier(worker_id)
+
+    @router.post('/account/bootstrap')
+    def account_bootstrap(body: dict, request: Request, identity=Depends(owner)):
+        token = request.headers.get('authorization', '')[7:]
+        if request.state.account_session or identity != 'customer': raise HTTPException(403, 'Legacy customer credential required')
+        if set(body) != {'username','password'}: raise HTTPException(422, 'Invalid account')
+        try: user = accounts.bootstrap_admin(body['username'], body['password'])
+        except ValueError: raise HTTPException(422, 'Account cannot be initialized') from None
+        response=JSONResponse(envelope({'user':user})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.post('/account/login')
+    def account_login(body: dict):
+        if set(body) != {'username','password'}: raise HTTPException(422, 'Invalid account')
+        try: session=accounts.login(body['username'],body['password'])
+        except ValueError: raise HTTPException(401, 'Invalid credentials') from None
+        except (OSError,sqlite3.Error): raise HTTPException(503, 'Identity unavailable') from None
+        response=JSONResponse(envelope(session)); response.headers['Cache-Control']='no-store'; return response
+
+    @router.get('/account/me')
+    def account_me(request: Request, identity=Depends(owner)):
+        token=request.headers.get('authorization','')[7:]
+        user=accounts.get_user(identity)
+        response=JSONResponse(envelope({'user':user or {'id':identity,'username':identity,'role':'admin' if identity == 'customer' else 'user','enabled':True},
+                                        'legacy':not request.state.account_session,'worker_access':not request.state.account_session or accounts.upstream_credential(identity) is not None}))
+        response.headers['Cache-Control']='no-store'; return response
+
+    @router.post('/account/logout')
+    def account_logout(request: Request, identity=Depends(owner)):
+        token=request.headers.get('authorization','')[7:]
+        if request.state.account_session: accounts.logout(token)
+        response=JSONResponse(envelope({'logged_out':True})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.get('/accounts')
+    def account_users(identity=Depends(admin_identity)):
+        response=JSONResponse(envelope({'users':accounts.list_users()})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.post('/accounts')
+    def account_create(body: dict, identity=Depends(admin_identity)):
+        if set(body) != {'username','password','role'}: raise HTTPException(422, 'Invalid account')
+        try: user=accounts.create_user(body['username'],body['password'],body['role'])
+        except ValueError: raise HTTPException(422, 'Account cannot be created') from None
+        response=JSONResponse(envelope({'user':user})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.post('/accounts/{user_id}/enabled')
+    def account_enable(user_id: str, body: dict, identity=Depends(admin_identity)):
+        if set(body) != {'enabled'} or type(body['enabled']) is not bool: raise HTTPException(422, 'Invalid status')
+        try: accounts.set_enabled(user_id, body['enabled'])
+        except LookupError: raise HTTPException(404, 'Account not found') from None
+        except ValueError: raise HTTPException(422, 'Account cannot be disabled') from None
+        response=JSONResponse(envelope({'enabled':body['enabled']})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.get('/chat/users')
+    def chat_users(identity=Depends(owner)):
+        if not accounts.get_user(identity): raise HTTPException(403, 'Account setup required')
+        response=JSONResponse(envelope({'users':[{'id':u['id'],'username':u['username']} for u in accounts.list_users() if u['enabled'] and u['id'] != identity]}))
+        response.headers['Cache-Control']='no-store'; return response
+
+    @router.get('/chat/rooms')
+    def chat_rooms(identity=Depends(owner)):
+        try: result=chat_store.list_rooms(identity)
+        except (PermissionError,ValueError): raise HTTPException(403, 'Account unavailable') from None
+        response=JSONResponse(envelope({'rooms':result})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.get('/chat/requests')
+    def chat_requests(identity=Depends(owner)):
+        try: result=chat_store.list_requests(identity)
+        except (PermissionError,ValueError): raise HTTPException(403, 'Account unavailable') from None
+        response=JSONResponse(envelope({'requests':result})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.post('/chat/requests')
+    def chat_request(body: dict, identity=Depends(owner)):
+        if set(body) != {'recipient'}: raise HTTPException(422, 'Invalid request')
+        try: result=chat_store.request_private(identity,body['recipient'])
+        except PermissionError: raise HTTPException(403, 'Account unavailable') from None
+        except ValueError: raise HTTPException(422, 'Request cannot be created') from None
+        response=JSONResponse(envelope({'request':result})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.post('/chat/requests/{request_id}/respond')
+    def chat_respond(request_id: str, body: dict, identity=Depends(owner)):
+        if set(body) != {'accept'} or type(body['accept']) is not bool: raise HTTPException(422, 'Invalid response')
+        try: result=chat_store.respond(identity,request_id,body['accept'])
+        except LookupError: raise HTTPException(404, 'Request not found') from None
+        except PermissionError: raise HTTPException(403, 'Account unavailable') from None
+        except ValueError: raise HTTPException(422, 'Request cannot be resolved') from None
+        response=JSONResponse(envelope({'request':result})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.get('/chat/rooms/{room_id}/messages')
+    def chat_messages(room_id: str, limit: int = Query(default=50, ge=1, le=200), before: int | None = Query(default=None,gt=0), identity=Depends(owner)):
+        try: result=chat_store.messages(identity,room_id,limit,before)
+        except PermissionError: raise HTTPException(403, 'Room unavailable') from None
+        except ValueError: raise HTTPException(422, 'Invalid room or pagination') from None
+        response=JSONResponse(envelope({'messages':result})); response.headers['Cache-Control']='no-store'; return response
+
+    @router.post('/chat/rooms/{room_id}/messages')
+    def chat_send(room_id: str, body: dict, identity=Depends(owner)):
+        if set(body) != {'text'}: raise HTTPException(422, 'Invalid message')
+        try: result=chat_store.send(identity,room_id,body['text'])
+        except PermissionError: raise HTTPException(403, 'Room unavailable') from None
+        except ValueError: raise HTTPException(422, 'Invalid message') from None
+        response=JSONResponse(envelope({'message':result})); response.headers['Cache-Control']='no-store'; return response
 
     @router.get('/market/candles')
     def market_candles(limit: int = Query(default=200, ge=1, le=1000),
@@ -290,6 +424,8 @@ def create_router(credential_path, upstream_factory):
     def update_slot_appearance(slot_id: str, body: dict, identity=Depends(owner)):
         try:
             value = slots.update_appearance(identity, slot_id, body)
+        except PermissionError:
+            raise HTTPException(403, 'Room unavailable') from None
         except LookupError:
             raise HTTPException(404, 'Slot not found') from None
         except (ValueError, TypeError):
@@ -335,6 +471,8 @@ def create_router(credential_path, upstream_factory):
             value = slots.read(identity, slot_id)
             if value['module_id'] != body['module_id']:
                 raise ValueError('slot binding changed')
+        except PermissionError:
+            raise HTTPException(403, 'Room unavailable') from None
         except LookupError:
             raise HTTPException(404, 'Slot not configured') from None
         except (ValueError, TypeError, OverflowError, KeyError):
@@ -350,6 +488,8 @@ def create_router(credential_path, upstream_factory):
             raise HTTPException(422, 'Invalid module input')
         try:
             value = slots.execute(identity, slot_id, body['input'], expected_module=body['module_id'])
+        except PermissionError:
+            raise HTTPException(403, 'Room unavailable') from None
         except LookupError:
             raise HTTPException(404, 'Slot not configured') from None
         except (ValueError, TypeError, OverflowError, KeyError):

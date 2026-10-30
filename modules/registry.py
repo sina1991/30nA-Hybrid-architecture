@@ -23,6 +23,7 @@ SUPPORTED_TYPES = {
     "gold-chart",
     "moving-average",
     "market-indicator",
+    "chat",
 }
 
 

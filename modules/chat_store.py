@@ -36,6 +36,7 @@ def _connect():
         id INTEGER PRIMARY KEY AUTOINCREMENT, room_id TEXT NOT NULL, author TEXT NOT NULL,
         body TEXT NOT NULL, created_at INTEGER NOT NULL)''')
     db.execute('CREATE INDEX IF NOT EXISTS chat_messages_room_id ON messages(room_id,id)')
+    db.execute('CREATE INDEX IF NOT EXISTS chat_messages_author_time ON messages(author,created_at)')
     return db
 
 
@@ -60,6 +61,8 @@ def request_private(owner, recipient):
     db = _connect()
     try:
         db.execute('BEGIN IMMEDIATE')
+        if db.execute("SELECT count(*) FROM invitations WHERE sender=? AND status='pending'", (owner,)).fetchone()[0] >= 20:
+            raise ValueError('pending request limit reached')
         if db.execute('SELECT 1 FROM rooms WHERE member_a=? AND member_b=?', (a,b)).fetchone(): raise ValueError('private room already exists')
         if db.execute("SELECT 1 FROM invitations WHERE status='pending' AND ((sender=? AND recipient=?) OR (sender=? AND recipient=?))", (owner,recipient,recipient,owner)).fetchone():
             raise ValueError('a request is already pending')
@@ -115,7 +118,10 @@ def send(owner, room, text):
     db = _connect()
     try:
         db.execute('BEGIN IMMEDIATE'); _authorize(db,owner,room)
-        now = int(time.time()); cursor = db.execute('INSERT INTO messages(room_id,author,body,created_at) VALUES(?,?,?,?)', (room,owner,text,now))
+        now = int(time.time())
+        if db.execute('SELECT count(*) FROM messages WHERE author=? AND created_at>?', (owner,now-60)).fetchone()[0] >= 60:
+            raise ValueError('message rate limit reached')
+        cursor = db.execute('INSERT INTO messages(room_id,author,body,created_at) VALUES(?,?,?,?)', (room,owner,text,now))
         db.commit()
         return {'id':cursor.lastrowid,'room_id':room,'author':owner,'body':text,'created_at':now}
     finally: db.close()
