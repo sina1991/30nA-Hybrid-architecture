@@ -81,6 +81,23 @@ def create_router(credential_path, upstream_factory):
         response.headers['Vary'] = 'Authorization'
         return response
 
+    @router.post('/modules/{module_id}/run')
+    def run_independent_module(module_id: str, body: dict, identity=Depends(owner)):
+        if set(body) != {'input'} or not isinstance(body['input'], dict) or any(
+                str(key).startswith('_') or key in ('owner', 'slot') for key in body['input']):
+            raise HTTPException(422, 'Invalid module input')
+        try:
+            slots._authorize_host_monitor(identity, module_id)
+            result = run_module(module_id, body['input'])
+        except LookupError:
+            raise HTTPException(404, 'Unknown module') from None
+        except (ValueError, TypeError, OverflowError, KeyError, ZeroDivisionError):
+            raise HTTPException(422, 'Invalid module input or unavailable resource') from None
+        response = JSONResponse(envelope({'result': result}))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
+
     @router.post('/slots/{slot_id}/binding')
     def bind_slot(slot_id: str, body: dict, identity=Depends(owner)):
         if set(body) - {'module_id', 'context', 'only_if_missing'} or type(body.get('only_if_missing', False)) is not bool:

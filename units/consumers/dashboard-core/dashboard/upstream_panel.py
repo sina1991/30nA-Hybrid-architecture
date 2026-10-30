@@ -7,7 +7,7 @@ ACCESS = r'''
     <button id="account-connect" type="submit">Sign in</button>
   </form>
   <div id="account-actions" class="account-actions" hidden>
-    <a id="worker-workspace-link" href="#worker-workspace">Manage Workers ↓</a>
+    <a id="worker-workspace-link" href="#workers">Manage Workers</a>
     <button id="account-refresh" type="button">Refresh</button>
     <button id="account-disconnect" type="button">Sign out</button>
   </div>
@@ -46,9 +46,8 @@ PANEL = r'''
 @media(max-width:560px){.account-access{flex-basis:100%}.account-panel{width:calc(100% - 32px);padding:16px}}
 </style>
 <section id="worker-workspace" class="account-panel" hidden aria-label="Run Worker">
-  <h2>Worker workspace</h2>
-  <p class="account-note">Run trusted, pre-registered Workers.</p>
   <div id="worker-notices"></div>
+  <div data-workspace-pane="workers">
   <section id="worker-management" hidden aria-label="Manage Workers">
     <h3>Manage Workers</h3>
     <button id="worker-create" type="button">Register Worker</button>
@@ -97,6 +96,7 @@ PANEL = r'''
     </fieldset>
   </form>
   <button id="worker-retry" type="button" hidden>Retry the same request</button>
+  </div>
   <section id="execution-detail" hidden aria-label="Execution result">
     <h3>Status and result</h3>
     <p id="execution-status" role="status" aria-live="polite"></p>
@@ -105,7 +105,7 @@ PANEL = r'''
     <button id="execution-cancel" type="button" hidden>Request cancellation</button>
     <pre id="execution-output"></pre>
   </section>
-  <section aria-label="Execution history">
+  <section data-workspace-pane="executions" aria-label="Execution history">
     <h3>Execution history</h3>
     <label for="history-worker">Filter by Worker or execution ID</label><input id="history-worker" type="search">
     <label for="history-status">Execution status</label><select id="history-status"><option value="">All statuses</option><option value="accepted">Queued</option><option value="running">Running</option><option value="succeeded">Succeeded</option><option value="failed">Failed</option><option value="cancelled">Cancelled</option></select>
@@ -154,6 +154,7 @@ PANEL = r'''
     el('worker-confirm-message').textContent = ''; el('edit-lifecycle').textContent = ''; el('worker-search').value = '';
     el('worker-list').replaceChildren(); el('history-worker').value = ''; el('history-status').value = ''; el('history-count').textContent = '';
     token = ''; pending = null; sending = false; active = null; enabledWorkers = [];
+    document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:false}}));
     el('account-token').value = '';
     el('account-worker').replaceChildren(); el('account-executions').replaceChildren();
     el('execution-output').textContent = ''; el('execution-id').textContent = '';
@@ -206,6 +207,18 @@ PANEL = r'''
       const current = generation;
       try {
         const result = await request('slots/' + encodeURIComponent(slot) + '/read', {module_id:moduleId});
+        if (current !== generation) throw new Error('The session changed.');
+        return result.result;
+      } catch (error) {
+        if (current === generation && error.status === 401) disconnect(error.message);
+        throw error;
+      }
+    },
+    async runIndependent(moduleId, input) {
+      if (!token || !authenticated) throw new Error('Sign in is required.');
+      const current = generation;
+      try {
+        const result = await request('modules/' + encodeURIComponent(moduleId) + '/run', {input});
         if (current !== generation) throw new Error('The session changed.');
         return result.result;
       } catch (error) {
@@ -275,6 +288,7 @@ PANEL = r'''
       });
       if (enabledWorkers.some(row => row.definition.worker_id === previous)) el('account-worker').value = previous;
       renderHistory(history.executions); controls();
+      document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:true,workers:allWorkers.length,enabled:enabledWorkers.length,executions:history.executions.length}}));
       status(enabledWorkers.length ? 'Account ready. Select a Worker and input.' : 'No active Worker. Register and enable a published Worker.');
     } catch (error) { if (current === generation && ticket === refreshTicket) handleError(error); }
   }

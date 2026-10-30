@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
@@ -15,6 +16,7 @@ from zoneinfo import ZoneInfoNotFoundError
 BASE_DIR = Path(__file__).resolve().parent
 THEMES_DIR = BASE_DIR / "themes"
 THEME_ID_PATTERN = re.compile(r"^[a-z0-9-]+$")
+PROJECT_ROOT = BASE_DIR.parents[3]
 
 app = FastAPI(
     title="Dashboard Core",
@@ -60,6 +62,23 @@ def load_themes() -> list[dict]:
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "service": "dashboard-core"}
+
+
+@app.get("/api/project")
+def project_info() -> dict:
+    try:
+        version = (PROJECT_ROOT / 'VERSION').read_text(encoding='utf-8').strip()
+    except OSError:
+        version = 'unknown'
+    try:
+        commit = subprocess.run(['git', '-c', f'safe.directory={PROJECT_ROOT}', '-C', str(PROJECT_ROOT),
+                                 'rev-parse', '--verify', 'HEAD'], capture_output=True, text=True,
+                                timeout=2, check=True).stdout.strip()
+        if not re.fullmatch(r'[0-9a-f]{40,64}', commit): commit = 'unknown'
+    except (OSError, subprocess.SubprocessError):
+        commit = 'unknown'
+    return {'name': '30nA Hybrid Architecture', 'version': version, 'commit': commit,
+            'dashboard_status': 'ok'}
 
 
 @app.get("/api/themes")
@@ -220,6 +239,32 @@ main { padding: 22px 24px; max-width: 1800px; margin: auto; }
 .dice-error { color: #fca5a5; }
 .empty { color: var(--muted); }
 footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--border); }
+.app-shell {margin-left:240px;min-height:100vh}
+.sidebar {position:fixed;inset:0 auto 0 0;width:240px;background:#0c1424;border-right:1px solid var(--border);padding:24px 16px;display:flex;flex-direction:column;gap:20px;z-index:10}
+.brand {font-weight:750;font-size:20px;color:var(--text);letter-spacing:.03em}
+.brand small {display:block;color:var(--muted);font-size:11px;letter-spacing:.12em;font-weight:500}
+.sidebar nav {display:grid;gap:4px}
+.nav-button {text-align:left;padding:11px 14px;color:var(--muted);background:transparent;border:1px solid transparent;border-radius:9px;font:inherit;cursor:pointer}
+.nav-button:hover,.nav-button[aria-current="page"] {color:#fff;background:#1b2b43;border-color:#304766}
+.sidebar-footer {margin-top:auto;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
+.mobile-menu {display:none;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font:inherit}
+.view-heading {margin:0 0 4px;font-size:26px}.view-description {color:var(--muted);margin:0 0 22px}
+.overview-grid,.module-catalog {display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.overview-card,.catalog-card,.info-card {background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:18px;min-width:0}
+.overview-card span {display:block;color:var(--muted);font-size:12px}.overview-card strong {display:block;font-size:26px;margin-top:8px}
+.catalog-card h3 {margin:0 0 4px}.catalog-card p {color:var(--muted);overflow-wrap:anywhere}
+.catalog-card code,.info-card code {overflow-wrap:anywhere}.catalog-card button {margin-top:8px}
+.catalog-search {width:min(100%,440px);padding:10px;background:#0b1120;color:var(--text);border:1px solid var(--border);border-radius:8px;font:inherit;margin:0 0 18px}
+.module-runner {margin:0 0 20px}.module-runner textarea {min-height:90px}.module-runner pre {white-space:pre-wrap;overflow-wrap:anywhere}
+.page-view[hidden], [hidden] {display:none!important}
+.workspace-note {color:var(--muted)}
+body:not([data-view="workers"]):not([data-view="executions"]) #worker-workspace {display:none!important}
+body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="executions"] [data-workspace-pane="workers"] {display:none!important}
+.account-panel {width:100%!important;max-width:none!important;margin:0!important}
+@media (max-width: 760px) {
+ .app-shell {margin-left:0}.sidebar {transform:translateX(-100%);transition:transform .2s ease;box-shadow:0 0 0 transparent}
+ body.nav-open .sidebar {transform:translateX(0);box-shadow:0 0 0 100vmax #0009}.mobile-menu {display:inline-block}
+}
 @media (max-width: 900px) {
   #grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .slot { grid-column: span 3 !important; grid-row: auto !important; }
@@ -232,11 +277,26 @@ footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--bo
 }
 </style>
 </head>
-<body>
+<body data-view="overview">
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+  <div class="brand">30nA <small>HYBRID ARCHITECTURE</small></div>
+  <nav aria-label="Dashboard sections">
+    <button class="nav-button" type="button" data-nav="overview" aria-current="page">Overview</button>
+    <button class="nav-button" type="button" data-nav="slots">Slots</button>
+    <button class="nav-button" type="button" data-nav="modules">Modules</button>
+    <button class="nav-button" type="button" data-nav="workers">Workers</button>
+    <button class="nav-button" type="button" data-nav="executions">Executions</button>
+    <button class="nav-button" type="button" data-nav="project">Project Info</button>
+    <button class="nav-button" type="button" data-nav="account">Account &amp; Settings</button>
+  </nav>
+  <div class="sidebar-footer">Version <span id="sidebar-version">Loading…</span><br>Server workspace</div>
+</aside>
+<div class="app-shell">
 <header>
   <div>
-    <h1>Dashboard Core</h1>
-    <div class="subtitle">Independent, theme-based workspace</div>
+    <button type="button" class="mobile-menu" id="mobile-menu" aria-controls="sidebar" aria-expanded="false">☰ Menu</button>
+    <h1>30nA Dashboard</h1>
+    <div class="subtitle">Your server workspace</div>
   </div>
   <div class="controls">
     <label for="theme">Theme</label>
@@ -244,13 +304,44 @@ footer { color: var(--muted); padding: 22px 24px; border-top: 1px solid var(--bo
   </div>
 </header>
 <main>
+  <section class="page-view" data-page="overview">
+    <h2 class="view-heading">Overview</h2><p class="view-description">A quick view of your workspace and server.</p>
+    <div class="overview-grid">
+      <div class="overview-card"><span>Dashboard</span><strong id="overview-health">Checking</strong></div>
+      <div class="overview-card"><span>Slots in theme</span><strong id="overview-slots">—</strong></div>
+      <div class="overview-card"><span>Modules</span><strong id="overview-modules">—</strong></div>
+      <div class="overview-card"><span>Workers</span><strong id="overview-workers">Sign in</strong></div>
+      <div class="overview-card"><span>Recent executions</span><strong id="overview-executions">Sign in</strong></div>
+    </div>
+  </section>
+  <section class="page-view" data-page="slots" hidden>
+  <h2 class="view-heading">Slots</h2><p class="view-description">Assign modules and inspect their output.</p>
   <div class="toolbar">
     <div id="theme-info">Loading themes…</div>
     <div id="status" role="status">Starting</div>
   </div>
   <section id="grid" aria-label="Dashboard slots"></section>
+  </section>
+  <section class="page-view" data-page="modules" hidden>
+    <h2 class="view-heading">Modules</h2><p class="view-description">Explore and run modules independently from slots.</p>
+    <input class="catalog-search" id="catalog-search" type="search" placeholder="Search modules by name or ID" aria-label="Search modules">
+    <div id="module-runner" class="module-runner info-card" hidden>
+      <h3 id="runner-title"></h3><label for="runner-input">Input JSON object</label>
+      <textarea id="runner-input" class="module-note-input" spellcheck="false">{}</textarea>
+      <button type="button" class="dice-roll-button" id="runner-run">Run module</button>
+      <button type="button" class="dice-roll-button" id="runner-close">Close</button>
+      <p id="runner-status" role="status"></p><pre id="runner-output"></pre>
+    </div>
+    <div id="module-catalog" class="module-catalog"></div>
+  </section>
+  <section class="page-view" data-page="workers" hidden><h2 class="view-heading">Workers</h2><p class="view-description">Manage and run registered Workers.</p><p class="workspace-note" data-auth-note>Sign in to manage Workers.</p></section>
+  <section class="page-view" data-page="executions" hidden><h2 class="view-heading">Executions</h2><p class="view-description">Review execution history and results.</p><p class="workspace-note" data-auth-note>Sign in to view executions.</p></section>
+  <section class="page-view" data-page="project" hidden><h2 class="view-heading">Project Info</h2><p class="view-description">Version and deployment information.</p><div class="info-card"><p>Project: <strong>30nA Hybrid Architecture</strong></p><p>Version: <strong id="project-version">Loading…</strong></p><p>Installed commit: <code id="project-commit">Loading…</code></p><p>Dashboard: <strong id="project-health">Checking</strong></p><a href="https://github.com/sina1991/30nA-Hybrid-architecture/tree/main/docs" target="_blank" rel="noopener noreferrer">Project documentation ↗</a></div></section>
+  <section class="page-view" data-page="account" hidden><h2 class="view-heading">Account &amp; Settings</h2><p class="view-description">Use the account controls in the header to sign in, refresh or sign out.</p><div class="info-card">The access token stays in memory for this browser session. Theme selection is available in the header.</div></section>
+  <div id="worker-panel-mount"></div>
 </main>
-<footer>Dashboard shell · Slot module selection is stored in this browser.</footer>
+<footer>30nA · Server workspace</footer>
+</div>
 
 <script>
 "use strict";
@@ -265,6 +356,99 @@ let availableModules = [];
 let currentTheme = null;
 const serverSlotContext = {};
 let slotSettings = readSettings();
+let runnerModule = null;
+
+function openView(name) {
+  if (!document.querySelector(`[data-page="${name}"]`)) name = 'overview';
+  document.body.dataset.view = name;
+  document.querySelectorAll('[data-page]').forEach(page => { page.hidden = page.dataset.page !== name; });
+  document.querySelectorAll('[data-nav]').forEach(button => {
+    if (button.dataset.nav === name) button.setAttribute('aria-current', 'page');
+    else button.removeAttribute('aria-current');
+  });
+  document.body.classList.remove('nav-open');
+  document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
+}
+document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => openView(button.dataset.nav)));
+document.getElementById('mobile-menu').addEventListener('click', () => {
+  const opened = document.body.classList.toggle('nav-open');
+  document.getElementById('mobile-menu').setAttribute('aria-expanded', String(opened));
+});
+document.addEventListener('keydown', event => { if (event.key === 'Escape' && document.body.classList.contains('nav-open')) openView(document.body.dataset.view); });
+document.addEventListener('click', event => {
+  if (document.body.classList.contains('nav-open') && !event.target.closest('#sidebar, #mobile-menu')) openView(document.body.dataset.view);
+  if (event.target.closest('#worker-workspace-link')) { event.preventDefault(); openView('workers'); }
+});
+document.addEventListener('dashboard-account-state', event => {
+  document.querySelectorAll('[data-auth-note]').forEach(note => { note.hidden = event.detail.ready; });
+  if (!event.detail.ready) {
+    document.getElementById('runner-output').textContent = '';
+    document.getElementById('runner-status').textContent = '';
+    document.getElementById('runner-input').value = '{}';
+  }
+});
+document.addEventListener('dashboard-overview', event => {
+  const info = event.detail;
+  document.getElementById('overview-workers').textContent = info.ready ? `${info.workers} (${info.enabled} active)` : 'Sign in';
+  document.getElementById('overview-executions').textContent = info.ready ? String(info.executions) : 'Sign in';
+});
+
+function renderCatalog() {
+  const catalog = document.getElementById('module-catalog');
+  const query = document.getElementById('catalog-search').value.trim().toLowerCase();
+  catalog.replaceChildren();
+  const modules = availableModules.filter(module => `${module.name} ${module.id}`.toLowerCase().includes(query));
+  if (!modules.length) { catalog.append(makeElement('p', 'module-detail', 'No modules match your search.')); return; }
+  modules.forEach(module => {
+    const card = makeElement('article', 'catalog-card');
+    const name = makeElement('h3', '', module.name);
+    const id = makeElement('code', '', module.id);
+    const description = makeElement('p', '', module.description);
+    const button = makeElement('button', 'dice-roll-button', 'Run independently'); button.type = 'button';
+    button.addEventListener('click', () => {
+      runnerModule = module.id;
+      document.getElementById('runner-title').textContent = `Run ${module.name}`;
+      document.getElementById('runner-input').value = '{}';
+      document.getElementById('runner-output').textContent = '';
+      document.getElementById('runner-status').textContent = 'Sign in and provide a JSON object. Example: {}';
+      document.getElementById('module-runner').hidden = false;
+      document.getElementById('runner-input').focus();
+    });
+    card.append(name, id, description, button); catalog.append(card);
+  });
+}
+document.getElementById('catalog-search').addEventListener('input', renderCatalog);
+document.getElementById('runner-close').addEventListener('click', () => { document.getElementById('module-runner').hidden = true; runnerModule = null; });
+document.getElementById('runner-run').addEventListener('click', async () => {
+  const status = document.getElementById('runner-status'), output = document.getElementById('runner-output');
+  const bridge = window.dashboardModuleState;
+  if (!runnerModule || !bridge || !bridge.ready()) { status.textContent = 'Sign in to run a module.'; return; }
+  let input;
+  try { input = JSON.parse(document.getElementById('runner-input').value); if (!input || Array.isArray(input) || typeof input !== 'object') throw Error(); }
+  catch (_) { status.textContent = 'Enter a valid JSON object, for example {}.'; return; }
+  const moduleId = runnerModule, button = document.getElementById('runner-run');
+  button.disabled = true; status.textContent = 'Running…'; output.textContent = '';
+  try {
+    const result = await bridge.runIndependent(moduleId, input);
+    if (bridge.ready() && runnerModule === moduleId) { output.textContent = JSON.stringify(result, null, 2); status.textContent = 'Completed.'; }
+  } catch (_) { if (bridge.ready() && runnerModule === moduleId) status.textContent = 'Module could not run. Check input and permissions.'; }
+  finally { button.disabled = false; }
+});
+async function loadProjectInfo() {
+  try {
+    const response = await fetch('/api/project', {cache:'no-store'});
+    if (!response.ok) throw Error();
+    const info = await response.json();
+    document.getElementById('sidebar-version').textContent = info.version;
+    document.getElementById('project-version').textContent = info.version;
+    document.getElementById('project-commit').textContent = info.commit;
+    document.getElementById('project-health').textContent = info.dashboard_status;
+    document.getElementById('overview-health').textContent = info.dashboard_status;
+  } catch (_) {
+    ['sidebar-version','project-version','project-commit','project-health','overview-health'].forEach(id => { document.getElementById(id).textContent = 'Unavailable'; });
+  }
+}
+loadProjectInfo();
 
 function readSettings() {
   try {
@@ -709,6 +893,7 @@ async function loadTheme(themeId) {
     const theme = await response.json();
 
     currentTheme = theme;
+    document.getElementById('overview-slots').textContent = String(theme.slots.length);
     grid.replaceChildren();
     grid.style.setProperty("--theme-columns", theme.grid.columns);
     theme.slots.forEach(slot => grid.append(makeSlot(slot)));
@@ -734,6 +919,8 @@ async function start() {
     const themeData = await themeResponse.json();
     const moduleData = await moduleResponse.json();
     availableModules = moduleData.modules;
+    document.getElementById('overview-modules').textContent = String(availableModules.length);
+    renderCatalog();
 
     themeSelect.replaceChildren();
     themeData.themes.forEach(theme => {
@@ -796,5 +983,5 @@ def create_app(*, credential_path=None, upstream_factory=None):
 
         @instance.get('/', response_class=HTMLResponse)
         def connected_dashboard():
-            return dashboard().replace('</header>', ACCESS + '</header>', 1).replace('</main>', '</main>' + PANEL, 1)
+            return dashboard().replace('</header>', ACCESS + '</header>', 1).replace('<div id="worker-panel-mount"></div>', PANEL, 1)
     return instance

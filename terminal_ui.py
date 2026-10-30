@@ -14,6 +14,10 @@ class Terminal:
         self.owner, self.manager_url = owner, manager_url
         self.token_file, self.ca_file = token_file, ca_file
         self.program = str(Path(__file__).resolve().parent / '30na')
+        try:
+            self.version = (Path(self.program).parent / 'VERSION').read_text(encoding='utf-8').strip()
+        except OSError:
+            self.version = 'unknown'
         self.slot_rows, self.module_rows, self.worker_rows = None, None, None
         self.health = None
         self.notice = None
@@ -110,7 +114,7 @@ class Terminal:
         count = lambda value: str(len(value)) if value is not None else 'unavailable'
         enabled = sum(row.get('lifecycle') == 'enabled' for row in (self.worker_rows or []))
         print(self.style('=' * width, '36'))
-        print(self.style('30nA STATUS', '1', '36') + self.style('  |  v0.1.2', '2') + '  |  Owner: ' + self.style(self.owner, '1'))
+        print(self.style('30nA STATUS', '1', '36') + self.style('  |  v' + self.version, '2') + '  |  Owner: ' + self.style(self.owner, '1'))
         health_color = '32' if str(self.health).lower() in ('ok', 'healthy', 'up') else '33'
         print('Dashboard: ' + self.style(self.health, '1', health_color) + f'  |  Slots: {count(self.slot_rows)}  |  Modules: {count(self.module_rows)}  |  Workers: {count(self.worker_rows)}' + (f' ({enabled} enabled)' if self.worker_rows is not None else ''))
         print(self.style('-' * width, '2'))
