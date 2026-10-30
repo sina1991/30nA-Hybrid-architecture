@@ -94,7 +94,7 @@ def list_active(owner):
 
 
 def create(owner, slot_type='standard'):
-    if slot_type not in ('standard', 'chart', 'fix-chart'): raise ValueError('invalid slot type')
+    if slot_type not in ('standard', 'small', 'chart', 'fix-chart'): raise ValueError('invalid slot type')
     db = _layout_db(owner)
     try:
         count = db.execute("SELECT count(*) FROM module_state WHERE owner=? AND module='slot-meta'", (owner,)).fetchone()[0]
@@ -151,7 +151,7 @@ def set_overview(owner, slot, visible):
 def update_appearance(owner, slot, updates):
     if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators'}:
         raise ValueError('invalid slot appearance')
-    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'chart', 'fix-chart'):
+    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'small', 'chart', 'fix-chart'):
         raise ValueError('invalid slot type')
     if 'chart_indicators' in updates and (not isinstance(updates['chart_indicators'], list) or len(updates['chart_indicators']) > len(CHART_DEFAULTS) or any(not isinstance(item, str) or item not in CHART_DEFAULTS for item in updates['chart_indicators']) or len(set(updates['chart_indicators'])) != len(updates['chart_indicators'])):
         raise ValueError('invalid chart indicators')
@@ -174,7 +174,7 @@ def update_appearance(owner, slot, updates):
         if not isinstance(layout, dict) or set(layout) != {'x', 'y', 'w', 'h'} or any(type(v) is not int for v in layout.values()):
             raise ValueError('invalid layout')
         if not (0 <= layout['x'] < 12 and 0 <= layout['y'] <= 500 and 2 <= layout['w'] <= 12
-                and layout['x'] + layout['w'] <= 12 and 4 <= layout['h'] <= 40):
+                and layout['x'] + layout['w'] <= 12 and 3 <= layout['h'] <= 40):
             raise ValueError('layout out of bounds')
     db = _layout_db(owner)
     try:
@@ -182,9 +182,11 @@ def update_appearance(owner, slot, updates):
         if not row: raise LookupError('slot is not active')
         meta = json.loads(row[0])
         resulting_type = updates.get('slot_type', meta.get('slot_type', 'standard'))
+        if resulting_type != 'small' and 'layout' in updates and updates['layout']['h'] < 4:
+            raise ValueError('layout out of bounds')
         if resulting_type == 'fix-chart' and 'layout' in updates and (updates['layout']['w'], updates['layout']['h']) != (8, 8):
             raise ValueError('fixed chart dimensions cannot be changed')
-        if resulting_type == 'fix-chart' and meta.get('slot_type') != 'fix-chart':
+        if resulting_type != meta.get('slot_type', 'standard') and (resulting_type in ('fix-chart', 'small') or meta.get('slot_type') == 'small'):
             meta.pop('layout', None)
         meta.update(updates)
         db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps(meta), owner, slot))
