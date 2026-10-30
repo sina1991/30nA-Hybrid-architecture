@@ -182,13 +182,32 @@ def update_appearance(owner, slot, updates):
         raise ValueError('invalid minimized state')
     if 'output_settings' in updates:
         output = updates['output_settings']
-        if not isinstance(output, dict) or set(output) != {'mode', 'label', 'field'}:
+        base = {'mode', 'label', 'field'}
+        optional = {'font_size', 'label_size', 'text_color', 'label_color', 'background_color', 'font_weight', 'font_family', 'align', 'decimals'}
+        if not isinstance(output, dict) or not base <= set(output) or set(output) - base - optional:
             raise ValueError('invalid output settings')
         if output['mode'] not in ('full', 'summary') or not isinstance(output['label'], str) or len(output['label']) > 32:
             raise ValueError('invalid output settings')
         field = output['field']
         if not isinstance(field, str) or len(field) > 160 or (field and not re.fullmatch(r'[A-Za-z0-9_-]+(?:\.[A-Za-z0-9_-]+)*', field)) or (output['mode'] == 'summary' and not field):
             raise ValueError('invalid output field')
+        for key in ('font_size', 'label_size'):
+            value = output.get(key)
+            if value is not None and (type(value) is not int or not 8 <= value <= 72):
+                raise ValueError('invalid output font size')
+        for key in ('text_color', 'label_color', 'background_color'):
+            value = output.get(key)
+            if value is not None and (not isinstance(value, str) or not re.fullmatch(r'#[0-9a-fA-F]{6}', value)):
+                raise ValueError('invalid output color')
+        if output.get('font_weight') not in (None, 'normal', 'medium', 'bold'):
+            raise ValueError('invalid output font weight')
+        if output.get('font_family') not in (None, 'system', 'mono', 'serif'):
+            raise ValueError('invalid output font family')
+        if output.get('align') not in (None, 'left', 'center', 'right'):
+            raise ValueError('invalid output alignment')
+        decimals = output.get('decimals')
+        if decimals is not None and (type(decimals) is not int or not 0 <= decimals <= 8):
+            raise ValueError('invalid output decimals')
     if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'small', 'minimal', 'chart', 'fix-chart'):
         raise ValueError('invalid slot type')
     if 'chart_indicators' in updates and (not isinstance(updates['chart_indicators'], list) or len(updates['chart_indicators']) > len(CHART_DEFAULTS) or any(not isinstance(item, str) or item not in CHART_DEFAULTS for item in updates['chart_indicators']) or len(set(updates['chart_indicators'])) != len(updates['chart_indicators'])):

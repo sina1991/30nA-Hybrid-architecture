@@ -274,12 +274,18 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .slot-list-label {flex:1;min-width:0;color:var(--text);font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .slot-list-label span {color:var(--muted);font-size:11px;margin-left:8px}
 .slot-pin-toggle {position:absolute;z-index:3;top:4px;left:4px;display:grid;place-items:center;width:21px;height:21px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--field);cursor:pointer;font-size:13px}
-#overview-grid .slot[data-minimized="true"] {grid-row:span 1;min-height:0;padding:5px 35px}
+#overview-grid .slot[data-minimized="true"] {grid-row:span 1;min-height:0;padding:5px 35px 5px 9px}
 #overview-grid .slot[data-minimized="true"] .module-body,#overview-grid .slot[data-minimized="true"] .slot-resize,#overview-grid .slot[data-minimized="true"] .chart-move-handle {display:none!important}
 .slot-min-label {font-size:12px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#overview-grid .slot:not(.chart-slot)[data-output-mode="full"] .module-body {padding-top:22px}
-.slot-summary {height:100%;min-height:0;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:5px 26px;font-variant-numeric:tabular-nums}
+#overview-grid .slot:not(.chart-slot)[data-output-mode="full"] .module-body {padding-right:25px}
+.slot-summary {height:100%;min-height:0;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;padding:5px 32px 5px 8px;font-variant-numeric:tabular-nums}
 .slot-summary-name {font-size:12px;color:var(--muted);font-weight:600;overflow-wrap:anywhere}.slot-summary-value {font-size:clamp(13px,1.5vw,20px);font-weight:700;color:var(--text);overflow-wrap:anywhere}
+#overview-grid .slot[data-custom-output-size="true"] .module-body :is(.module-title,.module-detail,.metric-label,.metric-value,.metric-group,.market-price,.market-status,.market-candle-info,.market-legend,.dice-result,.module-json,.slot-quick-result) {font-size:var(--output-font-size)}
+#overview-grid .slot[data-custom-output-weight="true"] .module-body :is(.module-title,.module-detail,.metric-label,.metric-value,.metric-group,.market-price,.market-status,.market-candle-info,.market-legend,.dice-result,.module-json,.slot-quick-result) {font-weight:var(--output-font-weight)}
+#overview-grid .slot[data-custom-output-color="true"] .module-body :is(.module-title,.module-detail,.metric-label,.metric-value,.metric-group,.market-price,.market-status,.market-candle-info,.market-legend,.dice-result,.module-json,.slot-quick-result) {color:var(--output-text-color)}
+.slot-menu-actions {display:grid!important;gap:10px!important}.slot-section {display:grid;gap:7px;padding:10px;background:var(--field);border:1px solid var(--border);border-radius:9px;margin-top:8px}.slot-section h4 {margin:0;font-size:12px;color:var(--muted)}
+.slot-section-actions,.slot-appearance-controls {display:flex;align-items:center;gap:7px;flex-wrap:wrap}.slot-section-actions button,.slot-appearance-controls button {font:inherit;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:7px;padding:6px 8px;cursor:pointer}.slot-section-actions .delete-slot {color:#e05a5a}
+.output-style-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:8px}.output-preview {padding:10px;border:1px solid var(--border);border-radius:7px;min-height:42px}.output-color-controls {display:flex;align-items:center;gap:7px}.output-color-controls input[type="color"] {width:50px;height:30px;padding:2px}
 .output-form {display:grid;gap:7px;padding:10px;margin-top:8px;background:var(--field);border:1px solid var(--border);border-radius:8px}
 .output-form label {display:grid;gap:4px;font-size:12px}.output-form input,.output-form select {width:100%;padding:6px;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;font:inherit}
 .slot[data-slot-type="small"] {min-height:140px}
@@ -1605,11 +1611,32 @@ function numericValue(value, path) {
   return typeof value === 'number' && Number.isFinite(value) ? value : null;
 }
 
+const OUTPUT_FONTS = {system:'system-ui, sans-serif', mono:'ui-monospace, monospace', serif:'Georgia, serif'};
+const OUTPUT_WEIGHTS = {normal:'400', medium:'500', bold:'700'};
+function applyOutputAppearance(card, body, settings) {
+  if (!settings) return;
+  if (settings.background_color) { body.style.backgroundColor = settings.background_color; body.style.borderRadius = '6px'; }
+  if (settings.font_family && OUTPUT_FONTS[settings.font_family]) body.style.fontFamily = OUTPUT_FONTS[settings.font_family];
+  if (settings.font_size != null) { card.dataset.customOutputSize='true'; card.style.setProperty('--output-font-size', `${settings.font_size}px`); body.style.fontSize = `${settings.font_size}px`; }
+  if (settings.text_color) { card.dataset.customOutputColor='true'; card.style.setProperty('--output-text-color', settings.text_color); body.style.color=settings.text_color; }
+  if (settings.font_weight && OUTPUT_WEIGHTS[settings.font_weight]) { card.dataset.customOutputWeight='true'; card.style.setProperty('--output-font-weight', OUTPUT_WEIGHTS[settings.font_weight]); body.style.fontWeight = OUTPUT_WEIGHTS[settings.font_weight]; }
+}
+function applySummaryAppearance(wrap, name, value, settings) {
+  if (settings.align) { wrap.style.justifyContent = ({left:'flex-start',center:'center',right:'flex-end'})[settings.align]; wrap.style.textAlign=settings.align; }
+  if (settings.font_size != null) value.style.fontSize = `${settings.font_size}px`;
+  if (settings.label_size != null) name.style.fontSize = `${settings.label_size}px`;
+  if (settings.text_color) value.style.color = settings.text_color;
+  if (settings.label_color || settings.text_color) name.style.color = settings.label_color || settings.text_color;
+  if (settings.font_weight && OUTPUT_WEIGHTS[settings.font_weight]) { name.style.fontWeight=OUTPUT_WEIGHTS[settings.font_weight]; value.style.fontWeight=OUTPUT_WEIGHTS[settings.font_weight]; }
+  if (settings.font_family && OUTPUT_FONTS[settings.font_family]) wrap.style.fontFamily = OUTPUT_FONTS[settings.font_family];
+  if (settings.background_color) wrap.style.backgroundColor = settings.background_color;
+}
+
 function renderSlotSummary(body, row, moduleInfo) {
   const settings = row.output_settings, wrap = makeElement('div', 'slot-summary');
   const name = makeElement('span', 'slot-summary-name', settings.label || moduleInfo?.name || row.module_id);
   const value = makeElement('span', 'slot-summary-value', '—');
-  value.title = `Field: ${settings.field}`; wrap.append(name, value); body.append(wrap);
+  value.title = `Field: ${settings.field}`; applySummaryAppearance(wrap, name, value, settings); wrap.append(name, value); body.append(wrap);
   let busy = false;
   async function refresh() {
     const bridge = window.dashboardModuleState;
@@ -1619,7 +1646,8 @@ function renderSlotSummary(body, row, moduleInfo) {
       const result = await bridge.read(row.slot, row.module_id);
       if (!body.isConnected || !bridge.ready()) return;
       const number = numericValue(result, settings.field);
-      value.textContent = number === null ? '—' : new Intl.NumberFormat('en-US', {maximumFractionDigits:8}).format(number);
+      const digits = Number.isInteger(settings.decimals) ? {minimumFractionDigits:settings.decimals, maximumFractionDigits:settings.decimals} : {maximumFractionDigits:8};
+      value.textContent = number === null ? '—' : new Intl.NumberFormat('en-US', digits).format(number);
       value.title = number === null ? `Field ${settings.field} has no numeric value` : `Field: ${settings.field}`;
     } catch (_) { if (body.isConnected) { value.textContent = '—'; value.title = 'Could not read this slot'; } }
     finally { busy = false; }
@@ -1728,7 +1756,7 @@ function makeSlot(row, area) {
   const pin = makeElement('button', 'slot-pin-toggle', '📌');
   pin.title = row.overview ? 'Remove from Overview' : 'Pin to Overview';
   pin.setAttribute('aria-label', pin.title); pin.setAttribute('aria-pressed', String(Boolean(row.overview)));
-  const pinMenu = makeElement('button', '', row.overview ? 'Remove from Overview' : 'Add to Overview');
+  const pinMenu = makeElement('button', '', row.overview ? '📌 Unpin from Overview' : '📌 Pin to Overview');
   pin.type = 'button';
   pinMenu.type = 'button';
   async function togglePin() {
@@ -1770,7 +1798,9 @@ function makeSlot(row, area) {
     try { await window.dashboardModuleState.setSlotAppearance(slot.id, {minimized:!row.minimized}); slotGeneration++; await refreshActiveSlots(); }
     catch (_) { notice.textContent = 'Could not change minimized state.'; minimize.disabled = false; }
   });
-  actions.append(pinMenu, duplicate, minimize, typeLabel, displayLabel, colorLabel, resetColor, remove);
+  const slotActionGroup = makeElement('div', 'slot-section-actions'); slotActionGroup.append(pinMenu, duplicate, minimize, remove);
+  const appearanceGroup = makeElement('div', 'slot-appearance-controls'); appearanceGroup.append(typeLabel, displayLabel, colorLabel, resetColor);
+  actions.append(makeElement('strong', '', 'Slot actions'), slotActionGroup, makeElement('strong', '', 'Slot appearance'), appearanceGroup);
   const controls = makeElement('div', 'slot-controls');
   const searchLabel = makeElement('label', '', 'Find module');
   const search = makeElement('input', 'module-search');
@@ -1943,22 +1973,83 @@ function makeSlot(row, area) {
       outputStatus.textContent=fields.length ? 'Choose a field, or enter its path.' : 'No numeric fields available yet. Run the module or enter a path.';
     } catch (_) { outputStatus.textContent='Could not load fields. Enter a field path.'; }
   }
-  outputDetails.addEventListener('toggle', () => { if (outputDetails.open) loadNumericFields(); });
+  const styleGrid = makeElement('div', 'output-style-grid');
+  function numericStyle(label, current, min, max, hint) {
+    const holder = makeElement('label', '', label), input = makeElement('input', '');
+    input.type='number'; input.min=String(min); input.max=String(max); input.step='1'; input.placeholder=hint;
+    input.value = current == null ? '' : String(current); holder.append(input); styleGrid.append(holder); return input;
+  }
+  function styleSelect(label, choices, current) {
+    const holder=makeElement('label','',label), select=makeElement('select','');
+    choices.forEach(([value,title]) => { const option=makeElement('option','',title); option.value=value; select.append(option); });
+    select.value=current || ''; holder.append(select); styleGrid.append(holder); return select;
+  }
+  function styleColor(label, current, fallback) {
+    const holder=makeElement('label','',label), controls=makeElement('div','output-color-controls'), mode=makeElement('select',''), color=makeElement('input','');
+    [['','Theme default'],['custom','Custom']].forEach(([value,title]) => {const option=makeElement('option','',title); option.value=value; mode.append(option);});
+    color.type='color'; color.value=current || fallback; mode.value=current ? 'custom' : ''; color.hidden=!current;
+    mode.addEventListener('change', () => { color.hidden=mode.value !== 'custom'; updatePreview(); });
+    controls.append(mode,color); holder.append(controls); styleGrid.append(holder); return {mode,color};
+  }
+  const fontSize=numericStyle('Number / text size (px)',outputSettings.font_size,8,72,'Theme default');
+  const labelSize=numericStyle('Short name size (px)',outputSettings.label_size,8,72,'Theme default');
+  const decimals=numericStyle('Decimal places (summary)',outputSettings.decimals,0,8,'Automatic');
+  const weight=styleSelect('Font weight',[['','Theme default'],['normal','Normal'],['medium','Medium'],['bold','Bold']],outputSettings.font_weight);
+  const family=styleSelect('Font family',[['','Theme default'],['system','System'],['mono','Monospace'],['serif','Serif']],outputSettings.font_family);
+  const alignment=styleSelect('Summary alignment',[['','Theme default'],['left','Left'],['center','Center'],['right','Right']],outputSettings.align);
+  const textColor=styleColor('Number / text color',outputSettings.text_color,'#e7edf7');
+  const labelColor=styleColor('Short name color',outputSettings.label_color,'#91a2bb');
+  const backgroundColor=styleColor('Output background',outputSettings.background_color,'#121c2e');
+  const previewLabel=makeElement('div','market-status','Summary preview');
+  const preview=makeElement('div','output-preview'); const previewWrap=makeElement('div','slot-summary');
+  const previewName=makeElement('span','slot-summary-name'), previewValue=makeElement('span','slot-summary-value','42.5');
+  previewWrap.append(previewName,previewValue); preview.append(previewWrap);
+  function styleValues() {
+    const asNumber = input => input.value === '' ? null : Number(input.value);
+    return {font_size:asNumber(fontSize),label_size:asNumber(labelSize),decimals:asNumber(decimals),
+      font_weight:weight.value || null,font_family:family.value || null,align:alignment.value || null,
+      text_color:textColor.mode.value ? textColor.color.value : null,
+      label_color:labelColor.mode.value ? labelColor.color.value : null,
+      background_color:backgroundColor.mode.value ? backgroundColor.color.value : null};
+  }
+  function updatePreview() {
+    previewWrap.removeAttribute('style'); previewName.removeAttribute('style'); previewValue.removeAttribute('style');
+    previewName.textContent=outputName.value.trim() || moduleInfo?.name || row.module_id;
+    const style=styleValues(); applySummaryAppearance(previewWrap,previewName,previewValue,style);
+    const digits=Number.isInteger(style.decimals) && style.decimals >= 0 && style.decimals <= 8 ? style.decimals : null;
+    previewValue.textContent=digits === null ? '42.5' : (42.5).toFixed(digits);
+  }
+  const summaryFields=makeElement('div','slot-section'); summaryFields.append(outputNameLabel,fieldLabel,pathLabel,refreshFields);
+  function updateOutputMode() { const isSummary=outputMode.value === 'summary'; summaryFields.hidden=!isSummary; preview.hidden=!isSummary; previewLabel.hidden=!isSummary; }
+  outputMode.addEventListener('change', () => { updateOutputMode(); if (outputMode.value === 'summary') loadNumericFields(); });
+  outputDetails.addEventListener('toggle', () => { if (outputDetails.open && outputMode.value === 'summary') loadNumericFields(); });
   refreshFields.addEventListener('click', loadNumericFields);
-  saveOutput.addEventListener('click', async () => {
-    saveOutput.disabled=true;
-    try { await window.dashboardModuleState.setSlotAppearance(slot.id,{output_settings:{mode:outputMode.value,label:outputName.value.trim(),field:fieldPath.value.trim()}}); slotGeneration++; await refreshActiveSlots(); }
-    catch (_) { outputStatus.textContent='Choose a numeric field or enter a valid path before saving.'; saveOutput.disabled=false; }
+  [fontSize,labelSize,decimals,weight,family,alignment,outputName,textColor.color,labelColor.color,backgroundColor.color].forEach(input => { input.addEventListener('input', updatePreview); input.addEventListener('change', updatePreview); });
+  const resetStyle=makeElement('button','chart-options-button','Reset appearance'); resetStyle.type='button';
+  resetStyle.addEventListener('click', () => {
+    [fontSize,labelSize,decimals,weight,family,alignment].forEach(input => {input.value='';});
+    [textColor,labelColor,backgroundColor].forEach(item => {item.mode.value='';item.color.hidden=true;}); updatePreview();
+    outputStatus.textContent='Appearance reset. Save to apply.';
   });
-  outputDetails.append(outputModeLabel,outputNameLabel,fieldLabel,pathLabel,refreshFields,saveOutput,outputStatus);
-  actions.prepend(controls);
+  saveOutput.addEventListener('click', async () => {
+    if (![fontSize,labelSize,decimals].every(input => input.checkValidity())) { outputStatus.textContent='Font sizes must be 8–72 px; decimal places must be 0–8.'; return; }
+    saveOutput.disabled=true;
+    try {
+      await window.dashboardModuleState.setSlotAppearance(slot.id,{output_settings:{mode:outputMode.value,label:outputName.value.trim(),field:fieldPath.value.trim(),...styleValues()}});
+      slotGeneration++; await refreshActiveSlots();
+    } catch (_) { outputStatus.textContent='Check the numeric field path and appearance values before saving.'; saveOutput.disabled=false; }
+  });
+  outputDetails.append(outputModeLabel,summaryFields,makeElement('strong','','Output appearance'),styleGrid,previewLabel,preview,resetStyle,saveOutput,outputStatus);
+  updateOutputMode(); updatePreview();
+  const moduleSection = makeElement('div', 'slot-section'); moduleSection.append(makeElement('h4', '', 'Module selection'), controls);
+  const runtimeSection = makeElement('div', 'slot-section'); runtimeSection.append(makeElement('h4', '', 'Run, input and Worker'));
   lock.classList.add('slot-icon');
-  headActions.append(run, inputButton, terminalButton, workerButton, lock); head.append(headActions);
+  headActions.append(run, inputButton, terminalButton, workerButton, lock); head.append(headActions); runtimeSection.append(head, inputDrawer, terminalDrawer, workerDrawer);
   const resize = makeElement('button', 'slot-resize', '↘'); resize.type = 'button';
   resize.setAttribute('aria-label', `Resize ${slot.id}`); resize.title = 'Drag to resize';
   const moveHandle = makeElement('div', 'chart-move-handle', 'Drag to move');
   const layoutNotice = makeElement('div', 'market-status'); layoutNotice.setAttribute('role', 'status');
-  settingsDialog.append(closeSettings, name, head, actions, outputDetails, inputDrawer, terminalDrawer, workerDrawer, notice);
+  settingsDialog.append(closeSettings, name, actions, moduleSection, outputDetails, runtimeSection, notice);
   if (area === 'slots') {
     const listLabel = makeElement('div', 'slot-list-label', moduleInfo?.name || row.module_id);
     listLabel.append(makeElement('span', '', slot.id));
@@ -1966,8 +2057,9 @@ function makeSlot(row, area) {
     return card;
   }
   if (row.minimized) card.append(makeElement('div','slot-min-label', row.output_settings?.label || moduleInfo?.name || row.module_id));
-  card.append(pin, menu, moveHandle, settingsDialog, layoutNotice, body, resize);
+  card.append(menu, moveHandle, settingsDialog, layoutNotice, body, resize);
   attachLayoutControls(card, moveHandle, resize, row, layoutNotice);
+  applyOutputAppearance(card, body, row.output_settings);
   if (!row.minimized && row.output_settings?.mode === 'summary') renderSlotSummary(body, row, moduleInfo);
   else if (!row.minimized && isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
   else if (!row.minimized) renderModuleContent(body, slot, selectedModule);
