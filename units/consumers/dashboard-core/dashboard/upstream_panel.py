@@ -31,6 +31,20 @@ PANEL = r'''
 .account-panel dialog {background:var(--field);color:var(--text);border:1px solid #475569;border-radius:12px;width:min(640px,90vw);max-height:85vh;overflow:auto;direction:ltr}
 .account-panel dialog::backdrop {background:rgba(0,0,0,.7)}
 .account-panel label {display:block;margin-top:12px}
+.account-panel .worker-header {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.account-panel .worker-header h3 {margin:0}.account-panel .worker-subtitle {color:var(--muted);margin:3px 0 0;font-size:12px}
+.account-panel #worker-search {width:min(100%,380px);margin:8px 0 14px}
+.account-panel #worker-list {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:10px;list-style:none;padding:0;margin:0}
+.account-panel #worker-list li {padding:0;min-width:0}
+.account-panel .worker-card {width:100%;text-align:left;min-height:90px;background:var(--panel);border:1px solid var(--border);border-radius:12px;display:flex;flex-direction:column;gap:6px;transition:border-color .15s}
+.account-panel .worker-card:hover {border-color:var(--accent)}
+.account-panel .worker-card strong {overflow-wrap:anywhere}.account-panel .worker-card small {color:var(--muted)}
+.account-panel .worker-badge {align-self:flex-start;border:1px solid var(--border);border-radius:20px;padding:2px 8px;color:var(--accent);font-size:11px}
+.account-panel .worker-section-card {background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:12px}
+.account-panel .worker-section-card h4 {margin:0 0 4px}.account-panel .worker-section-card p {margin:4px 0;color:var(--muted);font-size:12px}
+.account-panel .worker-meta summary {cursor:pointer;color:var(--accent);font-size:13px}
+.account-panel .worker-meta label {font-size:12px}.account-panel .worker-meta input {font-size:12px}
+.account-panel .worker-primary {background:var(--button);color:#fff;border-color:var(--button)}
 .account-panel dialog input,.account-panel dialog textarea,.account-panel dialog select {box-sizing:border-box;width:100%}
 .account-panel input[readonly] {opacity:.65}.account-panel button:focus-visible {outline:3px solid #38bdf8;outline-offset:3px}
 .account-access {flex:0 1 360px;max-width:100%;min-width:0}
@@ -49,10 +63,9 @@ PANEL = r'''
   <div id="worker-notices"></div>
   <div data-workspace-pane="workers">
   <section id="worker-management" hidden aria-label="Manage Workers">
-    <h3>Manage Workers</h3>
-    <button id="worker-create" type="button">Register Worker</button>
-    <label for="worker-search">Search Workers</label>
-    <input id="worker-search" type="search" placeholder="Worker ID">
+    <div class="worker-header"><div><h3>Worker library</h3><p class="worker-subtitle">Configure and run published Workers.</p></div>
+    <button class="worker-primary" id="worker-create" type="button">+ Register Worker</button></div>
+    <input id="worker-search" type="search" placeholder="Search Worker ID" aria-label="Search Workers">
     <ul id="worker-list"></ul>
     <p class="account-note">Execution requires a published Artifact. Its existence is not checked at registration. Configuration changes do not affect accepted executions.</p>
   </section>
@@ -61,13 +74,18 @@ PANEL = r'''
       <h3 id="worker-editor-title">Worker</h3>
       <fieldset id="worker-edit-fields">
         <label for="edit-worker-id">Worker ID</label><input id="edit-worker-id" required maxlength="128" dir="ltr">
+        <details class="worker-section-card worker-meta" id="worker-artifact-details"><summary>Artifact details</summary>
         <label for="edit-artifact-id">Published Artifact ID</label><input id="edit-artifact-id" required maxlength="256" dir="ltr">
         <label for="edit-artifact-hash">Artifact SHA-256</label><input id="edit-artifact-hash" required pattern="sha256:[0-9a-f]{64}" dir="ltr">
         <label for="edit-entrypoint">Entrypoint (module:function)</label><input id="edit-entrypoint" required maxlength="256" dir="ltr">
+        </details>
+        <div class="worker-section-card"><h4>Configuration</h4><p>Saved settings passed to each Worker execution.</p>
         <label for="edit-configuration">Configuration (JSON object)</label><textarea id="edit-configuration" rows="5" maxlength="500000" spellcheck="false"></textarea>
+        </div><div class="worker-section-card"><h4>Schedule</h4><p>Choose manual execution or a recurring interval.</p>
         <label for="edit-schedule">Schedule</label><select id="edit-schedule"><option value="manual">Manual</option><option value="interval">interval</option></select>
         <label for="edit-interval">Interval in seconds</label><input id="edit-interval" type="number" min="1" step="1" value="60">
         <p class="account-note">An enabled interval runs with empty input; the Worker must support it.</p>
+        </div>
         <p id="edit-lifecycle"></p>
         <div class="account-actions"><button id="worker-save" type="submit">Save</button><button id="worker-toggle" type="button">Change status</button><button id="worker-delete" type="button">Delete Worker</button></div>
       </fieldset>
@@ -85,15 +103,18 @@ PANEL = r'''
     </form>
   </dialog>
   <form id="worker-run-form" hidden>
+    <div class="worker-section-card"><h4>Run a Worker</h4><p>Enter a JSON object and inspect the execution result.</p>
     <fieldset id="worker-run-fields" disabled>
       <label for="account-worker">Active Worker</label>
       <select id="account-worker" required></select>
+      <button id="worker-example" type="button">Use example input</button>
       <label for="worker-input">Input as a JSON object</label>
       <textarea id="worker-input" rows="6" maxlength="500000" spellcheck="false">{"values":[10,20,30]}</textarea>
       <label for="worker-timeout">Execution timeout in seconds</label>
       <input id="worker-timeout" type="number" min="1" max="300" step="1" value="30" required>
-      <button id="worker-run" type="submit">Run Worker</button>
+      <button class="worker-primary" id="worker-run" type="submit">Run Worker</button>
     </fieldset>
+    </div>
   </form>
   <button id="worker-retry" type="button" hidden>Retry the same request</button>
   </div>
@@ -319,7 +340,11 @@ PANEL = r'''
     rows.forEach(row => {
       const item = document.createElement('li'), button = document.createElement('button');
       button.type = 'button'; button.dataset.worker = row.definition.worker_id;
-      button.textContent = row.definition.worker_id + ' · ' + (lifecycle[row.lifecycle] || row.lifecycle) + ' · Details and settings';
+      button.className = 'worker-card';
+      const name = document.createElement('strong'), badge = document.createElement('span'), detail = document.createElement('small');
+      name.textContent = row.definition.worker_id; badge.className = 'worker-badge'; badge.textContent = lifecycle[row.lifecycle] || row.lifecycle;
+      detail.textContent = row.schedule.kind === 'interval' ? `Every ${row.schedule.interval_seconds}s` : 'Manual execution';
+      button.append(name, badge, detail);
       button.disabled = managing || Boolean(pending);
       button.addEventListener('click', () => editWorker(row));
       item.append(button); list.append(item);
@@ -328,6 +353,7 @@ PANEL = r'''
   function editWorker(row = null) {
     if (managing || pending) return;
     editing = row; el('worker-edit-form').reset(); el('worker-edit-status').textContent = '';
+    el('worker-artifact-details').open = !row;
     el('worker-editor-title').textContent = row ? 'Worker details' : 'Register Worker';
     const fields = {'edit-worker-id':'worker_id','edit-artifact-id':'artifact_id','edit-artifact-hash':'artifact_hash','edit-entrypoint':'entrypoint'};
     Object.entries(fields).forEach(([id,key]) => {el(id).value = row ? row.definition[key] : ''; el(id).readOnly = Boolean(row);});
@@ -368,6 +394,14 @@ PANEL = r'''
     } finally { if (current === generation) {managing = false; controls(); renderWorkers();} }
   }
   el('worker-create').addEventListener('click', () => editWorker());
+  el('worker-example').addEventListener('click', () => {
+    const examples = {'demo-summary':{values:[10,20,30]}, 'sample-clock':{},
+      'sample-math':{values:[10,20,30]}, 'sample-text':{text:'Hello, 30nA!'}};
+    const worker = el('account-worker').value;
+    if (!Object.prototype.hasOwnProperty.call(examples, worker)) { status('No example input is available for this Worker.'); return; }
+    el('worker-input').value = JSON.stringify(examples[worker], null, 2);
+    status('Example input loaded. Review it before running the Worker.');
+  });
   el('worker-search').addEventListener('input',renderWorkers);
   el('history-worker').addEventListener('input', () => renderHistory(historyRows));
   el('history-status').addEventListener('change', () => renderHistory(historyRows));

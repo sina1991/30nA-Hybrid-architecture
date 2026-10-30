@@ -230,11 +230,11 @@ body:not([data-view="overview"]) #edit-layout {display:none}
   box-shadow:0 8px 24px #0002;
 }
 .slot-head {
-  display: flex; flex-direction:column; align-items:stretch; gap: 7px;
-  padding-bottom:8px; border-bottom:1px solid var(--border);
+  display:flex;align-items:center;min-height:30px;
 }
-.slot-name { font-weight: 650; overflow-wrap: anywhere; min-width:0; }
-.slot-name strong {display:block;color:var(--text);font-size:14px}.slot-name small {display:block;color:var(--muted);font-size:10px;font-weight:400}
+.slot-name {display:flex;align-items:baseline;gap:7px;min-width:0;overflow:hidden;white-space:nowrap;padding:0 2px 5px;border-bottom:1px solid var(--border)}
+.slot-name strong {font-size:11px;font-weight:600;color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.slot-name small {font-size:9px;color:var(--muted);opacity:.7;overflow:hidden;text-overflow:ellipsis}
 .slot-head-actions {display:flex;align-items:center;gap:4px;flex-wrap:nowrap;overflow-x:auto;max-width:100%;padding:2px 4px;scrollbar-width:thin}
 .slot-head-actions::before,.slot-head-actions::after {content:'';margin:auto}
 .slot-head-actions > * {flex:none}
@@ -1162,10 +1162,10 @@ function makeSlot(row, area) {
   searchLabel.textContent = 'Find module'; searchLabel.append(search); label.append(select); controls.append(searchLabel, searchHint, label);
   actions.prepend(controls);
   lock.classList.add('slot-icon');
-  headActions.append(run, inputButton, terminalButton, workerButton, pin, lock, menu); head.append(headActions, name);
+  headActions.append(run, inputButton, terminalButton, workerButton, pin, lock, menu); head.append(headActions);
   const resize = makeElement('button', 'slot-resize', '↘'); resize.type = 'button';
   resize.setAttribute('aria-label', `Resize ${slot.id}`); resize.title = 'Drag to resize';
-  card.append(head, actions, inputDrawer, terminalDrawer, notice, body, resize);
+  card.append(head, name, actions, inputDrawer, terminalDrawer, notice, body, resize);
   attachLayoutControls(card, name, resize, row, notice);
   renderModuleContent(body, slot, selectedModule);
   if (moduleInfo?.type !== 'host-monitor') attachSavedResult(body, slot, selectedModule);
