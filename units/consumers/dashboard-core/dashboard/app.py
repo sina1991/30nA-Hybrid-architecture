@@ -104,6 +104,8 @@ def clock_time(timezone: str | None = None) -> dict:
 @app.post("/api/modules/{module_id}/run")
 def execute_module(module_id: str, data: dict) -> dict:
     try:
+        if any(str(key).startswith('_') for key in data):
+            raise ValueError('reserved input field')
         return {"result": run_module(module_id, data)}
     except UnknownModule:
         raise HTTPException(status_code=404, detail="Unknown module") from None
@@ -325,29 +327,51 @@ function renderModuleContent(body, slot, moduleId) {
   }
 
   if (module.type === "slot-note") {
-    const setting = settingsFor(slot.id);
     body.append(makeElement("div", "module-title", module.name));
-    body.append(makeElement("div", "module-detail", module.description));
-
+    const hint = makeElement("div", "module-detail", "برای یادداشت مشترک با ترمینال وارد حساب شوید.");
     const textarea = makeElement("textarea", "module-note-input");
     textarea.setAttribute("aria-label", `Note for ${slot.name || slot.id}`);
-    textarea.placeholder = "Write a note for this slot…";
-    textarea.maxLength = 10000;
-    textarea.value = setting.note;
-    let timer = null, revision = 0;
+    textarea.maxLength = 10000; textarea.disabled = true;
+    const legacy = settingsFor(slot.id).note;
+    const migrate = makeElement("button", "dice-roll-button", "انتقال یادداشت قدیمی مرورگر");
+    migrate.type = "button"; migrate.hidden = !legacy; migrate.disabled = true;
+    migrate.addEventListener('click', () => {
+      if (textarea.value && textarea.value !== legacy && !window.confirm('یادداشت سرور با یادداشت قدیمی مرورگر جایگزین شود؟')) return;
+      textarea.value = legacy; textarea.dispatchEvent(new Event('input', {bubbles:true}));
+    });
+    body.append(hint, textarea, migrate);
+    let timer = null, revision = 0, writing = false;
+    async function refreshNote() {
+      const bridge = window.dashboardModuleState;
+      if (!bridge || !bridge.ready()) { textarea.value = ''; textarea.disabled = true; migrate.disabled = true; hint.textContent = "برای یادداشت مشترک وارد حساب شوید."; return; }
+      textarea.disabled = false; migrate.disabled = false;
+      if (writing || document.activeElement === textarea) return;
+      const current = revision;
+      try {
+        const output = await bridge.invoke(module.id, {slot:slot.id, action:'get'});
+        if (current !== revision || !textarea.isConnected || !bridge.ready()) return;
+        textarea.value = output.text; hint.textContent = "یادداشت سرور، مشترک با ترمینال";
+      } catch (_) { if (textarea.isConnected && bridge.ready()) hint.textContent = "دریافت یادداشت سرور ناموفق بود."; }
+    }
+    function accountChanged() { revision++; clearTimeout(timer); writing = false; refreshNote(); }
+    document.addEventListener('dashboard-account-state', accountChanged);
     textarea.addEventListener("input", () => {
-      const current = ++revision; clearTimeout(timer);
-      settingsFor(slot.id).note = textarea.value; saveSettings();
+      const current = ++revision; clearTimeout(timer); writing = true;
+      hint.textContent = "در حال ذخیره…";
       timer = setTimeout(async () => {
         try {
-          const output = await invokeModule(module.id, {text:textarea.value});
-          if (current !== revision || !textarea.isConnected) return;
-          settingsFor(slot.id).note = output.text; saveSettings();
-        } catch (_) { textarea.setCustomValidity("ذخیره یادداشت ناموفق بود."); return; }
-        textarea.setCustomValidity("");
+          await window.dashboardModuleState.invoke(module.id, {slot:slot.id, action:'set', text:textarea.value});
+          if (current === revision && textarea.isConnected) hint.textContent = "در سرور ذخیره شد.";
+        } catch (_) { if (current === revision && textarea.isConnected) hint.textContent = "ذخیره ناموفق بود؛ دوباره ویرایش کنید."; }
+        finally { if (current === revision) writing = false; }
       }, 300);
     });
-    body.append(textarea);
+    textarea.addEventListener('blur', () => { if (!writing) refreshNote(); });
+    function tick() {
+      if (!body.isConnected) { document.removeEventListener('dashboard-account-state', accountChanged); return; }
+      refreshNote(); setTimeout(tick, 2000);
+    }
+    setTimeout(tick, 0);
     return;
   }
 
@@ -374,25 +398,43 @@ function renderModuleContent(body, slot, moduleId) {
   }
 
   if (module.type === "counter") {
-    let value = 0, busy = false;
-    const display = makeElement("div", "module-title", "0");
+    let busy = false;
+    const display = makeElement("div", "module-title", "برای استفاده وارد حساب شوید.");
     display.setAttribute("aria-live", "polite");
     const controls = makeElement("div", "dice-controls");
+    function buttons(disabled) { controls.querySelectorAll("button").forEach(item => { item.disabled = disabled; }); }
+    async function refreshCounter() {
+      const bridge = window.dashboardModuleState;
+      if (!bridge || !bridge.ready()) { display.textContent = "برای استفاده وارد حساب شوید."; buttons(true); return; }
+      if (busy) return;
+      buttons(false);
+      try {
+        const output = await bridge.invoke(module.id, {slot:slot.id, action:'get'});
+        if (display.isConnected && bridge.ready() && !busy) display.textContent = String(output.value);
+      } catch (_) { if (display.isConnected && bridge.ready()) display.textContent = "دریافت شمارنده ناموفق بود."; }
+    }
+    function accountChanged() { refreshCounter(); }
+    document.addEventListener('dashboard-account-state', accountChanged);
     [["افزایش", "increment"], ["کاهش", "decrement"], ["صفر کردن", "reset"]].forEach(([label, action]) => {
       const button = makeElement("button", "dice-roll-button", label);
-      button.type = "button";
+      button.type = "button"; button.disabled = true;
       button.addEventListener("click", async () => {
         if (busy) return;
-        busy = true; controls.querySelectorAll("button").forEach(item => { item.disabled = true; });
+        busy = true; buttons(true);
         try {
-          const output = await invokeModule(module.id, {value, action});
-          value = output.value; display.textContent = String(value);
-        } catch (_) { display.textContent = "اجرای ماژول ناموفق بود."; }
-        finally { busy = false; controls.querySelectorAll("button").forEach(item => { item.disabled = false; }); }
+          const output = await window.dashboardModuleState.invoke(module.id, {slot:slot.id, action});
+          if (display.isConnected && window.dashboardModuleState.ready()) display.textContent = String(output.value);
+        } catch (_) { if (display.isConnected && window.dashboardModuleState.ready()) display.textContent = "اجرای ماژول ناموفق بود."; }
+        finally { busy = false; buttons(!window.dashboardModuleState.ready()); }
       });
       controls.append(button);
     });
     body.append(makeElement("div", "module-title", module.name), display, controls);
+    function tick() {
+      if (!body.isConnected) { document.removeEventListener('dashboard-account-state', accountChanged); return; }
+      refreshCounter(); setTimeout(tick, 2000);
+    }
+    setTimeout(tick, 0);
     return;
   }
 

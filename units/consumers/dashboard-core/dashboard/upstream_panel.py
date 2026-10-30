@@ -120,13 +120,14 @@ PANEL = r'''
   const labels = {accepted:'در صف',running:'در حال اجرا',succeeded:'موفق',failed:'ناموفق',cancelled:'لغوشده'};
   const terminal = job => ['succeeded','failed','cancelled'].includes(job.status);
   let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false;
-  let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0, authenticated = false;
+  let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0, authenticated = false, previousReady = false;
   let active = null, enabledWorkers = [], session = new AbortController();
 
   function status(message) { el('account-status').textContent = message; }
   function controls() {
     const ready = Boolean(token) && authenticated;
     el('worker-workspace').hidden = !ready;
+    if (ready !== previousReady) { previousReady = ready; document.dispatchEvent(new CustomEvent('dashboard-account-state', {detail:{ready}})); }
     el('worker-workspace-link').hidden = !ready;
     const notices = el(ready ? 'worker-notices' : 'account-notices');
     if (el('account-status').parentElement !== notices) notices.append(el('account-status'));
@@ -186,6 +187,21 @@ PANEL = r'''
       clearTimeout(timeout); parent.removeEventListener('abort', abort);
     }
   }
+  window.dashboardModuleState = {
+    ready: () => Boolean(token) && authenticated,
+    async invoke(id, data) {
+      if (!token || !authenticated || !['counter','slot-note'].includes(id)) throw new Error('ورود به حساب لازم است.');
+      const current = generation;
+      try {
+        const result = await request('modules/' + encodeURIComponent(id) + '/state', data);
+        if (current !== generation) throw new Error('نشست تغییر کرد.');
+        return result;
+      } catch (error) {
+        if (current === generation && error.status === 401) disconnect(error.message);
+        throw error;
+      }
+    }
+  };
   function handleError(error) {
     if (error.status === 401) disconnect(error.message);
     else status(error.message || 'ارتباط با سرویس برقرار نشد.');

@@ -45,11 +45,21 @@ else
     mv -T "$TEMPORARY" "$RELEASE"
 fi
 (umask 022; cd "$RELEASE"; bash scripts/deployment/prepare.sh)
+STATE_DIR=/var/lib/30na/dashboard
+if [[ -L $STATE_DIR ]]; then echo 'Dashboard state path must not be a symlink.' >&2; exit 1; fi
+if [[ ! -e $STATE_DIR ]]; then
+    install -d -m 0700 -o 30na -g 30na "$STATE_DIR"
+else
+    [[ -d $STATE_DIR && $(stat -c %u "$STATE_DIR") == "$(id -u 30na)" ]] || { echo 'Existing Dashboard state is not owned by 30na.' >&2; exit 1; }
+    mode=$(stat -c %a "$STATE_DIR")
+    (( (8#$mode & 077) == 0 )) || { echo 'Dashboard state directory must be private.' >&2; exit 1; }
+fi
 install -d -m 0755 "$(dirname "$DROPIN")"
 CHANGED=1
 ln -sfn "$RELEASE" "$LINK"
 cat >"$DROPIN" <<'UNIT'
 [Service]
+ReadWritePaths=/var/lib/30na/dashboard
 WorkingDirectory=/opt/30na/dashboard-current/units/consumers/dashboard-core
 Environment=PYTHONPATH=/opt/30na/dashboard-current/units/worker-manager:/opt/30na/dashboard-current/units/consumers/dashboard-core
 ExecStart=

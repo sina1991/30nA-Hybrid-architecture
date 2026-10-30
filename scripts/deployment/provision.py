@@ -136,7 +136,7 @@ def main():
     args=parser.parse_args()
     if os.geteuid()!=0:parser.error('Only root can provision an installation')
     service=pwd.getpwnam('30na');sandbox=pwd.getpwnam('30na-sandbox')
-    for name,account in [('code',sandbox),('data',sandbox),('runtime',sandbox),('manager',service)]:
+    for name,account in [('code',sandbox),('data',sandbox),('runtime',sandbox),('manager',service),('dashboard',service)]:
         target=Path('/var/lib/30na')/name
         target.mkdir(parents=True,exist_ok=True)
         os.chown(target,account.pw_uid,account.pw_gid);os.chmod(target,0o700)

@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from worker_manager.api import RegisterBody, ConfigureBody
 from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, owner_dependency
 from public_api import ConsumerAPIError, _identifier
+from .modules.execution import run_module
 
 
 class RunRequest(BaseModel):
@@ -62,6 +63,22 @@ def create_router(credential_path, upstream_factory):
         except ValueError:
             raise HTTPException(422, 'Invalid worker identifier') from None
         return '/api/v1/workers/' + _identifier(worker_id)
+
+    @router.post('/modules/{module_id}/state')
+    def module_state(module_id: str, body: dict, request: Request, identity=Depends(owner)):
+        if module_id not in ('counter', 'slot-note'):
+            raise HTTPException(404, 'Unsupported stateful module')
+        if any(str(key).startswith('_') or key == 'owner' for key in body):
+            raise HTTPException(422, 'Invalid module input')
+        slot = body.get('slot')
+        try:
+            result = run_module(module_id, {**body, '_state_owner': identity, '_state_slot': slot})
+        except (ValueError, TypeError, KeyError, OverflowError):
+            raise HTTPException(422, 'Invalid module input') from None
+        response = JSONResponse(envelope(result))
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Vary'] = 'Authorization'
+        return response
 
     @router.post('/workers', status_code=201)
     def register(body: RegisterBody, request: Request, identity=Depends(owner)):
