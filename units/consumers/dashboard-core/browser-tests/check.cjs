@@ -87,6 +87,10 @@ async function main() {
     const id=await page.locator('#execution-id').textContent();
     assert.match(id,/^[0-9a-f-]{36}$/);
     if(isReal) {
+      if(input.screenshot) {
+        assert.equal(await page.locator('#account-token').inputValue(),'');
+        await page.locator('.account-panel').screenshot({path:input.screenshot});
+      }
       await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
       await page.locator('#worker-input').fill('{"values":["invalid"]}');
       await page.locator('#worker-run').click();

@@ -50,12 +50,15 @@ def exercise_control_plane(root,cert,key,credentials,code_url,image,artifact_has
             sandbox_backend=DockerSandboxBackend(image),execution_store=SQLiteExecutionStore(root/(owner+'-runtime.db')))
         runtimes[owner]=instance
         return instance
-    clients=[]
     with https_server(runtime_app(credentials,factory),cert,key) as runtime_url:
+        try:
+            RuntimeHTTPGateway(runtime_url,'alice-integration-token').get('missing')
+        except httpx.ConnectError:
+            pass  # The ephemeral private CA must not be trusted by default.
+        else:
+            raise AssertionError('Untrusted Runtime certificate was accepted')
         def gateway(owner):
-            client=httpx.Client(verify=ssl.create_default_context(cafile=str(cert)),trust_env=False,follow_redirects=False)
-            clients.append(client)
-            return RuntimeHTTPGateway(runtime_url,owner+'-integration-token',client=client)
+            return RuntimeHTTPGateway(runtime_url,owner+'-integration-token',ca_file=str(cert))
         service=ControlService(root/'manager.db',gateway)
         with https_server(manager_app(service,credentials),cert,key) as manager_url:
             def upstream(owner,token): return {'worker-manager':PublicAPI(manager_url,token=token)}
@@ -100,7 +103,8 @@ def exercise_control_plane(root,cert,key,credentials,code_url,image,artifact_has
                     if os.environ.get('DASHBOARD_SKIP_BROWSER')!='1':
                         script=repository/'units/consumers/dashboard-core/browser-tests/check.cjs'
                         browser=subprocess.run(['node',str(script)],text=True,input=json.dumps({
-                            'url':dashboard_url,'token':'alice-integration-token'}),
+                            'url':dashboard_url,'token':'alice-integration-token',
+                            'screenshot':os.environ.get('DASHBOARD_SCREENSHOT')}),
                             stdout=subprocess.PIPE,stderr=subprocess.PIPE,timeout=75)
                         assert browser.returncode==0,browser.stdout+'\n'+browser.stderr
                         assert 'PASS: Chromium real Dashboard' in browser.stdout
@@ -109,4 +113,3 @@ def exercise_control_plane(root,cert,key,credentials,code_url,image,artifact_has
             assert restarted.get('alice',eid)['result']['result']=={'value':42}
         finally:
             restarted.close()
-        for client in clients:client.close()

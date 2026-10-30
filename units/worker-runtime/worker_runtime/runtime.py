@@ -1,4 +1,4 @@
-"""Synchronous, cancellable Worker execution. Subprocess isolation is NOT a sandbox."""
+"""Synchronous, cancellable Worker execution; Sandbox required unless trusted tests opt out."""
 from dataclasses import dataclass
 import hashlib
 from io import BytesIO
@@ -160,6 +160,17 @@ class WorkerRuntime:
         if not isinstance(eid, str) or not eid.strip():
             raise ValueError('execution_id must be a nonempty string')
         finish = lambda status, **kw: self._finish(eid, wid, status, **kw)
+
+        def reject(error, *, accepted=False):
+            # Validation must not overwrite a running or terminal execution that
+            # already owns this ID. Keep check + persistence under one lock so
+            # concurrent valid/invalid submissions cannot race the acceptance path.
+            with self._lock:
+                if eid in self._history:
+                    return ExecutionResult(eid, wid, False, 'failed', error=ExecutionError(
+                        'EXECUTION_CONFLICT', 'Execution ID already used'))
+                return finish('failed', accepted=accepted, error=error)
+
         try:
             definition = request.definition
             if not all(isinstance(getattr(definition, k), str) and getattr(definition, k) for k in
@@ -168,7 +179,7 @@ class WorkerRuntime:
             if not isinstance(request.configuration, dict) or not isinstance(request.input_payload, dict):
                 raise ValueError('Input and configuration must be JSON objects')
             if type(request.depth) is not int or request.depth < 0 or request.depth > self.max_depth:
-                return finish('failed', accepted=False, error=ExecutionError('DEPTH_LIMIT', 'Child depth exceeded'))
+                return reject(ExecutionError('DEPTH_LIMIT', 'Child depth exceeded'))
             timeout = request.timeout_seconds
             if isinstance(timeout, bool) or not isinstance(timeout, (float, int)) or not math.isfinite(timeout) or timeout <= 0:
                 raise ValueError('timeout_seconds must be finite and positive')
@@ -186,12 +197,12 @@ class WorkerRuntime:
                 request.input_payload, timeout, request.depth], sort_keys=True, allow_nan=False)
             if not re.fullmatch(r'sha256:[0-9a-f]{64}', definition.artifact_hash):
                 # Keep the existing bad-hash behavior for syntactically invalid hashes.
-                return finish('failed', error=ExecutionError('ARTIFACT_HASH_MISMATCH', 'Invalid artifact hash'))
+                return reject(ExecutionError('ARTIFACT_HASH_MISMATCH', 'Invalid artifact hash'), accepted=True)
             module, sep, function = definition.entrypoint.partition(':')
             if not sep or not all(part.isidentifier() for part in module.split('.')) or not function.isidentifier():
                 raise ValueError('Invalid entrypoint')
         except (AttributeError, TypeError, ValueError, OverflowError) as exc:
-            return finish('failed', accepted=False, error=ExecutionError('INVALID_INPUT', str(exc)[:256]))
+            return reject(ExecutionError('INVALID_INPUT', str(exc)[:256]))
 
         with self._lock:
             if key is not None and key in self._keys:

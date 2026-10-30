@@ -2,7 +2,7 @@
 
 Production deployments must inject a trusted identity provider and a
 DATA MANAGER client factory that preserves the authenticated owner identity.
-This module never executes submitted source code.
+Submitted source never runs in the API process; Build orchestrates isolated Docker tests.
 """
 
 from __future__ import annotations

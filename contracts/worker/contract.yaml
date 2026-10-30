@@ -1,22 +1,51 @@
 contract: worker.execution
-contract_version: "1.0.0"
+contract_version: 1.0.0
 core_references:
   envelope: core.message-envelope
   errors: core.error
   identifiers: core.identifiers
   status: core.operation-status
 request:
-  required: [execution_id, worker_id, artifact_id, artifact_hash, entrypoint, input_payload, configuration]
-  optional: [timeout_seconds, idempotency_key, parent_execution_id, depth]
+  required:
+  - execution_id
+  - worker_id
+  - artifact_id
+  - artifact_hash
+  - entrypoint
+  - input_payload
+  - configuration
+  optional:
+  - timeout_seconds
+  - idempotency_key
+  - depth
+  notes:
+  - This request describes the domain model. Runtime HTTP nests worker/artifact fields under definition; its exact
+    body is defined in runtime.openapi.json.
+  - Parent relationships are runtime-internal; clients cannot override ownership or parent identity.
 response:
-  required: [execution_id, worker_id, accepted, status]
-  optional: [result, error, children]
-status_values: [accepted, running, succeeded, failed, cancelled]
-error_required: [code, message]
+  required:
+  - execution_id
+  - worker_id
+  - accepted
+  - status
+  optional:
+  - result
+  - error
+  - children
+status_values:
+- accepted
+- running
+- succeeded
+- failed
+- cancelled
+error_required:
+- code
+- message
 cancellation:
   operation: cancel_execution
-  required: [execution_id]
-  semantics: "Best-effort cancellation of active execution and descendants; terminal results are immutable."
+  required:
+  - execution_id
+  semantics: Best-effort cancellation of active execution and descendants; terminal results are immutable.
 concurrency:
   capacity_exceeded_error: CAPACITY_EXCEEDED
   duplicate_execution_error: EXECUTION_CONFLICT
@@ -26,9 +55,14 @@ limits:
   max_children: configurable
   timeout_budget: shared_with_descendants
 artifact_provider:
-  interface: "fetch(artifact_id) -> bytes"
+  interface: fetch(artifact_id) -> bytes
   verification: sha256
-  code_manager_api: "GET /artifacts/{artifact_id}/content (not yet implemented by CODE MANAGER)"
+  code_manager_api: GET /api/v1/artifacts/{artifact_id}/content
 security:
-  sandbox: false
-  note: "Subprocess is not a production security boundary."
+  sandbox: true
+  note: HTTP Runtime requires a configured sandbox backend and an immutable image; trusted legacy demo/library tests
+    may explicitly opt out. Target-host acceptance remains a separate release gate.
+status: draft
+http_contracts:
+  manager: manager.openapi.json
+  runtime: runtime.openapi.json

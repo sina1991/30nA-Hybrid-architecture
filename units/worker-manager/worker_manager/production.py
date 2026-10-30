@@ -16,6 +16,6 @@ def create_app():
     def gateway(owner):
         bindings = json.loads(upstream_path.read_text())
         item = bindings[owner]
-        return RuntimeHTTPGateway(item['url'], item['token'])
+        return RuntimeHTTPGateway(item['url'], item['token'], ca_file=item.get('ca_file'))
     service = ControlService(os.environ['WORKER_MANAGER_DB'],gateway)
     return application(service,os.environ['WORKER_MANAGER_CREDENTIAL_FILE'])

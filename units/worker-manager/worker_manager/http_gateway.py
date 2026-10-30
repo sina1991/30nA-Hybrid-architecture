@@ -2,24 +2,31 @@
 from dataclasses import asdict
 from urllib.parse import urlsplit, quote
 import json
+import ssl
 
 import httpx
 
 
 class RuntimeHTTPGateway:
-    def __init__(self, base_url, token, *, client=None):
+    def __init__(self, base_url, token, *, client=None, ca_file=None):
         parsed = urlsplit(base_url)
         if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment or parsed.path not in ('', '/'):
             raise ValueError('Runtime must use an HTTPS origin')
         if not isinstance(token, str) or not token or not token.isascii() or any(c.isspace() for c in token):
             raise ValueError('Invalid Runtime credential')
+        if ca_file is not None and (not isinstance(ca_file,str) or not ca_file.strip()):
+            raise ValueError('ca_file must be a nonempty certificate path')
+        if ca_file is not None and client is not None:
+            raise ValueError('Configure CA verification on the injected client instead')
+        # Explicit private-CA trust never disables hostname/certificate verification.
+        self.verify = ssl.create_default_context(cafile=ca_file) if ca_file is not None else True
         self.base_url, self.token = base_url.rstrip('/'), token
         self.client = client
 
     def _request(self, method, path, payload=None, timeout=15):
         # An injected client is for trusted tests/embedding. Production retains
         # certificate verification and does not inherit HTTP proxy credentials.
-        client = self.client or httpx.Client(trust_env=False, follow_redirects=False)
+        client = self.client or httpx.Client(trust_env=False, follow_redirects=False, verify=self.verify)
         try:
             with client.stream(method, self.base_url + path, json=payload,
                                headers={'Authorization': 'Bearer ' + self.token}, timeout=timeout) as response:

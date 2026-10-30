@@ -1,14 +1,12 @@
 contract: code.api
-contract_version: "1.0.0"
+contract_version: 1.0.0
 status: approved
-
 transport:
   implementation: python-wsgi
   framework: standard-library
   base_path: /api/v1
   content_type: application/json
   max_request_bytes: 31457280
-
 identity:
   integration: pluggable
   future_provider: identity_unit
@@ -16,100 +14,125 @@ identity:
   development_header: X-Code-Manager-ID
   development_header_env: CODE_MANAGER_ALLOW_INSECURE_HEADER
   rules:
-    - "REMOTE_USER MUST be set by a trusted authentication layer."
-    - "The development header is accepted only when explicitly enabled."
-    - "owner_id MUST NOT be accepted from request JSON."
-    - "Production identity MUST be provided by a trusted deployment adapter."
-    - "Domain services MUST NOT depend directly on a specific authentication provider."
-    - "DATA MANAGER requests MUST preserve owner authorization."
-    - "The DATA MANAGER client factory MUST be replaceable per owner."
-    - "No insecure identity header is enabled implicitly."
-
+  - REMOTE_USER MUST be set by a trusted authentication layer.
+  - The development header is accepted only when explicitly enabled.
+  - owner_id MUST NOT be accepted from request JSON.
+  - Production identity MUST be provided by a trusted deployment adapter.
+  - Domain services MUST NOT depend directly on a specific authentication provider.
+  - DATA MANAGER requests MUST preserve owner authorization.
+  - The DATA MANAGER client factory MUST be replaceable per owner.
+  - No insecure identity header is enabled implicitly.
 success_envelope:
   required:
-    - contract_version
-    - payload
+  - contract_version
+  - payload
   optional:
-    - correlation_id
-
+  - correlation_id
 error_envelope:
   required:
-    - contract_version
-    - error
+  - contract_version
+  - error
   error_fields:
     required:
-      - code
-      - message
-      - retryable
+    - code
+    - message
+    - retryable
     optional:
-      - context
+    - context
     rules:
-      - "Error messages MUST NOT expose secrets or internal stack traces."
-
+    - Error messages MUST NOT expose secrets or internal stack traces.
 operations:
   register_source:
     method: POST
     path: /sources
     request_fields:
-      - source_id
-      - source_version
-      - source_content_base64
-      - entrypoint
-      - input_schema
-      - output_schema
+    - source_id
+    - source_version
+    - source_content_base64
+    - entrypoint
+    - input_schema
+    - output_schema
     optional_fields:
-      - contract_dependencies
-      - calculation_version
+    - contract_dependencies
+    - calculation_version
     response_fields:
-      - source_id
-      - source_version
-      - source_hash
-      - idempotent
+    - source_id
+    - source_version
+    - source_hash
+    - idempotent
     idempotency:
-      - "Same owner, source ID, version and ZIP bytes is idempotent."
-      - "Same owner, source ID and version with different ZIP bytes returns 409."
-      - "The original ZIP bytes are hashed before processing."
-      - "Automatic retries are disabled."
-
+    - Same owner, source ID, version and ZIP bytes is idempotent.
+    - Same owner, source ID and version with different ZIP bytes returns 409.
+    - The original ZIP bytes are hashed before processing.
+    - Automatic retries are disabled.
   list_sources:
     method: GET
     path: /sources
-
   inspect_source:
     method: POST
     path: /sources/{source_id}/versions/{source_version}/inspect
     response_fields:
-      - inspection_status
-      - findings
+    - inspection_status
+    - findings
     rules:
-      - "Inspection MUST NOT execute submitted source."
-      - "Archive inspection status MUST NOT imply dependency or runtime validation."
-
+    - Inspection MUST NOT execute submitted source.
+    - Archive inspection status MUST NOT imply dependency or runtime validation.
   get_source:
     method: GET
     path: /sources/{source_id}/versions/{source_version}
-
   build_source:
     method: POST
     path: /builds
-    status: reserved_not_implemented
-
+    status: implemented
+    rules:
+    - HTTP success does not imply a successful Build; inspect payload.build.status and publishable.
+    - All mandatory stages and positively confirmed cleanup are required for publication.
   get_artifact:
     method: GET
     path: /artifacts/{artifact_id}
     status: reserved_not_implemented
-
   publish_artifact:
     method: POST
     path: /artifacts/{artifact_id}/publish
-    status: reserved_not_implemented
-
+    status: implemented
+    request_fields:
+    - build_id
+    rules:
+    - Only a successful owner-scoped Build with every mandatory stage passed may be published.
+    - Raw source_zip is never a downloadable built_artifact.
+  list_builds:
+    method: GET
+    path: /builds
+    status: implemented
+    query:
+      limit:
+        default: 50
+        minimum: 1
+        maximum: 100
+  get_build:
+    method: GET
+    path: /builds/{build_id}
+    status: implemented
+    rules:
+    - Build history is owner-scoped; a missing or foreign Build returns 404.
+  download_artifact:
+    method: GET
+    path: /artifacts/{artifact_id}/content
+    status: implemented
+    content_type: application/octet-stream
+    response_headers:
+    - X-Artifact-Hash
+    - ETag
+    - Cache-Control
+    rules:
+    - Return byte-exact owner-scoped built artifact content after hash/manifest verification.
 rules:
-  - "No operation may provide direct access to Data Manager storage."
-  - "All source metadata operations MUST be owner-scoped."
-  - "Source ZIP content MUST be supplied as Base64 in the JSON request."
-  - "The request size limit includes Base64 encoding overhead."
-  - "Unsupported build and artifact operations return an explicit 501 error."
-  - "Operation execution status and artifact lifecycle status are distinct."
-  - "A correlation_id supplied by the caller is preserved when valid."
-  - "Published artifacts MUST be immutable."
+- No operation may provide direct access to Data Manager storage.
+- All source metadata operations MUST be owner-scoped.
+- Source ZIP content MUST be supplied as Base64 in the JSON request.
+- The request size limit includes Base64 encoding overhead.
+- Reserved artifact metadata operations return an explicit 501 error; Build, publication and content download are
+  implemented.
+- Operation execution status and artifact lifecycle status are distinct.
+- A correlation_id supplied by the caller is preserved when valid.
+- Published artifacts MUST be immutable.
