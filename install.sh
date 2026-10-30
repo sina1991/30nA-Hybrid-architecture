@@ -40,6 +40,20 @@ ask() {
     read -r answer </dev/tty
     printf -v "$1" '%s' "$answer"
 }
+clean_input() {
+    # Strip surrounding terminal/paste whitespace and Unicode direction wrappers.
+    # Do not remove or rewrite characters inside an address.
+    python3 - "$1" <<'PYTHON'
+import sys
+value=sys.argv[1]
+wrappers='\u200e\u200f\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069\ufeff'
+while True:
+    cleaned=value.strip().strip(wrappers).strip()
+    if cleaned==value:break
+    value=cleaned
+print(value)
+PYTHON
+}
 validate() {
     python3 - "$DOMAIN" "$EMAIL" "$REF" <<'PY'
 import ipaddress,re,sys
@@ -48,7 +62,7 @@ try:ipaddress.ip_address(name);raise SystemExit('از دامنه یا subdomain 
 except ValueError:pass
 if len(name)>253 or '.' not in name or any(not re.fullmatch(r'[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?',part) for part in name.split('.')):
     raise SystemExit('دامنه معتبر با حروف کوچک، بدون https:// یا path لازم است.')
-if not re.fullmatch(r'[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}',email):raise SystemExit('email معتبر لازم است.')
+if not re.fullmatch(r'[A-Za-z0-9._+%-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}',email):raise SystemExit('email معتبر لازم است؛ آن را با حروف انگلیسی و بدون فاصله داخل آدرس وارد کنید یا از --email استفاده کنید.')
 if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9._/-]{0,199}',ref) or '..' in ref:raise SystemExit('Git ref نامعتبر است.')
 PY
 }
@@ -163,6 +177,15 @@ PROFILE
     [[ $IMAGE =~ ^sha256:[0-9a-f]{64}$ ]] || die 'Image marker نامعتبر است'
     as_sandbox docker image inspect "$IMAGE" >/dev/null
 }
+obtain_certificate() {
+    # Standalone must own port 80. Restore our Nginx even if ACME fails.
+    systemctl stop nginx
+    local certificate_status=0
+    certbot certonly --non-interactive --agree-tos --email "$EMAIL" --standalone --preferred-challenges http \
+        --domain "$DOMAIN" --cert-name 30na-dashboard --keep-until-expiring || certificate_status=$?
+    systemctl start nginx
+    [[ $certificate_status == 0 ]] || return "$certificate_status"
+}
 certificates() {
     install -d -m 0755 "$CONFIG/ca" /var/lib/30na/acme
     if [[ ! -f $CONFIG/ca/internal.crt ]]; then
@@ -190,11 +213,16 @@ certificates() {
         ufw allow 443/tcp
     fi
     say 'دریافت certificate عمومی؛ DNS باید به همین VPS اشاره کند و firewall ابری TCP 80/443 را باز بگذارد.'
-    certbot certonly --non-interactive --agree-tos --email "$EMAIL" --webroot -w /var/lib/30na/acme \
-        --domain "$DOMAIN" --cert-name 30na-dashboard --keep-until-expiring
+    obtain_certificate
     "$APP/.venv/bin/python" "$APP/scripts/deployment/provision.py" --domain "$DOMAIN" --image "$IMAGE" --sandbox-uid "$SANDBOX_UID" --public-tls
-    install -d -m 0755 /etc/letsencrypt/renewal-hooks/deploy
-    printf '#!/bin/sh\nset -eu\n/usr/sbin/nginx -t\n/bin/systemctl reload nginx\n' >/etc/letsencrypt/renewal-hooks/deploy/30na-nginx
+    install -d -m 0755 /etc/letsencrypt/renewal-hooks/{pre,post,deploy}
+    # Older webroot certificates retain their stored renewal method until reconfigured.
+    if grep -Eq '^authenticator[[:space:]]*=[[:space:]]*standalone[[:space:]]*$' /etc/letsencrypt/renewal/30na-dashboard.conf; then
+        printf '#!/bin/sh\nset -eu\n/bin/systemctl stop nginx\n' >/etc/letsencrypt/renewal-hooks/pre/30na-nginx
+        printf '#!/bin/sh\nset -eu\n/usr/sbin/nginx -t\n/bin/systemctl start nginx\n' >/etc/letsencrypt/renewal-hooks/post/30na-nginx
+        chmod 0755 /etc/letsencrypt/renewal-hooks/{pre,post}/30na-nginx
+    fi
+    printf '#!/bin/sh\nset -eu\n/usr/sbin/nginx -t\nif /bin/systemctl is-active --quiet nginx; then /bin/systemctl reload nginx; fi\n' >/etc/letsencrypt/renewal-hooks/deploy/30na-nginx
     chmod 0755 /etc/letsencrypt/renewal-hooks/deploy/30na-nginx
     systemctl enable --now certbot.timer
     nginx -t
@@ -227,6 +255,8 @@ main() {
     command -v python3 >/dev/null || die 'ابتدا Python 3 و curl را نصب کنید'
     [[ -n $DOMAIN ]] || ask DOMAIN 'دامنه Dashboard، مثال dashboard.example.com'
     [[ -n $EMAIL ]] || ask EMAIL "email برای Let's Encrypt"
+    DOMAIN=$(clean_input "$DOMAIN")
+    EMAIL=$(clean_input "$EMAIL")
     validate
     if [[ $CHECK_ONLY == 0 ]]; then
         [[ $EUID == 0 ]] || die 'ابتدا sudo -i اجرا کنید'
