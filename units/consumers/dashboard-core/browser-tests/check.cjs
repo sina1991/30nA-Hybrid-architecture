@@ -36,11 +36,21 @@ async function main() {
     const page = await context.newPage();
     const errors=[];page.on('pageerror',error=>errors.push(error.message));
     let posts=[], lookups=0, completed=false, cancellation=false, block=false, release, started;
+    const bindings = new Map();
     let startedPromise=new Promise(resolve=>started=resolve);
     if(!isReal) await page.route('**/api/upstreams/**', async route => {
       const req=route.request();const path=new URL(req.url()).pathname;
       if(req.headers().authorization !== 'Bearer browser-test-token') return route.fulfill({status:401,json:{error:{code:'UNAUTHORIZED'}}});
       const send=payload=>route.fulfill({json:{contract_version:'1.0.0',payload}});
+      const slotMatch = path.match(/^\/api\/upstreams\/slots\/([^/]+)\/(binding|read|execute)$/);
+      if (slotMatch) {
+        const [, slot, action] = slotMatch, body = req.postDataJSON();
+        if (action === 'binding') {
+          if (!body.only_if_missing || !bindings.has(slot)) bindings.set(slot, {module_id:body.module_id, context:body.context || {}});
+          return send({binding:bindings.get(slot)});
+        }
+        return send({result:null});
+      }
       if(path === '/api/upstreams/workers') return send({workers:[
         {definition:{worker_id:'demo-summary'},lifecycle:'enabled'},
         {definition:{worker_id:'disabled-worker'},lifecycle:'disabled'}]});
@@ -60,11 +70,21 @@ async function main() {
     });
     await page.goto(base);
     await require('./layout.cjs')(page,false);
+    const slotSearch = page.locator('.slot').first().locator('.module-search');
+    const slotSelect = page.locator('.slot').first().locator('.module-select');
+    const initiallySelected = await slotSelect.inputValue();
+    await slotSearch.fill('system-monitor');
+    assert((await slotSelect.locator('option').allTextContents()).some(text => text.includes('System Monitor')));
+    assert.equal(await slotSelect.inputValue(), initiallySelected);
+    await slotSearch.fill('no-such-module-123');
+    assert.equal(await slotSelect.inputValue(), initiallySelected);
+    assert((await page.locator('.slot').first().locator('.module-search-hint').textContent()).includes('No matching'));
+    await slotSearch.fill('');
     if(input.layoutScreenshot) await page.screenshot({path:input.layoutScreenshot});
     await page.locator('#account-token').fill(isReal?input.token:'wrong');
     await page.locator('#account-connect').click();
     if(!isReal) {
-      await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('معتبر نیست'));
+      await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('Invalid account credentials'));
       assert.equal(posts.length,0);
       await page.locator('#account-token').fill('browser-test-token');
       await page.locator('#account-connect').click();
@@ -86,7 +106,7 @@ async function main() {
       assert(await page.locator('#worker-run').isDisabled());
       await page.locator('#worker-retry').click();
     }
-    await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='موفق',null,{timeout:45000});
+    await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='Succeeded',null,{timeout:45000});
     assert.deepEqual(JSON.parse(await page.locator('#execution-output').textContent()),result);
     const id=await page.locator('#execution-id').textContent();
     assert.match(id,/^[0-9a-f-]{36}$/);
@@ -98,25 +118,25 @@ async function main() {
       await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
       await page.locator('#worker-input').fill('{"values":["invalid"]}');
       await page.locator('#worker-run').click();
-      await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='ناموفق',null,{timeout:45000});
+      await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='Failed',null,{timeout:45000});
       assert.equal(JSON.parse(await page.locator('#execution-output').textContent()).code,'EXECUTION_ERROR');
       await page.locator('#account-refresh').click();
-      await page.waitForFunction(()=>document.getElementById('account-executions').textContent.includes('ناموفق'));
+      await page.waitForFunction(()=>document.getElementById('account-executions').textContent.includes('Failed'));
     }
     if(!isReal) {
       assert.equal(posts.length,2);assert.deepEqual(posts[0],posts[1]);
       await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
       await page.locator('#worker-run').click();
-      await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='موفق');
+      await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='Succeeded');
       assert.equal(posts.length,3);
       assert.notEqual(posts[2].idempotency_key,posts[1].idempotency_key);
       // A cancellation acknowledgment must never fabricate terminal cancellation.
       cancellation=true;
       await page.locator('#execution-refresh').click();
-      await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='در حال اجرا');
+      await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='Running');
       await page.locator('#execution-cancel').click();
-      await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('توقف اجرا تأیید نشد'));
-      assert.equal(await page.locator('#execution-status').textContent(),'در حال اجرا');
+      await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('Cancellation was not confirmed'));
+      assert.equal(await page.locator('#execution-status').textContent(),'Running');
     }
     if(isReal) await require('./management.cjs')(page);
     const storage=await page.evaluate(()=>JSON.stringify({local:{...localStorage},session:{...sessionStorage}}));

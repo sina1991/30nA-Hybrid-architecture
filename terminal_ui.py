@@ -110,7 +110,7 @@ class Terminal:
         count = lambda value: str(len(value)) if value is not None else 'unavailable'
         enabled = sum(row.get('lifecycle') == 'enabled' for row in (self.worker_rows or []))
         print(self.style('=' * width, '36'))
-        print(self.style('30nA STATUS', '1', '36') + self.style('  |  v0.1.2 (preview)', '2') + '  |  Owner: ' + self.style(self.owner, '1'))
+        print(self.style('30nA STATUS', '1', '36') + self.style('  |  v0.1.2', '2') + '  |  Owner: ' + self.style(self.owner, '1'))
         health_color = '32' if str(self.health).lower() in ('ok', 'healthy', 'up') else '33'
         print('Dashboard: ' + self.style(self.health, '1', health_color) + f'  |  Slots: {count(self.slot_rows)}  |  Modules: {count(self.module_rows)}  |  Workers: {count(self.worker_rows)}' + (f' ({enabled} enabled)' if self.worker_rows is not None else ''))
         print(self.style('-' * width, '2'))

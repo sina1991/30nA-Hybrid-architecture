@@ -21,7 +21,8 @@ class DiceRollerModuleTests(unittest.TestCase):
         self.assertIn('countInput.max = "100"', PAGE)
         self.assertIn('sidesInput.max = "1000"', PAGE)
         self.assertIn('setAttribute("aria-live", "polite")', PAGE)
-        self.assertIn('result.textContent = rolls.join(" + ") + " = " + total;', PAGE)
+        self.assertIn('await invokeModule(module.id, {count, sides}, slot.id)', PAGE)
+        self.assertIn('output.rolls.join(" + ")', PAGE)
 
 
 if __name__ == "__main__":

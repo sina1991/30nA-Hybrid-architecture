@@ -36,9 +36,9 @@ BFF قبل از تماس upstream، credential کاربر را از hash mapping
 
 ## theme و module
 
-Themeهای واقعی `compact-6`، `standard-8` و `wide-12`، metadata/grid/slot دارند. شناسه theme باید با نام فایل JSON برابر باشد. moduleها از manifestهای package کشف می‌شوند و فقط typeهای whitelist `empty`، `health`، `theme-summary`، `slot-note` و `dice-roller` فعال‌اند. manifest شامل id/name/description/version/api_version/type و api_version برابر `1` است. registry به معنی اجازه import/execution کد دلخواه نیست.
+Themeهای واقعی `compact-6`، `standard-8` و `wide-12`، metadata/grid/slot دارند. شناسه theme باید با نام فایل JSON برابر باشد. moduleها از manifestهای package کشف می‌شوند و typeهای مجاز، از جمله `clock`، `calculator`، `counter` و `host-monitor`، در registry تعریف شده‌اند. manifest شامل id/name/description/version/api_version/type و api_version برابر `1` است. registry به معنی اجازه import/execution کد دلخواه نیست.
 
-dice-roller در browser اجرا می‌شود، Worker Runtime نیست؛ تعداد dice از ۱ تا ۱۰۰ و sides از ۲ تا ۱۰۰۰ دارد. module health، سلامت Dashboard را می‌خواند و اثبات سلامت همه سرویس‌ها نیست. انتخاب theme/slot در browser باقی می‌ماند؛ account history server-side است.
+dice-roller با منطق server-side اجرا می‌شود، Worker Runtime نیست؛ تعداد dice از ۱ تا ۱۰۰ و sides از ۲ تا ۱۰۰۰ دارد. module health، سلامت Dashboard را می‌خواند و اثبات سلامت همه سرویس‌ها نیست. پس از ورود، اتصال Slot به Module و نتیجه monitor به owner روی سرور تعلق دارد و از CLI نیز قابل استفاده است. در هر Slot جست‌وجوی Module بر اساس نام یا ID وجود دارد.
 
 ## زمان و ظرفیت UI
 

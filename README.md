@@ -2,7 +2,7 @@
 
 Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORKER RUNTIME و Dashboard.
 
-**وضعیت: توسعه v0.1.1؛ آخرین Release رسمی v0.1.0 است. پذیرش نهایی Production هنوز باز است.**
+**وضعیت: نسخه v0.1.2؛ پذیرش نهایی Production روی VPS همچنان نیازمند بررسی مستقل است.**
 
 ## نصب کامل روی Ubuntu VPS
 
@@ -29,9 +29,9 @@ installer وجود مسیرها، حساب‌ها و portهای مرتبط را 
 
 هر اتصال سرویس، identity همان owner را حفظ می‌کند. Build و اجرای Worker در Docker جدا انجام می‌شوند؛ جزئیات مرزها در [فصل معماری](docs/manual/01-architecture.md) است. [منبع نمودار](docs/assets/architecture.dot) با Graphviz قابل بازتولید است.
 
-![اسلات‌ها و ورود کوچک در نسخه توسعه v0.1.1](docs/assets/dashboard-layout-v011.png)
+![نمای پیشین اسلات‌ها و ورود کوچک](docs/assets/dashboard-layout-v011.png)
 
-تصویر حالت پیش از ورود در Chromium محلی است: ورود کوچک در header و اسلات‌ها در بخش اصلی صفحه قرار دارند. محیط Worker پس از ورود، زیر همه اسلات‌ها نمایش داده می‌شود. [تغییرات و فرمان آزمایش v0.1.1](docs/development/dashboard-v0.1.1.md).
+تصویر تاریخی حالت پیش از ورود است. اسلات‌ها در بخش اصلی و محیط Worker پس از ورود زیر آن‌ها نمایش داده می‌شوند؛ در نسخه فعلی جست‌وجوی Module نیز به هر Slot اضافه شده است. [راهنمای Moduleها و اجرای ترمینالی](docs/development/modules-terminal.md).
 
 ## راهنمای Agentهای هوش مصنوعی
 

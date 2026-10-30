@@ -1,6 +1,26 @@
 {
   "cli": [
     [
+      "modules/clock/clock.py",
+      18,
+      "--timezone"
+    ],
+    [
+      "modules/module_support.py",
+      9,
+      "--input"
+    ],
+    [
+      "modules/module_support.py",
+      10,
+      "--owner"
+    ],
+    [
+      "modules/module_support.py",
+      11,
+      "--slot"
+    ],
+    [
       "scripts/deployment/provision.py",
       132,
       "--domain"
@@ -215,6 +235,18 @@
       "optional lookup"
     ],
     [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/module_state.py",
+      14,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/slots.py",
+      37,
+      "optional lookup"
+    ],
+    [
       "DASHBOARD_SCREENSHOT",
       "units/worker-runtime/tests/control_plane_helper.py",
       114,
@@ -296,6 +328,48 @@
       "SANDBOX_FAULT_INJECTION_ACK",
       "scripts/security/run_sandbox_daemon_fault_injection.py",
       42,
+      "optional lookup"
+    ],
+    [
+      "TERM",
+      "terminal_ui.py",
+      22,
+      "optional lookup"
+    ],
+    [
+      "TERM",
+      "terminal_ui.py",
+      104,
+      "optional lookup"
+    ],
+    [
+      "THIRTYNA_MONITOR_DISK_PATHS",
+      "modules/host_monitor.py",
+      42,
+      "optional lookup"
+    ],
+    [
+      "THIRTYNA_MONITOR_DOCKER",
+      "modules/host_monitor.py",
+      152,
+      "optional lookup"
+    ],
+    [
+      "THIRTYNA_MONITOR_LOG_PATHS",
+      "modules/host_monitor.py",
+      129,
+      "optional lookup"
+    ],
+    [
+      "THIRTYNA_MONITOR_OWNERS",
+      "modules/slots.py",
+      14,
+      "optional lookup"
+    ],
+    [
+      "THIRTYNA_MONITOR_SERVICES",
+      "modules/host_monitor.py",
+      69,
       "optional lookup"
     ],
     [
@@ -925,14 +999,19 @@
       "sha256": "0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e"
     },
     {
-      "bytes": 1710,
-      "path": "AGENTS.md",
-      "sha256": "92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d"
+      "bytes": 11649,
+      "path": "30na",
+      "sha256": "5b0d2274cb1ba60f3394927e908a29c5bdcf25bf51ad1c6053eca07c5e00d9e6"
     },
     {
-      "bytes": 4463,
+      "bytes": 2124,
+      "path": "AGENTS.md",
+      "sha256": "abff7ec1d833f288225af6ad93ec95436b0187fd05c0a1f953d7e53e5ddbea2c"
+    },
+    {
+      "bytes": 4956,
       "path": "CHANGELOG.md",
-      "sha256": "657127747553e3b0435afb0e6347a9c1b060d39873170bb8305ed14cf5dacdcf"
+      "sha256": "a96af343d5e228ccaf07d1e7c425f8e362b8941ec6a55a0901aa7c743690ca88"
     },
     {
       "bytes": 2817,
@@ -940,9 +1019,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 7225,
+      "bytes": 7363,
       "path": "README.md",
-      "sha256": "7034ed3a96b530b9cfc7ad430dd21c46833c2e902b43f887f8cea7f2bd33cbd8"
+      "sha256": "1e5461f0565f1a5cf1c46d61c39d5f0cfc42df35bb3f800670dd59dcf9da8628"
     },
     {
       "bytes": 1866,
@@ -1160,6 +1239,11 @@
       "sha256": "61be22996ffde6955a58f7665f691f3411a0caf8126cd6187ccb486e69ac16f9"
     },
     {
+      "bytes": 181,
+      "path": "deployment/30na-cli",
+      "sha256": "233864675e420c7c102c05a90bbd7b5b45626ed50cba0a7a5196eae259356e6c"
+    },
+    {
       "bytes": 709,
       "path": "deployment/30na-review",
       "sha256": "d491bfd8a98c9fb7ace8a825043775129c5db9b193f83ec4260586a8c71b0802"
@@ -1170,9 +1254,9 @@
       "sha256": "595bb8311728b0f10aa4695992cad683ca78847d8dfa4c09e551d7035f001488"
     },
     {
-      "bytes": 762,
+      "bytes": 819,
       "path": "deployment/systemd/30na-dashboard.service",
-      "sha256": "85599cbec8644f262957c833ea2324b98f029ac55de2c684d86cbaf0fd3d6535"
+      "sha256": "4208a90b065f01c6ee967b14e85a8fed09233de712c822cb1bf3dc4204e972f5"
     },
     {
       "bytes": 734,
@@ -1200,9 +1284,219 @@
       "sha256": "17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f"
     },
     {
-      "bytes": 16024,
+      "bytes": 15266,
       "path": "install.sh",
-      "sha256": "62050220579e2ff848786576895831c1bc0ee415b918d589569d4846507c1ac7"
+      "sha256": "834aff84e6ea0366d782f902b9bcda057b2d7f290b6c1c2b48cd8888bac39b52"
+    },
+    {
+      "bytes": 55,
+      "path": "modules/__init__.py",
+      "sha256": "884e080626de6c419827b873df812d991d6b73c2c2fd5419a5b019583eb8e059"
+    },
+    {
+      "bytes": 160,
+      "path": "modules/alerts/manifest.json",
+      "sha256": "8b37b53a82afbb96cdaf1d16f01a3321671168b27ddabb961eebc7c393238e8d"
+    },
+    {
+      "bytes": 263,
+      "path": "modules/alerts/module.py",
+      "sha256": "94bbd626fdca69c7c74d456ce328582e8d2455d91cdccd20742baef64b6af72f"
+    },
+    {
+      "bytes": 178,
+      "path": "modules/calculator/manifest.json",
+      "sha256": "a1697698e2452c0165e17aedff5a11b61845740c6fcd7408cad34f90533ab423"
+    },
+    {
+      "bytes": 1033,
+      "path": "modules/calculator/module.py",
+      "sha256": "88256927623eec9529c986f7543aa179e55349b517574d44dc8f818836de18c8"
+    },
+    {
+      "bytes": 794,
+      "path": "modules/clock/clock.py",
+      "sha256": "88595bffcae5fec638e48c6cef085160acb62fe95860cc9316f1351270693fc0"
+    },
+    {
+      "bytes": 150,
+      "path": "modules/clock/manifest.json",
+      "sha256": "344220c8fef4d4a771ac909b1cb4c2d8d875cebb94a09438176ca1ed5bcb7eea"
+    },
+    {
+      "bytes": 168,
+      "path": "modules/counter/manifest.json",
+      "sha256": "e9a24c818a815286fc4814b0b2a32b8ea6befa5c48f76b793baba96ad83917ad"
+    },
+    {
+      "bytes": 1638,
+      "path": "modules/counter/module.py",
+      "sha256": "3583494b5d67816970eea91f81de96d5b712135a6a7c0cef35a04532b1eb4849"
+    },
+    {
+      "bytes": 180,
+      "path": "modules/dashboard-health/manifest.json",
+      "sha256": "83759a4b520e69bf9722b5238ae5e92488da03bcde70b77a877665548125fd51"
+    },
+    {
+      "bytes": 960,
+      "path": "modules/dashboard-health/module.py",
+      "sha256": "db799d1f4ac897f5d56febd2628f1e06548232f73350f946453c05f3fbb0bcb9"
+    },
+    {
+      "bytes": 199,
+      "path": "modules/dice-roller/manifest.json",
+      "sha256": "ead3dda45d00b8d1e8582ccd2d859486385ef0c682aa3b1a6d750cf1c0a3c33b"
+    },
+    {
+      "bytes": 694,
+      "path": "modules/dice-roller/module.py",
+      "sha256": "0166c383e6fe7ed89532dee4cc58bae634de3ec61e839fb25564a6ceba9df70c"
+    },
+    {
+      "bytes": 172,
+      "path": "modules/disk-usage/manifest.json",
+      "sha256": "5594f7cfc929d54f28aa5007f3b566c08c6bd7478fb25b0c6dbb2496496c42b8"
+    },
+    {
+      "bytes": 261,
+      "path": "modules/disk-usage/module.py",
+      "sha256": "6c76a9ef7867d7a414035daf638c8b9497f04b8b2751f250c984c54bddfcb610"
+    },
+    {
+      "bytes": 187,
+      "path": "modules/docker-monitor/manifest.json",
+      "sha256": "78f8832a7cdc4c251b5576792425f7d2263f441d69b5616c7064a293681cb602"
+    },
+    {
+      "bytes": 263,
+      "path": "modules/docker-monitor/module.py",
+      "sha256": "3deefa3ab19f99355fe88500ba6f297d3a87ad28713a2814ad4323af27c3b7e3"
+    },
+    {
+      "bytes": 150,
+      "path": "modules/empty/manifest.json",
+      "sha256": "2fb5fa5c447ca6edca494b8632322031604d9a2ff095c8e78d38467eff2be1a7"
+    },
+    {
+      "bytes": 364,
+      "path": "modules/empty/module.py",
+      "sha256": "18663f5ed9b09efec95efd6aa3a632844f076aea9e3cbeb3fc15da3f6ca961c9"
+    },
+    {
+      "bytes": 1834,
+      "path": "modules/execution.py",
+      "sha256": "097566eae47b40809755551145abe3c1a0ea4d7493b5685263430db0b08e7df9"
+    },
+    {
+      "bytes": 8410,
+      "path": "modules/host_monitor.py",
+      "sha256": "cc76c577110d8acc5a0e7c30b8fa759e96be91812cfbaedfaff0e49a727e12a6"
+    },
+    {
+      "bytes": 163,
+      "path": "modules/log-viewer/manifest.json",
+      "sha256": "a91ca1cbee3771400e9d86466688226a1313b4597bdd9887d00d7d334443e1f9"
+    },
+    {
+      "bytes": 261,
+      "path": "modules/log-viewer/module.py",
+      "sha256": "0a490f3a6644d9f158b7abd2adad4f63baec04b17b0f19680671e4480f18efc3"
+    },
+    {
+      "bytes": 1543,
+      "path": "modules/module_state.py",
+      "sha256": "0b24fbd1ea8fe464e1bed8a9833e4351762644e2eb5de71a2b48f7035edce93a"
+    },
+    {
+      "bytes": 1349,
+      "path": "modules/module_support.py",
+      "sha256": "0c670fd5d6e6900321909f5af8bebcb8cdb8db747696eebc42ca1358942b1431"
+    },
+    {
+      "bytes": 177,
+      "path": "modules/network-monitor/manifest.json",
+      "sha256": "2b29dfd7b49a487ec6a7c0c4737df2ed61d1f9728231b8bfa1fdca79930bac72"
+    },
+    {
+      "bytes": 264,
+      "path": "modules/network-monitor/module.py",
+      "sha256": "bd094bbe764aa10879b727b6071a964f87c8a1e916c010e9cc8e133b17c716dc"
+    },
+    {
+      "bytes": 182,
+      "path": "modules/process-monitor/manifest.json",
+      "sha256": "f2cb4ff053526e70ce9862ec76d7e13f2c14113181eeba9a48029c1c0a115b80"
+    },
+    {
+      "bytes": 264,
+      "path": "modules/process-monitor/module.py",
+      "sha256": "a6d553bad61ab7fb92bfeca8383aabd131dacd1ecbd5233bbc72f54c2f48378b"
+    },
+    {
+      "bytes": 3412,
+      "path": "modules/registry.py",
+      "sha256": "b18b7cda2a1678f41a5fc2abc569b5e8a171b6b74604c75d7df403570ff295ba"
+    },
+    {
+      "bytes": 187,
+      "path": "modules/service-monitor/manifest.json",
+      "sha256": "c25730e3345c9c8fbc141e2d040014d780728f890f326c74adff0667c2efce24"
+    },
+    {
+      "bytes": 264,
+      "path": "modules/service-monitor/module.py",
+      "sha256": "57d93d44f8007d8e7816453f1d47f7388527e53f94eabb67f400b8b2fb5aa676"
+    },
+    {
+      "bytes": 186,
+      "path": "modules/slot-note/manifest.json",
+      "sha256": "f4b599ff9d1ca2a7e6175cfec3d779ed9ae8d26d4ee4ff30861d38fb41e659cf"
+    },
+    {
+      "bytes": 1080,
+      "path": "modules/slot-note/module.py",
+      "sha256": "3cdc5fe1b4abf488de8aa800c4f81259bb28f2706e5ae18499ed07b1b61a9355"
+    },
+    {
+      "bytes": 3916,
+      "path": "modules/slots.py",
+      "sha256": "29a81f53821ab6253c056225a958043f2983b301f1b3188748bd4e96fa6763d4"
+    },
+    {
+      "bytes": 182,
+      "path": "modules/system-monitor/manifest.json",
+      "sha256": "7869970d1d74e070d8e7d3b6a8debc6796006f1a33d28cdd367c6544036171c8"
+    },
+    {
+      "bytes": 263,
+      "path": "modules/system-monitor/module.py",
+      "sha256": "50a175a66728611bd03a6355154ac6c9bd75f683f59dbd21dbf0deae690b9756"
+    },
+    {
+      "bytes": 184,
+      "path": "modules/theme-summary/manifest.json",
+      "sha256": "1c9e029abcc9f1dd8236d68d45356599ba085a4c362bd0b57884f605115374d0"
+    },
+    {
+      "bytes": 842,
+      "path": "modules/theme-summary/module.py",
+      "sha256": "310834952e466f96553fb014e0b8d45e551757a3baecb4433598f8e2cea52890"
+    },
+    {
+      "bytes": 701,
+      "path": "modules/theme-summary/themes/compact-6.json",
+      "sha256": "ae0ea5e577c3455e1e5186426078b92ba4a71c2c4407c28c426ae14e1c1e5475"
+    },
+    {
+      "bytes": 897,
+      "path": "modules/theme-summary/themes/standard-8.json",
+      "sha256": "5eca7faeff243bd66d0d543f9abd3cf8cb546d3ba9a0255fe6be2fc25962861a"
+    },
+    {
+      "bytes": 1284,
+      "path": "modules/theme-summary/themes/wide-12.json",
+      "sha256": "10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048"
     },
     {
       "bytes": 191,
@@ -1245,9 +1539,9 @@
       "sha256": "b257cb69651bdb04f156083b51360ea30467afda1e598fab40322889e2cc7bc1"
     },
     {
-      "bytes": 7563,
+      "bytes": 7585,
       "path": "scripts/deployment/provision.py",
-      "sha256": "301c3a12e9b293ce1df803aca14524db40f26cd8d7561cc420e4687fa282e321"
+      "sha256": "9aa72de47fd16b933d9cafce4204a23c66fa447c5c104abb5e7d2d2ab9dacbb3"
     },
     {
       "bytes": 4454,
@@ -1255,9 +1549,9 @@
       "sha256": "f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20"
     },
     {
-      "bytes": 3502,
+      "bytes": 4523,
       "path": "scripts/deployment/update_dashboard.sh",
-      "sha256": "98e8944c6310380684d75dd28ba16d35f22b7f64a20141bfacbd37a2469c2d58"
+      "sha256": "40fa85bd7e4886a9a5b2ab7b93eec98ab0e743ae8120b39d09439cad63732eb6"
     },
     {
       "bytes": 3205,
@@ -1308,6 +1602,11 @@
       "bytes": 5751,
       "path": "scripts/testing/run_ci.py",
       "sha256": "e456246359b97e4c27138eba8ebace0b81a838d30600ef0b4e867173eab2afa2"
+    },
+    {
+      "bytes": 21800,
+      "path": "terminal_ui.py",
+      "sha256": "f106f9ba8568fc0830770cc169244510acc3984e2daa891548c0d67d4c1ca9db"
     },
     {
       "bytes": 2220,
@@ -1460,9 +1759,9 @@
       "sha256": "f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496"
     },
     {
-      "bytes": 9235,
+      "bytes": 10421,
       "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "6269ab8ca3627ed929df40a46f013002b69f6d9a8a7a5c1b564440cec259b6d1"
+      "sha256": "fa6857b22aa71029f936334b83d2073c08088dec6bd9c4af85f0d6680d91b68e"
     },
     {
       "bytes": 1610,
@@ -1470,9 +1769,9 @@
       "sha256": "0eea28bbe25519a5668c8e2ef224d1b934c3d769d4060b44c824809a444c6547"
     },
     {
-      "bytes": 3504,
+      "bytes": 3475,
       "path": "units/consumers/dashboard-core/browser-tests/management.cjs",
-      "sha256": "63c4510592921047bbafc86bffde93908fac5e7ca40e96707a6c0e700639588e"
+      "sha256": "e50b81b1e00341e3a27623dacc5bf851bbaac7783412f1e68d6450713eba25de"
     },
     {
       "bytes": 1765,
@@ -1490,9 +1789,9 @@
       "sha256": "df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048"
     },
     {
-      "bytes": 17185,
+      "bytes": 33442,
       "path": "units/consumers/dashboard-core/dashboard/app.py",
-      "sha256": "26f079fccb43b6685cfa507b6bac4065d5024f6d0cc16632a2b32692b1cd1499"
+      "sha256": "03e5c09b9e376b6a212e08129f8cc81402c818c280a2728ac1f94deb1b4c223b"
     },
     {
       "bytes": 41,
@@ -1500,34 +1799,24 @@
       "sha256": "35ef8ebac64753121ad6a4d2e62c7c2c90b29160f0c22dbadb2faf113226622f"
     },
     {
-      "bytes": 180,
-      "path": "units/consumers/dashboard-core/dashboard/modules/packages/dashboard-health/manifest.json",
-      "sha256": "83759a4b520e69bf9722b5238ae5e92488da03bcde70b77a877665548125fd51"
+      "bytes": 169,
+      "path": "units/consumers/dashboard-core/dashboard/modules/execution.py",
+      "sha256": "5bef73ad14e3c2595302b184e0cae257303cea569d45fefa6f3b7127eb3123a2"
     },
     {
-      "bytes": 199,
-      "path": "units/consumers/dashboard-core/dashboard/modules/packages/dice-roller/manifest.json",
-      "sha256": "ead3dda45d00b8d1e8582ccd2d859486385ef0c682aa3b1a6d750cf1c0a3c33b"
+      "bytes": 172,
+      "path": "units/consumers/dashboard-core/dashboard/modules/module_state.py",
+      "sha256": "3a347ce78439f00e178fc4e49961b77ed8a56941085fdf77df7b389919a4afa8"
     },
     {
-      "bytes": 150,
-      "path": "units/consumers/dashboard-core/dashboard/modules/packages/empty/manifest.json",
-      "sha256": "2fb5fa5c447ca6edca494b8632322031604d9a2ff095c8e78d38467eff2be1a7"
+      "bytes": 174,
+      "path": "units/consumers/dashboard-core/dashboard/modules/module_support.py",
+      "sha256": "9d78e2dafa971a209de113786d8d0e138526c1121143a7cc2d4d8f38471e2266"
     },
     {
-      "bytes": 186,
-      "path": "units/consumers/dashboard-core/dashboard/modules/packages/slot-note/manifest.json",
-      "sha256": "f4b599ff9d1ca2a7e6175cfec3d779ed9ae8d26d4ee4ff30861d38fb41e659cf"
-    },
-    {
-      "bytes": 184,
-      "path": "units/consumers/dashboard-core/dashboard/modules/packages/theme-summary/manifest.json",
-      "sha256": "1c9e029abcc9f1dd8236d68d45356599ba085a4c362bd0b57884f605115374d0"
-    },
-    {
-      "bytes": 3366,
+      "bytes": 173,
       "path": "units/consumers/dashboard-core/dashboard/modules/registry.py",
-      "sha256": "08bdf4cacc75ed578c908a5c873c16776a2573c2164fcbf8528705588b9af3cc"
+      "sha256": "b920ecb3337de92010152921ce7891951d132b65330c992e015682887f3fb631"
     },
     {
       "bytes": 696,
@@ -1535,34 +1824,19 @@
       "sha256": "3cb7072b852490b9539315bc26d695448049bd26e946226a4655d4b0d98b44fd"
     },
     {
-      "bytes": 701,
-      "path": "units/consumers/dashboard-core/dashboard/themes/compact-6.json",
-      "sha256": "ae0ea5e577c3455e1e5186426078b92ba4a71c2c4407c28c426ae14e1c1e5475"
-    },
-    {
-      "bytes": 897,
-      "path": "units/consumers/dashboard-core/dashboard/themes/standard-8.json",
-      "sha256": "5eca7faeff243bd66d0d543f9abd3cf8cb546d3ba9a0255fe6be2fc25962861a"
-    },
-    {
-      "bytes": 1284,
-      "path": "units/consumers/dashboard-core/dashboard/themes/wide-12.json",
-      "sha256": "10be282fd11f12bdf37c1161039d04364d5b6a34dce1af89bfb7133d132d4048"
-    },
-    {
-      "bytes": 28869,
+      "bytes": 29256,
       "path": "units/consumers/dashboard-core/dashboard/upstream_panel.py",
-      "sha256": "3f649355983ad84edefed4610252870040ccaf5bdf071f0d8baea65534eed588"
+      "sha256": "07392440bc1a41cbb39187e69c7f5f4c1c4512fb616bdb8a2d3d19113d2a9dd1"
     },
     {
-      "bytes": 5769,
+      "bytes": 9086,
       "path": "units/consumers/dashboard-core/dashboard/upstreams.py",
-      "sha256": "bb2c271684aa4b2f54cd62f67b3ad45f6a8ff94c6735243f4012abe4f1d2da3c"
+      "sha256": "e3751bbc891823fccdfeec31f1fabb981ecaa91c920cc0ee411ca01e687ce044"
     },
     {
-      "bytes": 1948,
+      "bytes": 2080,
       "path": "units/consumers/dashboard-core/legacy-tests/test_dashboard.py",
-      "sha256": "6c79bea530d6ac779e5930b263d58bd030e1844b23ce95a14cf3abaf256caaa7"
+      "sha256": "e34085021222909575d449a8ba5bc9618db2a13b3cd0719a5c1dd4c8c5aa2742"
     },
     {
       "bytes": 3954,
@@ -1600,9 +1874,14 @@
       "sha256": "12b26f91c3be9fbbbee012b54a1f2a556c99a52cc829d3afd0bdfe26213ab35d"
     },
     {
-      "bytes": 1034,
+      "bytes": 1089,
       "path": "units/consumers/dashboard-core/tests/test_issue26_dice_roller.py",
-      "sha256": "7d3066b58ba3b049424dfa54cef414e4b5d5bbaa3b312c853212614266a53bb7"
+      "sha256": "1b67e3fefd4e42704c0622569e569878e5af1142a01caf57e7107aaf3b4ca2ff"
+    },
+    {
+      "bytes": 3183,
+      "path": "units/consumers/dashboard-core/tests/test_monitor_modules.py",
+      "sha256": "81d8bf6af1a329c181f4da2574b169d1d0f8eb948943e5253dbb91c9ebc3e2c2"
     },
     {
       "bytes": 5718,
@@ -2044,6 +2323,228 @@
       "(self)"
     ],
     [
+      "modules/calculator/module.py",
+      11,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/clock/clock.py",
+      7,
+      "current_time",
+      "(timezone=None)"
+    ],
+    [
+      "modules/clock/clock.py",
+      12,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/clock/clock.py",
+      16,
+      "main",
+      "()"
+    ],
+    [
+      "modules/counter/module.py",
+      10,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/counter/module.py",
+      15,
+      "run.apply",
+      "(value)"
+    ],
+    [
+      "modules/dashboard-health/module.py",
+      13,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/dice-roller/module.py",
+      11,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/empty/module.py",
+      9,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/execution.py",
+      21,
+      "UnknownModule",
+      "class"
+    ],
+    [
+      "modules/execution.py",
+      26,
+      "_load",
+      "(module_id)"
+    ],
+    [
+      "modules/execution.py",
+      33,
+      "run_module",
+      "(module_id, data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      12,
+      "_mem",
+      "()"
+    ],
+    [
+      "modules/host_monitor.py",
+      23,
+      "_cpu_sample",
+      "()"
+    ],
+    [
+      "modules/host_monitor.py",
+      28,
+      "system",
+      "(data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      40,
+      "disk",
+      "(data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      53,
+      "network",
+      "(data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      67,
+      "service",
+      "(data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      83,
+      "process",
+      "(data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      87,
+      "process.sample",
+      "()"
+    ],
+    [
+      "modules/host_monitor.py",
+      110,
+      "alerts",
+      "(data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      127,
+      "logs",
+      "(data)"
+    ],
+    [
+      "modules/host_monitor.py",
+      151,
+      "docker",
+      "(data)"
+    ],
+    [
+      "modules/module_state.py",
+      9,
+      "change",
+      "(owner, module, slot, default, operation)"
+    ],
+    [
+      "modules/module_support.py",
+      7,
+      "main",
+      "(run)"
+    ],
+    [
+      "modules/registry.py",
+      26,
+      "ModuleManifestError",
+      "class"
+    ],
+    [
+      "modules/registry.py",
+      30,
+      "load_modules",
+      "()"
+    ],
+    [
+      "modules/registry.py",
+      104,
+      "list_modules",
+      "()"
+    ],
+    [
+      "modules/registry.py",
+      109,
+      "get_module",
+      "(module_id: str)"
+    ],
+    [
+      "modules/slot-note/module.py",
+      10,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/slots.py",
+      12,
+      "_authorize_host_monitor",
+      "(owner, module_id)"
+    ],
+    [
+      "modules/slots.py",
+      19,
+      "binding",
+      "(owner, slot, module_id=None, context=None, only_if_missing=False)"
+    ],
+    [
+      "modules/slots.py",
+      27,
+      "binding.update",
+      "(previous)"
+    ],
+    [
+      "modules/slots.py",
+      34,
+      "list_slots",
+      "(owner)"
+    ],
+    [
+      "modules/slots.py",
+      46,
+      "execute",
+      "(owner, slot, data, expected_module=None)"
+    ],
+    [
+      "modules/slots.py",
+      65,
+      "read",
+      "(owner, slot)"
+    ],
+    [
+      "modules/theme-summary/module.py",
+      12,
+      "run",
+      "(data)"
+    ],
+    [
       "scripts/deployment/provision.py",
       17,
       "validate",
@@ -2318,6 +2819,126 @@
       23,
       "main",
       "()"
+    ],
+    [
+      "terminal_ui.py",
+      11,
+      "Terminal",
+      "class"
+    ],
+    [
+      "terminal_ui.py",
+      12,
+      "Terminal.__init__",
+      "(self, owner='customer', manager_url='https://localhost:18444', token_file='/etc/30na/customer-token', ca_file='/etc/30na/ca/trust.pem')"
+    ],
+    [
+      "terminal_ui.py",
+      24,
+      "Terminal.style",
+      "(self, text, *codes)"
+    ],
+    [
+      "terminal_ui.py",
+      29,
+      "Terminal.ask",
+      "(self, label, default=None)"
+    ],
+    [
+      "terminal_ui.py",
+      34,
+      "Terminal.choose",
+      "(self, title, rows, label, default=0)"
+    ],
+    [
+      "terminal_ui.py",
+      52,
+      "Terminal.call",
+      "(self, args, *, state=False, quiet=False)"
+    ],
+    [
+      "terminal_ui.py",
+      73,
+      "Terminal.show",
+      "(self, value)"
+    ],
+    [
+      "terminal_ui.py",
+      85,
+      "Terminal.slot_args",
+      "(self, *args)"
+    ],
+    [
+      "terminal_ui.py",
+      88,
+      "Terminal.worker_args",
+      "(self, *args)"
+    ],
+    [
+      "terminal_ui.py",
+      92,
+      "Terminal.refresh",
+      "(self)"
+    ],
+    [
+      "terminal_ui.py",
+      102,
+      "Terminal.screen",
+      "(self, title=None)"
+    ],
+    [
+      "terminal_ui.py",
+      153,
+      "Terminal.overview",
+      "(self)"
+    ],
+    [
+      "terminal_ui.py",
+      159,
+      "Terminal.input_for",
+      "(self, module_id)"
+    ],
+    [
+      "terminal_ui.py",
+      215,
+      "Terminal.number",
+      "(self, label, default)"
+    ],
+    [
+      "terminal_ui.py",
+      223,
+      "Terminal.integer",
+      "(self, label, default, minimum, maximum)"
+    ],
+    [
+      "terminal_ui.py",
+      231,
+      "Terminal.slots_menu",
+      "(self)"
+    ],
+    [
+      "terminal_ui.py",
+      277,
+      "Terminal.modules_menu",
+      "(self)"
+    ],
+    [
+      "terminal_ui.py",
+      307,
+      "Terminal.executions_menu",
+      "(self)"
+    ],
+    [
+      "terminal_ui.py",
+      323,
+      "Terminal.workers_menu",
+      "(self)"
+    ],
+    [
+      "terminal_ui.py",
+      363,
+      "Terminal.run",
+      "(self)"
     ],
     [
       "tests_support/code_manager.py",
@@ -3995,75 +4616,63 @@
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      23,
+      26,
       "load_themes",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      58,
+      61,
       "health",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      63,
+      66,
       "list_themes",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      80,
+      83,
       "get_theme",
       "(theme_id: str)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      92,
+      95,
+      "clock_time",
+      "(timezone: str | None=None)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      105,
+      "execute_module",
+      "(module_id: str, data: dict)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      120,
       "api_modules",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      98,
+      126,
       "dashboard",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      506,
+      778,
       "create_app",
       "(*, credential_path=None, upstream_factory=None)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      526,
+      798,
       "create_app.connected_dashboard",
       "()"
-    ],
-    [
-      "units/consumers/dashboard-core/dashboard/modules/registry.py",
-      22,
-      "ModuleManifestError",
-      "class"
-    ],
-    [
-      "units/consumers/dashboard-core/dashboard/modules/registry.py",
-      26,
-      "load_modules",
-      "()"
-    ],
-    [
-      "units/consumers/dashboard-core/dashboard/modules/registry.py",
-      100,
-      "list_modules",
-      "()"
-    ],
-    [
-      "units/consumers/dashboard-core/dashboard/modules/registry.py",
-      105,
-      "get_module",
-      "(module_id: str)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/production.py",
@@ -4079,85 +4688,109 @@
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      12,
+      14,
       "RunRequest",
       "class"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      19,
+      21,
       "create_router",
       "(credential_path, upstream_factory)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      31,
+      33,
       "create_router.forward",
       "(request, identity, name, method, path, payload=None, status=200)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      52,
+      54,
       "create_router.read",
       "(operation: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      58,
+      60,
       "create_router.worker_path",
       "(worker_id)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      67,
+      69,
+      "create_router.module_state",
+      "(module_id: str, body: dict, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      85,
+      "create_router.bind_slot",
+      "(slot_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      98,
+      "create_router.read_slot",
+      "(slot_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      115,
+      "create_router.execute_slot",
+      "(slot_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      130,
       "create_router.register",
       "(body: RegisterBody, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      72,
+      135,
       "create_router.worker",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      76,
+      139,
       "create_router.configure",
       "(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      82,
+      145,
       "create_router.remove",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      86,
+      149,
       "create_router.enable",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      90,
+      153,
       "create_router.disable",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      94,
+      157,
       "create_router.run",
       "(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      105,
+      168,
       "create_router.execution",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      109,
+      172,
       "create_router.cancel",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
@@ -4550,6 +5183,30 @@
       19,
       "DiceRollerModuleTests.test_dice_roller_has_bounded_accessible_controls",
       "(self)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_monitor_modules.py",
+      13,
+      "test_monitor_is_not_exposed_by_public_module_endpoint",
+      "()"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_monitor_modules.py",
+      18,
+      "test_slot_monitor_result_is_owner_scoped_and_binding_checked",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_monitor_modules.py",
+      42,
+      "test_log_and_disk_paths_require_explicit_permission",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "units/consumers/dashboard-core/tests/test_monitor_modules.py",
+      55,
+      "test_rebinding_invalidates_saved_slot_output",
+      "(tmp_path, monkeypatch)"
     ],
     [
       "units/consumers/dashboard-core/tests/test_public_api.py",
@@ -7205,6 +7862,12 @@
     ]
   ],
   "tables": [
+    [
+      "modules/module_state.py",
+      19,
+      "module_state",
+      "CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))"
+    ],
     [
       "units/code-manager/code_manager/build_pipeline.py",
       474,

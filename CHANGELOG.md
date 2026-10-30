@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.2
+
+- Add an English interactive CLI with refreshed status, numbered menus, navigation path and terminal colors.
+- Add independent server monitoring modules and owner-scoped slot execution and saved results.
+- Add module search to each Dashboard slot and share saved monitor results with the terminal.
+- Limit host monitoring to configured owners and permitted resources; document permissions and terminal commands.
+- External API, SSL, weather and BiQuote modules remain future work.
+
 ## Unreleased — v0.1.1 Dashboard layout
 
 - Compact account access in the header; keep slots at the top before and after login.

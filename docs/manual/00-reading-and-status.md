@@ -1,14 +1,13 @@
 # ۰۰ — دامنه، وضعیت و روش استفاده
 
-این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit `6f71531301ea97b29d479b371e02cee0838ffd76` روی branch توسعه `feat/dashboard-v0.1.1` است؛ Release رسمی فعلی `v0.1.0` باقی مانده است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.
+این دفترچه راهنمای پروژه برای نسخه v0.1.2 است. وضعیت و شواهد انتشار روی commit مربوط در GitHub و [یادداشت انتشار](../releases/v0.1.2.md) قابل مشاهده است؛ اسناد و تصاویر تاریخی الزاماً رفتار رابط فعلی را نشان نمی‌دهند.
 
 ## وضعیت قابل اثبات
 
-- نسخه فعلی **Release candidate برای demo با Workerهای trusted و ازپیش‌ثبت‌شده** است.
-- اجرای کامل محلی چیدمان v0.1.1 و پنل مدیریت Worker روی Python 3.11 و 3.12: `315 passed, 65 subtests passed`، بدون skipped/warning؛ شامل چیدمان desktop/mobile، قبل و بعد از login/logout و Chromium CRUD واقعی روی HTTPS/Docker است.
-- [CI پیشین c3b97d2](https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604) روی Ubuntu 24.04 شامل تست‌های هر دو Python، Chromium و security scans موفق بوده است؛ این لینک evidence تاریخی همان SHA است. اصلاحات فعلی به‌صورت محلی در هر دو Python تأیید شده‌اند؛ نتیجه CI checkout جدید را در [صفحه Actions branch](https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Fdashboard-v0.1.1) بررسی کنید.
-- کد برای VPS، systemd، credential files و HTTPS آماده شده؛ log ارائه‌شده operator، موفقیت نصب و smoke اجرای واقعی روی VPS را گزارش می‌کند؛ این شاهد محدود به مسیر نصب و اجرای نمونه است. Rootless security acceptance، fault-injection و backup/restore مستقل هنوز تأیید نشده‌اند. update جدید Dashboard از Cloud روی VPS اعمال نشده است.
-- Docker محیط Cloud rootful بود. نتیجه آن پذیرش امنیتی rootless روی VPS نیست.
+- v0.1.2 شامل CLI تعاملی، جست‌وجوی Module در Slot و هشت Module محلی پایش است. [راهنمای اجرای ترمینالی](../development/modules-terminal.md) مجوزها و محدودیت‌ها را شرح می‌دهد.
+- نسخه دارای سابقه نصب و آزمایش توسط کاربر روی VPS است؛ این سابقه همه مسیرهای نسخه جدید را تأیید نمی‌کند. Rootless security acceptance، fault injection و backup/restore مستقل همچنان نیاز به بررسی دارند.
+- آزمون محدود `--unit-only` جای آزمون کامل Docker، Chromium و CI روی commit انتشار را نمی‌گیرد. [وضعیت CI](https://github.com/sina1991/30nA-Hybrid-architecture/actions/workflows/ci.yml) را برای commit موردنظر بررسی کنید.
+- Moduleهای خارجی Website/API، SSL، API Data، Price، Weather و BiQuote/XAUUSD در این نسخه موجود نیستند.
 
 ## ترتیب منابع و حل تعارض
 
