@@ -6,7 +6,7 @@ Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORK
 
 ## نصب کامل روی Ubuntu VPS
 
-یک VPS خالی با **Ubuntu 24.04 LTS**، دسترسی root و دامنه یا subdomain متصل به IP آن آماده کنید. TCP `80/443` باید در firewall سرور و پنل VPS باز باشند. installer، HTTPS رایگان Let’s Encrypt و تمدید آن، Rootless Docker، سرویس‌ها و Worker نمونه را تنظیم می‌کند.
+یک VPS خالی با **Ubuntu 24.04 LTS**، دسترسی root و دامنه یا subdomain متصل به IP آن آماده کنید. TCP `80/443` باید در firewall سرور و پنل VPS باز باشند. installer، HTTPS رایگان Let’s Encrypt با `Certbot --standalone` و تمدید آن، Rootless Docker، سرویس‌ها و Worker نمونه را تنظیم می‌کند.
 
 ```bash
 sudo -i

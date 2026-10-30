@@ -9,7 +9,7 @@ th{background:#eff5fa}pre{direction:ltr;text-align:left;background:#f1f5f9;paddi
 code{direction:ltr;unicode-bidi:isolate;font-family:monospace;overflow-wrap:anywhere}.nowrap{white-space:nowrap;direction:ltr;unicode-bidi:isolate}blockquote{border-right:4px solid #c48a11;padding:8px 16px;margin:16px 0;background:#fff8e7}
 @media print{body{font-size:10pt;padding:0;max-width:none}h1{break-before:page}pre,table{font-size:8pt}tr{break-inside:avoid}a{color:inherit;text-decoration:none}@page{size:A4;margin:16mm}}
 </style><body><h1 id="30na-hybrid-architecture">دفترچه جامع پروژه 30nA Hybrid Architecture</h1>
-<p>تاریخ بررسی: <code>2026-10-30</code>؛ مبنای رفتار برنامه: <code>87ad0ab696276e7fdeb75f118e78185f81e4dfc7</code>.</p>
+<p>تاریخ بررسی: <code>2026-10-30</code>؛ مبنای رفتار برنامه: <code>0948a3f3f33fac3d6795e9409bbbedbd7cbc0a92</code>.</p>
 <p>این کتاب نسخه یک‌جلدی فصل‌های همین پوشه است. فصل‌ها و مرجع ماشینی منبع نگهداری هستند؛ BOOK.md و HTML را دستی ویرایش نکنید.</p>
 <h2 id="_1">فهرست مطالب</h2>
 <ul>
@@ -37,11 +37,11 @@ code{direction:ltr;unicode-bidi:isolate;font-family:monospace;overflow-wrap:anyw
 </ul>
 <p><a id="chapter-00"></a></p>
 <h1 id="_2">۰۰ — دامنه، وضعیت و روش استفاده</h1>
-<p>این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit <code>87ad0ab696276e7fdeb75f118e78185f81e4dfc7</code> روی branch <code>feat/release-readiness</code> است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.</p>
+<p>این دفترچه، مرجع نسخه فعلی Monorepo برای توسعه‌دهنده، operator و کارفرماست. تاریخ بررسی ۲۰۲۶-۱۰-۳۰ و مبنای رفتار برنامه Commit <code>0948a3f3f33fac3d6795e9409bbbedbd7cbc0a92</code> روی branch <code>feat/release-readiness</code> است. تغییر مستندات لزوماً همین SHA را ندارد؛ SHA فوق نسخه کدِ بررسی‌شده است، نه وعده نصب آن روی VPS.</p>
 <h2 id="_3">وضعیت قابل اثبات</h2>
 <ul>
 <li>نسخه فعلی <strong>Release candidate برای demo با Workerهای trusted و ازپیش‌ثبت‌شده</strong> است.</li>
-<li>اجرای کامل محلی روی Python 3.11 و 3.12: <code>303 passed, 65 subtests passed</code>، بدون skipped یا warning.</li>
+<li>آخرین اجرای کامل محلی پیش از اصلاح ورودی و ACME، روی کد <code>87ad0ab</code> و Python 3.11 و 3.12: <code>303 passed, 65 subtests passed</code>، بدون skipped یا warning. اصلاحات جدید installer در هر دو Python با <code>19 passed</code> تست هدف، شامل PTY واقعی و failure recovery، تأیید شده‌اند. CI نسخه جاری در لینک branch قابل بررسی است.</li>
 <li><a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604">CI پیشین c3b97d2</a> روی Ubuntu 24.04 شامل تست‌های هر دو Python، Chromium و security scans موفق بوده است؛ این لینک evidence تاریخی همان SHA است. اصلاحات فعلی به‌صورت محلی در هر دو Python تأیید شده‌اند؛ نتیجه CI checkout جدید را در <a href="https://github.com/sina1991/30nA-Hybrid-architecture/actions?query=branch%3Afeat%2Frelease-readiness">صفحه Actions branch</a> بررسی کنید.</li>
 <li>کد برای VPS، systemd، credential files و HTTPS آماده شده؛ <strong>استقرار واقعی، Rootless host acceptance، fault-injection روی میزبان هدف و backup/restore عملیاتی هنوز تأیید نشده‌اند</strong>.</li>
 <li>Docker محیط Cloud rootful بود. نتیجه آن پذیرش امنیتی rootless روی VPS نیست.</li>
@@ -1425,7 +1425,7 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <h1 id="_45">مرجع ماشینی و پوشش فایل‌ها</h1>
 <p>این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.</p>
-<p>تعداد فایل‌های فنی و پشتیبان: <strong>192</strong>؛ تعداد نمادهای Python: <strong>868</strong>.</p>
+<p>تعداد فایل‌های فنی و پشتیبان: <strong>192</strong>؛ تعداد نمادهای Python: <strong>873</strong>.</p>
 <h2 id="_46">موجودی کامل فایل‌های فنی</h2>
 <table>
 <thead>
@@ -1468,8 +1468,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/CHANGELOG.md">CHANGELOG.md</a></td>
-<td style="text-align: right;">3074</td>
-<td><code>b2449af9794abe29c4f8116284270a08b4c2b74f1238033ad13247d1bfacdb58</code></td>
+<td style="text-align: right;">3438</td>
+<td><code>a1715fc0f6e72e922e994d4f887a72aba6291a8bb8ef18ab7ba2a33dd10cdb69</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/CONTRIBUTING.md">CONTRIBUTING.md</a></td>
@@ -1478,8 +1478,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/README.md">README.md</a></td>
-<td style="text-align: right;">6546</td>
-<td><code>2b27680cd1f944c6758b5a66f36fde840fb5477b9238749268c71089365bbbc5</code></td>
+<td style="text-align: right;">6574</td>
+<td><code>485982298d1161d6957e8f484b876487f3ef033d0d372249f435d842424e9452</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/SECURITY.md">SECURITY.md</a></td>
@@ -1738,8 +1738,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/install.sh">install.sh</a></td>
-<td style="text-align: right;">14486</td>
-<td><code>81b2273e90d6e7b7063abb268f2e1bf762336f8ee0ddc24a4e146d3c0b41eb3a</code></td>
+<td style="text-align: right;">16042</td>
+<td><code>d943918a66c0fc00a9c9dc86b00a65dcff2eb05bd90eb7ac1a6f4192e88472ab</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/requirements-dev.txt">requirements-dev.txt</a></td>
@@ -2118,8 +2118,8 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py">units/consumers/dashboard-core/tests/test_installer.py</a></td>
-<td style="text-align: right;">4965</td>
-<td><code>8c7493a9dd12cb1102611f8114a532f3be158a924f5470cce3de3146efdb582a</code></td>
+<td style="text-align: right;">8578</td>
+<td><code>12b26f91c3be9fbbbee012b54a1f2a556c99a52cc829d3afd0bdfe26213ab35d</code></td>
 </tr>
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_issue26_dice_roller.py">units/consumers/dashboard-core/tests/test_issue26_dice_roller.py</a></td>
@@ -5422,6 +5422,31 @@ with closing(sqlite3.connect(source.as_uri() + '?mode=ro', uri=True)) as src:
 <tr>
 <td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L86">units/consumers/dashboard-core/tests/test_installer.py</a></td>
 <td><code>test_installer_shell_validation_and_help_do_not_provision</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L96">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_valid_installer_contact_passes_validation</code></td>
+<td><code>(email)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L104">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_invalid_installer_contact_is_rejected</code></td>
+<td><code>(email)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L111">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_terminal_paste_wrappers_are_trimmed_without_rewriting_internal_input</code></td>
+<td><code>()</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L120">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_standalone_stops_and_restores_nginx_even_when_acme_fails</code></td>
+<td><code>(tmp_path, certificate_status)</code></td>
+</tr>
+<tr>
+<td><a href="https://github.com/sina1991/30nA-Hybrid-architecture/blob/feat/release-readiness/units/consumers/dashboard-core/tests/test_installer.py#L131">units/consumers/dashboard-core/tests/test_installer.py</a></td>
+<td><code>test_interactive_prompts_accept_normal_email_in_a_real_terminal</code></td>
 <td><code>()</code></td>
 </tr>
 <tr>

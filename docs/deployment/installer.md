@@ -8,7 +8,7 @@
 
 برای روش خودکار فعلی، یک دامنه یا subdomain مانند `dashboard.example.com` لازم است. رکورد `A` را به IPv4 همین VPS و فقط در صورت فعال بودن IPv6، `AAAA` را به IPv6 درست آن متصل کنید. نیازی به خرید certificate نیست: installer با Certbot، certificate عمومی رایگان Let’s Encrypt را دریافت و timer تمدید و reload Nginx را تنظیم می‌کند. IP خام در این installer پذیرفته نمی‌شود؛ این محدودیت مسیر نصب فعلی است، نه ادعای ناممکن‌بودن HTTPS روی IP.
 
-TCP **80 و 443** باید از اینترنت به همین سرور برسند؛ در firewall پنل VPS نیز آن‌ها را باز کنید. اگر UFW از قبل فعال باشد، installer فقط این دو port را اجازه می‌دهد؛ UFW را enable/reset نمی‌کند و قانون SSH را تغییر نمی‌دهد. certificate با HTTP-01 دریافت می‌شود؛ DNS اشتباه، AAAA خراب، CDN/proxy ناسازگار یا port 80 بسته، نصب را متوقف می‌کند. DNS اولیه با resolve بررسی می‌شود؛ اثبات دسترسی عمومی هنگام challenge انجام می‌شود.
+TCP **80 و 443** باید از اینترنت به همین سرور برسند؛ در firewall پنل VPS نیز آن‌ها را باز کنید. اگر UFW از قبل فعال باشد، installer فقط این دو port را اجازه می‌دهد؛ UFW را enable/reset نمی‌کند و قانون SSH را تغییر نمی‌دهد. certificate با `Certbot --standalone` و HTTP-01 دریافت می‌شود؛ DNS اشتباه، AAAA خراب، CDN/proxy ناسازگار یا port 80 بسته، نصب را متوقف می‌کند. DNS اولیه با resolve بررسی می‌شود؛ اثبات دسترسی عمومی هنگام challenge انجام می‌شود.
 
 برای اتصالات داخلی، certificate خصوصی با SANهای `localhost` و `127.0.0.1` ساخته می‌شود و trust صریح تنظیم می‌گردد؛ نیازی به چند دامنه عمومی نیست. TLS verification و hostname check خاموش نمی‌شوند.
 
@@ -104,6 +104,10 @@ systemctl status certbot.timer
 certbot renew --dry-run
 ```
 
-HTTP port 80 برای renewal باز بماند. deploy hook فقط پس از certificate renewal موفق، `nginx -t` و reload را انجام می‌دهد. انقضای certificate و نتیجه timer را monitor کنید؛ فعال بودن timer به‌تنهایی تضمین دسترسی ACME در آینده نیست. certificate داخلی ده‌ساله است و باید پیش از انقضا با rollout هماهنگ certificate/trust سرویس‌ها تعویض شود؛ Certbot آن را تمدید نمی‌کند.
+HTTP port 80 برای renewal باز بماند. برای certificate جدید با authenticator `standalone`، pre-hook پیش از renewal، Nginx را متوقف می‌کند و post-hook پس از تلاش renewal، Nginx را دوباره راه می‌اندازد؛ در این فاصله Dashboard موقتاً در دسترس نیست. deploy hook، config را با `nginx -t` بررسی می‌کند و فقط اگر Nginx فعال باشد reload می‌کند. هنگام نصب اولیه نیز Nginx حتی پس از خطای ACME دوباره start می‌شود. certificateهای قدیمی webroot تا reconfigure صریح روش قبلی خود را حفظ می‌کنند. انقضای certificate و نتیجه timer را monitor کنید؛ فعال بودن timer به‌تنهایی تضمین دسترسی ACME در آینده نیست. certificate داخلی ده‌ساله است و باید پیش از انقضا با rollout هماهنگ certificate/trust سرویس‌ها تعویض شود؛ Certbot آن را تمدید نمی‌کند.
 
 پیش از تحویل نهایی، [پذیرش Sandbox روی میزبان](../security/production-host-sandbox-acceptance.md)، daemon fault injection روی VM disposable، [backup/restore](../manual/15-backup-and-recovery.md)، identity و Release review لازم‌اند. نصب موفق را معادل تأیید امنیت اجرای کد ناشناس یا Production-ready ندانید.
+
+## ورودی email و حالت standalone
+
+email معمولی معتبر پذیرفته می‌شود؛ `--standalone` روش پاسخ‌دادن به challenge است و نیاز به ثبت حساب ACME را حذف نمی‌کند. installer فاصله و کاراکترهای جهت متن در ابتدا و انتهای ورودی Pasteشده را پاک می‌کند؛ کاراکتر نامعتبر داخل آدرس را تغییر نمی‌دهد. برای عبور از prompt می‌توانید `--domain` و `--email` را صریح بدهید. تست‌های جداگانه، email معتبر و نامعتبر، Paste و مسیر interactive در PTY واقعی را بررسی می‌کنند؛ mock سیستم نیز توقف/start مجدد Nginx پس از موفقیت و شکست ACME را می‌سنجد.

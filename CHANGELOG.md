@@ -32,3 +32,8 @@ Production release remains gated on reviewed rootless target-host acceptance, li
 - Add a fresh-host Ubuntu 24.04 installer with dedicated Rootless Docker, generated owner-bound credentials, systemd services and Nginx.
 - Obtain and renew a public Let’s Encrypt certificate for the supplied Dashboard domain; keep private upstream TLS on loopback.
 - Gate completion on Build/publication and real Dashboard BFF success/failure verification; preserve install credentials and SHA when resuming.
+
+## Unreleased — ACME standalone and contact input
+
+- Use Certbot standalone HTTP-01, stopping and restoring installer-owned Nginx even after issuance failure; configure standalone renewal pre/post hooks.
+- Normalize outer terminal paste whitespace/direction wrappers while preserving strict address validation; test valid/invalid contacts and real PTY prompts.

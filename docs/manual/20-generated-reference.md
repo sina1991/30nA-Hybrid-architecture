@@ -3,7 +3,7 @@
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **192**؛ تعداد نمادهای Python: **868**.
+تعداد فایل‌های فنی و پشتیبان: **192**؛ تعداد نمادهای Python: **873**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -15,9 +15,9 @@
 | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
 | [AGENTS.md](../../AGENTS.md) | 1710 | `92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d` |
-| [CHANGELOG.md](../../CHANGELOG.md) | 3074 | `b2449af9794abe29c4f8116284270a08b4c2b74f1238033ad13247d1bfacdb58` |
+| [CHANGELOG.md](../../CHANGELOG.md) | 3438 | `a1715fc0f6e72e922e994d4f887a72aba6291a8bb8ef18ab7ba2a33dd10cdb69` |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
-| [README.md](../../README.md) | 6546 | `2b27680cd1f944c6758b5a66f36fde840fb5477b9238749268c71089365bbbc5` |
+| [README.md](../../README.md) | 6574 | `485982298d1161d6957e8f484b876487f3ef033d0d372249f435d842424e9452` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
 | [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
 | [agents/base-prompt.md](../../agents/base-prompt.md) | 5002 | `967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a` |
@@ -69,7 +69,7 @@
 | [examples/demo-summary/demo_worker.py](../../examples/demo-summary/demo_worker.py) | 691 | `339e8d841d6a233bba5d48cd5373d03a96bd68db1f9ec486cacb63c92e303a0f` |
 | [examples/demo-summary/tests/__init__.py](../../examples/demo-summary/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [examples/demo-summary/tests/test_demo.py](../../examples/demo-summary/tests/test_demo.py) | 463 | `17eef4278b29454ff646e90c360db40e86e2c90396ec41938b18f6b78e6d8d1f` |
-| [install.sh](../../install.sh) | 14486 | `81b2273e90d6e7b7063abb268f2e1bf762336f8ee0ddc24a4e146d3c0b41eb3a` |
+| [install.sh](../../install.sh) | 16042 | `d943918a66c0fc00a9c9dc86b00a65dcff2eb05bd90eb7ac1a6f4192e88472ab` |
 | [requirements-dev.txt](../../requirements-dev.txt) | 191 | `baa71328e392be7ddb0840fff882f389a2ee21c1d5f96cea2c87b7bdf7cae04d` |
 | [requirements-docs.lock](../../requirements-docs.lock) | 371 | `6bd1ef812562571e65c9d9e4152ff06caa9c93aa23e079f25d630fd1bf1e3876` |
 | [requirements-docs.txt](../../requirements-docs.txt) | 104 | `a5f88176f3e70130d2af9dd3f55e17a4080489288844d229d585d543a164c0b3` |
@@ -145,7 +145,7 @@
 | [units/consumers/dashboard-core/requirements.txt](../../units/consumers/dashboard-core/requirements.txt) | 35 | `db7518ee2c4a66fe896a926b2f2024ab7a8cf85c0f0d3d0827388da44234e223` |
 | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py) | 887 | `7297377436f1100bd7097db30d78183ebcc9683434f078b497bb951224d736d6` |
 | [units/consumers/dashboard-core/tests/test_demo_seed.py](../../units/consumers/dashboard-core/tests/test_demo_seed.py) | 1782 | `689e6c3a35708d88e7ac8f3d69d0298eec5d26a71a2d7cb8c6c3c21c97cb123e` |
-| [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py) | 4965 | `8c7493a9dd12cb1102611f8114a532f3be158a924f5470cce3de3146efdb582a` |
+| [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py) | 8578 | `12b26f91c3be9fbbbee012b54a1f2a556c99a52cc829d3afd0bdfe26213ab35d` |
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py) | 1034 | `7d3066b58ba3b049424dfa54cef414e4b5d5bbaa3b312c853212614266a53bb7` |
 | [units/consumers/dashboard-core/tests/test_public_api.py](../../units/consumers/dashboard-core/tests/test_public_api.py) | 5718 | `412284d0158636ec9b1241252b21a3cc8c7ed4f4e24d9f2b9304eb0af970fd25` |
 | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py) | 5974 | `4780e8e8a2c632f3e96a0fff2589f556d4b2971b25adc95145d72bdd6b4e4817` |
@@ -992,6 +992,11 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L81) | `test_verification_rejects_false_success_and_uses_bff_routes.WrongResult.post` | `(self, *args)` |
 | [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L82) | `test_verification_rejects_false_success_and_uses_bff_routes.WrongResult.get` | `(self, *args)` |
 | [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L86) | `test_installer_shell_validation_and_help_do_not_provision` | `()` |
+| [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L96) | `test_valid_installer_contact_passes_validation` | `(email)` |
+| [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L104) | `test_invalid_installer_contact_is_rejected` | `(email)` |
+| [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L111) | `test_terminal_paste_wrappers_are_trimmed_without_rewriting_internal_input` | `()` |
+| [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L120) | `test_standalone_stops_and_restores_nginx_even_when_acme_fails` | `(tmp_path, certificate_status)` |
+| [units/consumers/dashboard-core/tests/test_installer.py](../../units/consumers/dashboard-core/tests/test_installer.py#L131) | `test_interactive_prompts_accept_normal_email_in_a_real_terminal` | `()` |
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py#L11) | `DiceRollerModuleTests` | `class` |
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py#L12) | `DiceRollerModuleTests.test_dice_roller_is_registered_in_the_api_catalog` | `(self)` |
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py#L19) | `DiceRollerModuleTests.test_dice_roller_has_bounded_accessible_controls` | `(self)` |
