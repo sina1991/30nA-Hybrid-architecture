@@ -8,6 +8,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 
 from .modules.registry import list_modules
+from .modules.packages.clock.clock import current_time
+from zoneinfo import ZoneInfoNotFoundError
 
 BASE_DIR = Path(__file__).resolve().parent
 THEMES_DIR = BASE_DIR / "themes"
@@ -86,6 +88,16 @@ def get_theme(theme_id: str) -> dict:
             return theme
 
     raise HTTPException(status_code=404, detail="Theme not found")
+
+
+@app.get("/api/modules/clock")
+def clock_time(timezone: str | None = None) -> dict:
+    try:
+        if timezone is not None and (not timezone or len(timezone) > 128):
+            raise ValueError("Invalid time zone")
+        return {"time": current_time(timezone)}
+    except (ValueError, ZoneInfoNotFoundError):
+        raise HTTPException(status_code=422, detail="Unknown time zone") from None
 
 
 @app.get("/api/modules")
@@ -341,11 +353,18 @@ function renderModuleContent(body, slot, moduleId) {
     display.setAttribute("aria-label", "زمان محلی");
     body.append(makeElement("div", "module-title", module.name), display,
       makeElement("div", "module-detail", "زمان محلی مرورگر"));
-    function updateClock() {
-      display.textContent = new Intl.DateTimeFormat("fa-IR", {
-        hour: "2-digit", minute: "2-digit", second: "2-digit"
-      }).format(new Date());
-      setTimeout(() => { if (display.isConnected) updateClock(); }, 1000);
+    async function updateClock() {
+      try {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const response = await fetch("/api/modules/clock?timezone=" + encodeURIComponent(timezone), {cache:"no-store"});
+        if (!response.ok) throw new Error("Clock unavailable");
+        const data = await response.json();
+        display.textContent = data.time;
+      } catch (_) {
+        display.textContent = "دریافت ساعت ممکن نیست.";
+      } finally {
+        setTimeout(() => { if (display.isConnected) updateClock(); }, 1000);
+      }
     }
     updateClock();
     return;
