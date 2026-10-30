@@ -1,7 +1,7 @@
 {
   "title": "دفترچه جامع پروژه 30nA Hybrid Architecture",
   "date": "2026-10-30",
-  "application_commit": "c3b97d2ce8365a3beafd04e3e49465de2181ea59",
+  "application_commit": "610983301f90748b8ffe7aae732427ccd729aa13",
   "ci_url": "https://github.com/sina1991/30nA-Hybrid-architecture/actions/runs/40976228604",
   "chapters": [
     "00-reading-and-status.md",

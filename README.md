@@ -10,6 +10,20 @@ Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORK
 
 معماری، APIها، تنظیمات، توسعه، Docker، Ubuntu، امنیت، DB، backup/recovery، تست، تحویل و مرجع ماشینی فایل‌ها در ۲۱ فصل ارائه شده‌اند. اسناد baseline قدیمی از مرجع فعلی جدا هستند.
 
+## معماری و نمای Dashboard
+
+![نمودار معماری و مرز سرویس‌ها](docs/assets/architecture.svg)
+
+هر اتصال سرویس، identity همان owner را حفظ می‌کند. Build و اجرای Worker در Docker جدا انجام می‌شوند؛ جزئیات مرزها در [فصل معماری](docs/manual/01-architecture.md) است. [منبع نمودار](docs/assets/architecture.dot) با Graphviz قابل بازتولید است.
+
+![اجرای موفق Worker نمونه در Dashboard](docs/assets/dashboard-execution.png)
+
+Screenshot از تست واقعی محلی Chromium → Dashboard → Manager → Runtime با Artifact ساخته‌شده در Docker است؛ ورودی `[10,20,30]`، مجموع `60` را برگردانده است. این تصویر مربوط به VPS نیست و هیچ tokenی در آن نمایش داده نمی‌شود.
+
+## راهنمای Agentهای هوش مصنوعی
+
+[راهنمای فنی مستقل Agent](docs/AGENT_GUIDE.md) شامل نقشه تغییر، توابع و signatureها، APIها، schemaها، envها و تست‌های مرتبط است. [AGENTS.md](AGENTS.md) نقطه ورود Agent به مخزن است.
+
 ## شروع توسعه
 
 Python 3.11 یا 3.12، Docker و OpenSSL لازم‌اند. برای تست کامل UI، Node و Chrome/Chromium نیز لازم است. از checkout موجود استفاده کنید؛ Git worktree تازه لازم نیست.

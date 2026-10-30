@@ -27,22 +27,23 @@
 | endpoint سالم ولی اجرا خراب | provider/auth/image/Artifact | یک functional request معتبر لازم است |
 | SSH از Cloud وصل نمی‌شود | policy TCP و credential امن | تغییر VPS به‌تنهایی مسیر Cloud را ایجاد نمی‌کند؛ راه دور تأییدنشده را ادعا نکنید |
 
-## اختلاف‌های تأییدشده اسناد/implementation
+## اختلاف‌های باز اسناد/implementation
 
 | مورد | واقعیت و اثر | معیار رفع |
 |---|---|---|
-| `contracts/worker/contract.yaml` | endpoint قدیمی و `sandbox:false` با Runtime جدید هم‌راستا نیست | قرارداد نهایی versioned و تطبیق consumerها؛ فعلاً OpenAPI فعلی و کد ملاک HTTP است |
-| `contracts/code/api/contract.yaml` | build/publish هنوز reserved توصیف شده، ولی implementation واقعی دارد؛ metadata همچنان 501 است | sync قرارداد با implementation بدون مخلوط‌کردن metadata/download |
 | DATA envelope | موفقیت raw است، در حالی که Dashboard PublicAPI envelope می‌خواهد | adapter/contract صریح و real-service test برای DATA direct |
 | Agent08 code-manager | backend امن provision نمی‌شود؛ proof demo متفاوت است | wiring sandbox/provider/hash/identity و acceptance مستقل |
-| Runtime terminal result | validation اولیه بعضی درخواست‌ها قبل از duplicate execution-ID check، `_finish` را صدا می‌زند؛ ورودی نامعتبر با ID قبلی می‌تواند snapshot terminal قبلی را بازنویسی کند | جلوگیری از overwrite و regression test برای reuse نامعتبر ID؛ Manager/UI عادی UUID تازه تولید می‌کنند |
 | Runtime children در HTTP | library پشتیبانی دارد ولی production definitions را populate نمی‌کند | مسیر owner-scoped provisioning و E2E children |
 | CA خصوصی | trust source HTTPX/urllib/browser یکسان فرض نشود | آزمون deployment با CA واقعی همه clientها |
 | trace | gateway WSGI، HTTP_X_* را حذف می‌کند | policy امن correlation و propagation سرتاسری تست‌شده |
-| registry Agent | مسیر تاریخی `contracts/consumer` با محل فعلی `contracts/dashboard` یکی نیست | به‌روزرسانی registry با scope و مرجع صحیح در تغییر جداگانه |
-| بعضی docstringها | متن قدیمی از اجرای source/نبود sandbox خبر می‌دهد | تغییر مستندات نزدیک کد با review؛ رفتار واقعی Build/Runtime در این دفترچه مشخص است |
 
-در این task documentation، schema عملیاتی یا منطق برنامه برای پنهان‌کردن این اختلاف‌ها تغییر داده نمی‌شود. اختلاف در قرارداد versioned، تصمیم جداگانه با تست لازم است.
+## موارد اصلاح‌شده در بازبینی سراسری
+
+- قرارداد CODE برای Build، history، publish و download با implementation هماهنگ شد؛ metadata Artifact همچنان 501 است.
+- Worker YAML اکنون مسیر `/content` و Sandbox اجباری HTTP را توصیف می‌کند؛ `parent_execution_id` به‌عنوان ورودی HTTP معرفی نمی‌شود.
+- registry مالکیت Dashboard و READMEهای فعال و استانداردهای توسعه اصلاح شدند.
+- Manager → Runtime اکنون CA خصوصی را با `ca_file` و verification کامل می‌پذیرد؛ acceptance با CA واقعی VPS همچنان ضروری است.
+- ایراد بازنویسی history Runtime رفع شد؛ جزئیات regression در ادامه آمده است.
 
 ## مرزهای محصول و عملیات باز
 
@@ -54,6 +55,6 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 
 تغییر implementation/contract/docs هم‌راستا؛ تست مرتبط و منفی اجراشده؛ CI SHA صحیح؛ اثر migration/rollback روشن؛ evidence میزبان برای ریسک‌های عملیاتی؛ محدودیت باقی‌مانده شفاف. هیچ فایل dummy، تست skipped یا تغییر expected hash برای ساختن ظاهر موفقیت پذیرفته نیست. Release candidate را تا پایان gateهای هدف، Production-ready معرفی نکنید.
 
-## بازتولید مورد terminal history در Runtime
+## ایراد رفع‌شده history در Runtime
 
-در بررسی documentation، یک Runtime بدون backend با ZIP trusted در حافظه ساخته شد. درخواست با ID تازه به terminal failed با `SANDBOX_UNAVAILABLE` رسید؛ همان ID با entrypoint نامعتبر `worker:invalid-name` دوباره submit شد و history آن به error `INVALID_INPUT` تغییر کرد. هیچ subprocess یا credential/DB عملیاتی در این بازتولید استفاده نشد. این مشاهده مربوط به محتوای snapshot terminal است، نه ادعای اجرای موفق قبلی. تا اصلاح، مصرف‌کننده مستقیم Runtime نباید ID قبلی را با request متفاوت reuse کند؛ این محدودیت باید با test و fix مستقل برطرف شود.
+در بازبینی، درخواست اولیه با ID تازه به `SANDBOX_UNAVAILABLE` رسید؛ submit مجدد همان ID با entrypoint نامعتبر، snapshot قبلی را به `INVALID_INPUT` تغییر می‌داد. اکنون check و ثبت validation failure زیر همان lock انجام می‌شوند و ID قبلی با `EXECUTION_CONFLICT` رد می‌شود. تست‌های `test_history_reuse.py`، وضعیت‌های succeeded/failed/cancelled با چهار نوع ورودی نامعتبر، حفظ history و idempotency پس از restart SQLite و حفظ اجرای running را بررسی می‌کنند. رفتار replay معتبر همان key تغییر نکرده است.

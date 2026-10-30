@@ -32,7 +32,7 @@
   --manager-token-file /SECURE/PATH/manager-token
 ```
 
-URLها و مسیرهای placeholder را با تنظیمات واقعی جایگزین کنید. فایل token باید private و با mode `0400` یا `0600` باشد. مقدار token را در command line، Chat یا log وارد نکنید. TLS verification فعال می‌ماند؛ CA خصوصی باید در trust store سیستم معتبر باشد.
+URLها و مسیرهای placeholder را با تنظیمات واقعی جایگزین کنید. فایل token باید private و با mode `0400` یا `0600` باشد. مقدار token را در command line، Chat یا log وارد نکنید. TLS verification فعال می‌ماند؛ برای seed که از urllib استفاده می‌کند، CA خصوصی باید در trust پیش‌فرض Python/OpenSSL معتبر باشد؛ در صورت نیاز `SSL_CERT_FILE` را برای همان process به PEM معتبر تنظیم کنید. تنظیم Manager → Runtime جداست و از `ca_file` در mapping هر owner استفاده می‌کند؛ [راهنمای TLS](ubuntu.md) را ببینید.
 
 اسکریپت source مورداعتماد `examples/demo-summary/` را ثبت می‌کند، تست‌های آن را در Docker Build اجرا می‌کند، Artifact را از Publication Gate عبور می‌دهد و Worker با نام `demo-summary` را ثبت و فعال می‌کند. تغییر محتوای همان source version یا reference متفاوت Worker موجود با خطا متوقف می‌شود و overwrite نمی‌شود. تکرار روی همان کد/image مجاز است؛ Worker عمداً disabledشده دوباره خودکار فعال نمی‌شود.
 

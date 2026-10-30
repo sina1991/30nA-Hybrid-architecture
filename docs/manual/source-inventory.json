@@ -32,7 +32,7 @@
     ],
     [
       "scripts/documentation/build_manual.py",
-      158,
+      173,
       "--check"
     ],
     [
@@ -189,6 +189,12 @@
       "required lookup"
     ],
     [
+      "DASHBOARD_SCREENSHOT",
+      "units/worker-runtime/tests/control_plane_helper.py",
+      107,
+      "optional lookup"
+    ],
+    [
       "DASHBOARD_SKIP_BROWSER",
       "units/consumers/dashboard-core/tests/test_browser.py",
       12,
@@ -197,7 +203,7 @@
     [
       "DASHBOARD_SKIP_BROWSER",
       "units/worker-runtime/tests/control_plane_helper.py",
-      100,
+      103,
       "optional lookup"
     ],
     [
@@ -418,12 +424,12 @@
     [
       "ARTIFACT_HASH_MISMATCH",
       "units/worker-runtime/worker_runtime/runtime.py",
-      189
+      200
     ],
     [
       "ARTIFACT_HASH_MISMATCH",
       "units/worker-runtime/worker_runtime/runtime.py",
-      228
+      239
     ],
     [
       "ARTIFACT_INTEGRITY_FAILED",
@@ -443,7 +449,7 @@
     [
       "ARTIFACT_INVALID",
       "units/worker-runtime/worker_runtime/runtime.py",
-      243
+      254
     ],
     [
       "ARTIFACT_NOT_FOUND",
@@ -463,7 +469,7 @@
     [
       "ARTIFACT_UNAVAILABLE",
       "units/worker-runtime/worker_runtime/runtime.py",
-      226
+      237
     ],
     [
       "BUILD_INVALID",
@@ -528,22 +534,22 @@
     [
       "CAPACITY_EXCEEDED",
       "units/worker-runtime/worker_runtime/runtime.py",
-      245
+      256
     ],
     [
       "CHILD_FAILED",
       "units/worker-runtime/worker_runtime/runtime.py",
-      384
+      395
     ],
     [
       "CHILD_LIMIT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      360
+      371
     ],
     [
       "CHILD_NOT_FOUND",
       "units/worker-runtime/worker_runtime/runtime.py",
-      369
+      380
     ],
     [
       "CONFLICT",
@@ -573,32 +579,37 @@
     [
       "DEPTH_LIMIT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      171
+      182
     ],
     [
       "EXECUTION_CONFLICT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      203
+      170
+    ],
+    [
+      "EXECUTION_CONFLICT",
+      "units/worker-runtime/worker_runtime/runtime.py",
+      214
     ],
     [
       "EXECUTION_ERROR",
       "units/worker-runtime/worker_runtime/runtime.py",
-      327
+      338
     ],
     [
       "EXECUTION_ERROR",
       "units/worker-runtime/worker_runtime/runtime.py",
-      345
+      356
     ],
     [
       "EXECUTION_ERROR",
       "units/worker-runtime/worker_runtime/runtime.py",
-      352
+      363
     ],
     [
       "EXECUTION_ERROR",
       "units/worker-runtime/worker_runtime/runtime.py",
-      355
+      366
     ],
     [
       "FORBIDDEN",
@@ -613,7 +624,7 @@
     [
       "IDEMPOTENCY_CONFLICT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      200
+      211
     ],
     [
       "INTERNAL_ERROR",
@@ -628,12 +639,12 @@
     [
       "INVALID_INPUT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      194
+      205
     ],
     [
       "INVALID_INPUT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      366
+      377
     ],
     [
       "INVALID_RESPONSE",
@@ -683,7 +694,7 @@
     [
       "OUTPUT_LIMIT_EXCEEDED",
       "units/worker-runtime/worker_runtime/runtime.py",
-      343
+      354
     ],
     [
       "RUNTIME_RESTARTED",
@@ -698,7 +709,7 @@
     [
       "SANDBOX_UNAVAILABLE",
       "units/worker-runtime/worker_runtime/runtime.py",
-      248
+      259
     ],
     [
       "SERVICE_UNAVAILABLE",
@@ -833,12 +844,12 @@
     [
       "TIMEOUT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      321
+      332
     ],
     [
       "TIMEOUT",
       "units/worker-runtime/worker_runtime/runtime.py",
-      371
+      382
     ],
     [
       "UNSUPPORTED_CONTRACT_VERSION",
@@ -863,9 +874,9 @@
       "sha256": "76565420d6347129e8c1b99ae259c764efa836509053365541eacebc5c27e188"
     },
     {
-      "bytes": 95,
+      "bytes": 108,
       "path": ".gitattributes",
-      "sha256": "b1e8ca1456a74e03820e949faba7cfeb0eb1cb93b77148d0c29d5661ced884dc"
+      "sha256": "5c74770b9a41953e78518fc6f380870b3d0b1b7985a19f8cd6ad52e8bcd07b08"
     },
     {
       "bytes": 4601,
@@ -873,9 +884,9 @@
       "sha256": "43337a0b754e591affe6f08657892e35202a16978aa7ca8f5086f8dda730b088"
     },
     {
-      "bytes": 3888,
+      "bytes": 3917,
       "path": ".github/workflows/ci.yml",
-      "sha256": "52a16299581863bc096d010a9c476f7a70a559c8585b4967bfabe882fe67316b"
+      "sha256": "889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf"
     },
     {
       "bytes": 265,
@@ -883,19 +894,24 @@
       "sha256": "0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e"
     },
     {
-      "bytes": 2065,
+      "bytes": 1710,
+      "path": "AGENTS.md",
+      "sha256": "92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d"
+    },
+    {
+      "bytes": 2616,
       "path": "CHANGELOG.md",
-      "sha256": "0357930b097d304bd9d6c3dd2ef980a8281dd2b071fd0f488bfd42ec516d67c6"
+      "sha256": "a0e00efbcf9dcc3a6cb2dad170a1a221287d74d804d8d4e5b5b3bc2fd34b13c6"
     },
     {
-      "bytes": 2561,
+      "bytes": 2817,
       "path": "CONTRIBUTING.md",
-      "sha256": "c11506b334424145f69e772f2a4e78075d8d229a980db7bdc627f016ea018f2b"
+      "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 3705,
+      "bytes": 4920,
       "path": "README.md",
-      "sha256": "1bb443a0b86ceb166e86ea010636bb29f9475130e436d7d68e7489144b66b056"
+      "sha256": "3ea86d5c3f477d33bc333ed168060f2940b0f8c50b87244c62668f1d4a725f25"
     },
     {
       "bytes": 1866,
@@ -903,9 +919,9 @@
       "sha256": "341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655"
     },
     {
-      "bytes": 4233,
+      "bytes": 4234,
       "path": "agents/README.md",
-      "sha256": "3550ee06bcca6f0ddf73f5f4639096c942a19d96d292bd025ee737a5bbbde662"
+      "sha256": "636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f"
     },
     {
       "bytes": 5002,
@@ -923,9 +939,9 @@
       "sha256": "668f3c984f15966f242731b8eed9dcdb19519cd01a1267c0b6a9475eba2f3c6e"
     },
     {
-      "bytes": 3332,
+      "bytes": 4266,
       "path": "contracts/code/api/contract.yaml",
-      "sha256": "6092da1e55ea76223325f080ea666f713cfcd4eb0582a2c105ff259784eab0c6"
+      "sha256": "777bc4bf227a8fb98ff2c6f475b07851a80fac8a7b36fa4f87c80dcebd79da88"
     },
     {
       "bytes": 3184,
@@ -1093,14 +1109,14 @@
       "sha256": "a428e57aa90aa0e31bcdc35ea8308a24fa34b9087242e330028ff6fe41c536e9"
     },
     {
-      "bytes": 2510,
+      "bytes": 2032,
       "path": "contracts/worker/README.md",
-      "sha256": "3e9b40a3096f8435e1e225698e243529d6baf1482364baa3077509f8cd741e93"
+      "sha256": "4d330cd753ad143a1af46237f79305b122623a4828997ada4f717c1417984201"
     },
     {
-      "bytes": 1293,
+      "bytes": 1791,
       "path": "contracts/worker/contract.yaml",
-      "sha256": "16850163fdf9f1bf25a2d66f87cc950c45de789b6ac393a8b744f3b7f4e5a694"
+      "sha256": "d046ca2059196d0b12aadcfe5a5e639d792bc389c0c8b1e476aa17f42f6d6674"
     },
     {
       "bytes": 97456,
@@ -1208,9 +1224,9 @@
       "sha256": "3443bd17d389f8cd8e500ce70138239f9037a00418237d0851a25aa3145000a6"
     },
     {
-      "bytes": 12099,
+      "bytes": 13014,
       "path": "scripts/documentation/build_manual.py",
-      "sha256": "88b4a2f0b47fec6286cb570cd7ed297e9afcbe99c0f760930a27d5cccdd7ce08"
+      "sha256": "b35c24b03ef7c20564d3b0c3123cba19d0f53f46fa3c56d263173019d91c7ae9"
     },
     {
       "bytes": 4521,
@@ -1258,9 +1274,9 @@
       "sha256": "1170efd7f23978c79fb04db74e7a7aaf5f6479a1ea97f7aa0baebe5e26049a8f"
     },
     {
-      "bytes": 30937,
+      "bytes": 30977,
       "path": "units/code-manager/code_manager/api.py",
-      "sha256": "5ee1295cd58ce255ee81189e3dd46d926774d89cef53e423d62cfd1b579a2557"
+      "sha256": "50825f5d1e1f7d50b0251cec57d5c620cf7ba1b8a33e4cb7128aa6f0ac218191"
     },
     {
       "bytes": 836,
@@ -1388,14 +1404,14 @@
       "sha256": "6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0"
     },
     {
-      "bytes": 4229,
+      "bytes": 4394,
       "path": "units/consumers/dashboard-core/README.md",
-      "sha256": "2c2bd5dd7c02fded9467b8a8e99f96edc27d38cb47731ea79429b2d6e1f6de09"
+      "sha256": "9e097b0a43ddd4d2199d9859c0247bbe4ae946eec4ba462471d59ba34a843925"
     },
     {
-      "bytes": 8302,
+      "bytes": 8497,
       "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "9d918dcd1c937b3212e47c15b468c516c74e977d322bde8d7ee1691df8039b5b"
+      "sha256": "3e3360524dcbff03407e3dc0681de213ce09ca1628cdd9ae56b10bfbd5e011f9"
     },
     {
       "bytes": 1765,
@@ -1533,9 +1549,9 @@
       "sha256": "4780e8e8a2c632f3e96a0fff2589f556d4b2971b25adc95145d72bdd6b4e4817"
     },
     {
-      "bytes": 2924,
+      "bytes": 2923,
       "path": "units/data-manager/README.md",
-      "sha256": "a5494d6e193db73bc93c0c802904e60163adff51c487e3531ba3778f0a57bdaf"
+      "sha256": "68a95bf1737bb4f9fdbda0710cf1870e0029e3620761598fcee16d19daa3dd6f"
     },
     {
       "bytes": 0,
@@ -1603,14 +1619,19 @@
       "sha256": "a5f5bfb409a6bacd67d6baefca909cbda9237301757e939e07f434a988b1c378"
     },
     {
-      "bytes": 5140,
+      "bytes": 2747,
       "path": "units/worker-manager/README.md",
-      "sha256": "4fe8d150153683469578f1e10d853bc0aa8a0724e0d053ff5129882ad07f3d9f"
+      "sha256": "60c21b2fff146cfeaa412680b34d8b07f5180fdaffc5801a54cf25be0fe5cb0f"
     },
     {
       "bytes": 7946,
       "path": "units/worker-manager/tests/test_control_api.py",
       "sha256": "9f685170dd0b0807e3e2661a54363cdfae71e3a224066b33f503626a18e41f51"
+    },
+    {
+      "bytes": 852,
+      "path": "units/worker-manager/tests/test_gateway_tls.py",
+      "sha256": "a7470d6ce67839e0606f18490dad288e40cf8e7a2685dca8fff659e416b9cd37"
     },
     {
       "bytes": 4108,
@@ -1648,9 +1669,9 @@
       "sha256": "9b2d503ecb32d6fe129c9b1c2daa248cead9687e3a2b36470d86fbb9fbc0be04"
     },
     {
-      "bytes": 2395,
+      "bytes": 2933,
       "path": "units/worker-manager/worker_manager/http_gateway.py",
-      "sha256": "f9d4cc9faba6ac3b2b012c9a29e3889d984658bd7dfb689bcdd799e16f08cc03"
+      "sha256": "888c12455bebf6737ebe5e147f2dc45d413b22bbf90a2874f101755759c205b3"
     },
     {
       "bytes": 2915,
@@ -1658,9 +1679,9 @@
       "sha256": "561835b42cdd36c54303581701c162f4d67a3eed2884c8c4ea0401421178b431"
     },
     {
-      "bytes": 862,
+      "bytes": 891,
       "path": "units/worker-manager/worker_manager/production.py",
-      "sha256": "194c338ea711c59e629edfafb6cc54cd401f45ab0b723a10d87206298e7b8bb5"
+      "sha256": "75efea78f73ca1ff8661ead38acf95ef7aa049afc82ee3758a0e5f7e155bfddf"
     },
     {
       "bytes": 1881,
@@ -1678,14 +1699,14 @@
       "sha256": "1ab946a64e2844b8a81b231a8d57428f0e6f34d2d6f2078bbdad2b6badc172fe"
     },
     {
-      "bytes": 7721,
+      "bytes": 7799,
       "path": "units/worker-runtime/README.md",
-      "sha256": "f42a8c94d97990119f06e7a248124b8daa7a0bd24e21d81b9b02a51b0184bd3e"
+      "sha256": "927188b494450962688cb4422c855902fb480ecb0fb7502665b3f544c74ca064"
     },
     {
-      "bytes": 6944,
+      "bytes": 7113,
       "path": "units/worker-runtime/tests/control_plane_helper.py",
-      "sha256": "ef739c8f6ab9e28fab0896e2939d8ab1b73de7fa6f5907eb4910e4194e4be93a"
+      "sha256": "30f0ce1f3b69dcb89f1188458d3afc007566ac5c0ae3b27547a0cb65cc816928"
     },
     {
       "bytes": 237,
@@ -1711,6 +1732,11 @@
       "bytes": 15478,
       "path": "units/worker-runtime/tests/test_docker_sandbox_integration.py",
       "sha256": "8610d2d69f7989867576d54e24962bd44eb1544c7c2b9141ba878686fc7825cb"
+    },
+    {
+      "bytes": 3782,
+      "path": "units/worker-runtime/tests/test_history_reuse.py",
+      "sha256": "cc52d66f93947d28a484ba9550cd475e7b639bc06b5f616327e46a2e78125e3c"
     },
     {
       "bytes": 2527,
@@ -1773,9 +1799,9 @@
       "sha256": "6cc8b877e8c59b75a0d45be9610972385e6539f89213e7d694f2ed1b967796f1"
     },
     {
-      "bytes": 20783,
+      "bytes": 21328,
       "path": "units/worker-runtime/worker_runtime/runtime.py",
-      "sha256": "48ae853d09f1264b6624ef3a5dba600c11c517b78b84abc6e8da1e9fccdf5826"
+      "sha256": "23cfe1d3cc9e6690987807db6173aac94f53e0467e4603bdfc2b5a54a551aafb"
     },
     {
       "bytes": 6453,
@@ -2045,24 +2071,30 @@
     [
       "scripts/documentation/build_manual.py",
       123,
+      "agent_guide",
+      "(facts)"
+    ],
+    [
+      "scripts/documentation/build_manual.py",
+      138,
       "book",
       "(manifest, contents)"
     ],
     [
       "scripts/documentation/build_manual.py",
-      137,
+      152,
       "render_html",
       "(markdown_text, manifest)"
     ],
     [
       "scripts/documentation/build_manual.py",
-      141,
+      156,
       "render_html.remote",
       "(match)"
     ],
     [
       "scripts/documentation/build_manual.py",
-      157,
+      172,
       "main",
       "()"
     ],
@@ -5067,6 +5099,18 @@
       "(request)"
     ],
     [
+      "units/worker-manager/tests/test_gateway_tls.py",
+      7,
+      "test_missing_or_invalid_private_ca_is_not_silently_ignored",
+      "(tmp_path)"
+    ],
+    [
+      "units/worker-manager/tests/test_gateway_tls.py",
+      15,
+      "test_injected_client_cannot_silently_override_explicit_ca_configuration",
+      "()"
+    ],
+    [
       "units/worker-manager/tests/test_runtime_gateway.py",
       18,
       "FakeRuntimeGateway",
@@ -5602,37 +5646,37 @@
     ],
     [
       "units/worker-manager/worker_manager/http_gateway.py",
-      9,
+      10,
       "RuntimeHTTPGateway",
       "class"
     ],
     [
       "units/worker-manager/worker_manager/http_gateway.py",
-      10,
+      11,
       "RuntimeHTTPGateway.__init__",
-      "(self, base_url, token, *, client=None)"
+      "(self, base_url, token, *, client=None, ca_file=None)"
     ],
     [
       "units/worker-manager/worker_manager/http_gateway.py",
-      19,
+      26,
       "RuntimeHTTPGateway._request",
       "(self, method, path, payload=None, timeout=15)"
     ],
     [
       "units/worker-manager/worker_manager/http_gateway.py",
-      40,
+      47,
       "RuntimeHTTPGateway.submit",
       "(self, request)"
     ],
     [
       "units/worker-manager/worker_manager/http_gateway.py",
-      44,
+      51,
       "RuntimeHTTPGateway.get",
       "(self, execution_id)"
     ],
     [
       "units/worker-manager/worker_manager/http_gateway.py",
-      47,
+      54,
       "RuntimeHTTPGateway.cancel",
       "(self, execution_id)"
     ],
@@ -5926,13 +5970,13 @@
     ],
     [
       "units/worker-runtime/tests/control_plane_helper.py",
-      55,
+      60,
       "exercise_control_plane.gateway",
       "(owner)"
     ],
     [
       "units/worker-runtime/tests/control_plane_helper.py",
-      61,
+      64,
       "exercise_control_plane.upstream",
       "(owner, token)"
     ],
@@ -6205,6 +6249,48 @@
       258,
       "test_real_docker_memory_cgroup_kills_over_limit_process",
       "()"
+    ],
+    [
+      "units/worker-runtime/tests/test_history_reuse.py",
+      15,
+      "make_runtime",
+      "(tmp_path)"
+    ],
+    [
+      "units/worker-runtime/tests/test_history_reuse.py",
+      25,
+      "make_runtime.Provider",
+      "class"
+    ],
+    [
+      "units/worker-runtime/tests/test_history_reuse.py",
+      26,
+      "make_runtime.Provider.fetch",
+      "(self, key)"
+    ],
+    [
+      "units/worker-runtime/tests/test_history_reuse.py",
+      34,
+      "start",
+      "(runtime, request)"
+    ],
+    [
+      "units/worker-runtime/tests/test_history_reuse.py",
+      47,
+      "invalid",
+      "(request, kind)"
+    ],
+    [
+      "units/worker-runtime/tests/test_history_reuse.py",
+      57,
+      "test_invalid_reuse_preserves_terminal_history_and_persistent_idempotency",
+      "(tmp_path, terminal, kind)"
+    ],
+    [
+      "units/worker-runtime/tests/test_history_reuse.py",
+      76,
+      "test_invalid_reuse_cannot_terminate_a_running_execution",
+      "(tmp_path)"
     ],
     [
       "units/worker-runtime/tests/test_http_api.py",
@@ -6700,19 +6786,25 @@
     ],
     [
       "units/worker-runtime/worker_runtime/runtime.py",
-      214,
+      164,
+      "WorkerRuntime.submit.reject",
+      "(error, *, accepted=False)"
+    ],
+    [
+      "units/worker-runtime/worker_runtime/runtime.py",
+      225,
       "WorkerRuntime._execute",
       "(self, request, finish)"
     ],
     [
       "units/worker-runtime/worker_runtime/runtime.py",
-      251,
+      262,
       "WorkerRuntime._run_subprocess",
       "(self, request, finish, source, deadline)"
     ],
     [
       "units/worker-runtime/worker_runtime/runtime.py",
-      285,
+      296,
       "WorkerRuntime._run_subprocess.drain_stdout",
       "()"
     ],

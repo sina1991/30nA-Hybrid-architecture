@@ -1,19 +1,11 @@
-# Worker execution contract v1.0.0
+# Worker execution contracts
 
-مرجع رفتار فعلی و اختلاف قراردادهای قدیمی: [دفترچه جامع](../../docs/manual/07-worker-runtime.md) و [دفتر اختلاف‌ها](../../docs/manual/19-troubleshooting-and-gaps.md). وجود label قرارداد به معنی پذیرش deployment نیست.
+قرارداد domain در [contract.yaml](contract.yaml) وضعیت `draft` دارد. شکل HTTP فعلی در [Manager OpenAPI](manager.openapi.json) و [Runtime OpenAPI](runtime.openapi.json) ثبت شده است؛ domain request تخت را با HTTP request دارای `definition` یکسان فرض نکنید.
 
+Manager مالک تعریف، configuration، lifecycle و scheduling است. Runtime مالک وضعیت `accepted/running/succeeded/failed/cancelled`، اعتبارسنجی Artifact، اجرای Sandbox و نتیجه است. input و configuration باید JSON object باشند. خطاها `code/message/retryable` دارند؛ retryable تضمین تکرار امن نیست.
 
-Request: `ExecutionRequest(definition, configuration, input_payload, execution_id, timeout_seconds, idempotency_key, parent_execution_id, depth)`. Definition contains `worker_id`, `artifact_id`, `artifact_hash` (`sha256:<hex>`), `entrypoint` (`module:function`). Inputs and configuration must be JSON objects.
+Runtime از endpoint احراز هویت‌شده `GET /api/v1/artifacts/{artifact_id}/content` در CODE استفاده می‌کند؛ فقط `built_artifact` منتشرشده قابل دانلود است. hash بایت‌ها پیش از اجرا بررسی می‌شود. HTTP، Sandbox پیکربندی‌شده می‌خواهد؛ direct subprocess فقط برای fixture مورداعتماد با opt-out صریح کتابخانه مجاز است.
 
-Gateway `submit(request)` returns `ExecutionResult(execution_id, worker_id, accepted, status, result, error, children)`. `status` uses CORE operation statuses `accepted/running/succeeded/failed/cancelled`; rejection is `accepted=False, status=failed`. Errors contain CORE `code/message/retryable`. Timeout maps to failed/TIMEOUT, explicit cancellation to cancelled/CANCELLED. Lifecycle belongs only to Manager.
+Idempotency به owner/Runtime محدود است. همان key و request، نتیجه قبلی را برمی‌گرداند؛ request متفاوت conflict است. ID استفاده‌شده با validation نامعتبر نیز history قبلی را تغییر نمی‌دهد. SQLite و process lock برای production factory موجود است؛ cross-process/distributed coordination تضمین نمی‌شود.
 
-Idempotency keys are scoped per runtime instance; duplicate same-key same-request returns cached result, changed request returns IDEMPOTENCY_CONFLICT. Retry without a key is a new execution. Child execution is declarative: a worker returns `{ "children": [{"worker_id": "...", "input": {...}}], "value": ... }`; Runtime executes children sequentially via a registered definition resolver and returns `children` plus the parent `value`. Child failure fails the parent. Maximum depth and child count are bounded. Cancellation/timeout apply to each subprocess; no distributed propagation guarantee.
-
-Artifact provider must implement `fetch(artifact_id) -> bytes` using a public CODE MANAGER API. Until a public authenticated download API is exposed, production integration is blocked. An injected provider is supported for local execution/tests; do not access CODE MANAGER internal storage.
-
-Security: subprocess isolation is NOT a sandbox. Untrusted Python can access the host with the subprocess permissions. Do not deploy with untrusted artifacts. No durable state, cross-process idempotency, scheduler, authenticated network gateway, or hard memory/CPU sandbox is provided.
-
-Stage 4 clarifies cancellation, execution-ID uniqueness, process-local
-idempotency, child limits, shared timeout budgets and CODE MANAGER's missing
-public artifact download endpoint. See `units/worker-runtime/README.md` for
-security constraints and production blockers.
+Children در library با resolver ثبت‌شده، سقف depth/count و deadline مشترک پشتیبانی می‌شوند؛ production HTTP هنوز provisioning تعریف children را فراهم نمی‌کند. [دفترچه Runtime](../../docs/manual/07-worker-runtime.md) و [مرزهای باز](../../docs/manual/19-troubleshooting-and-gaps.md) را پیش از توسعه یا استقرار بخوانید.

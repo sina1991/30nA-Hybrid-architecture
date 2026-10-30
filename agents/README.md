@@ -32,7 +32,7 @@
    پردازش و تجمیع نتایج.
 
 6. DASHBOARD CORE CONSUMER
-   Owner: units/consumers/dashboard-core, contracts/consumer
+   Owner: units/consumers/dashboard-core, contracts/dashboard
    مسئول: هسته داشبورد، رجیستری ماژول‌ها، قالب‌ها و اتصال
    داشبورد به APIهای عمومی؛ بدون دسترسی مستقیم به پایگاه داده.
 

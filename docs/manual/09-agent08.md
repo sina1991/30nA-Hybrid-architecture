@@ -18,7 +18,7 @@ Agent08 یک integration proof مستقل در [agent08.py](../../units/integrat
 
 اما constructor فعلی در این mode، `require_sandbox=True` می‌دهد و **sandbox_backend را provision نمی‌کند**؛ بنابراین داشتن URL/token به‌تنهایی مسیر اجرایی آماده ایجاد نمی‌کند و Runtime بعد از دریافت Artifact می‌تواند `SANDBOX_UNAVAILABLE` بدهد. همچنین hash تعریف Worker از fixture محلی محاسبه می‌شود و Artifact مقصد باید دقیقاً با آن متناسب باشد. این mode به‌عنوان deployment کامل توصیه نمی‌شود.
 
-`LoopbackArtifactProvider` در این proof محدود به hostname loopback برای HTTP است؛ این استثنای قدیمی را مجوز انتقال bearer روی HTTP عمومی یا جایگزین transport production ندانید. API artifact نسخه‌دار فعلی در provider اصلی وجود دارد؛ عبارت خلاف آن در YAML قدیمی Worker، baseline تاریخی است.
+`LoopbackArtifactProvider` در این proof محدود به hostname loopback برای HTTP است؛ این استثنای قدیمی را مجوز انتقال bearer روی HTTP عمومی یا جایگزین transport production ندانید. API artifact نسخه‌دار فعلی در provider اصلی وجود دارد؛ Worker YAML در بازبینی سراسری به همین مسیر اصلاح شده است.
 
 ## نگهداری و توسعه
 

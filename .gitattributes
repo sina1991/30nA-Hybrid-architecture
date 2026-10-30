@@ -1,2 +1,3 @@
 # Printed handbook artifacts are binary; do not apply text whitespace/diff rules.
 *.pdf binary
+*.png binary

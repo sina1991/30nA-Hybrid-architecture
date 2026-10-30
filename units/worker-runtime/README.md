@@ -59,8 +59,9 @@ provenance. The content endpoint serves only published `built_artifact` objects,
 never a registered `source_zip`. The WORKER RUNTIME `CodeManagerArtifactProvider`
 targets the versioned `/api/v1/artifacts/{id}/content` route. Unit tests cover URL
 construction, authorization header, byte-exact content, content type and size caps.
-A real-service end-to-end test with production identity/ownership configuration is
-still required; adapter unit tests do not prove that deployed integration path.
+Repository E2E tests exercise real HTTPS services, owner-bound identity, Build,
+publication, Docker Runtime and Dashboard. Acceptance on the target VPS remains
+required; local tests do not certify its identity, TLS or rootless daemon setup.
 
 ## Security limitations
 

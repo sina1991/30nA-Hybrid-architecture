@@ -75,7 +75,7 @@ jobs:
         run: '"$RUNNER_TEMP/gitleaks" git --log-opts="--all --diff-merges=first-parent" --redact --no-banner'
 
   documentation:
-    name: Handbook freshness, coverage and links
+    name: Handbook and Agent guide freshness, coverage and links
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
@@ -87,7 +87,7 @@ jobs:
           python-version: '3.11'
       - name: Install hash-locked manual renderer
         run: python -m pip install --require-hashes -r requirements-docs.lock
-      - name: Check generated handbook, inventory, PDF checksums and all local links
+      - name: Check generated handbook, Agent guide, inventory, PDF checksums and all local links
         run: |
           python scripts/documentation/build_manual.py --check
           python scripts/documentation/check_docs.py

@@ -16,11 +16,11 @@ python3 -m uvicorn dashboard.app:app --host 127.0.0.1 --port 8020
 
 APIهای موجود: `GET /health`، `GET /api/themes`، `GET /api/themes/{theme_id}`، `GET /api/modules` و `GET /`.
 Themeها: `compact-6`، `standard-8`، `wide-12`. ماژول‌ها: `empty`، `health`، `theme-summary`، `slot-note`.
-انتخاب‌ها در `localStorage` مرورگر باقی می‌مانند.
+انتخاب‌های نمایشی در `localStorage` باقی می‌مانند؛ token فقط در حافظه است و در storage مرورگر ذخیره نمی‌شود.
 
 ## Public API Adapter
 
-`public_api.py` عملیات read-only مستند DATA MANAGER و CODE MANAGER را با کنترل نسخه، Timeout و خطاها ارائه می‌کند. در حالت پیش‌فرض فقط Adapter مستقل است؛ factory احراز هویت‌شده پایین آن را به Routeهای read-only وصل می‌کند. قرار دادن Token عمومی سرویس در Endpoint عمومی ممنوع است.
+`public_api.py` عملیات GET/POST با کنترل نسخه، Timeout و خطاها ارائه می‌کند. factory احراز هویت‌شده، مسیرهای مجاز Worker list/run/history/detail/cancel و مشاهده CODE sources را وصل می‌کند. DATA موفقیت raw دارد و اتصال مستقیم آن به adapter envelope فعلی پشتیبانی‌شده نیست. قرار دادن Token عمومی سرویس در Endpoint عمومی ممنوع است.
 
 متغیرهای اختیاری: `DATA_MANAGER_URL`, `DATA_MANAGER_TOKEN`, `DATA_MANAGER_TIMEOUT` و مشابه آن‌ها برای `CODE_MANAGER`. از Development identity header فقط روی loopback و با تأیید محیط استفاده شود.
 

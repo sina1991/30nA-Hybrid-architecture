@@ -3,26 +3,27 @@
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **185**؛ تعداد نمادهای Python: **833**.
+تعداد فایل‌های فنی و پشتیبان: **188**؛ تعداد نمادهای Python: **844**.
 
 ## موجودی کامل فایل‌های فنی
 
 | فایل | byte | SHA-256 |
 |---|---:|---|
 | [.editorconfig](../../.editorconfig) | 115 | `76565420d6347129e8c1b99ae259c764efa836509053365541eacebc5c27e188` |
-| [.gitattributes](../../.gitattributes) | 95 | `b1e8ca1456a74e03820e949faba7cfeb0eb1cb93b77148d0c29d5661ced884dc` |
+| [.gitattributes](../../.gitattributes) | 108 | `5c74770b9a41953e78518fc6f380870b3d0b1b7985a19f8cd6ad52e8bcd07b08` |
 | [.github/workflows/baseline-verification.yml](../../.github/workflows/baseline-verification.yml) | 4601 | `43337a0b754e591affe6f08657892e35202a16978aa7ca8f5086f8dda730b088` |
-| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3888 | `52a16299581863bc096d010a9c476f7a70a559c8585b4967bfabe882fe67316b` |
+| [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
-| [CHANGELOG.md](../../CHANGELOG.md) | 2065 | `0357930b097d304bd9d6c3dd2ef980a8281dd2b071fd0f488bfd42ec516d67c6` |
-| [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2561 | `c11506b334424145f69e772f2a4e78075d8d229a980db7bdc627f016ea018f2b` |
-| [README.md](../../README.md) | 3705 | `1bb443a0b86ceb166e86ea010636bb29f9475130e436d7d68e7489144b66b056` |
+| [AGENTS.md](../../AGENTS.md) | 1710 | `92da157d0a539ea987a2125c58b29760d0f0a5f632a9ad10888a30b842207d6d` |
+| [CHANGELOG.md](../../CHANGELOG.md) | 2616 | `a0e00efbcf9dcc3a6cb2dad170a1a221287d74d804d8d4e5b5b3bc2fd34b13c6` |
+| [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
+| [README.md](../../README.md) | 4920 | `3ea86d5c3f477d33bc333ed168060f2940b0f8c50b87244c62668f1d4a725f25` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
-| [agents/README.md](../../agents/README.md) | 4233 | `3550ee06bcca6f0ddf73f5f4639096c942a19d96d292bd025ee737a5bbbde662` |
+| [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
 | [agents/base-prompt.md](../../agents/base-prompt.md) | 5002 | `967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a` |
 | [agents/tasks/01-core.md](../../agents/tasks/01-core.md) | 2178 | `246f884a492333b17d4cbcebb0435776f0eb4546f6e887cbafd57a294438692e` |
 | [contracts/code/README.md](../../contracts/code/README.md) | 977 | `668f3c984f15966f242731b8eed9dcdb19519cd01a1267c0b6a9475eba2f3c6e` |
-| [contracts/code/api/contract.yaml](../../contracts/code/api/contract.yaml) | 3332 | `6092da1e55ea76223325f080ea666f713cfcd4eb0582a2c105ff259784eab0c6` |
+| [contracts/code/api/contract.yaml](../../contracts/code/api/contract.yaml) | 4266 | `777bc4bf227a8fb98ff2c6f475b07851a80fac8a7b36fa4f87c80dcebd79da88` |
 | [contracts/code/artifact/contract.yaml](../../contracts/code/artifact/contract.yaml) | 3184 | `e3fb5973ececc41f17effd535046cc8b220a80b49db158d5c30bfdf4ccb971c4` |
 | [contracts/code/build/contract.yaml](../../contracts/code/build/contract.yaml) | 6349 | `1f44c0366aca58e1171779c67ab92747587ee0169e387c628a09e2e6622d9454` |
 | [contracts/code/errors/contract.yaml](../../contracts/code/errors/contract.yaml) | 1438 | `6699b246a1102080450e11d194261ec8ae423ed28252350591825866d37781b9` |
@@ -56,8 +57,8 @@
 | [contracts/data/record/contract.yaml](../../contracts/data/record/contract.yaml) | 318 | `edb2fe2a87e637935f5668589b138cc19147f458bac9899c2fc3a25f959fa521` |
 | [contracts/data/resource/contract.yaml](../../contracts/data/resource/contract.yaml) | 360 | `14003104e2d9c49bacc6e8479160fc580b9c1e4a4d53c16909d5db38689951bb` |
 | [contracts/data/versioning/policy.yaml](../../contracts/data/versioning/policy.yaml) | 494 | `a428e57aa90aa0e31bcdc35ea8308a24fa34b9087242e330028ff6fe41c536e9` |
-| [contracts/worker/README.md](../../contracts/worker/README.md) | 2510 | `3e9b40a3096f8435e1e225698e243529d6baf1482364baa3077509f8cd741e93` |
-| [contracts/worker/contract.yaml](../../contracts/worker/contract.yaml) | 1293 | `16850163fdf9f1bf25a2d66f87cc950c45de789b6ac393a8b744f3b7f4e5a694` |
+| [contracts/worker/README.md](../../contracts/worker/README.md) | 2032 | `4d330cd753ad143a1af46237f79305b122623a4828997ada4f717c1417984201` |
+| [contracts/worker/contract.yaml](../../contracts/worker/contract.yaml) | 1791 | `d046ca2059196d0b12aadcfe5a5e639d792bc389c0c8b1e476aa17f42f6d6674` |
 | [contracts/worker/manager.openapi.json](../../contracts/worker/manager.openapi.json) | 97456 | `b7741b353d8eff68cfc2813ba43266c3de99363aa087ff1301be60899483257e` |
 | [contracts/worker/runtime.openapi.json](../../contracts/worker/runtime.openapi.json) | 33671 | `61be22996ffde6955a58f7665f691f3411a0caf8126cd6187ccb486e69ac16f9` |
 | [deployment/30na-review](../../deployment/30na-review) | 709 | `d491bfd8a98c9fb7ace8a825043775129c5db9b193f83ec4260586a8c71b0802` |
@@ -79,7 +80,7 @@
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py) | 4454 | `f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py) | 1164 | `5e9d644203ae3157224aa5742c9bd46ee52007b3607c3b43de94af32f9a38b78` |
 | [scripts/development/export_openapi.py](../../scripts/development/export_openapi.py) | 1373 | `3443bd17d389f8cd8e500ce70138239f9037a00418237d0851a25aa3145000a6` |
-| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py) | 12099 | `88b4a2f0b47fec6286cb570cd7ed297e9afcbe99c0f760930a27d5cccdd7ce08` |
+| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py) | 13014 | `b35c24b03ef7c20564d3b0c3123cba19d0f53f46fa3c56d263173019d91c7ae9` |
 | [scripts/documentation/check_docs.py](../../scripts/documentation/check_docs.py) | 4521 | `7684f7ac6e65f30b1da9afc05cfedcf71158294265cbfb3adf6b85320a568929` |
 | [scripts/documentation/render_pdf.cjs](../../scripts/documentation/render_pdf.cjs) | 2173 | `56c52e9e3a70c1db86e10acda8c5e1f9f22c8533533175ccfa75519ce9335791` |
 | [scripts/security/install_gitleaks.py](../../scripts/security/install_gitleaks.py) | 1405 | `4c2307bccfbfde650a5c1c74acb3022877138d42d8442139657dfbc5a4e85150` |
@@ -89,7 +90,7 @@
 | [tests_support/code_manager.py](../../tests_support/code_manager.py) | 2220 | `c789173d8bf728310ecc339a4a05858017826e61b2db8c67961bd521f41aac59` |
 | [units/code-manager/README.md](../../units/code-manager/README.md) | 6974 | `a6188e8e5994c3db15537556d8968cc42ee90bb0aadaed5bfa33396d6d2cb14e` |
 | [units/code-manager/code_manager/__init__.py](../../units/code-manager/code_manager/__init__.py) | 121 | `1170efd7f23978c79fb04db74e7a7aaf5f6479a1ea97f7aa0baebe5e26049a8f` |
-| [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py) | 30937 | `5ee1295cd58ce255ee81189e3dd46d926774d89cef53e423d62cfd1b579a2557` |
+| [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py) | 30977 | `50825f5d1e1f7d50b0251cec57d5c620cf7ba1b8a33e4cb7128aa6f0ac218191` |
 | [units/code-manager/code_manager/artifact_routes.py](../../units/code-manager/code_manager/artifact_routes.py) | 836 | `c493d71e3210f2fee5bdfa16c121b7e610a416610fc37cf8b11bbca6558dd4e5` |
 | [units/code-manager/code_manager/blob_storage.py](../../units/code-manager/code_manager/blob_storage.py) | 3389 | `cd283b12c4484a79c8dc369a8cdb229dcac8bcca4734372b6e7fbc6de8c8d6ca` |
 | [units/code-manager/code_manager/build_pipeline.py](../../units/code-manager/code_manager/build_pipeline.py) | 53754 | `32e9048691514d464064c763796b23eaa163b190821f398e7597e8bd8d86bd2e` |
@@ -115,8 +116,8 @@
 | [units/code-manager/tests/test_source_archive.py](../../units/code-manager/tests/test_source_archive.py) | 4072 | `725c536a24cf9107074404b8d035f34148455d27f7a3b5311e3d444b29f3ffeb` |
 | [units/code-manager/tests/test_source_registration.py](../../units/code-manager/tests/test_source_registration.py) | 3772 | `aa451da0cc27ec1d438239eba22bcb4380c4d056cd38e2f02a8bd64ca096ffae` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py) | 3829 | `6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0` |
-| [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 4229 | `2c2bd5dd7c02fded9467b8a8e99f96edc27d38cb47731ea79429b2d6e1f6de09` |
-| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 8302 | `9d918dcd1c937b3212e47c15b468c516c74e977d322bde8d7ee1691df8039b5b` |
+| [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 4394 | `9e097b0a43ddd4d2199d9859c0247bbe4ae946eec4ba462471d59ba34a843925` |
+| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 8497 | `3e3360524dcbff03407e3dc0681de213ce09ca1628cdd9ae56b10bfbd5e011f9` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
 | [units/consumers/dashboard-core/dashboard/__init__.py](../../units/consumers/dashboard-core/dashboard/__init__.py) | 34 | `df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048` |
@@ -144,7 +145,7 @@
 | [units/consumers/dashboard-core/tests/test_issue26_dice_roller.py](../../units/consumers/dashboard-core/tests/test_issue26_dice_roller.py) | 1034 | `7d3066b58ba3b049424dfa54cef414e4b5d5bbaa3b312c853212614266a53bb7` |
 | [units/consumers/dashboard-core/tests/test_public_api.py](../../units/consumers/dashboard-core/tests/test_public_api.py) | 5718 | `412284d0158636ec9b1241252b21a3cc8c7ed4f4e24d9f2b9304eb0af970fd25` |
 | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py) | 5974 | `4780e8e8a2c632f3e96a0fff2589f556d4b2971b25adc95145d72bdd6b4e4817` |
-| [units/data-manager/README.md](../../units/data-manager/README.md) | 2924 | `a5494d6e193db73bc93c0c802904e60163adff51c487e3531ba3778f0a57bdaf` |
+| [units/data-manager/README.md](../../units/data-manager/README.md) | 2923 | `68a95bf1737bb4f9fdbda0710cf1870e0029e3620761598fcee16d19daa3dd6f` |
 | [units/data-manager/__init__.py](../../units/data-manager/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [units/data-manager/api/__init__.py](../../units/data-manager/api/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [units/data-manager/api/app.py](../../units/data-manager/api/app.py) | 7294 | `056f16dd44f85d7ef835e2909524d355815abb9379aac32f65270c83184c6a3a` |
@@ -158,8 +159,9 @@
 | [units/integration/agent08/agent08.py](../../units/integration/agent08/agent08.py) | 6359 | `72661e80d670ec371c7d0259043c5281e9ed56fb320112ee99f6ce6b935399e9` |
 | [units/integration/agent08/script/modules_ok.py](../../units/integration/agent08/script/modules_ok.py) | 228 | `d703c414ba44b35f1604fd96e5db0e201c723156309da196d9806d76997ae9bb` |
 | [units/integration/agent08/tests/test_integration.py](../../units/integration/agent08/tests/test_integration.py) | 1011 | `a5f5bfb409a6bacd67d6baefca909cbda9237301757e939e07f434a988b1c378` |
-| [units/worker-manager/README.md](../../units/worker-manager/README.md) | 5140 | `4fe8d150153683469578f1e10d853bc0aa8a0724e0d053ff5129882ad07f3d9f` |
+| [units/worker-manager/README.md](../../units/worker-manager/README.md) | 2747 | `60c21b2fff146cfeaa412680b34d8b07f5180fdaffc5801a54cf25be0fe5cb0f` |
 | [units/worker-manager/tests/test_control_api.py](../../units/worker-manager/tests/test_control_api.py) | 7946 | `9f685170dd0b0807e3e2661a54363cdfae71e3a224066b33f503626a18e41f51` |
+| [units/worker-manager/tests/test_gateway_tls.py](../../units/worker-manager/tests/test_gateway_tls.py) | 852 | `a7470d6ce67839e0606f18490dad288e40cf8e7a2685dca8fff659e416b9cd37` |
 | [units/worker-manager/tests/test_runtime_gateway.py](../../units/worker-manager/tests/test_runtime_gateway.py) | 4108 | `1cd85f88bb521cd8f483ff45e0218ec353300ca94d04826942fd061479b4a28e` |
 | [units/worker-manager/tests/test_sqlite_store.py](../../units/worker-manager/tests/test_sqlite_store.py) | 3413 | `d53314bcaadc31f5383aec43df49332482e317eb4921b8b6cb591fa9d721d93a` |
 | [units/worker-manager/tests/test_worker_manager.py](../../units/worker-manager/tests/test_worker_manager.py) | 3545 | `ea86704f175d68094a7489b48cf5bba5e4c46fcd6f87e669b96ab8f82c8d7c8b` |
@@ -167,19 +169,20 @@
 | [units/worker-manager/worker_manager/api.py](../../units/worker-manager/worker_manager/api.py) | 5666 | `6ed283131a84d0b0d3fdeb3705cb6dc136b44d49dad454b272e83663f342e6c5` |
 | [units/worker-manager/worker_manager/control_service.py](../../units/worker-manager/worker_manager/control_service.py) | 13345 | `d5df1c86576a2e860a70467f0d302a3fe30b3b877d6ecacffb6b10182ff5540c` |
 | [units/worker-manager/worker_manager/http_common.py](../../units/worker-manager/worker_manager/http_common.py) | 5788 | `9b2d503ecb32d6fe129c9b1c2daa248cead9687e3a2b36470d86fbb9fbc0be04` |
-| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py) | 2395 | `f9d4cc9faba6ac3b2b012c9a29e3889d984658bd7dfb689bcdd799e16f08cc03` |
+| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py) | 2933 | `888c12455bebf6737ebe5e147f2dc45d413b22bbf90a2874f101755759c205b3` |
 | [units/worker-manager/worker_manager/models.py](../../units/worker-manager/worker_manager/models.py) | 2915 | `561835b42cdd36c54303581701c162f4d67a3eed2884c8c4ea0401421178b431` |
-| [units/worker-manager/worker_manager/production.py](../../units/worker-manager/worker_manager/production.py) | 862 | `194c338ea711c59e629edfafb6cc54cd401f45ab0b723a10d87206298e7b8bb5` |
+| [units/worker-manager/worker_manager/production.py](../../units/worker-manager/worker_manager/production.py) | 891 | `75efea78f73ca1ff8661ead38acf95ef7aa049afc82ee3758a0e5f7e155bfddf` |
 | [units/worker-manager/worker_manager/runtime_gateway.py](../../units/worker-manager/worker_manager/runtime_gateway.py) | 1881 | `78330ad1b48e2897c29be1bd01a517af3ac2a586518baf6c64689fafb646d772` |
 | [units/worker-manager/worker_manager/service.py](../../units/worker-manager/worker_manager/service.py) | 7286 | `69a4d54daf645b3b02b96e2c1cc2490ec3769914064b960acf146fd344af4c17` |
 | [units/worker-manager/worker_manager/sqlite_store.py](../../units/worker-manager/worker_manager/sqlite_store.py) | 7587 | `1ab946a64e2844b8a81b231a8d57428f0e6f34d2d6f2078bbdad2b6badc172fe` |
-| [units/worker-runtime/README.md](../../units/worker-runtime/README.md) | 7721 | `f42a8c94d97990119f06e7a248124b8daa7a0bd24e21d81b9b02a51b0184bd3e` |
-| [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py) | 6944 | `ef739c8f6ab9e28fab0896e2939d8ab1b73de7fa6f5907eb4910e4194e4be93a` |
+| [units/worker-runtime/README.md](../../units/worker-runtime/README.md) | 7799 | `927188b494450962688cb4422c855902fb480ecb0fb7502665b3f544c74ca064` |
+| [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py) | 7113 | `30f0ce1f3b69dcb89f1188458d3afc007566ac5c0ae3b27547a0cb65cc816928` |
 | [units/worker-runtime/tests/sandbox-image/Dockerfile](../../units/worker-runtime/tests/sandbox-image/Dockerfile) | 237 | `ca42b03b1ccc46fb2610353c923ed43b4ad34042c159dd183d282935dd1ef360` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../../units/worker-runtime/tests/test_code_manager_adapter.py) | 5099 | `8e20c3253a49c0019554b458d47c30a4ebd15690ed1b0e3829b85b25cdbb42c9` |
 | [units/worker-runtime/tests/test_code_manager_runtime_e2e.py](../../units/worker-runtime/tests/test_code_manager_runtime_e2e.py) | 12129 | `e027d0eb99d592297351cddd6c01e587fef6a7c3e64359439ad11ef16a4b99bf` |
 | [units/worker-runtime/tests/test_docker_sandbox.py](../../units/worker-runtime/tests/test_docker_sandbox.py) | 13362 | `a53b4b0b24568cdd05d31f5b35a0de684133e8d2342eea3110aab890a217ab2d` |
 | [units/worker-runtime/tests/test_docker_sandbox_integration.py](../../units/worker-runtime/tests/test_docker_sandbox_integration.py) | 15478 | `8610d2d69f7989867576d54e24962bd44eb1544c7c2b9141ba878686fc7825cb` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py) | 3782 | `cc52d66f93947d28a484ba9550cd475e7b639bc06b5f616327e46a2e78125e3c` |
 | [units/worker-runtime/tests/test_http_api.py](../../units/worker-runtime/tests/test_http_api.py) | 2527 | `107876a44299cce2863f63bdc5eba72b12c920f3da948156c11693744980e1e0` |
 | [units/worker-runtime/tests/test_integration.py](../../units/worker-runtime/tests/test_integration.py) | 2647 | `dac3941ef2dc7a9456c81740fe213c132f1fce363beae27de01eb5966dbe50c6` |
 | [units/worker-runtime/tests/test_operational.py](../../units/worker-runtime/tests/test_operational.py) | 8910 | `54c109c57a74618176ee7c73ee9a6fb33d950bde553f9d2354cd522a603e9961` |
@@ -192,7 +195,7 @@
 | [units/worker-runtime/worker_runtime/docker_sandbox.py](../../units/worker-runtime/worker_runtime/docker_sandbox.py) | 14523 | `4571ba77c8f4fd06603db44e2d1daa307b4c0ec2bf86d25854a5f85d3fbeca25` |
 | [units/worker-runtime/worker_runtime/loopback_artifact_provider.py](../../units/worker-runtime/worker_runtime/loopback_artifact_provider.py) | 919 | `58a28bb6842ff8411ed45068f2144e76dabcf0495eba35a7cda8b9f52e7982eb` |
 | [units/worker-runtime/worker_runtime/production.py](../../units/worker-runtime/worker_runtime/production.py) | 1477 | `6cc8b877e8c59b75a0d45be9610972385e6539f89213e7d694f2ed1b967796f1` |
-| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py) | 20783 | `48ae853d09f1264b6624ef3a5dba600c11c517b78b84abc6e8da1e9fccdf5826` |
+| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py) | 21328 | `23cfe1d3cc9e6690987807db6173aac94f53e0467e4603bdfc2b5a54a551aafb` |
 | [units/worker-runtime/worker_runtime/sqlite_store.py](../../units/worker-runtime/worker_runtime/sqlite_store.py) | 6453 | `a76d79185f001898a49385420cd7b657bd0070e4fe50257303ef146c0334b18d` |
 
 ## محل خواندن متغیرهای محیطی
@@ -222,8 +225,9 @@
 | `CODE_MANAGER_INTEGRATION_OWNER` | [units/code-manager/tests/test_data_manager_integration.py](../../units/code-manager/tests/test_data_manager_integration.py#L40) | optional lookup |
 | `CREDENTIALS_DIRECTORY` | [units/integration/agent08/agent08.py](../../units/integration/agent08/agent08.py#L68) | optional lookup |
 | `DASHBOARD_CREDENTIAL_FILE` | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L15) | required lookup |
+| `DASHBOARD_SCREENSHOT` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L107) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py#L12) | optional lookup |
-| `DASHBOARD_SKIP_BROWSER` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L100) | optional lookup |
+| `DASHBOARD_SKIP_BROWSER` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L103) | optional lookup |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py#L16) | tooling assignment |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L748) | optional lookup |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [units/code-manager/tests/test_data_manager_integration.py](../../units/code-manager/tests/test_data_manager_integration.py#L33) | optional lookup |
@@ -268,7 +272,7 @@
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L79) | `--manager-token-file` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py#L13) | `--database` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py#L14) | `--ready-file` |
-| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L158) | `--check` |
+| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L173) | `--check` |
 | [scripts/security/install_gitleaks.py](../../scripts/security/install_gitleaks.py#L12) | `--output` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../../scripts/security/run_sandbox_daemon_fault_injection.py#L212) | `image` |
 | [scripts/testing/run_ci.py](../../scripts/testing/run_ci.py#L25) | `--image` |
@@ -284,16 +288,16 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `ACCESS_DENIED` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L84) |
 | `ACCESS_DENIED` | [units/code-manager/tests/test_api.py](../../units/code-manager/tests/test_api.py#L78) |
 | `ARTIFACT_CONFLICT` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L687) |
-| `ARTIFACT_HASH_MISMATCH` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L189) |
-| `ARTIFACT_HASH_MISMATCH` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L228) |
+| `ARTIFACT_HASH_MISMATCH` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L200) |
+| `ARTIFACT_HASH_MISMATCH` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L239) |
 | `ARTIFACT_INTEGRITY_FAILED` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L689) |
 | `ARTIFACT_INTEGRITY_FAILED` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L697) |
 | `ARTIFACT_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L683) |
-| `ARTIFACT_INVALID` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L243) |
+| `ARTIFACT_INVALID` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L254) |
 | `ARTIFACT_NOT_FOUND` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L495) |
 | `ARTIFACT_NOT_FOUND` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L592) |
 | `ARTIFACT_NOT_FOUND` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L685) |
-| `ARTIFACT_UNAVAILABLE` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L226) |
+| `ARTIFACT_UNAVAILABLE` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L237) |
 | `BUILD_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L521) |
 | `BUILD_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L649) |
 | `BUILD_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L651) |
@@ -306,28 +310,29 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `BUILD_NOT_PUBLISHABLE` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L560) |
 | `BUILD_NOT_PUBLISHABLE` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L563) |
 | `CANCELLED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L150) |
-| `CAPACITY_EXCEEDED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L245) |
-| `CHILD_FAILED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L384) |
-| `CHILD_LIMIT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L360) |
-| `CHILD_NOT_FOUND` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L369) |
+| `CAPACITY_EXCEEDED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L256) |
+| `CHILD_FAILED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L395) |
+| `CHILD_LIMIT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L371) |
+| `CHILD_NOT_FOUND` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L380) |
 | `CONFLICT` | [units/consumers/dashboard-core/tests/test_demo_seed.py](../../units/consumers/dashboard-core/tests/test_demo_seed.py#L29) |
 | `CONFLICT` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L18) |
 | `DATA_ERROR` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L2) |
 | `DATA_MANAGER_UNAVAILABLE` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L711) |
 | `DATA_MANAGER_UNAVAILABLE` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L716) |
-| `DEPTH_LIMIT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L171) |
-| `EXECUTION_CONFLICT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L203) |
-| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L327) |
-| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L345) |
-| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L352) |
-| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L355) |
+| `DEPTH_LIMIT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L182) |
+| `EXECUTION_CONFLICT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L170) |
+| `EXECUTION_CONFLICT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L214) |
+| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L338) |
+| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L356) |
+| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L363) |
+| `EXECUTION_ERROR` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L366) |
 | `FORBIDDEN` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L23) |
 | `HTTP_ERROR` | [units/code-manager/code_manager/data_manager_client.py](../../units/code-manager/code_manager/data_manager_client.py#L245) |
-| `IDEMPOTENCY_CONFLICT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L200) |
+| `IDEMPOTENCY_CONFLICT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L211) |
 | `INTERNAL_ERROR` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L727) |
 | `INVALID_INPUT` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L28) |
-| `INVALID_INPUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L194) |
-| `INVALID_INPUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L366) |
+| `INVALID_INPUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L205) |
+| `INVALID_INPUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L377) |
 | `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L91) |
 | `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L100) |
 | `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L102) |
@@ -337,10 +342,10 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `NOT_FOUND` | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L64) |
 | `NOT_FOUND` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L13) |
 | `OPERATION_NOT_IMPLEMENTED` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L587) |
-| `OUTPUT_LIMIT_EXCEEDED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L343) |
+| `OUTPUT_LIMIT_EXCEEDED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L354) |
 | `RUNTIME_RESTARTED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L74) |
 | `SANDBOX_CLEANUP_UNCONFIRMED` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L144) |
-| `SANDBOX_UNAVAILABLE` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L248) |
+| `SANDBOX_UNAVAILABLE` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L259) |
 | `SERVICE_UNAVAILABLE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L96) |
 | `SOURCE_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L232) |
 | `SOURCE_INVALID` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L237) |
@@ -367,8 +372,8 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `SOURCE_NOT_FOUND` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L676) |
 | `SOURCE_NOT_FOUND` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L693) |
 | `SOURCE_VERSION_CONFLICT` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L691) |
-| `TIMEOUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L321) |
-| `TIMEOUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L371) |
+| `TIMEOUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L332) |
+| `TIMEOUT` | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L382) |
 | `UNSUPPORTED_CONTRACT_VERSION` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L105) |
 | `UNSUPPORTED_VERSION` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L33) |
 | `UPSTREAM_ERROR` | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L107) |
@@ -594,10 +599,11 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L55) | `collect.Visitor.visit_ClassDef` | `(self, node)` |
 | [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L58) | `collect.Visitor.visit_FunctionDef` | `(self, node)` |
 | [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L92) | `reference` | `(facts)` |
-| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L123) | `book` | `(manifest, contents)` |
-| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L137) | `render_html` | `(markdown_text, manifest)` |
-| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L141) | `render_html.remote` | `(match)` |
-| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L157) | `main` | `()` |
+| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L123) | `agent_guide` | `(facts)` |
+| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L138) | `book` | `(manifest, contents)` |
+| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L152) | `render_html` | `(markdown_text, manifest)` |
+| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L156) | `render_html.remote` | `(match)` |
+| [scripts/documentation/build_manual.py](../../scripts/documentation/build_manual.py#L172) | `main` | `()` |
 | [scripts/documentation/check_docs.py](../../scripts/documentation/check_docs.py#L17) | `repository_files` | `()` |
 | [scripts/documentation/check_docs.py](../../scripts/documentation/check_docs.py#L22) | `prose` | `(text)` |
 | [scripts/documentation/check_docs.py](../../scripts/documentation/check_docs.py#L35) | `anchors` | `(path)` |
@@ -1098,6 +1104,8 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/worker-manager/tests/test_control_api.py](../../units/worker-manager/tests/test_control_api.py#L160) | `test_http_crud_auth_validation_revocation_and_size` | `(service, tmp_path)` |
 | [units/worker-manager/tests/test_control_api.py](../../units/worker-manager/tests/test_control_api.py#L184) | `test_transport_failure_is_explicit_not_success_or_retry` | `(service)` |
 | [units/worker-manager/tests/test_control_api.py](../../units/worker-manager/tests/test_control_api.py#L188) | `test_transport_failure_is_explicit_not_success_or_retry.unavailable` | `(request)` |
+| [units/worker-manager/tests/test_gateway_tls.py](../../units/worker-manager/tests/test_gateway_tls.py#L7) | `test_missing_or_invalid_private_ca_is_not_silently_ignored` | `(tmp_path)` |
+| [units/worker-manager/tests/test_gateway_tls.py](../../units/worker-manager/tests/test_gateway_tls.py#L15) | `test_injected_client_cannot_silently_override_explicit_ca_configuration` | `()` |
 | [units/worker-manager/tests/test_runtime_gateway.py](../../units/worker-manager/tests/test_runtime_gateway.py#L18) | `FakeRuntimeGateway` | `class` |
 | [units/worker-manager/tests/test_runtime_gateway.py](../../units/worker-manager/tests/test_runtime_gateway.py#L19) | `FakeRuntimeGateway.__init__` | `(self)` |
 | [units/worker-manager/tests/test_runtime_gateway.py](../../units/worker-manager/tests/test_runtime_gateway.py#L24) | `FakeRuntimeGateway.submit` | `(self, request)` |
@@ -1187,12 +1195,12 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/worker-manager/worker_manager/http_common.py](../../units/worker-manager/worker_manager/http_common.py#L119) | `ProcessLock` | `class` |
 | [units/worker-manager/worker_manager/http_common.py](../../units/worker-manager/worker_manager/http_common.py#L121) | `ProcessLock.__init__` | `(self, path)` |
 | [units/worker-manager/worker_manager/http_common.py](../../units/worker-manager/worker_manager/http_common.py#L131) | `ProcessLock.close` | `(self)` |
-| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L9) | `RuntimeHTTPGateway` | `class` |
-| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L10) | `RuntimeHTTPGateway.__init__` | `(self, base_url, token, *, client=None)` |
-| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L19) | `RuntimeHTTPGateway._request` | `(self, method, path, payload=None, timeout=15)` |
-| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L40) | `RuntimeHTTPGateway.submit` | `(self, request)` |
-| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L44) | `RuntimeHTTPGateway.get` | `(self, execution_id)` |
-| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L47) | `RuntimeHTTPGateway.cancel` | `(self, execution_id)` |
+| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L10) | `RuntimeHTTPGateway` | `class` |
+| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L11) | `RuntimeHTTPGateway.__init__` | `(self, base_url, token, *, client=None, ca_file=None)` |
+| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L26) | `RuntimeHTTPGateway._request` | `(self, method, path, payload=None, timeout=15)` |
+| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L47) | `RuntimeHTTPGateway.submit` | `(self, request)` |
+| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L51) | `RuntimeHTTPGateway.get` | `(self, execution_id)` |
+| [units/worker-manager/worker_manager/http_gateway.py](../../units/worker-manager/worker_manager/http_gateway.py#L54) | `RuntimeHTTPGateway.cancel` | `(self, execution_id)` |
 | [units/worker-manager/worker_manager/models.py](../../units/worker-manager/worker_manager/models.py#L14) | `WorkerLifecycle` | `class` |
 | [units/worker-manager/worker_manager/models.py](../../units/worker-manager/worker_manager/models.py#L21) | `Schedule` | `class` |
 | [units/worker-manager/worker_manager/models.py](../../units/worker-manager/worker_manager/models.py#L27) | `Schedule.__post_init__` | `(self)` |
@@ -1241,8 +1249,8 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L18) | `https_server` | `(app, cert, key)` |
 | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L39) | `exercise_control_plane` | `(root, cert, key, credentials, code_url, image, artifact_hash)` |
 | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L48) | `exercise_control_plane.factory` | `(owner)` |
-| [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L55) | `exercise_control_plane.gateway` | `(owner)` |
-| [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L61) | `exercise_control_plane.upstream` | `(owner, token)` |
+| [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L60) | `exercise_control_plane.gateway` | `(owner)` |
+| [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L64) | `exercise_control_plane.upstream` | `(owner, token)` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../../units/worker-runtime/tests/test_code_manager_adapter.py#L18) | `FakeResponse` | `class` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../../units/worker-runtime/tests/test_code_manager_adapter.py#L19) | `FakeResponse.__init__` | `(self, body, *, status=200, content_type='application/octet-stream')` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../../units/worker-runtime/tests/test_code_manager_adapter.py#L25) | `FakeResponse.__enter__` | `(self)` |
@@ -1288,6 +1296,13 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/worker-runtime/tests/test_docker_sandbox_integration.py](../../units/worker-runtime/tests/test_docker_sandbox_integration.py#L165) | `test_real_docker_cancellation_removes_container` | `(tmp_path)` |
 | [units/worker-runtime/tests/test_docker_sandbox_integration.py](../../units/worker-runtime/tests/test_docker_sandbox_integration.py#L218) | `test_real_docker_pids_limit_blocks_fork_storm` | `(tmp_path)` |
 | [units/worker-runtime/tests/test_docker_sandbox_integration.py](../../units/worker-runtime/tests/test_docker_sandbox_integration.py#L258) | `test_real_docker_memory_cgroup_kills_over_limit_process` | `()` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py#L15) | `make_runtime` | `(tmp_path)` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py#L25) | `make_runtime.Provider` | `class` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py#L26) | `make_runtime.Provider.fetch` | `(self, key)` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py#L34) | `start` | `(runtime, request)` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py#L47) | `invalid` | `(request, kind)` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py#L57) | `test_invalid_reuse_preserves_terminal_history_and_persistent_idempotency` | `(tmp_path, terminal, kind)` |
+| [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py#L76) | `test_invalid_reuse_cannot_terminate_a_running_execution` | `(tmp_path)` |
 | [units/worker-runtime/tests/test_http_api.py](../../units/worker-runtime/tests/test_http_api.py#L13) | `Runtime` | `class` |
 | [units/worker-runtime/tests/test_http_api.py](../../units/worker-runtime/tests/test_http_api.py#L16) | `Runtime.__init__` | `(self)` |
 | [units/worker-runtime/tests/test_http_api.py](../../units/worker-runtime/tests/test_http_api.py#L17) | `Runtime.submit` | `(self, request)` |
@@ -1370,9 +1385,10 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L113) | `WorkerRuntime.cancel` | `(self, execution_id)` |
 | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L141) | `WorkerRuntime._finish` | `(self, eid, wid, status, *, result=None, error=None, accepted=True, children=())` |
 | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L157) | `WorkerRuntime.submit` | `(self, request)` |
-| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L214) | `WorkerRuntime._execute` | `(self, request, finish)` |
-| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L251) | `WorkerRuntime._run_subprocess` | `(self, request, finish, source, deadline)` |
-| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L285) | `WorkerRuntime._run_subprocess.drain_stdout` | `()` |
+| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L164) | `WorkerRuntime.submit.reject` | `(error, *, accepted=False)` |
+| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L225) | `WorkerRuntime._execute` | `(self, request, finish)` |
+| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L262) | `WorkerRuntime._run_subprocess` | `(self, request, finish, source, deadline)` |
+| [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py#L296) | `WorkerRuntime._run_subprocess.drain_stdout` | `()` |
 | [units/worker-runtime/worker_runtime/sqlite_store.py](../../units/worker-runtime/worker_runtime/sqlite_store.py#L17) | `SQLiteExecutionStore` | `class` |
 | [units/worker-runtime/worker_runtime/sqlite_store.py](../../units/worker-runtime/worker_runtime/sqlite_store.py#L20) | `SQLiteExecutionStore.__init__` | `(self, database_path: str \| Path, *, timeout_seconds: float=5.0)` |
 | [units/worker-runtime/worker_runtime/sqlite_store.py](../../units/worker-runtime/worker_runtime/sqlite_store.py#L36) | `SQLiteExecutionStore._connect` | `(self)` |

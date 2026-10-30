@@ -6,8 +6,8 @@
 |---|---|---|
 | مشترک | `contracts/core/` | YAMLهای draft، قواعد پایه |
 | DATA | `contracts/data/` و WSGI واقعی | draft؛ response خام با envelope عمومی یکسان نیست |
-| CODE | `contracts/code/` و API واقعی | بخشی approved؛ بخش API قدیمی نسبت به Build عقب است |
-| Worker | `contracts/worker/contract.yaml` | legacy، بخشی ناسازگار با Runtime جدید |
+| CODE | `contracts/code/` و API واقعی | وضعیت فایل‌ها مستقل؛ API با Build/publish/download فعلی هماهنگ شده است |
+| Worker | `contracts/worker/contract.yaml` | draft domain؛ مسیر download و الزام Sandbox اصلاح شده؛ OpenAPI ملاک شکل HTTP است |
 | Manager HTTP | `contracts/worker/manager.openapi.json` | schema تولیدشده از factory فعلی |
 | Runtime HTTP | `contracts/worker/runtime.openapi.json` | schema تولیدشده از factory فعلی |
 | Dashboard HTTP | `contracts/dashboard/openapi.json` | shell و BFF فعلی |

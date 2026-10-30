@@ -24,7 +24,7 @@ Archive معتبر، hash برابر و entrypoint موجود پیش از launch
 {"execution_id":"11111111-1111-4111-8111-111111111111","worker_id":"demo-summary","accepted":true,"status":"succeeded","result":{"sum":60},"error":null,"children":[]}
 ```
 
-شناسه نمونه را برای درخواست‌های واقعی تکرار نکنید. یک ایراد باز در validation زودهنگامِ reuse نامعتبر ID می‌تواند snapshot terminal قبلی را بازنویسی کند؛ روش بازتولید و scope آن در فصل عیب‌یابی ثبت شده است. HTTP result داخل envelope است؛ نتیجه error ممکن است HTTP 200 و status failed داشته باشد. get execution owner دیگر 404 است. factory جلوی اشتراک یک Runtime instance بین ownerها را می‌گیرد و HTTP بدون backend امن 503/failed می‌شود.
+شناسه نمونه را برای درخواست‌های واقعی تکرار نکنید. reuse نامعتبر ID قبلی با `EXECUTION_CONFLICT` رد می‌شود و history جاری یا terminal را تغییر نمی‌دهد؛ این رفتار با regression test روی SQLite و restart بررسی شده است. همان key و request معتبر همچنان replay نتیجه قبلی است. HTTP result داخل envelope است؛ نتیجه error ممکن است HTTP 200 و status failed داشته باشد. get execution owner دیگر 404 است. factory جلوی اشتراک یک Runtime instance بین ownerها را می‌گیرد و HTTP بدون backend امن 503/failed می‌شود.
 
 ## state، timeout و cancel
 

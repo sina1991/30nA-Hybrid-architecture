@@ -120,6 +120,21 @@ def reference(facts):
     return '\n'.join(rows)+'\n'
 
 
+def agent_guide(facts):
+    rows=[(ROOT/'docs/AGENT_GUIDE.source.md').read_text().rstrip(),
+          '', '<!-- Generated contract snapshots and Python/OpenAPI index. Do not edit. -->',
+          '', '## تنظیمات فعلی و limitهای مسیر اجرا', '',
+          (MANUAL/'10-configuration.md').read_text().replace('# ۱۰ — مرجع تنظیمات و limitها',
+              '### مرجع تنظیمات').replace('](../../','](../').rstrip()]
+    for record in facts['files']:
+        name=record['path']
+        if name.startswith('contracts/') and name.endswith(('.yaml','.yml')):
+            rows += ['', '## Contract: '+name, '', '['+name+'](../'+name+')',
+                     '', '```yaml', (ROOT/name).read_text().rstrip(), '```']
+    rows += ['', reference(facts).replace('](../../','](../').rstrip()]
+    return '\n'.join(rows)+'\n'
+
+
 def book(manifest,contents):
     rows=['# '+manifest['title'],'', 'تاریخ بررسی: `'+manifest['date']+'`؛ مبنای رفتار برنامه: `'+manifest['application_commit']+'`.',
           '', 'این کتاب نسخه یک‌جلدی فصل‌های همین پوشه است. فصل‌ها و مرجع ماشینی منبع نگهداری هستند؛ BOOK.md و HTML را دستی ویرایش نکنید.', '', '## فهرست مطالب','']
@@ -162,6 +177,7 @@ def main():
     contents={name:outputs.get(name,(MANUAL/name).read_text() if (MANUAL/name).exists() else '') for name in manifest['chapters']}
     missing=[name for name,text in contents.items() if not text.strip()]
     if missing:raise SystemExit('Missing chapters: '+', '.join(missing))
+    outputs['../AGENT_GUIDE.md']=agent_guide(facts)
     outputs['BOOK.md']=book(manifest,contents)
     outputs['PROJECT_MANUAL.html']=render_html(outputs['BOOK.md'],manifest)
     stale=[]

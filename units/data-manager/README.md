@@ -11,7 +11,7 @@ Data Manager مالک مدل‌های داده، منابع، اعتبارسنج
 
 ```bash
 python3 -m unittest discover -s units/data-manager/tests -v
-````
+```
 از ریشهٔ پروژه:
 ```
 python3 units/data-manager/run.py

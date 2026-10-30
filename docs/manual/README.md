@@ -1,6 +1,6 @@
 # دفترچه جامع پروژه 30nA
 
-مرجع نسخه فعلی، به زبان فارسی با اصطلاحات فنی اصلی. مبنای بررسی کد `c3b97d2`، تاریخ ۲۰۲۶-۱۰-۳۰. وضعیت محصول Release candidate برای demo با Worker trusted است؛ پذیرش VPS هنوز مستقل و تأییدنشده است.
+مرجع نسخه فعلی، به زبان فارسی با اصطلاحات فنی اصلی. مبنای بررسی کد `6109833`، تاریخ ۲۰۲۶-۱۰-۳۰. وضعیت محصول Release candidate برای demo با Worker trusted است؛ پذیرش VPS هنوز مستقل و تأییدنشده است.
 
 ## نسخه‌های قابل مطالعه
 
@@ -50,3 +50,7 @@ node scripts/documentation/render_pdf.cjs
 اگر از venv دارای pip استفاده می‌کنید، نصب docs lock با `python -m pip install --require-hashes` نیز ممکن است. برای PDF، Chrome/Chromium محلی لازم است. renderer آفلاین است و app، env، credential یا DB عملیاتی را نمی‌خواند. PDF manifest، hash HTML و PDF را ثبت می‌کند و checker مانع PDF قدیمی نسبت به HTML می‌شود.
 
 اسناد baseline در پوشه handbook/audit تاریخچه‌اند؛ این دفترچه و OpenAPI فعلی را با آن‌ها اشتباه نگیرید. اختلاف‌های واقعی حذف نشده‌اند و در فصل ۱۹ قابل پیگیری‌اند.
+
+## توسعه با Agent
+
+[راهنمای فنی مستقل Agent](../AGENT_GUIDE.md) نقشه تغییر و index کامل توابع و قراردادها را یکجا دارد. توضیحات در [منبع راهنما](../AGENT_GUIDE.source.md) و index از کد نگهداری می‌شوند؛ همان build و freshness check بالا این خروجی را هم پوشش می‌دهند.

@@ -38,3 +38,7 @@
 ## دفترچه جامع
 
 معماری، APIها، پیکربندی، عملیات و محدودیت‌های جاری در [دفترچه کامل](manual/README.md) ثبت شده‌اند.
+
+## بازبینی سراسری مستندات
+
+قراردادهای CODE/Worker و READMEهای فعال هماهنگ شدند؛ bug بازنویسی history Runtime رفع و CA خصوصی Manager → Runtime اضافه شد. اصلاحات در تست کامل محلی هر دو Python با `294 passed, 65 subtests passed` بررسی شدند. [گزارش بازبینی](DOCUMENTATION_REVIEW.md) و [راهنمای مستقل Agent](AGENT_GUIDE.md) جزئیات دارند. این نتیجه جای پذیرش VPS نیست.

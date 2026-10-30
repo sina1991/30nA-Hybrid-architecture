@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased — Documentation and Runtime correctness
+
+- Preserve active and terminal Runtime history when an invalid request reuses an execution ID; cover SQLite restart and idempotency replay.
+- Add explicit private-CA configuration for owner-bound Manager-to-Runtime HTTPS with verification enabled.
+- Align CODE/Worker contracts and active READMEs; add a generated standalone AI Agent guide, architecture diagram and real Dashboard screenshot.
+- Refresh the Persian manual, source index and offline PDF; check generated Agent references in CI.
+
 ## Unreleased — Initial customer demo
 
 - Dashboard executes enabled pre-registered trusted Workers with JSON input, result polling, history and cancellation.

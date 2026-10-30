@@ -61,6 +61,8 @@ directoryها باید متعلق به حساب مربوط، با mode `0700` ب
 }
 ```
 
+فقط در mapping مربوط به Manager → Runtime می‌توانید field اختیاری `"ca_file": "/etc/30na/ca/runtime-ca.pem"` اضافه کنید؛ نبود آن از trust پیش‌فرض HTTPX استفاده می‌کند. فایل باید PEM معتبر، قابل خواندن حساب سرویس و فاقد private key باشد. این field در Runtime → CODE مصرف نمی‌شود.
+
 هر owner باید credential همان owner را در سرویس مقصد داشته باشد؛ یک token ادمین مشترک برای همه کاربران استفاده نکنید. transportها redirect را دنبال نمی‌کنند و TLS verification را خاموش نمی‌کنند. credentialهای outbound cache می‌شوند؛ پس از rotation، سرویس مصرف‌کننده را restart کنید.
 
 ## تنظیمات هر سرویس
@@ -103,7 +105,7 @@ DASHBOARD_WORKER_MANAGER_URL=https://manager.example.com
 DASHBOARD_CODE_MANAGER_URL=https://code.example.com
 ```
 
-Dashboard، token کاربر را پس از اعتبارسنجی به مقصد تعیین‌شده می‌فرستد؛ بنابراین برای همین حالت، credential کاربر در Dashboard و upstream باید به owner یکسان نگاشت شود. token نه در HTML تولیدشده قرار می‌گیرد و نه در localStorage ذخیره می‌شود. این نسخه فقط عملیات read-only را در Dashboard ارائه می‌کند.
+Dashboard، token کاربر را پس از اعتبارسنجی به مقصد تعیین‌شده می‌فرستد؛ بنابراین برای همین حالت، credential کاربر در Dashboard و upstream باید به owner یکسان نگاشت شود. token نه در HTML تولیدشده قرار می‌گیرد و نه در localStorage ذخیره می‌شود. Dashboard اجرای Worker، polling نتیجه، history و cancel را نیز از BFF محدود و احراز هویت‌شده ارائه می‌کند.
 
 ## systemd، HTTPS و شبکه
 
@@ -111,7 +113,7 @@ templateها در `deployment/systemd/` قرار دارند. پیش از نصب�
 
 هر سرویس دقیقاً **یک process** دارد. Manager یک lock روی DB و Runtime یک lock روی state root می‌گیرد؛ چند worker یا چند replica روی همان state مجاز نیست. CODE از Gunicorn با یک process و هشت thread استفاده می‌کند. برای Build و Runtime، `PrivateTmp` فعال نکنید: Docker daemon باید فایل‌های staging را در همان مسیر ببیند.
 
-Listenerهای داخلی فقط روی loopback هستند: CODE `8099`، Manager `8101`، Runtime `8102` و Dashboard `8020`. یک reverse proxy با certificate معتبر، سقف body، timeout مناسب Build/Runtime و rate limit جلوی آن‌ها قرار دهید. Authorization باید بدون log شدن حفظ شود. در اتصال داخلی نیز برای transportهای Runtime از URL معتبر HTTPS استفاده کنید؛ CA خصوصی را در trust store استاندارد سیستم نصب کنید، نه با `verify=False`.
+Listenerهای داخلی فقط روی loopback هستند: CODE `8099`، Manager `8101`، Runtime `8102` و Dashboard `8020`. یک reverse proxy با certificate معتبر، سقف body، timeout مناسب Build/Runtime و rate limit جلوی آن‌ها قرار دهید. Authorization باید بدون log شدن حفظ شود. در اتصال داخلی نیز برای transportهای Runtime از URL معتبر HTTPS استفاده کنید؛ برای Manager → Runtime، مسیر PEM معتبر را در `ca_file` هر owner در `WORKER_MANAGER_RUNTIME_CREDENTIALS` قرار دهید. برای transportهای urllib در Runtime → CODE، Dashboard و seed، trust پیش‌فرض Python/OpenSSL و در صورت نیاز `SSL_CERT_FILE` را برای همان process تنظیم و آزمایش کنید. `trust_env=False` در HTTPX باعث می‌شود `SSL_CERT_FILE` جای `ca_file` Manager را نگیرد؛ از `verify=False` استفاده نکنید.
 
 در firewall فقط SSH محدودشده و HTTPS مورد نیاز را باز کنید. هیچ Docker socket یا TCP API را عمومی نکنید. development identity headerها در Production خاموش بمانند.
 

@@ -1,0 +1,28 @@
+digraph Architecture {
+  graph [rankdir=LR,bgcolor="#0b1120",pad="0.4",nodesep="0.45",ranksep="0.6",fontname="DejaVu Sans",label="30nA | Release candidate architecture",labelloc=t,fontsize=22,fontcolor="#e2e8f0"];
+  node [shape=box,style="rounded,filled",fillcolor="#17263d",color="#38547a",fontname="DejaVu Sans",fontcolor="#e2e8f0",margin="0.18,0.12"];
+  edge [color="#56b6e8",fontcolor="#b9d7ef",fontname="DejaVu Sans",fontsize=10];
+  browser [label="Browser\nToken in memory"];
+  dashboard [label="Dashboard / BFF\nAllowed routes only"];
+  manager [label="Worker Manager\nOwner-scoped queue + scheduler"];
+  runtime [label="Worker Runtime\nHash verification + execution"];
+  code [label="Code Manager\nSource / Build / Publication"];
+  data [label="Data Manager\nIn-process WSGI adapter"];
+  sandbox [label="Docker Sandbox\nPinned image / no network",fillcolor="#17362f",color="#4c9c7b"];
+  mdb [label="Manager SQLite",shape=cylinder];
+  rdb [label="Per-owner Runtime SQLite",shape=cylinder];
+  blobs [label="CODE blobs + manifests",shape=cylinder];
+  ddb [label="DATA SQLite",shape=cylinder];
+  browser -> dashboard [label="HTTPS + bearer"];
+  dashboard -> manager [label="HTTPS / same owner"];
+  dashboard -> code [label="Optional source listing"];
+  manager -> runtime [label="HTTPS / owner credential"];
+  runtime -> code [label="HTTPS / published bytes"];
+  code -> data [label="Public API / same owner"];
+  manager -> mdb [color="#708299"];
+  runtime -> rdb [color="#708299"];
+  code -> blobs [color="#708299"];
+  data -> ddb [color="#708299"];
+  code -> sandbox [label="Isolated source tests"];
+  runtime -> sandbox [label="Worker execution"];
+}

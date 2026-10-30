@@ -31,3 +31,5 @@ python scripts/testing/run_ci.py --image "$(docker image inspect --format '{{.Id
 فصل‌ها در `docs/manual/` منبع‌اند؛ `BOOK.md`، HTML، source inventory و PDF generated هستند. طبق [راهنمای ساخت](docs/manual/README.md) بازتولید و freshness/link/PDF checksum را بررسی کنید. baselineهای تاریخی را با وضعیت جاری اشتباه نگیرید.
 
 انتخاب license یا تعهد SLA نیازمند تصمیم صاحب پروژه است؛ صرف عمومی‌بودن repository، مجوز متن‌باز یا تعهد پشتیبانی ایجاد نمی‌کند.
+
+برای شروع Agent جدید، [AGENTS.md](AGENTS.md) و [راهنمای فنی مستقل](docs/AGENT_GUIDE.md) نقطه ورود هستند؛ برای تغییر کوچک از جدول مسیریابی همان راهنما استفاده کنید.
