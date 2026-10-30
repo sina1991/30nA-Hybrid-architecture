@@ -505,7 +505,7 @@ start();
 
 def create_app(*, credential_path=None, upstream_factory=None):
     """Return an isolated app; upstream access requires explicit identity setup."""
-    instance = FastAPI(title='Dashboard Core', version='0.1.0')
+    instance = FastAPI(title='Dashboard Core', version='0.1.1')
     configured = credential_path is not None and upstream_factory is not None
     for route in app.routes:
         path = getattr(route, 'path', '')
@@ -519,10 +519,10 @@ def create_app(*, credential_path=None, upstream_factory=None):
         instance.add_middleware(BodyLimitMiddleware)
         register_error_handlers(instance)
         from .upstreams import create_router
-        from .upstream_panel import PANEL
+        from .upstream_panel import ACCESS, PANEL
         instance.include_router(create_router(credential_path, upstream_factory))
 
         @instance.get('/', response_class=HTMLResponse)
         def connected_dashboard():
-            return dashboard().replace('<main>', PANEL + '<main>', 1)
+            return dashboard().replace('</header>', ACCESS + '</header>', 1).replace('</main>', '</main>' + PANEL, 1)
     return instance

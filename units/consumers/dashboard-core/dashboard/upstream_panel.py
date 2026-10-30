@@ -1,7 +1,23 @@
 """Account workspace for trusted, pre-registered workers; credentials stay in memory."""
+ACCESS = r'''
+<div class="account-access" dir="rtl" aria-label="حساب کاربری">
+  <form id="account-form">
+    <label class="account-label" for="account-token">Access token حساب</label>
+    <input id="account-token" type="password" autocomplete="off" placeholder="Access token" required>
+    <button id="account-connect" type="submit">ورود به حساب</button>
+  </form>
+  <div id="account-actions" class="account-actions" hidden>
+    <a id="worker-workspace-link" href="#worker-workspace">مدیریت Workerها ↓</a>
+    <button id="account-refresh" type="button">به‌روزرسانی</button>
+    <button id="account-disconnect" type="button">خروج از حساب</button>
+  </div>
+  <div id="account-notices"><p id="account-status" role="status" aria-live="polite"></p></div>
+</div>
+'''
+
 PANEL = r'''
 <style>
-.account-panel {margin:24px;padding:24px;border:1px solid #24324a;border-radius:12px;direction:rtl}
+.account-panel {width:calc(100% - 48px);max-width:1752px;margin:0 auto 24px;padding:24px;border:1px solid #24324a;border-radius:12px;direction:rtl}
 .account-panel form,.account-panel fieldset {display:grid;gap:12px}
 .account-panel fieldset {border:0;padding:0;margin:0;min-width:0}
 .account-panel input,.account-panel textarea,.account-panel select,.account-panel button {
@@ -17,20 +33,22 @@ PANEL = r'''
 .account-panel label {display:block;margin-top:12px}
 .account-panel dialog input,.account-panel dialog textarea,.account-panel dialog select {box-sizing:border-box;width:100%}
 .account-panel input[readonly] {opacity:.65}.account-panel button:focus-visible {outline:3px solid #38bdf8;outline-offset:3px}
+.account-access {flex:0 1 360px;max-width:100%;min-width:0}
+.account-access form,.account-access .account-actions {display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0}
+.account-access input,.account-access button,.account-access a {font:inherit;border:1px solid var(--border);border-radius:7px;padding:7px 10px;background:var(--panel);color:var(--text)}
+.account-access input {flex:1;min-width:0;width:170px;direction:ltr}
+.account-access button {cursor:pointer;white-space:nowrap}
+.account-access a {text-decoration:none}
+.account-access [hidden] {display:none!important}
+.account-access #account-status {font-size:12px;color:var(--muted);margin:4px 0 0;overflow-wrap:anywhere}
+#account-status:empty {display:none}
+.account-label {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(max-width:560px){.account-access{flex-basis:100%}.account-panel{width:calc(100% - 32px);padding:16px}}
 </style>
-<section class="account-panel" aria-label="اجرای Worker">
+<section id="worker-workspace" class="account-panel" hidden aria-label="اجرای Worker">
   <h2>محیط اجرای Worker</h2>
   <p class="account-note">نسخه اولیه برای اجرای Workerهای مورداعتماد و ازپیش‌ثبت‌شده است.</p>
-  <form id="account-form">
-    <label for="account-token">Access token حساب</label>
-    <input id="account-token" type="password" autocomplete="off" required>
-    <button id="account-connect" type="submit">ورود به حساب</button>
-  </form>
-  <div id="account-actions" class="account-actions" hidden>
-    <button id="account-refresh" type="button">به‌روزرسانی تاریخچه</button>
-    <button id="account-disconnect" type="button">خروج از حساب</button>
-  </div>
-  <p id="account-status" role="status" aria-live="polite">وارد حساب نشده‌اید.</p>
+  <div id="worker-notices"></div>
   <section id="worker-management" hidden aria-label="مدیریت Workerها">
     <h3>مدیریت Workerها</h3>
     <button id="worker-create" type="button">ثبت Worker جدید</button>
@@ -102,11 +120,16 @@ PANEL = r'''
   const labels = {accepted:'در صف',running:'در حال اجرا',succeeded:'موفق',failed:'ناموفق',cancelled:'لغوشده'};
   const terminal = job => ['succeeded','failed','cancelled'].includes(job.status);
   let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false;
-  let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0;
+  let allWorkers = [], historyRows = [], editing = null, confirmation = null, managing = false, refreshTicket = 0, authenticated = false;
   let active = null, enabledWorkers = [], session = new AbortController();
 
   function status(message) { el('account-status').textContent = message; }
   function controls() {
+    const ready = Boolean(token) && authenticated;
+    el('worker-workspace').hidden = !ready;
+    el('worker-workspace-link').hidden = !ready;
+    const notices = el(ready ? 'worker-notices' : 'account-notices');
+    if (el('account-status').parentElement !== notices) notices.append(el('account-status'));
     el('account-actions').hidden = !token;
     el('worker-run-form').hidden = !token;
     el('worker-management').hidden = !token;
@@ -123,7 +146,7 @@ PANEL = r'''
   }
   function disconnect(message = 'از حساب خارج شدید. اجراهای پذیرفته‌شده در سرور ادامه دارند.') {
     generation++; watcher++; clearTimeout(timer); session.abort(); session = new AbortController();
-    refreshTicket++; allWorkers = []; historyRows = []; editing = null; confirmation = null; managing = false;
+    authenticated = false; refreshTicket++; allWorkers = []; historyRows = []; editing = null; confirmation = null; managing = false;
     el('worker-editor').close(); el('worker-confirm').close();
     el('worker-edit-form').reset(); el('worker-edit-status').textContent = '';
     el('worker-confirm-form').reset(); el('worker-confirm-status').textContent = '';
@@ -189,7 +212,7 @@ PANEL = r'''
     try {
       const [workers,history] = await Promise.all([request('workers'),request('executions')]);
       if (current !== generation || ticket !== refreshTicket) return;
-      allWorkers = workers.workers; renderWorkers();
+      authenticated = true; allWorkers = workers.workers; renderWorkers();
       const previous = el('account-worker').value;
       enabledWorkers = workers.workers.filter(row => row.lifecycle === 'enabled');
       el('account-worker').replaceChildren();

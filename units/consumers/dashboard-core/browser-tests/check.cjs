@@ -19,8 +19,9 @@ if(isReal) {
 const server = http.createServer((req,res) => {
   res.setHeader('content-type', req.url === '/' ? 'text/html; charset=utf-8' : 'application/json');
   if(req.url === '/') res.end(input.html);
-  else if(req.url === '/api/themes') res.end('{"themes":[]}');
-  else if(req.url === '/api/modules') res.end('{"modules":[]}');
+  else if(req.url === '/api/themes') res.end(JSON.stringify({themes:(input.themes||[]).map(theme=>({...theme,slot_count:theme.slots.length}))}));
+  else if(req.url === '/api/modules') res.end(JSON.stringify({modules:input.modules||[]}));
+  else if(req.url.startsWith('/api/themes/')) res.end(JSON.stringify((input.themes||[]).find(theme=>theme.id===req.url.split('/').pop())));
   else if(req.url === '/health') res.end('{"status":"ok"}');
   else {res.statusCode=404;res.end('{}');}
 });
@@ -58,6 +59,8 @@ async function main() {
         result:completed?{result}:null});
     });
     await page.goto(base);
+    await require('./layout.cjs')(page,false);
+    if(input.layoutScreenshot) await page.screenshot({path:input.layoutScreenshot});
     await page.locator('#account-token').fill(isReal?input.token:'wrong');
     await page.locator('#account-connect').click();
     if(!isReal) {
@@ -67,6 +70,7 @@ async function main() {
       await page.locator('#account-connect').click();
     }
     await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
+    await require('./layout.cjs')(page,true);
     await page.locator('#account-worker').selectOption('demo-summary');
     assert(!await page.locator('#account-worker').textContent().then(text=>text.includes('disabled-worker')));
     if(!isReal) {
@@ -124,6 +128,7 @@ async function main() {
     assert.equal(await page.locator('#edit-artifact-id').inputValue(),'');
     assert.equal(await page.locator('#worker-list').textContent(),'');
     assert.equal(await page.locator('#execution-output').textContent(),'');
+    await require('./layout.cjs')(page,false);
     if(!isReal) {
       await page.locator('#account-token').fill('browser-test-token');await page.locator('#account-connect').click();
       await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
