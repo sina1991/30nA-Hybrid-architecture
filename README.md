@@ -15,7 +15,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-archite
 
 در مراحل نصب، **دامنه و email** پرسیده می‌شوند؛ خرید یا دریافت دستی certificate لازم نیست. این فرمان مربوط به branch `feat/release-readiness` است. پس از Build و اجرای موفق نمونه، آدرس `https://دامنه-شما` نمایش داده می‌شود. token ورود در فایل root-only `/etc/30na/customer-token` ساخته می‌شود و چاپ نمی‌شود.
 
-نصب روی سرور دارای سرویس/داده موجود متوقف می‌شود. [راهنمای installer](docs/deployment/installer.md) شامل پیش‌نیاز، دانلود قابل بررسی، `--check-only`، ادامه نصب ناموفق، تمدید certificate و خطایابی است. نصب موفق جای پذیرش امنیتی نهایی VPS نیست.
+installer وجود مسیرها، حساب‌ها و portهای مرتبط را بررسی و در صورت تداخل متوقف می‌شود؛ شناسایی همه داده‌ها و سرویس‌های نامرتبط ممکن نیست، پس آن را فقط روی VPS خالی اختصاصی اجرا کنید. [راهنمای installer](docs/deployment/installer.md) شامل پیش‌نیاز، دانلود قابل بررسی، `--check-only`، ادامه نصب ناموفق، تمدید certificate و خطایابی است. نصب موفق جای پذیرش امنیتی نهایی VPS نیست.
 
 ## دفترچه کامل پروژه
 

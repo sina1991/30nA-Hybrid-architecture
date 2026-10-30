@@ -39,7 +39,7 @@ domain و email مثال را با مقادیر خود عوض کنید. انتخ
 bash /tmp/30na-install.sh --domain dashboard.example.com --email admin@example.com --check-only
 ```
 
-این گزینه OS، root، systemd، resolve دامنه، حساب‌ها، مسیرهای موجود و portهای موردنیاز را بررسی می‌کند. apt، user، certificate یا سرویس ایجاد نمی‌کند؛ تست واقعی ACME، Docker و اجرا در این حالت انجام نمی‌شود. برای شروع، `python3` و `curl` باید موجود باشند؛ اگر installer نبود Python را گزارش کرد، آن‌ها را از apt رسمی نصب کنید.
+این گزینه OS، root، systemd، resolve دامنه، حساب‌ها، مسیرهای موجود و portهای موردنیاز را بررسی می‌کند. این بررسی inventory کامل همه سرویس‌ها و داده‌های سرور نیست؛ خالی و اختصاصی بودن VPS را administrator باید بداند. apt، user، certificate یا سرویس ایجاد نمی‌کند؛ تست واقعی ACME، Docker و اجرا در این حالت انجام نمی‌شود. برای شروع، `python3` و `curl` باید موجود باشند؛ اگر installer نبود Python را گزارش کرد، آن‌ها را از apt رسمی نصب کنید.
 
 ## مراحل واقعی نصب
 
