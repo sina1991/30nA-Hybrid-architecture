@@ -200,3 +200,13 @@ Moduleهای `demo-account/demo-trade/demo-bot/demo-positions/demo-reports` در
 در Upload Center بخش `Download from URL` فایل HTTPS عمومی تا ۲۰ MiB را با همان قواعد Public/Direct دریافت می‌کند. نام اختیاری است و پیش‌فرض از URL گرفته می‌شود. Redirectها دوباره validate می‌شوند؛ DNS به IP عمومی اعتبارسنجی‌شده pin می‌شود، hostname در TLS بررسی می‌شود و آدرس‌های داخلی/metadata، Credential در URL، انتقال فشرده و پورت غیر 443 پذیرفته نمی‌شوند. Cookie/Session کاربر به منبع ارسال نمی‌شود. لینک صفحهٔ YouTube لینک فایل دانلود نیست. دانلود ناقص یا بزرگ‌تر از حد در فهرست ذخیره نمی‌شود.
 
 سقف Nginx در مسیر عمومی Dashboard در نصب جدید ۳۰ MiB است؛ updater برای locationهای Dashboard در تنظیمات managed همین override را اعمال می‌کند تا محدودیت قدیمی ۱ MiB مانع آپلود ۲۰ MiB نشود. سایر APIها محدودیت Backend قبلی خود را حفظ می‌کنند.
+
+
+## Music Player
+
+```bash
+30na modules run music-player --owner OWNER_ID --slot cli --input '{}'
+python3 /opt/30na/dashboard-current/modules/music-player/module.py --owner OWNER_ID --slot cli --input -
+```
+
+ورودی ذخیره: `{"action":"set","tracks":[{"title":"Night sky","settings":{"source":"external","url":"https://example.com/audio.mp3"}}]}`. owner باید حساب فعال واقعی باشد؛ اجرای مستقیم فقط برای اپراتور محلی trusted است. state فهرست حداکثر ۱۰ Track برای همان owner ذخیره می‌شود. CLI descriptor می‌دهد؛ پخش فقط در مرورگر است. ماژول و تب Media یک Playlist و یک موتور پخش دارند؛ Logout آن را پاک می‌کند. [راهنمای کاربر](../dashboard/USER_GUIDE.md).

@@ -17,7 +17,7 @@ SUPPORTED_TYPES = {
     "session-clock",
     "price-levels",
     "demo-account", "demo-trade", "demo-bot", "demo-positions", "demo-reports",
-    "media-player",
+    "media-player", "music-player",
     "myip",
     "economic-calendar",
     "empty",

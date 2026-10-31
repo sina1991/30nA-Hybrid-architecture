@@ -1,6 +1,6 @@
 # دفترچه جامع پروژه 30nA Hybrid Architecture
 
-تاریخ بررسی: `2026-10-30`؛ مبنای رفتار برنامه: `6f71531301ea97b29d479b371e02cee0838ffd76`.
+تاریخ بررسی: `2026-11-01`؛ مبنای رفتار برنامه: `v1.1.1`.
 
 این کتاب نسخه یک‌جلدی فصل‌های همین پوشه است. فصل‌ها و مرجع ماشینی منبع نگهداری هستند؛ BOOK.md و HTML را دستی ویرایش نکنید.
 
@@ -447,11 +447,11 @@ Worker می‌تواند `{"value":7,"children":[{"worker_id":"child","input":{}
 
 ## دو حالت مستقل
 
-`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، ورود کوچک را در header و Workspace حساب را پس از بخش اسلات‌ها قرار می‌دهد. Workspace تا دریافت موفق داده حساب پنهان است. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
+`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، صفحهٔ ورود مستقل با Password/Token را پیش از نمایش Dashboard و Workspace حساب را پس از بخش اسلات‌ها قرار می‌دهد. Workspace تا دریافت موفق داده حساب پنهان است. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
 
 ## راهنمای کاربر
 
-۱. صفحه HTTPS را باز کنید؛ Access token اختصاصی حساب را وارد کنید. ۲. Worker enabled را انتخاب کنید. ۳. JSON object و timeout بین ۱ تا ۳۰۰ ثانیه بدهید. ۴. اجرای Worker را بزنید. ۵. وضعیت و execution ID را ببینید؛ خروجی موفق به‌صورت JSON نمایش داده می‌شود. ۶. در history، اجرای قبلی را انتخاب کنید. ۷. cancel، درخواست best-effort می‌فرستد؛ تا وضعیت terminal نیاید، cancelled ساخته نمی‌شود.
+۱. صفحه HTTPS را باز کنید؛ با Username/Password وارد شوید یا بخش Use an access token را باز کنید. ۲. Worker enabled را انتخاب کنید. ۳. JSON object و timeout بین ۱ تا ۳۰۰ ثانیه بدهید. ۴. اجرای Worker را بزنید. ۵. وضعیت و execution ID را ببینید؛ خروجی موفق به‌صورت JSON نمایش داده می‌شود. ۶. در history، اجرای قبلی را انتخاب کنید. ۷. cancel، درخواست best-effort می‌فرستد؛ تا وضعیت terminal نیاید، cancelled ساخته نمی‌شود.
 
 ورودی پیش‌فرض برای Worker نمونه `{"values":[10,20,30]}` است؛ همه Workerها الزاماً همین input را نمی‌پذیرند. پنل اکنون ثبت Worker با reference Artifact، جزئیات، ویرایش configuration/schedule، enable/disable و حذف دارد. UI هنوز source upload یا Build/Publication ندارد؛ reference باید برای اجرای موفق از Artifact منتشرشده همان owner باشد و وجود آن در لحظه ثبت بررسی نمی‌شود.
 
@@ -461,7 +461,7 @@ Worker می‌تواند `{"value":7,"children":[{"worker_id":"child","input":{}
 
 Token در HTML server-rendered، URL، localStorage، sessionStorage یا cookie ذخیره نمی‌شود؛ فقط تا logout/reload در closure صفحه می‌ماند. درخواست‌ها bearer دارند و cookie ارسال نمی‌کنند. ورود روی HTTP غیرloopback در UI رد می‌شود. `textContent` برای نمایش داده استفاده می‌شود. defaultهای theme و یادداشت‌های slot در localStorage نگهداری می‌شوند؛ این storage مربوط به token حساب نیست.
 
-BFF قبل از تماس upstream، credential کاربر را از hash mapping احراز می‌کند و همان credential را forward می‌کند؛ token ادمین عمومی جایگزین نمی‌شود. owner در body قابل انتخاب نیست. پاسخ account `Cache-Control: no-store` و `Vary: Authorization` دارد. CSRF cookie session یا OAuth/OIDC در این نسخه وجود ندارد؛ این سیستم login/password عمومی نیست.
+BFF قبل از تماس upstream، credential کاربر را از hash mapping احراز می‌کند و همان credential را forward می‌کند؛ token ادمین عمومی جایگزین نمی‌شود. owner در body قابل انتخاب نیست. پاسخ account `Cache-Control: no-store` و `Vary: Authorization` دارد. CSRF cookie session یا OAuth/OIDC در این نسخه وجود ندارد؛ ورود Password داخلی پروژه است؛ OAuth/OIDC عمومی ندارد.
 
 ## routeهای اصلی
 
@@ -498,6 +498,11 @@ History فعلاً حداکثر ۱۰۰ اجرای اخیر است. فیلتر Wo
 ## چیدمان v0.1.1
 
 اسلات‌ها در بالای صفحه باقی می‌مانند؛ login/logout جای آن‌ها را تغییر نمی‌دهد. پس از ورود، مدیریت، اجرا و history زیر تمام اسلات‌ها نمایش داده می‌شوند. پیام‌های Worker داخل Workspace و پیام ورود در header قرار می‌گیرند. لینک header دسترسی مستقیم به Workspace پایین صفحه می‌دهد. [نسخه توسعه و روش بررسی روی VPS](../development/dashboard-v0.1.1.md).
+
+
+## امکانات Dashboard در v1.1.1
+
+[راهنمای کاربر](../../docs/dashboard/USER_GUIDE.md)، [معامله دمو](../../docs/dashboard/demo-trading.md)، [Signal Scripts](../../docs/dashboard/signal-scripts.md) و [دفترچهٔ کم‌توکن Agent](../../docs/DASHBOARD_AGENT.md) مسیرهای فعال استفاده و توسعه‌اند. Login پس‌زمینه‌های تصادفی/نوبتی دارد؛ ذخیرهٔ رمز تابع Password Manager مرورگر است. Music Player یک audio بیرون تب‌ها و Playlist شخصی حداکثر ۱۰ Track دارد. Demo با USD/XAUUSD شبیه‌سازی‌شده و شرط دادهٔ تازه کار می‌کند؛ Signal به‌تنهایی سفارش نمی‌سازد. Upload امن تا ۲۰ MiB و Import HTTPS با Public/Direct در دسترس است.
 
 <a id="chapter-09"></a>
 
@@ -1103,7 +1108,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **279**؛ تعداد نمادهای Python: **1152**.
+تعداد فایل‌های فنی و پشتیبان: **349**؛ تعداد نمادهای Python: **1445**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -1113,15 +1118,15 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [.gitattributes](../../.gitattributes) | 108 | `5c74770b9a41953e78518fc6f380870b3d0b1b7985a19f8cd6ad52e8bcd07b08` |
 | [.github/workflows/baseline-verification.yml](../../.github/workflows/baseline-verification.yml) | 4601 | `43337a0b754e591affe6f08657892e35202a16978aa7ca8f5086f8dda730b088` |
 | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
-| [.github/workflows/release.yml](../../.github/workflows/release.yml) | 2995 | `3bd849d3a5468419d50a6d21ac431f9d552580595629e5cdfdcbf6206843f8f1` |
+| [.github/workflows/release.yml](../../.github/workflows/release.yml) | 3091 | `f509fd3ba0721c1991a598ebfa4f376d77225c96ba18f11206ae5ab24c7b6052` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
-| [30na](../../30na) | 20177 | `273a9019ec0a2dd1b8ecb555604ef892cab994c0705692217885368f526e29dd` |
-| [AGENTS.md](../../AGENTS.md) | 2124 | `abff7ec1d833f288225af6ad93ec95436b0187fd05c0a1f953d7e53e5ddbea2c` |
-| [CHANGELOG.md](../../CHANGELOG.md) | 5504 | `bedb47a35a693f0fd92e01588ddcdfc53e7c684a3e7b9cff9e6e09c069ef405d` |
+| [30na](../../30na) | 23425 | `da6ed0a5cb32962c36e637593db0dd3e92ca0657426772a2fc4bc5216d84119e` |
+| [AGENTS.md](../../AGENTS.md) | 2381 | `8a436c29913fe45dee2d6ebb4de73ee58e30fae33f1df9773988a401e4208b05` |
+| [CHANGELOG.md](../../CHANGELOG.md) | 6155 | `78eeea764662138e0cb7299f6aa5aa9c748852c3ddb9a52e74f3f42293196dd5` |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
-| [README.md](../../README.md) | 7508 | `1b7f68a8a03babf23ffafec46debd676456d75b7cb557354282315f334e5680e` |
+| [README.md](../../README.md) | 7771 | `c7221479d9173c15d9a763bbb8f3024efd5fd3b97e01b17e519c07658dd1e78a` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
-| [VERSION](../../VERSION) | 6 | `1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8` |
+| [VERSION](../../VERSION) | 6 | `cc52f678848b814373757b460383bf61960e4943c203735adde0a350b3e50989` |
 | [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
 | [agents/base-prompt.md](../../agents/base-prompt.md) | 5002 | `967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a` |
 | [agents/tasks/01-core.md](../../agents/tasks/01-core.md) | 2178 | `246f884a492333b17d4cbcebb0435776f0eb4546f6e887cbafd57a294438692e` |
@@ -1169,7 +1174,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [deployment/systemd/30na-account-sync.service](../../deployment/systemd/30na-account-sync.service) | 655 | `cd2defd98c3272dcb46b1e67aeb801877bae5de8ceb49e742b1e9d6b24a48166` |
 | [deployment/systemd/30na-account-sync.timer](../../deployment/systemd/30na-account-sync.timer) | 210 | `dcfeb8816598de7cbb8bd8c05e6329476a2bf0d986503566bfad1097eb6e46ba` |
 | [deployment/systemd/30na-code-manager.service](../../deployment/systemd/30na-code-manager.service) | 840 | `595bb8311728b0f10aa4695992cad683ca78847d8dfa4c09e551d7035f001488` |
-| [deployment/systemd/30na-dashboard.service](../../deployment/systemd/30na-dashboard.service) | 819 | `4208a90b065f01c6ee967b14e85a8fed09233de712c822cb1bf3dc4204e972f5` |
+| [deployment/systemd/30na-dashboard.service](../../deployment/systemd/30na-dashboard.service) | 861 | `d5214ad3a1bba29384d96bdf1f1c31a2b031fcb27b1a15b9d7a163b4a48202ba` |
 | [deployment/systemd/30na-worker-manager.service](../../deployment/systemd/30na-worker-manager.service) | 734 | `0051999306cf9921f50d1078b729231bb9660b42d534cdbcc895e683a07e7a36` |
 | [deployment/systemd/30na-worker-runtime.service](../../deployment/systemd/30na-worker-runtime.service) | 915 | `22a0304b13147dbff1454da3c28d105ce3898525166132d1cc834f28e123d405` |
 | [examples/demo-summary/demo_worker.py](../../examples/demo-summary/demo_worker.py) | 691 | `339e8d841d6a233bba5d48cd5373d03a96bd68db1f9ec486cacb63c92e303a0f` |
@@ -1198,57 +1203,103 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [modules/alerts/module.py](../../modules/alerts/module.py) | 263 | `94bbd626fdca69c7c74d456ce328582e8d2455d91cdccd20742baef64b6af72f` |
 | [modules/calculator/manifest.json](../../modules/calculator/manifest.json) | 178 | `a1697698e2452c0165e17aedff5a11b61845740c6fcd7408cad34f90533ab423` |
 | [modules/calculator/module.py](../../modules/calculator/module.py) | 1033 | `88256927623eec9529c986f7543aa179e55349b517574d44dc8f818836de18c8` |
+| [modules/chart_overlays.py](../../modules/chart_overlays.py) | 1875 | `86618085cfacba3a9efc32ea3af750bb3087d895f66fa4a891a9c2654cce19e2` |
 | [modules/chat-box/manifest.json](../../modules/chat-box/manifest.json) | 150 | `10429340f56d582794adc6f252cc7235cf862023a773dfd98b270d4acb33ff58` |
 | [modules/chat-box/module.py](../../modules/chat-box/module.py) | 1122 | `41df328162f831e882e9592bbc6fa24d883e795e3112745d4c4d7b7d2a906969` |
 | [modules/chat_store.py](../../modules/chat_store.py) | 7264 | `d821d3cf7aaedb47aff533894a06a941dcc2114517eefcb234e54f5ebccaf1a2` |
+| [modules/client_ip.py](../../modules/client_ip.py) | 479 | `b28aebb4057568f92ab628cd627d4a68d732d24ec1d3a0401d858012f3e2fbf6` |
 | [modules/clock/clock.py](../../modules/clock/clock.py) | 794 | `88595bffcae5fec638e48c6cef085160acb62fe95860cc9316f1351270693fc0` |
 | [modules/clock/manifest.json](../../modules/clock/manifest.json) | 150 | `344220c8fef4d4a771ac909b1cb4c2d8d875cebb94a09438176ca1ed5bcb7eea` |
 | [modules/counter/manifest.json](../../modules/counter/manifest.json) | 168 | `e9a24c818a815286fc4814b0b2a32b8ea6befa5c48f76b793baba96ad83917ad` |
 | [modules/counter/module.py](../../modules/counter/module.py) | 1638 | `3583494b5d67816970eea91f81de96d5b712135a6a7c0cef35a04532b1eb4849` |
 | [modules/dashboard-health/manifest.json](../../modules/dashboard-health/manifest.json) | 180 | `83759a4b520e69bf9722b5238ae5e92488da03bcde70b77a877665548125fd51` |
 | [modules/dashboard-health/module.py](../../modules/dashboard-health/module.py) | 960 | `db799d1f4ac897f5d56febd2628f1e06548232f73350f946453c05f3fbb0bcb9` |
+| [modules/demo-account/manifest.json](../../modules/demo-account/manifest.json) | 197 | `10285e68fa8ff2915de5ba4dbfcd478ceadbf9ddb42b552b025047ac4bad653e` |
+| [modules/demo-account/module.py](../../modules/demo-account/module.py) | 363 | `aac9310dbcdf9737e8cd54f2edd5cbeafa33a590e5e111044d419a16e9df1be9` |
+| [modules/demo-bot/manifest.json](../../modules/demo-bot/manifest.json) | 201 | `64aa32f9300093f61a8fd7cde2e366d23bb1ec01789b7315016a06fed7d09bcd` |
+| [modules/demo-bot/module.py](../../modules/demo-bot/module.py) | 359 | `fe7441ec78e13dce46b494b8e01261ad1fb67020e6dde699b73b1c10e44c4a6e` |
+| [modules/demo-positions/manifest.json](../../modules/demo-positions/manifest.json) | 202 | `c5e92bcde8d2a584c8b6bf322729debf630cbbc2137bff53c7a93d2a1dd1747c` |
+| [modules/demo-positions/module.py](../../modules/demo-positions/module.py) | 365 | `8b2625df2aedc43397c72daef6086b70a48733dee0cb84032908b415d9eeceba` |
+| [modules/demo-reports/manifest.json](../../modules/demo-reports/manifest.json) | 201 | `6b7e1096d0fb7355e7739b5919559afef8baf014af68b8a2a2fb761afcbf2c5b` |
+| [modules/demo-reports/module.py](../../modules/demo-reports/module.py) | 363 | `2d290ad396b5a71e679eded9e80f6cc2f4e99be03a7f7e80b396d27cf44013bb` |
+| [modules/demo-trade/manifest.json](../../modules/demo-trade/manifest.json) | 197 | `df5305a0be0343f249dcbf77983d10944a7b4138acdc8ab6523b85ff60f845d5` |
+| [modules/demo-trade/module.py](../../modules/demo-trade/module.py) | 361 | `0e7d7b6066ea3ea086187000de96b8a3b5bd671cf3e6943d56ad241e0003b8c7` |
+| [modules/demo_components.py](../../modules/demo_components.py) | 2363 | `302de92670cae96e3d9396ffd075faa4ebec3c1cb9bbd4735b802543f5c30bac` |
+| [modules/demo_trading.py](../../modules/demo_trading.py) | 31440 | `df2c4116b565ca1396e9966e980821e033f03d7ba0590a496a189d8443698a3b` |
 | [modules/dice-roller/manifest.json](../../modules/dice-roller/manifest.json) | 199 | `ead3dda45d00b8d1e8582ccd2d859486385ef0c682aa3b1a6d750cf1c0a3c33b` |
 | [modules/dice-roller/module.py](../../modules/dice-roller/module.py) | 694 | `0166c383e6fe7ed89532dee4cc58bae634de3ec61e839fb25564a6ceba9df70c` |
 | [modules/disk-usage/manifest.json](../../modules/disk-usage/manifest.json) | 172 | `5594f7cfc929d54f28aa5007f3b566c08c6bd7478fb25b0c6dbb2496496c42b8` |
 | [modules/disk-usage/module.py](../../modules/disk-usage/module.py) | 261 | `6c76a9ef7867d7a414035daf638c8b9497f04b8b2751f250c984c54bddfcb610` |
 | [modules/docker-monitor/manifest.json](../../modules/docker-monitor/manifest.json) | 187 | `78f8832a7cdc4c251b5576792425f7d2263f441d69b5616c7064a293681cb602` |
 | [modules/docker-monitor/module.py](../../modules/docker-monitor/module.py) | 263 | `3deefa3ab19f99355fe88500ba6f297d3a87ad28713a2814ad4323af27c3b7e3` |
+| [modules/economic-calendar/manifest.json](../../modules/economic-calendar/manifest.json) | 222 | `53b38739fe81e550a79b6a97f80c467d2e2b4df76bdfaa5ef2c23523808438d8` |
+| [modules/economic-calendar/module.py](../../modules/economic-calendar/module.py) | 292 | `7ab1bf99528ed57d706997786e413cef58455d7dbdfaf0e36ca87954eedc694e` |
+| [modules/economic_calendar.py](../../modules/economic_calendar.py) | 4466 | `edc5c28fdf77792ca4947b95bd88388e308b507754a305d97f7314679c40d150` |
 | [modules/empty/manifest.json](../../modules/empty/manifest.json) | 150 | `2fb5fa5c447ca6edca494b8632322031604d9a2ff095c8e78d38467eff2be1a7` |
 | [modules/empty/module.py](../../modules/empty/module.py) | 364 | `18663f5ed9b09efec95efd6aa3a632844f076aea9e3cbeb3fc15da3f6ca961c9` |
-| [modules/execution.py](../../modules/execution.py) | 2085 | `e6c5a916b2c286668abd8c9721211af67a78d8bcfe811a3e26a22e9bc9d4f0cd` |
+| [modules/execution.py](../../modules/execution.py) | 2604 | `6aec4b7207369beb10a53427ad07d9b6ea9c5502d5e64972c0908292e854f276` |
 | [modules/gold-chart/manifest.json](../../modules/gold-chart/manifest.json) | 198 | `9be1ef05655de7dc910270785e2c0b0f82b1d6a65f5e0795326ebb2df1f48942` |
 | [modules/gold-chart/module.py](../../modules/gold-chart/module.py) | 822 | `08a0986abc0636ad38b4bf58859088816f9b29a918a6ed7fe47522dbea27bed4` |
 | [modules/host_monitor.py](../../modules/host_monitor.py) | 8410 | `cc76c577110d8acc5a0e7c30b8fa759e96be91812cfbaedfaff0e49a727e12a6` |
-| [modules/indicator_profiles.py](../../modules/indicator_profiles.py) | 2161 | `1688916f16d805cda4b9ee5d90de1c76054388329a6cdd2d7588cfd3efe302b7` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py) | 2262 | `ea617a387f241b3615fc1de2946e93805b4a6a51ff8257eb49f5bdd1a44536d8` |
 | [modules/log-viewer/manifest.json](../../modules/log-viewer/manifest.json) | 163 | `a91ca1cbee3771400e9d86466688226a1313b4597bdd9887d00d7d334443e1f9` |
 | [modules/log-viewer/module.py](../../modules/log-viewer/module.py) | 261 | `0a490f3a6644d9f158b7abd2adad4f63baec04b17b0f19680671e4480f18efc3` |
 | [modules/macd/manifest.json](../../modules/macd/manifest.json) | 151 | `42049c3fb84c9e437ff67c79a1657971a43dc6e1b427217e76f5b845199379a9` |
 | [modules/macd/module.py](../../modules/macd/module.py) | 967 | `8ff6c9b3fcd17e247fd9e9f52a610404fd9880bfad2e633e378e86839faabe42` |
+| [modules/media-audio/manifest.json](../../modules/media-audio/manifest.json) | 208 | `a1b20a8cef60f8eebba216a3b469faae41811690825ecf9512c960a3fdb351fe` |
+| [modules/media-audio/module.py](../../modules/media-audio/module.py) | 346 | `1d83ad24ec3c8dd3b82ba28ec4ea6b886708a59601776bc7b7fe5e3b56df01fb` |
+| [modules/media-image/manifest.json](../../modules/media-image/manifest.json) | 208 | `a771583fa304a3286b2b09a2789b7db3d39b4d39049972057d1b34fc3b98de34` |
+| [modules/media-image/module.py](../../modules/media-image/module.py) | 346 | `06fcdbdacf2da220000b67749c4282eebb89a10bfa3337be01cd7ac0c3a3ba13` |
+| [modules/media-player/manifest.json](../../modules/media-player/manifest.json) | 218 | `61c8e4f7c6573a05ad9288c8048e108594f3ca55bc2a8097b96c176cf73d8bb6` |
+| [modules/media-player/module.py](../../modules/media-player/module.py) | 290 | `7e3683328722ddc14af4a8f2184e9f0107e1b166e2f02ce333b1bd7c0124a904` |
+| [modules/media-video/manifest.json](../../modules/media-video/manifest.json) | 216 | `213e3379cd2489b66a92445ca904a74a2e3161ff766403e49a0962e54f8db5a9` |
+| [modules/media-video/module.py](../../modules/media-video/module.py) | 346 | `91c4e16795d851ce8e47ae46aee9af12d4e26c7912487ac72ccb982957961dfc` |
+| [modules/media.py](../../modules/media.py) | 7590 | `ba7c43b0fbafa4f8ef08cdda4ab9b143006694ecfca4330be9c68eb6f2a24af2` |
 | [modules/module_state.py](../../modules/module_state.py) | 1543 | `0b24fbd1ea8fe464e1bed8a9833e4351762644e2eb5de71a2b48f7035edce93a` |
-| [modules/module_support.py](../../modules/module_support.py) | 1349 | `0c670fd5d6e6900321909f5af8bebcb8cdb8db747696eebc42ca1358942b1431` |
+| [modules/module_support.py](../../modules/module_support.py) | 1496 | `7c2b1a85e8741db0fc0d53614f93e60320f7a21447c7c14a5eda872a7c3c99d3` |
 | [modules/moving-average/manifest.json](../../modules/moving-average/manifest.json) | 198 | `77490e0affb550cc4e4a722cd34c02005ba6b8a780ef5e93b3f64b40657f3c5b` |
 | [modules/moving-average/module.py](../../modules/moving-average/module.py) | 933 | `cb4426dfd02522e3db5ddb775db16120cf870eaad46c616261051daed6ecc671` |
+| [modules/music-player/manifest.json](../../modules/music-player/manifest.json) | 192 | `0341f0b5fe84397f38b819dc699902ca000f79a69cd7d18e6ea9cd46958924c2` |
+| [modules/music-player/module.py](../../modules/music-player/module.py) | 290 | `dbc22fb6ebb5c0531f6049e4c38d2652268c8aa919dab7639c913d0c6913825c` |
+| [modules/music.py](../../modules/music.py) | 1945 | `dcec2a944d16e4192296150a146e39fab42e9ef1549cbe71eddbad991ceb6eb8` |
+| [modules/myip/manifest.json](../../modules/myip/manifest.json) | 165 | `c1b2d1f33d5ed7a8f12b364249b77e117636d73b9f44bf85c43e283fd949bc9f` |
+| [modules/myip/module.py](../../modules/myip/module.py) | 819 | `31dd2ec1a44736b715a0fe37b34b8f4c9e832a00273a6091c86e23ac4545d5d2` |
 | [modules/network-monitor/manifest.json](../../modules/network-monitor/manifest.json) | 177 | `2b29dfd7b49a487ec6a7c0c4737df2ed61d1f9728231b8bfa1fdca79930bac72` |
 | [modules/network-monitor/module.py](../../modules/network-monitor/module.py) | 264 | `bd094bbe764aa10879b727b6071a964f87c8a1e916c010e9cc8e133b17c716dc` |
+| [modules/previous-day-levels/manifest.json](../../modules/previous-day-levels/manifest.json) | 210 | `c9e867b61ff5939f8dd9caeabeeabd26cb0924f30a3c1d10093d1202952c2fb1` |
+| [modules/previous-day-levels/module.py](../../modules/previous-day-levels/module.py) | 361 | `b372b3dc1eea23de242d931bb4b434e43882369067c8793fefec5facd656a6fc` |
+| [modules/previous-day-session-levels/manifest.json](../../modules/previous-day-session-levels/manifest.json) | 241 | `7763d6026a2d67a1ba12799a66f994b6c82f2b2d5a6270f951eb0bfb397e4838` |
+| [modules/previous-day-session-levels/module.py](../../modules/previous-day-session-levels/module.py) | 369 | `e91555c404faf14bb90acfa33785a9b11dcb7d0a674ae8807772aa41b6fc14ec` |
 | [modules/process-monitor/manifest.json](../../modules/process-monitor/manifest.json) | 182 | `f2cb4ff053526e70ce9862ec76d7e13f2c14113181eeba9a48029c1c0a115b80` |
 | [modules/process-monitor/module.py](../../modules/process-monitor/module.py) | 264 | `a6d553bad61ab7fb92bfeca8383aabd131dacd1ecbd5233bbc72f54c2f48378b` |
-| [modules/registry.py](../../modules/registry.py) | 3488 | `408d4e2a8679be6f7858b13cc6585edabdb6286f5da52e6d8949b71dc61fd7bc` |
+| [modules/registry.py](../../modules/registry.py) | 3947 | `d3a0e8588b81e3c1baf1e8b4b003911e48a6e098c657fa723a5bb577e3b11cee` |
+| [modules/round-levels/manifest.json](../../modules/round-levels/manifest.json) | 205 | `7d64f005e1278b43d118ffca5b8f1939a3f657098e73510d055d2164a0990886` |
+| [modules/round-levels/module.py](../../modules/round-levels/module.py) | 354 | `7ad80c024f6552cf8c61856d8d80167d8bcd46e9d3ad35ec0122285b10038626` |
 | [modules/rsi/manifest.json](../../modules/rsi/manifest.json) | 144 | `9a37fdba13fba5890becb0d02bf13c3ab3354a04dd2e6de10a3571bc5fd434c9` |
 | [modules/rsi/module.py](../../modules/rsi/module.py) | 930 | `ab2fb19594580420b9616415700960cf107b56d679adbf6c4357b1a752ecdc70` |
 | [modules/service-monitor/manifest.json](../../modules/service-monitor/manifest.json) | 187 | `c25730e3345c9c8fbc141e2d040014d780728f890f326c74adff0667c2efce24` |
 | [modules/service-monitor/module.py](../../modules/service-monitor/module.py) | 264 | `57d93d44f8007d8e7816453f1d47f7388527e53f94eabb67f400b8b2fb5aa676` |
-| [modules/signal_rules.py](../../modules/signal_rules.py) | 9666 | `7a74b9fbc599f183a4a62bc72fd82df4e974a574d2e26960c3456e045f74497c` |
-| [modules/slot-note/manifest.json](../../modules/slot-note/manifest.json) | 186 | `f4b599ff9d1ca2a7e6175cfec3d779ed9ae8d26d4ee4ff30861d38fb41e659cf` |
+| [modules/session-clock/manifest.json](../../modules/session-clock/manifest.json) | 200 | `511902f55fcae6893eb740577379653dd6df7c200f12a8b7746591e23f70e72d` |
+| [modules/session-clock/module.py](../../modules/session-clock/module.py) | 355 | `d0dd3a3ff82926db4a8ec7cacd465b0d570172ec8202370ce922bd50d498624d` |
+| [modules/session-windows/manifest.json](../../modules/session-windows/manifest.json) | 232 | `745aa8f319fb7177b729590537a2a0d75007a7da4304375176fb8f0fbe3f5026` |
+| [modules/session-windows/module.py](../../modules/session-windows/module.py) | 357 | `d506e53fd01515159a09b97b430080c8feeefdcbfac3b4bd9197f888d5765190` |
+| [modules/session_presets.py](../../modules/session_presets.py) | 1916 | `79518228e1942aff777f1e86fe124a219b846ae382a169da0b780ab6b6f31338` |
+| [modules/signal_rules.py](../../modules/signal_rules.py) | 9719 | `55e4c7fd1c8ea052f6953e6594d8838a0eb93096131176d89f8ed97084cfedd3` |
+| [modules/slot-note/manifest.json](../../modules/slot-note/manifest.json) | 207 | `8b1aa1c8b6d090b1f2352882fd17fbf1cb95a60212133dd18d14bea297cda3e6` |
 | [modules/slot-note/module.py](../../modules/slot-note/module.py) | 1080 | `3cdc5fe1b4abf488de8aa800c4f81259bb28f2706e5ae18499ed07b1b61a9355` |
-| [modules/slot_workers.py](../../modules/slot_workers.py) | 9406 | `0ed77c14d28a223c61bec5e9014c997de0929d6087abacd61ed95b29f903c190` |
-| [modules/slots.py](../../modules/slots.py) | 20179 | `0184c5d09772136d0483303098d29d26019b6123f93868ece663ee179983bf3a` |
+| [modules/slot_workers.py](../../modules/slot_workers.py) | 10074 | `7c1e051e86b8e5b3805b38475c3eca7d358af79ae9b535e58ce1f22d32c19790` |
+| [modules/slots.py](../../modules/slots.py) | 24203 | `64b4ae945b3986950dd87af5afb9463ab9665fd7a7e7191a3eb8acb3dbc342e6` |
 | [modules/system-monitor/manifest.json](../../modules/system-monitor/manifest.json) | 182 | `7869970d1d74e070d8e7d3b6a8debc6796006f1a33d28cdd367c6544036171c8` |
 | [modules/system-monitor/module.py](../../modules/system-monitor/module.py) | 263 | `50a175a66728611bd03a6355154ac6c9bd75f683f59dbd21dbf0deae690b9756` |
+| [modules/technical.py](../../modules/technical.py) | 24134 | `fb3df6791da7fd35ecbe5cad441a5f931e119bc34fededa456b19416d33e8c1b` |
 | [modules/theme-summary/manifest.json](../../modules/theme-summary/manifest.json) | 184 | `1c9e029abcc9f1dd8236d68d45356599ba085a4c362bd0b57884f605115374d0` |
 | [modules/theme-summary/module.py](../../modules/theme-summary/module.py) | 907 | `3816fa9e8d789d856faf2ca612ad2f0804377d42cd47b98b7ea523c3a1baaa79` |
 | [modules/theme-summary/themes/daylight.json](../../modules/theme-summary/themes/daylight.json) | 367 | `82eae6ddc20bb89125cfb1b30f482a065c09fca054c9d5033f53f58dc1215179` |
 | [modules/theme-summary/themes/forest.json](../../modules/theme-summary/themes/forest.json) | 362 | `50c438dcf6a4fe9a021f24e5796ab825237c61908c7fa108725f29267be543a2` |
 | [modules/theme-summary/themes/midnight.json](../../modules/theme-summary/themes/midnight.json) | 366 | `7781c016ac10996f7b69340c1b50fd6e1ddee61e9cc322c6fe1b6ceb10538850` |
+| [modules/upload_download.py](../../modules/upload_download.py) | 5951 | `4c08639d689a874ac7a0c2672b6140570567e50e61b6bf8ac8d3e989b607b89c` |
+| [modules/uploads.py](../../modules/uploads.py) | 4067 | `6aff0782575aa311d1c5e0dc0af3b00dd3a67a5cac66292451a030b196998275` |
+| [modules/workspaces.py](../../modules/workspaces.py) | 8672 | `3912ae8e96f72adeb892dbda4802217377a1695fdc6416a4745336ad6aa5bdb1` |
 | [requirements-dev.txt](../../requirements-dev.txt) | 191 | `baa71328e392be7ddb0840fff882f389a2ee21c1d5f96cea2c87b7bdf7cae04d` |
 | [requirements-docs.lock](../../requirements-docs.lock) | 371 | `6bd1ef812562571e65c9d9e4152ff06caa9c93aa23e079f25d630fd1bf1e3876` |
 | [requirements-docs.txt](../../requirements-docs.txt) | 104 | `a5f88176f3e70130d2af9dd3f55e17a4080489288844d229d585d543a164c0b3` |
@@ -1256,12 +1307,13 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [requirements-security.txt](../../requirements-security.txt) | 82 | `e7220957dc9403d0d068104c1ee5b1b3358e781c4ad91f25dc1c3b7d9d04031a` |
 | [requirements-services.txt](../../requirements-services.txt) | 158 | `74a1e833fd436a73bb9036bea4c7f0119d3898b29c0eb282c6d68d9fe0e1bc50` |
 | [requirements.lock](../../requirements.lock) | 24139 | `4df657a15a0d990dd2133c14ebbc28d9e12a2bff0c7dc549f20ac38ea7ea24d0` |
+| [scripts/deployment/configure_client_ip.py](../../scripts/deployment/configure_client_ip.py) | 1764 | `51759f61f37775d66a5c9a848838cb49998eaf918b985eae80de244c652652fd` |
 | [scripts/deployment/prepare.sh](../../scripts/deployment/prepare.sh) | 266 | `b257cb69651bdb04f156083b51360ea30467afda1e598fab40322889e2cc7bc1` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py) | 7585 | `9aa72de47fd16b933d9cafce4204a23c66fa447c5c104abb5e7d2d2ab9dacbb3` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py) | 7621 | `b91b358cea6aa386e7ea7bdef518cb37c4099677dc19ee3fcb208617731edd01` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py) | 4454 | `f166dbdfa25ab1a80abf91a3f728ac5ed40f7f2c310e78c316dceb16f689ef20` |
 | [scripts/deployment/seed_sample_workers.py](../../scripts/deployment/seed_sample_workers.py) | 3711 | `6fb96d6dc0423a2db716142a2461d5590745d6fdf15d52ae8c8cb7a3721d84ba` |
 | [scripts/deployment/sync_account_credentials.py](../../scripts/deployment/sync_account_credentials.py) | 9728 | `cec67692dc01cedb413d443e599e139702a7d89a7c7c22f6f3b67ec942c99fa5` |
-| [scripts/deployment/update_dashboard.sh](../../scripts/deployment/update_dashboard.sh) | 6167 | `b165da6cceb04b6fb8eda606308c3f414de073bb1beb1baf98ee27c149b126e7` |
+| [scripts/deployment/update_dashboard.sh](../../scripts/deployment/update_dashboard.sh) | 7106 | `a45174a998d68fe4a8a0f7d221a7916f98c733586e2bde3b08e3ef14c5970e58` |
 | [scripts/deployment/verify_install.py](../../scripts/deployment/verify_install.py) | 3205 | `c0ac64d85583279ec7d81447003f45f2c045ca84a172b1c7dfc7554901e3b8f1` |
 | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py) | 1164 | `5e9d644203ae3157224aa5742c9bd46ee52007b3607c3b43de94af32f9a38b78` |
 | [scripts/development/export_openapi.py](../../scripts/development/export_openapi.py) | 1373 | `3443bd17d389f8cd8e500ce70138239f9037a00418237d0851a25aa3145000a6` |
@@ -1277,6 +1329,22 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [tests/test_account_chat_browser.py](../../tests/test_account_chat_browser.py) | 923 | `eeaf3a954269fcbcf57000dc645362090f30fb6cadf7fbbf2e8e161a8a3b79c6` |
 | [tests/test_account_provisioning.py](../../tests/test_account_provisioning.py) | 11536 | `662e4d2ed7de4fda8bdd53325ffa3c8b28ddff88ecf2abc36121c6031acb87d4` |
 | [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py) | 5328 | `aa209ce5608616ee6f918f35723e2614c9c757b1491a511594a0ff42b24f9f6e` |
+| [tests/test_chart_overlay_browser.py](../../tests/test_chart_overlay_browser.py) | 2047 | `eff72cfe506ef5df18fafbcf0a46890fda627e320a080036416a5f51602c221c` |
+| [tests/test_chart_overlays.py](../../tests/test_chart_overlays.py) | 4094 | `f173efecc67ad5a6a5a55fd1d97125ae7b3d45412f2caf0b828abaa03dc1f908` |
+| [tests/test_dashboard_update_ref.py](../../tests/test_dashboard_update_ref.py) | 2103 | `ca8d91ccddcb5f015eb01907746ad08d6dc70926b584f6499d98afd62509ecc3` |
+| [tests/test_demo_cli.py](../../tests/test_demo_cli.py) | 3148 | `0b76967bd7be68f09f7b8b6bdd1e8b97264adb8982a217324867c30c54f8d6d0` |
+| [tests/test_demo_media_browser.py](../../tests/test_demo_media_browser.py) | 875 | `b279277b148a80113eb2845c5eaa0650757e61a830d2506e7d3882dbc903242f` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py) | 15857 | `fbb44987bff21b037025bafd55a203b4a3a19b9a207c64beecdd7f05dacc54dd` |
+| [tests/test_media_modules.py](../../tests/test_media_modules.py) | 4853 | `c0bbebc0b8738f5977ae97e8508adf0e722ce67d9ce42f6d2c80c578b8e37a3a` |
+| [tests/test_music_player.py](../../tests/test_music_player.py) | 4874 | `1431ea99cad7a8d561cd5430d0a9e6f80715e0258e312bb794903c79f489df6f` |
+| [tests/test_shared_dashboards.py](../../tests/test_shared_dashboards.py) | 5561 | `5276012acd538bf3ca04503220e77c9741cc8261648b7803ec405975dabd505d` |
+| [tests/test_technical_browser.py](../../tests/test_technical_browser.py) | 1692 | `ab5ec16655b559d6a851e0c23a3af60689052ffb92e3f761ad515cd1ffb8e387` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py) | 12736 | `39242133dc7559ef9938572177968128fd01fd3316e7dad0072ecfd6a421742a` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py) | 6565 | `2eb673e47531cbba59f54e316ad343493e9f45ba917bcd758d16c98843a6bb26` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py) | 6758 | `788d19dca5fd556e0850bd8c3f7726ff849f4f38d411e44fead1b0b2c25fac72` |
+| [tests/test_upload_proxy.py](../../tests/test_upload_proxy.py) | 1510 | `4856e07f54ef0ba5c8f13113565927914b5584f838483f727baa32bba2a6d3c4` |
+| [tests/test_workspace_browser.py](../../tests/test_workspace_browser.py) | 825 | `a4f497d00bad2df21a046a16bee1c659e187a64699e29961121110bf3e709ca5` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py) | 5825 | `caf51c481526777016edd5788e586c5b85408e22c0c3f48fcddde7297bb62e8c` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py) | 2220 | `c789173d8bf728310ecc339a4a05858017826e61b2db8c67961bd521f41aac59` |
 | [units/code-manager/README.md](../../units/code-manager/README.md) | 6974 | `a6188e8e5994c3db15537556d8968cc42ee90bb0aadaed5bfa33396d6d2cb14e` |
 | [units/code-manager/code_manager/__init__.py](../../units/code-manager/code_manager/__init__.py) | 121 | `1170efd7f23978c79fb04db74e7a7aaf5f6479a1ea97f7aa0baebe5e26049a8f` |
@@ -1307,23 +1375,30 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/code-manager/tests/test_source_registration.py](../../units/code-manager/tests/test_source_registration.py) | 3772 | `aa451da0cc27ec1d438239eba22bcb4380c4d056cd38e2f02a8bd64ca096ffae` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py) | 3829 | `6925377e57535e07b77d67cec24da10e46554cc3413c03bd30e0c821196d1fe0` |
 | [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 5199 | `f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496` |
-| [units/consumers/dashboard-core/browser-tests/accounts_chat.cjs](../../units/consumers/dashboard-core/browser-tests/accounts_chat.cjs) | 5477 | `fca4c960cd1a538ffe54a47ab757e7e76719266868b07354547e6c1bad177fc0` |
-| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11423 | `827955fd672363a90ea467576e7d234fa6798d08ab3fe77c8459382d47525191` |
+| [units/consumers/dashboard-core/browser-tests/accounts_chat.cjs](../../units/consumers/dashboard-core/browser-tests/accounts_chat.cjs) | 6982 | `fbef0ce3d952e56fb5afb39bdc19effca7fd40be58f9b7e0c9e5edaef81687f0` |
+| [units/consumers/dashboard-core/browser-tests/chart_overlays.cjs](../../units/consumers/dashboard-core/browser-tests/chart_overlays.cjs) | 5028 | `efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f` |
+| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11143 | `2d8310840435e4f53625c7221a238b4d5122d8c5cde7c6846680a2693df279e7` |
+| [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19069 | `29dd2b4fdf7aa9d15d090eb51186d9f756473d27520d0c6f4e04106116ac4076` |
 | [units/consumers/dashboard-core/browser-tests/layout.cjs](../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1242 | `399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc` |
 | [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3475 | `e50b81b1e00341e3a27623dacc5bf851bbaac7783412f1e68d6450713eba25de` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
+| [units/consumers/dashboard-core/browser-tests/technical.cjs](../../units/consumers/dashboard-core/browser-tests/technical.cjs) | 5082 | `7f9b0eb8e333fb7f2c1c21867c653e04d9ab5a8322b40b82eef9c4224b2fd441` |
+| [units/consumers/dashboard-core/browser-tests/workspaces.cjs](../../units/consumers/dashboard-core/browser-tests/workspaces.cjs) | 6474 | `96a9fe151a972e6fd4a1e611f1fb705997aafa0b5dc519b6f4aaf55d9d537f43` |
 | [units/consumers/dashboard-core/dashboard/__init__.py](../../units/consumers/dashboard-core/dashboard/__init__.py) | 34 | `df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 172468 | `e6f687316c6674a1ffa581ec60903dbfa5afe577499c23c1c4d907ba2c7b9bea` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 271932 | `8eb40500a261861fcf8c2de5f7e6633243ecf3b704db3ddd02043ed5a391698f` |
 | [units/consumers/dashboard-core/dashboard/modules/__init__.py](../../units/consumers/dashboard-core/dashboard/modules/__init__.py) | 41 | `35ef8ebac64753121ad6a4d2e62c7c2c90b29160f0c22dbadb2faf113226622f` |
 | [units/consumers/dashboard-core/dashboard/modules/execution.py](../../units/consumers/dashboard-core/dashboard/modules/execution.py) | 169 | `5bef73ad14e3c2595302b184e0cae257303cea569d45fefa6f3b7127eb3123a2` |
 | [units/consumers/dashboard-core/dashboard/modules/module_state.py](../../units/consumers/dashboard-core/dashboard/modules/module_state.py) | 172 | `3a347ce78439f00e178fc4e49961b77ed8a56941085fdf77df7b389919a4afa8` |
 | [units/consumers/dashboard-core/dashboard/modules/module_support.py](../../units/consumers/dashboard-core/dashboard/modules/module_support.py) | 174 | `9d78e2dafa971a209de113786d8d0e138526c1121143a7cc2d4d8f38471e2266` |
 | [units/consumers/dashboard-core/dashboard/modules/registry.py](../../units/consumers/dashboard-core/dashboard/modules/registry.py) | 173 | `b920ecb3337de92010152921ce7891951d132b65330c992e015682887f3fb631` |
+| [units/consumers/dashboard-core/dashboard/music_panel.py](../../units/consumers/dashboard-core/dashboard/music_panel.py) | 9483 | `de7cfbf704ccac5bc385af1e9677fc0bc46bc770df79d57250a605624c0e0561` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py) | 696 | `3cb7072b852490b9539315bc26d695448049bd26e946226a4655d4b0d98b44fd` |
-| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 55255 | `2d77a2472c5027243626b4d3f20de722deabfc28f532c5e1ffbd31decbbab11d` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py) | 31440 | `b8be5fa8ea99c1e9d73eb4c8f1d0dfa79cd815554b2cfec9510b2b8d076fda64` |
-| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py) | 2075 | `989cab754c511a6474dbfdb45763a22d957229624715f67c9cca892ed9ce423f` |
+| [units/consumers/dashboard-core/dashboard/static/login-airless.png](../../units/consumers/dashboard-core/dashboard/static/login-airless.png) | 3282622 | `7d67839c7df7371083a3b28c3052396e25bc90265b31d4e9bd462ea6f099d4f5` |
+| [units/consumers/dashboard-core/dashboard/static/login-galaxy.png](../../units/consumers/dashboard-core/dashboard/static/login-galaxy.png) | 2659793 | `b3fbd8a0b7086d9dc7667dbde7b84b415442173e4afa6e297718f9d82cedf64b` |
+| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 65218 | `59ffda66b5406b3649ba4e7b7caf88e4c755c93c66f053f1eee6ef2068e436e2` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py) | 50083 | `22c9657242af7143787f0273a6cbffb31cf6d10a019daf6bcfccba7a0c19a782` |
+| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py) | 2142 | `a2f3ff7914c9cc00a36293a12d74d66180967543225c0691fdf16d270eaf3ce6` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../units/consumers/dashboard-core/legacy-tests/test_registry.py) | 3954 | `aaa8da8a33038f063560bd693de4722924f8ec35121f506933ff53fc3d196d22` |
 | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py) | 7569 | `56cb6258ba13de0f6bfb586c872f9f8c915cb60cfedcf7663812b815066d1d74` |
 | [units/consumers/dashboard-core/requirements-dev.txt](../../units/consumers/dashboard-core/requirements-dev.txt) | 49 | `76d1b0013bd73822840766e68b234055b0962571813765d60b2c012dc82ec88e` |
@@ -1421,17 +1496,22 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/accounts.py](../../modules/accounts.py#L22) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/accounts.py](../../modules/accounts.py#L191) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/chat_store.py](../../modules/chat_store.py#L20) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/demo_trading.py](../../modules/demo_trading.py#L64) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/economic_calendar.py](../../modules/economic_calendar.py#L49) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/media.py](../../modules/media.py#L50) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/module_state.py](../../modules/module_state.py#L14) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/signal_rules.py](../../modules/signal_rules.py#L128) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/signal_rules.py](../../modules/signal_rules.py#L170) | optional lookup |
-| `DASHBOARD_MODULE_STATE_DIR` | [modules/slot_workers.py](../../modules/slot_workers.py#L79) | optional lookup |
-| `DASHBOARD_MODULE_STATE_DIR` | [modules/slot_workers.py](../../modules/slot_workers.py#L146) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/slot_workers.py](../../modules/slot_workers.py#L83) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/slot_workers.py](../../modules/slot_workers.py#L150) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/slots.py](../../modules/slots.py#L50) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/slots.py](../../modules/slots.py#L61) | optional lookup |
+| `DASHBOARD_MODULE_STATE_DIR` | [modules/uploads.py](../../modules/uploads.py#L19) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L49) | optional lookup |
 | `DASHBOARD_SCREENSHOT` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L114) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/consumers/dashboard-core/tests/test_browser.py](../../units/consumers/dashboard-core/tests/test_browser.py#L12) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/worker-runtime/tests/control_plane_helper.py](../../units/worker-runtime/tests/control_plane_helper.py#L110) | optional lookup |
+| `DASHBOARD_TRUST_LOCAL_PROXY` | [modules/client_ip.py](../../modules/client_ip.py#L10) | optional lookup |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [scripts/development/data_manager_server.py](../../scripts/development/data_manager_server.py#L16) | tooling assignment |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [units/code-manager/code_manager/api.py](../../units/code-manager/code_manager/api.py#L748) | optional lookup |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [units/code-manager/tests/test_data_manager_integration.py](../../units/code-manager/tests/test_data_manager_integration.py#L33) | optional lookup |
@@ -1481,10 +1561,10 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [modules/module_support.py](../../modules/module_support.py#L9) | `--input` |
 | [modules/module_support.py](../../modules/module_support.py#L10) | `--owner` |
 | [modules/module_support.py](../../modules/module_support.py#L11) | `--slot` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L132) | `--domain` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L133) | `--image` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L134) | `--sandbox-uid` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L135) | `--public-tls` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L133) | `--domain` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L134) | `--image` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L135) | `--sandbox-uid` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L136) | `--public-tls` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L76) | `--code-url` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L77) | `--manager-url` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L78) | `--code-token-file` |
@@ -1560,6 +1640,7 @@ codeهای پویا، پیام‌های UI و status HTTP با این فهرست
 | `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L110) |
 | `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L117) |
 | `INVALID_RESPONSE` | [units/consumers/dashboard-core/public_api.py](../../units/consumers/dashboard-core/public_api.py#L120) |
+| `NOT_FOUND` | [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L164) |
 | `NOT_FOUND` | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L60) |
 | `NOT_FOUND` | [units/consumers/dashboard-core/tests/test_upstreams.py](../../units/consumers/dashboard-core/tests/test_upstreams.py#L64) |
 | `NOT_FOUND` | [units/data-manager/errors.py](../../units/data-manager/errors.py#L13) |
@@ -1705,6 +1786,34 @@ CREATE TABLE IF NOT EXISTS messages (
         body TEXT NOT NULL, created_at INTEGER NOT NULL)
 ```
 
+### جدول demo_accounts در modules/demo_trading.py
+
+[modules/demo_trading.py](../../modules/demo_trading.py#L73)
+
+```sql
+CREATE TABLE IF NOT EXISTS demo_accounts (
+          id TEXT PRIMARY KEY,owner TEXT NOT NULL,name TEXT NOT NULL,initial_cents INTEGER NOT NULL,balance_cents INTEGER NOT NULL,
+          settings TEXT NOT NULL,pin_salt BLOB NOT NULL,pin_hash BLOB NOT NULL,pin_window REAL NOT NULL DEFAULT 0,pin_attempts INTEGER NOT NULL DEFAULT 0,
+          created_at REAL NOT NULL,last_bid TEXT,last_quote_at REAL);
+        CREATE INDEX IF NOT EXISTS demo_account_owner ON demo_accounts(owner);
+        CREATE TABLE IF NOT EXISTS demo_preferences(owner TEXT PRIMARY KEY,active_account TEXT NOT NULL REFERENCES demo_accounts(id));
+        CREATE TABLE IF NOT EXISTS demo_orders (
+          id TEXT PRIMARY KEY,owner TEXT NOT NULL,account_id TEXT NOT NULL REFERENCES demo_accounts(id),side TEXT NOT NULL,status TEXT NOT NULL,
+          order_type TEXT NOT NULL,entry_requested TEXT,entry_fill TEXT,sl TEXT NOT NULL,tp TEXT NOT NULL,volume TEXT NOT NULL,contract_size TEXT NOT NULL,
+          leverage INTEGER NOT NULL,commission_rate TEXT NOT NULL,swap_rate TEXT NOT NULL,margin_cents INTEGER NOT NULL DEFAULT 0,
+          commission_cents INTEGER NOT NULL DEFAULT 0,swap_cents INTEGER NOT NULL DEFAULT 0,profit_cents INTEGER NOT NULL DEFAULT 0,
+          created_at REAL NOT NULL,opened_at REAL,closed_at REAL,close_price TEXT,close_reason TEXT,source TEXT NOT NULL,
+          source_slot TEXT,show_on_chart INTEGER NOT NULL,request_id TEXT NOT NULL,signature TEXT NOT NULL,last_swap_day INTEGER,
+          UNIQUE(owner,account_id,request_id));
+        CREATE INDEX IF NOT EXISTS demo_order_scope ON demo_orders(owner,account_id,status);
+        CREATE UNIQUE INDEX IF NOT EXISTS demo_request_owner ON demo_orders(owner,request_id);
+        CREATE UNIQUE INDEX IF NOT EXISTS demo_active_slot ON demo_orders(owner,source_slot) WHERE source_slot IS NOT NULL AND status IN ('open','pending');
+        CREATE TABLE IF NOT EXISTS demo_deals(id INTEGER PRIMARY KEY AUTOINCREMENT,owner TEXT NOT NULL,account_id TEXT NOT NULL,order_id TEXT,
+          kind TEXT NOT NULL,amount_cents INTEGER NOT NULL,price TEXT,created_at REAL NOT NULL);
+        CREATE TABLE IF NOT EXISTS demo_equity(owner TEXT NOT NULL,account_id TEXT NOT NULL,time INTEGER NOT NULL,equity_cents INTEGER NOT NULL,
+          PRIMARY KEY(owner,account_id,time));
+```
+
 ### جدول module_state در modules/module_state.py
 
 [modules/module_state.py](../../modules/module_state.py#L19)
@@ -1715,10 +1824,28 @@ CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NU
 
 ### جدول module_state در modules/slot_workers.py
 
-[modules/slot_workers.py](../../modules/slot_workers.py#L82)
+[modules/slot_workers.py](../../modules/slot_workers.py#L86)
 
 ```sql
 CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))
+```
+
+### جدول uploads در modules/uploads.py
+
+[modules/uploads.py](../../modules/uploads.py#L31)
+
+```sql
+CREATE TABLE IF NOT EXISTS uploads (
+            id TEXT PRIMARY KEY, name TEXT NOT NULL, size INTEGER NOT NULL,
+            sender TEXT NOT NULL, recipient TEXT, created_at INTEGER NOT NULL, content BLOB NOT NULL)
+```
+
+### جدول shared_dashboards در modules/workspaces.py
+
+[modules/workspaces.py](../../modules/workspaces.py#L15)
+
+```sql
+CREATE TABLE IF NOT EXISTS shared_dashboards (id TEXT PRIMARY KEY, sender TEXT NOT NULL, name TEXT NOT NULL, created_at INTEGER NOT NULL, payload TEXT NOT NULL, UNIQUE(sender,name))
 ```
 
 ### جدول build_history در units/code-manager/code_manager/build_pipeline.py
@@ -1979,6 +2106,7 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [modules/accounts.py](../../modules/accounts.py#L170) | `set_enabled` | `(user_id, enabled)` |
 | [modules/accounts.py](../../modules/accounts.py#L187) | `upstream_credential` | `(user_id)` |
 | [modules/calculator/module.py](../../modules/calculator/module.py#L11) | `run` | `(data)` |
+| [modules/chart_overlays.py](../../modules/chart_overlays.py#L6) | `calculate` | `(owner, profiles, chart, end_time=None)` |
 | [modules/chat-box/module.py](../../modules/chat-box/module.py#L10) | `run` | `(data)` |
 | [modules/chat_store.py](../../modules/chat_store.py#L19) | `_connect` | `()` |
 | [modules/chat_store.py](../../modules/chat_store.py#L43) | `_active_user` | `(owner)` |
@@ -1989,17 +2117,69 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [modules/chat_store.py](../../modules/chat_store.py#L106) | `list_requests` | `(owner)` |
 | [modules/chat_store.py](../../modules/chat_store.py#L114) | `send` | `(owner, room, text)` |
 | [modules/chat_store.py](../../modules/chat_store.py#L130) | `messages` | `(owner, room, limit=50, before=None)` |
+| [modules/client_ip.py](../../modules/client_ip.py#L6) | `address` | `(request)` |
 | [modules/clock/clock.py](../../modules/clock/clock.py#L7) | `current_time` | `(timezone=None)` |
 | [modules/clock/clock.py](../../modules/clock/clock.py#L12) | `run` | `(data)` |
 | [modules/clock/clock.py](../../modules/clock/clock.py#L16) | `main` | `()` |
 | [modules/counter/module.py](../../modules/counter/module.py#L10) | `run` | `(data)` |
 | [modules/counter/module.py](../../modules/counter/module.py#L15) | `run.apply` | `(value)` |
 | [modules/dashboard-health/module.py](../../modules/dashboard-health/module.py#L13) | `run` | `(data)` |
+| [modules/demo-account/module.py](../../modules/demo-account/module.py#L8) | `run` | `(data)` |
+| [modules/demo-bot/module.py](../../modules/demo-bot/module.py#L8) | `run` | `(data)` |
+| [modules/demo-positions/module.py](../../modules/demo-positions/module.py#L8) | `run` | `(data)` |
+| [modules/demo-reports/module.py](../../modules/demo-reports/module.py#L8) | `run` | `(data)` |
+| [modules/demo-trade/module.py](../../modules/demo-trade/module.py#L8) | `run` | `(data)` |
+| [modules/demo_components.py](../../modules/demo_components.py#L7) | `run` | `(kind, data)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L27) | `Conflict` | `class` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L28) | `Unavailable` | `class` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L29) | `RateLimited` | `class` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L32) | `dec` | `(value, minimum=None, maximum=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L40) | `cents` | `(value)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L41) | `dollars` | `(value)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L42) | `tick` | `(cfg)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L45) | `configuration` | `(raw=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L58) | `owner_key` | `(owner)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L63) | `database` | `()` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L98) | `account` | `(db, owner, ident=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L109) | `public_account` | `(row)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L114) | `pin_hash` | `(pin, salt)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L115) | `valid_pin` | `(pin)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L118) | `check_pin` | `(db, row, pin)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L127) | `create_account` | `(owner, name, initial_balance, pin, settings=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L142) | `select_account` | `(owner, ident)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L149) | `update_settings` | `(owner, ident, raw)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L158) | `set_pin` | `(owner, ident, pin)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L167) | `observed_quote` | `(cfg)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L192) | `orders` | `(db, row, status=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L198) | `floating` | `(order, quote)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L203) | `metrics` | `(db, row, quote)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L211) | `free_cents` | `(db, row, quote)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L216) | `deal` | `(db, row, order, kind, amount, price=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L221) | `close_fill` | `(db, row, order, quote, reason)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L229) | `fill` | `(db, row, order, quote)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L241) | `process` | `(db, row, quote)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L278) | `price_value` | `(value, cfg)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L284) | `public_order` | `(row, quote=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L292) | `submit` | `(owner, data, source='manual', source_slot=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L353) | `alter_order` | `(owner, ident, action, value=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L374) | `state` | `(owner, account_id=None, source_slot=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L397) | `report` | `(owner, account_id=None, since=0, until=None)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L420) | `DemoScheduler` | `class` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L421) | `DemoScheduler.__init__` | `(self)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L422) | `DemoScheduler.start` | `(self)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L424) | `DemoScheduler.stop` | `(self)` |
+| [modules/demo_trading.py](../../modules/demo_trading.py#L427) | `DemoScheduler.loop` | `(self)` |
 | [modules/dice-roller/module.py](../../modules/dice-roller/module.py#L11) | `run` | `(data)` |
+| [modules/economic_calendar.py](../../modules/economic_calendar.py#L15) | `NoRedirect` | `class` |
+| [modules/economic_calendar.py](../../modules/economic_calendar.py#L16) | `NoRedirect.redirect_request` | `(self, *args, **kwargs)` |
+| [modules/economic_calendar.py](../../modules/economic_calendar.py#L19) | `settings` | `(raw=None)` |
+| [modules/economic_calendar.py](../../modules/economic_calendar.py#L30) | `parse` | `(rows)` |
+| [modules/economic_calendar.py](../../modules/economic_calendar.py#L46) | `_run` | `(data)` |
+| [modules/economic_calendar.py](../../modules/economic_calendar.py#L83) | `run` | `(data)` |
 | [modules/empty/module.py](../../modules/empty/module.py#L9) | `run` | `(data)` |
-| [modules/execution.py](../../modules/execution.py#L24) | `UnknownModule` | `class` |
-| [modules/execution.py](../../modules/execution.py#L29) | `_load` | `(module_id)` |
-| [modules/execution.py](../../modules/execution.py#L36) | `run_module` | `(module_id, data)` |
+| [modules/execution.py](../../modules/execution.py#L29) | `UnknownModule` | `class` |
+| [modules/execution.py](../../modules/execution.py#L34) | `_load` | `(module_id)` |
+| [modules/execution.py](../../modules/execution.py#L41) | `run_module` | `(module_id, data)` |
 | [modules/gold-chart/module.py](../../modules/gold-chart/module.py#L12) | `run` | `(data)` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L12) | `_mem` | `()` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L23) | `_cpu_sample` | `()` |
@@ -2012,20 +2192,42 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [modules/host_monitor.py](../../modules/host_monitor.py#L110) | `alerts` | `(data)` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L127) | `logs` | `(data)` |
 | [modules/host_monitor.py](../../modules/host_monitor.py#L151) | `docker` | `(data)` |
-| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L13) | `list_profiles` | `(owner)` |
-| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L17) | `save` | `(owner, data, profile_id=None)` |
-| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L27) | `save.update` | `(old)` |
-| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L40) | `delete` | `(owner, profile_id)` |
-| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L41) | `delete.update` | `(old)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L14) | `list_profiles` | `(owner)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L18) | `save` | `(owner, data, profile_id=None)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L28) | `save.update` | `(old)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L41) | `delete` | `(owner, profile_id)` |
+| [modules/indicator_profiles.py](../../modules/indicator_profiles.py#L42) | `delete.update` | `(old)` |
 | [modules/macd/module.py](../../modules/macd/module.py#L10) | `run` | `(data)` |
+| [modules/media-audio/module.py](../../modules/media-audio/module.py#L7) | `run` | `(data)` |
+| [modules/media-image/module.py](../../modules/media-image/module.py#L7) | `run` | `(data)` |
+| [modules/media-video/module.py](../../modules/media-video/module.py#L7) | `run` | `(data)` |
+| [modules/media.py](../../modules/media.py#L16) | `settings` | `(raw=None)` |
+| [modules/media.py](../../modules/media.py#L30) | `extension` | `(name)` |
+| [modules/media.py](../../modules/media.py#L36) | `signature` | `(fmt, head)` |
+| [modules/media.py](../../modules/media.py#L49) | `root` | `()` |
+| [modules/media.py](../../modules/media.py#L58) | `server_file` | `(name)` |
+| [modules/media.py](../../modules/media.py#L70) | `uploaded` | `(owner, ident)` |
+| [modules/media.py](../../modules/media.py#L76) | `library` | `(owner)` |
+| [modules/media.py](../../modules/media.py#L93) | `youtube_video` | `(url)` |
+| [modules/media.py](../../modules/media.py#L107) | `describe` | `(owner, cfg, expected_kind=None)` |
+| [modules/media.py](../../modules/media.py#L133) | `run` | `(data, kind=None)` |
 | [modules/module_state.py](../../modules/module_state.py#L9) | `change` | `(owner, module, slot, default, operation)` |
 | [modules/module_support.py](../../modules/module_support.py#L7) | `main` | `(run)` |
 | [modules/moving-average/module.py](../../modules/moving-average/module.py#L10) | `run` | `(data)` |
-| [modules/registry.py](../../modules/registry.py#L30) | `ModuleManifestError` | `class` |
-| [modules/registry.py](../../modules/registry.py#L34) | `load_modules` | `()` |
-| [modules/registry.py](../../modules/registry.py#L108) | `list_modules` | `()` |
-| [modules/registry.py](../../modules/registry.py#L113) | `get_module` | `(module_id: str)` |
+| [modules/music.py](../../modules/music.py#L6) | `playlist` | `(owner, tracks=None)` |
+| [modules/music.py](../../modules/music.py#L27) | `run` | `(data)` |
+| [modules/myip/module.py](../../modules/myip/module.py#L9) | `run` | `(data)` |
+| [modules/previous-day-levels/module.py](../../modules/previous-day-levels/module.py#L8) | `run` | `(data)` |
+| [modules/previous-day-session-levels/module.py](../../modules/previous-day-session-levels/module.py#L8) | `run` | `(data)` |
+| [modules/registry.py](../../modules/registry.py#L39) | `ModuleManifestError` | `class` |
+| [modules/registry.py](../../modules/registry.py#L43) | `load_modules` | `()` |
+| [modules/registry.py](../../modules/registry.py#L118) | `list_modules` | `(include_archived=False)` |
+| [modules/registry.py](../../modules/registry.py#L123) | `get_module` | `(module_id: str)` |
+| [modules/round-levels/module.py](../../modules/round-levels/module.py#L8) | `run` | `(data)` |
 | [modules/rsi/module.py](../../modules/rsi/module.py#L10) | `run` | `(data)` |
+| [modules/session-clock/module.py](../../modules/session-clock/module.py#L8) | `run` | `(data)` |
+| [modules/session-windows/module.py](../../modules/session-windows/module.py#L8) | `run` | `(data)` |
+| [modules/session_presets.py](../../modules/session_presets.py#L7) | `mt5_color` | `(value)` |
 | [modules/signal_rules.py](../../modules/signal_rules.py#L14) | `list_rules` | `(owner)` |
 | [modules/signal_rules.py](../../modules/signal_rules.py#L18) | `save` | `(owner, data, rule_id=None)` |
 | [modules/signal_rules.py](../../modules/signal_rules.py#L36) | `save.update` | `(old)` |
@@ -2045,15 +2247,15 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [modules/signal_rules.py](../../modules/signal_rules.py#L159) | `SignalScheduler._loop` | `(self)` |
 | [modules/slot-note/module.py](../../modules/slot-note/module.py#L10) | `run` | `(data)` |
 | [modules/slot_workers.py](../../modules/slot_workers.py#L24) | `configure` | `(owner, slot, payload)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L64) | `SlotWorkerScheduler` | `class` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L65) | `SlotWorkerScheduler.__init__` | `(self)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L69) | `SlotWorkerScheduler.start` | `(self)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L74) | `SlotWorkerScheduler.stop` | `(self)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L78) | `SlotWorkerScheduler._connect` | `(self)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L85) | `SlotWorkerScheduler._recover` | `(self)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L98) | `SlotWorkerScheduler._claim` | `(self)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L124) | `SlotWorkerScheduler._finish` | `(self, owner, slot, revision, error)` |
-| [modules/slot_workers.py](../../modules/slot_workers.py#L141) | `SlotWorkerScheduler._loop` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L68) | `SlotWorkerScheduler` | `class` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L69) | `SlotWorkerScheduler.__init__` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L73) | `SlotWorkerScheduler.start` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L78) | `SlotWorkerScheduler.stop` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L82) | `SlotWorkerScheduler._connect` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L89) | `SlotWorkerScheduler._recover` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L102) | `SlotWorkerScheduler._claim` | `(self)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L128) | `SlotWorkerScheduler._finish` | `(self, owner, slot, revision, error)` |
+| [modules/slot_workers.py](../../modules/slot_workers.py#L145) | `SlotWorkerScheduler._loop` | `(self)` |
 | [modules/slots.py](../../modules/slots.py#L14) | `_authorize_host_monitor` | `(owner, module_id)` |
 | [modules/slots.py](../../modules/slots.py#L21) | `binding` | `(owner, slot, module_id=None, context=None, only_if_missing=False)` |
 | [modules/slots.py](../../modules/slots.py#L29) | `binding.update` | `(previous)` |
@@ -2061,22 +2263,71 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [modules/slots.py](../../modules/slots.py#L47) | `list_slots` | `(owner)` |
 | [modules/slots.py](../../modules/slots.py#L59) | `_layout_db` | `(owner)` |
 | [modules/slots.py](../../modules/slots.py#L76) | `list_active` | `(owner)` |
-| [modules/slots.py](../../modules/slots.py#L97) | `create` | `(owner, slot_type='standard')` |
-| [modules/slots.py](../../modules/slots.py#L114) | `duplicate` | `(owner, slot)` |
-| [modules/slots.py](../../modules/slots.py#L141) | `bind_active` | `(owner, slot, module_id, context, only_if_missing=False)` |
-| [modules/slots.py](../../modules/slots.py#L165) | `set_overview` | `(owner, slot, visible)` |
-| [modules/slots.py](../../modules/slots.py#L179) | `update_appearance` | `(owner, slot, updates)` |
-| [modules/slots.py](../../modules/slots.py#L263) | `delete` | `(owner, slot)` |
-| [modules/slots.py](../../modules/slots.py#L274) | `_market_preferences` | `(owner, slot, module_id)` |
-| [modules/slots.py](../../modules/slots.py#L283) | `execute` | `(owner, slot, data, expected_module=None, expected_revision=None)` |
-| [modules/slots.py](../../modules/slots.py#L308) | `read` | `(owner, slot)` |
+| [modules/slots.py](../../modules/slots.py#L99) | `create` | `(owner, slot_type='standard')` |
+| [modules/slots.py](../../modules/slots.py#L116) | `duplicate` | `(owner, slot)` |
+| [modules/slots.py](../../modules/slots.py#L143) | `bind_active` | `(owner, slot, module_id, context, only_if_missing=False)` |
+| [modules/slots.py](../../modules/slots.py#L167) | `set_overview` | `(owner, slot, visible)` |
+| [modules/slots.py](../../modules/slots.py#L181) | `update_appearance` | `(owner, slot, updates)` |
+| [modules/slots.py](../../modules/slots.py#L278) | `delete` | `(owner, slot)` |
+| [modules/slots.py](../../modules/slots.py#L289) | `_market_preferences` | `(owner, slot, module_id)` |
+| [modules/slots.py](../../modules/slots.py#L298) | `_technical_preferences` | `(owner, slot, module_id)` |
+| [modules/slots.py](../../modules/slots.py#L303) | `execute` | `(owner, slot, data, expected_module=None, expected_revision=None, request_ip=None)` |
+| [modules/slots.py](../../modules/slots.py#L340) | `read` | `(owner, slot, request_ip=None)` |
+| [modules/technical.py](../../modules/technical.py#L40) | `number` | `(value, low, high, name)` |
+| [modules/technical.py](../../modules/technical.py#L46) | `integer` | `(value, low, high, name)` |
+| [modules/technical.py](../../modules/technical.py#L51) | `minute` | `(value)` |
+| [modules/technical.py](../../modules/technical.py#L58) | `color` | `(value)` |
+| [modules/technical.py](../../modules/technical.py#L62) | `line_style` | `(value)` |
+| [modules/technical.py](../../modules/technical.py#L69) | `settings` | `(kind, raw=None)` |
+| [modules/technical.py](../../modules/technical.py#L138) | `dst_seconds` | `(stamp, rule)` |
+| [modules/technical.py](../../modules/technical.py#L142) | `dst_seconds.last_sunday` | `(month)` |
+| [modules/technical.py](../../modules/technical.py#L149) | `wall` | `(stamp, cfg)` |
+| [modules/technical.py](../../modules/technical.py#L153) | `epoch` | `(local, cfg)` |
+| [modules/technical.py](../../modules/technical.py#L162) | `timestamp` | `(value)` |
+| [modules/technical.py](../../modules/technical.py#L166) | `reference_wall` | `(stamp, cfg)` |
+| [modules/technical.py](../../modules/technical.py#L170) | `scheduled` | `(day, minutes, cfg)` |
+| [modules/technical.py](../../modules/technical.py#L180) | `selected` | `(item, cfg)` |
+| [modules/technical.py](../../modules/technical.py#L185) | `occurrences` | `(cfg, day)` |
+| [modules/technical.py](../../modules/technical.py#L200) | `clock_result` | `(cfg, now)` |
+| [modules/technical.py](../../modules/technical.py#L234) | `session_chart` | `(cfg, data, now)` |
+| [modules/technical.py](../../modules/technical.py#L257) | `round_result` | `(cfg, price, low, high, previous=None)` |
+| [modules/technical.py](../../modules/technical.py#L278) | `candle` | `(raw)` |
+| [modules/technical.py](../../modules/technical.py#L288) | `bars` | `(data, now, days)` |
+| [modules/technical.py](../../modules/technical.py#L306) | `merge` | `(aggregate, row)` |
+| [modules/technical.py](../../modules/technical.py#L313) | `previous_result` | `(kind, cfg, data, now)` |
+| [modules/technical.py](../../modules/technical.py#L356) | `run` | `(kind, data)` |
+| [modules/technical.py](../../modules/technical.py#L381) | `run.update` | `(old)` |
 | [modules/theme-summary/module.py](../../modules/theme-summary/module.py#L12) | `run` | `(data)` |
+| [modules/upload_download.py](../../modules/upload_download.py#L19) | `DownloadError` | `class` |
+| [modules/upload_download.py](../../modules/upload_download.py#L20) | `DownloadBusy` | `class` |
+| [modules/upload_download.py](../../modules/upload_download.py#L23) | `target` | `(url)` |
+| [modules/upload_download.py](../../modules/upload_download.py#L34) | `public_address` | `(host)` |
+| [modules/upload_download.py](../../modules/upload_download.py#L49) | `PinnedHTTPS` | `class` |
+| [modules/upload_download.py](../../modules/upload_download.py#L50) | `PinnedHTTPS.__init__` | `(self, host, address)` |
+| [modules/upload_download.py](../../modules/upload_download.py#L54) | `PinnedHTTPS.connect` | `(self)` |
+| [modules/upload_download.py](../../modules/upload_download.py#L63) | `response_for` | `(url)` |
+| [modules/upload_download.py](../../modules/upload_download.py#L75) | `download` | `(url)` |
+| [modules/upload_download.py](../../modules/upload_download.py#L111) | `import_url` | `(owner, url, name='', visibility='public', recipient=None)` |
+| [modules/uploads.py](../../modules/uploads.py#L18) | `database` | `()` |
+| [modules/uploads.py](../../modules/uploads.py#L40) | `principal` | `(owner)` |
+| [modules/uploads.py](../../modules/uploads.py#L45) | `create` | `(owner, name, visibility, recipient, content)` |
+| [modules/uploads.py](../../modules/uploads.py#L56) | `validate_metadata` | `(owner, name, visibility, recipient)` |
+| [modules/uploads.py](../../modules/uploads.py#L68) | `create_bytes` | `(owner, name, visibility, recipient, data)` |
+| [modules/uploads.py](../../modules/uploads.py#L78) | `list_files` | `(owner)` |
+| [modules/uploads.py](../../modules/uploads.py#L84) | `access` | `(owner, file_id, delete=False)` |
+| [modules/workspaces.py](../../modules/workspaces.py#L13) | `connect` | `(owner)` |
+| [modules/workspaces.py](../../modules/workspaces.py#L19) | `catalog` | `(owner)` |
+| [modules/workspaces.py](../../modules/workspaces.py#L30) | `save` | `(owner, name, theme)` |
+| [modules/workspaces.py](../../modules/workspaces.py#L71) | `load` | `(owner, ident)` |
+| [modules/workspaces.py](../../modules/workspaces.py#L120) | `delete` | `(owner, ident)` |
+| [scripts/deployment/configure_client_ip.py](../../scripts/deployment/configure_client_ip.py#L10) | `configure` | `(path)` |
+| [scripts/deployment/configure_client_ip.py](../../scripts/deployment/configure_client_ip.py#L20) | `configure.upload_limit` | `(match)` |
 | [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L17) | `validate` | `(domain, image, sandbox_uid)` |
 | [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L27) | `atomic` | `(path, content, *, mode=416, uid=0, gid=0)` |
 | [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L43) | `nginx_config` | `(domain, public_tls=False)` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L87) | `environments` | `(image, sandbox_uid)` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L98) | `provision` | `(config, nginx_path, *, domain, image, sandbox_uid, service_gid, sandbox_gid, owner_uid=0, public_tls=False)` |
-| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L130) | `main` | `()` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L88) | `environments` | `(image, sandbox_uid)` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L99) | `provision` | `(config, nginx_path, *, domain, image, sandbox_uid, service_gid, sandbox_gid, owner_uid=0, public_tls=False)` |
+| [scripts/deployment/provision.py](../../scripts/deployment/provision.py#L131) | `main` | `()` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L20) | `source_archive` | `()` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L33) | `seed` | `(code, manager)` |
 | [scripts/deployment/seed_demo.py](../../scripts/deployment/seed_demo.py#L63) | `read_token` | `(path)` |
@@ -2186,6 +2437,136 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L76) | `test_existing_customer_workspace_cannot_be_rebootstrapped` | `(users)` |
 | [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L84) | `test_chat_module_slot_obeys_room_membership` | `(users)` |
 | [tests/test_accounts_chat.py](../../tests/test_accounts_chat.py#L95) | `test_login_throttle_expires` | `(users, monkeypatch)` |
+| [tests/test_chart_overlay_browser.py](../../tests/test_chart_overlay_browser.py#L10) | `test_actual_chart_overlays_and_profile_controls` | `(tmp_path)` |
+| [tests/test_chart_overlays.py](../../tests/test_chart_overlays.py#L8) | `seed` | `()` |
+| [tests/test_chart_overlays.py](../../tests/test_chart_overlays.py#L20) | `test_all_profiles_render_through_authenticated_market_api` | `(client)` |
+| [tests/test_chart_overlays.py](../../tests/test_chart_overlays.py#L45) | `test_signal_rules_reject_chart_only_profile_without_breaking_existing_rules` | `(tmp_path, monkeypatch)` |
+| [tests/test_chart_overlays.py](../../tests/test_chart_overlays.py#L52) | `test_old_empty_session_profile_can_load_supplied_preset` | `(client)` |
+| [tests/test_dashboard_update_ref.py](../../tests/test_dashboard_update_ref.py#L9) | `git` | `(path, *args)` |
+| [tests/test_dashboard_update_ref.py](../../tests/test_dashboard_update_ref.py#L14) | `history` | `(tmp_path)` |
+| [tests/test_dashboard_update_ref.py](../../tests/test_dashboard_update_ref.py#L33) | `test_resolves_commit_branch_and_tag` | `(history, name)` |
+| [tests/test_dashboard_update_ref.py](../../tests/test_dashboard_update_ref.py#L41) | `test_missing_short_commit_fails_instead_of_using_head` | `(history)` |
+| [tests/test_demo_cli.py](../../tests/test_demo_cli.py#L12) | `run` | `(args, root, data=None)` |
+| [tests/test_demo_cli.py](../../tests/test_demo_cli.py#L17) | `test_standalone_account_and_reports` | `(tmp_path)` |
+| [tests/test_demo_cli.py](../../tests/test_demo_cli.py#L28) | `test_bot_module_uses_simple_action_contract_and_real_quote_fixture` | `(tmp_path)` |
+| [tests/test_demo_cli.py](../../tests/test_demo_cli.py#L51) | `test_media_descriptors_run_without_browser` | `(tmp_path)` |
+| [tests/test_demo_media_browser.py](../../tests/test_demo_media_browser.py#L9) | `test_demo_and_media_workflow` | `(tmp_path)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L15) | `market` | `(tmp_path, monkeypatch)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L18) | `market.quote` | `(cfg)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L23) | `new` | `(owner='alice', settings=None)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L24) | `trade` | `(**extra)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L27) | `test_buy_spread_margin_commission_and_close_ledger` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L40) | `test_sell_and_both_bot_contracts` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L53) | `test_pending_sell_stop_triggers_and_stop_loss_uses_observed_gap_price` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L63) | `test_take_profit_and_invalid_pending_gap` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L70) | `test_ownership_idempotency_slot_uniqueness_and_settings_lock` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L81) | `test_parallel_replay_creates_one_order` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L87) | `test_pin_hash_rate_limit_and_no_secret_in_public_results` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L98) | `test_insufficient_margin_rolls_back_and_stop_out_liquidates` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L107) | `test_swap_triple_day_and_repeated_reads_are_not_double_charged` | `(market, monkeypatch)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L114) | `test_stale_quotes_block_mutation_without_fabricated_execution` | `(market, monkeypatch)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L123) | `test_invalid_price_directions_and_precision` | `(market, data)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L128) | `test_api_bot_aliases_owner_scope_csv_and_scheduler_secret_policy` | `(client, monkeypatch)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L151) | `test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output` | `(tmp_path, monkeypatch)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L161) | `test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.Adapter` | `class` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L162) | `test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.Adapter.__init__` | `(self, owner)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L163) | `test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.Adapter.get` | `(self, path)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L166) | `test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.factory` | `(owner, token)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L179) | `test_quote_adapter_requires_current_collector_and_prices` | `(tmp_path, monkeypatch)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L193) | `test_archived_prototypes_are_not_in_new_module_catalog` | `()` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L201) | `test_replay_stays_bound_to_original_account_after_selection_change` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L210) | `test_long_lived_active_position_survives_history_window` | `(market)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L221) | `test_account_quota_and_ownership_are_checked_before_expensive_pin_hash` | `(market, monkeypatch)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L223) | `test_account_quota_and_ownership_are_checked_before_expensive_pin_hash.measured` | `(pin, salt)` |
+| [tests/test_demo_trading.py](../../tests/test_demo_trading.py#L233) | `test_quote_diagnostics_distinguish_closed_or_delayed_market_from_collector_failure` | `(tmp_path, monkeypatch)` |
+| [tests/test_media_modules.py](../../tests/test_media_modules.py#L12) | `test_external_media_is_a_descriptor_not_a_server_fetch` | `()` |
+| [tests/test_media_modules.py](../../tests/test_media_modules.py#L22) | `test_server_media_is_bounded_to_shared_folder_and_validated` | `(client, tmp_path)` |
+| [tests/test_media_modules.py](../../tests/test_media_modules.py#L38) | `test_direct_media_checks_each_request_and_is_not_copied_into_shared_templates` | `(client)` |
+| [tests/test_media_modules.py](../../tests/test_media_modules.py#L55) | `test_youtube_links_generate_only_allowlisted_non_autoplay_embeds` | `()` |
+| [tests/test_music_player.py](../../tests/test_music_player.py#L12) | `track` | `(url='https://example.com/music.mp3')` |
+| [tests/test_music_player.py](../../tests/test_music_player.py#L16) | `test_personal_playlist_limits_and_no_owner_override` | `(client)` |
+| [tests/test_music_player.py](../../tests/test_music_player.py#L28) | `test_direct_audio_does_not_transfer_via_shared_dashboard_and_cli_reads_same_playlist` | `(client)` |
+| [tests/test_music_player.py](../../tests/test_music_player.py#L46) | `test_login_routes_and_backgrounds_are_public_without_exposing_credentials` | `(client)` |
+| [tests/test_music_player.py](../../tests/test_music_player.py#L56) | `test_login_ip_uses_trusted_request_without_authentication` | `(client, monkeypatch)` |
+| [tests/test_music_player.py](../../tests/test_music_player.py#L68) | `test_note_slot_keeps_plain_text_owner_and_shared_copy` | `(client)` |
+| [tests/test_shared_dashboards.py](../../tests/test_shared_dashboards.py#L7) | `test_named_shared_dashboard_copies_layout_notes_and_profiles` | `(client)` |
+| [tests/test_shared_dashboards.py](../../tests/test_shared_dashboards.py#L45) | `test_restricted_modules_and_private_chat_do_not_grant_access_on_load` | `(client)` |
+| [tests/test_shared_dashboards.py](../../tests/test_shared_dashboards.py#L60) | `test_failed_load_is_atomic_and_same_name_only_updates_own_template` | `(client)` |
+| [tests/test_shared_dashboards.py](../../tests/test_shared_dashboards.py#L71) | `test_portable_calculator_content_is_copied_with_a_new_revision` | `(client)` |
+| [tests/test_technical_browser.py](../../tests/test_technical_browser.py#L10) | `test_five_independent_indicators_in_chromium` | `(tmp_path)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L14) | `isolated_state` | `(tmp_path, monkeypatch)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L18) | `ts` | `(value)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L21) | `bar` | `(stamp, op=100, high=110, low=90, close=105, **extra)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L26) | `test_documented_auto_examples` | `(price, step)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L32) | `test_spacing_stability_and_recalculation` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L44) | `test_previous_trading_day_friday_to_monday` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L54) | `test_session_only_scan_open_and_end_exclusion` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L62) | `test_overnight_session_is_provisional_until_end` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L74) | `test_no_fallback_from_missing_sunday_session` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L81) | `test_dst_rules_at_real_transition_instants` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L91) | `schedule` | `(**updates)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L97) | `test_clock_uses_reference_dst_independent_of_broker` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L109) | `test_windows_and_clock_share_the_same_schedule_and_only_traded_dates` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L121) | `test_supplied_schedule_is_default_and_explicit_empty_configuration_is_honored` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L137) | `test_nonexistent_dst_wall_time_is_not_invented` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L143) | `test_persistent_settings_and_spacing_are_owner_and_slot_scoped` | `(client)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L165) | `test_standalone_cli` | `(kind, tmp_path)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L178) | `test_rejects_invalid_inputs` | `(kind, data)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L182) | `test_authenticated_module_api_and_reserved_fields` | `(client)` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L193) | `test_broker_day_duration_respects_dst` | `()` |
+| [tests/test_technical_indicators.py](../../tests/test_technical_indicators.py#L203) | `test_local_market_data_and_owner_scoped_round_anchor` | `(tmp_path, monkeypatch)` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py#L8) | `put` | `(client, token, **updates)` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py#L14) | `test_direct_access_delete_and_safe_download` | `(client)` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py#L35) | `test_public_limits_names_and_disabled_accounts` | `(client)` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py#L49) | `test_upload_state_cannot_live_in_checkout` | `(monkeypatch)` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py#L56) | `test_output_is_owner_scoped_and_does_not_change_result` | `(client)` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py#L71) | `test_binary_upload_larger_than_legacy_limit_and_private_media` | `(client)` |
+| [tests/test_upload_center.py](../../tests/test_upload_center.py#L92) | `test_binary_size_boundary_and_chunked_enforcement` | `(client, monkeypatch)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L10) | `Response` | `class` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L11) | `Response.__init__` | `(self, body=b'file', status=200, **headers)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L13) | `Response.getheader` | `(self, name, default=None)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L16) | `fake_response` | `(monkeypatch, factory)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L18) | `fake_response.response` | `(url)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L28) | `test_reject_unsafe_url` | `(url)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L35) | `test_dns_blocks_internal_reserved_and_mapped_addresses` | `(monkeypatch, address)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L40) | `test_dns_is_pinned_without_forwarding_credentials` | `(monkeypatch)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L42) | `test_dns_is_pinned_without_forwarding_credentials.resolve` | `(*a, **kw)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L45) | `test_dns_is_pinned_without_forwarding_credentials.Connection` | `class` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L46) | `test_dns_is_pinned_without_forwarding_credentials.Connection.__init__` | `(self, host, address)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L47) | `test_dns_is_pinned_without_forwarding_credentials.Connection.request` | `(self, method, path, headers)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L50) | `test_dns_is_pinned_without_forwarding_credentials.Connection.getresponse` | `(self)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L51) | `test_dns_is_pinned_without_forwarding_credentials.Connection.close` | `(self)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L57) | `test_redirect_to_private_host_is_revalidated` | `(monkeypatch)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L60) | `test_redirect_to_private_host_is_revalidated.Connection` | `class` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L61) | `test_redirect_to_private_host_is_revalidated.Connection.__init__` | `(self, host, address)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L62) | `test_redirect_to_private_host_is_revalidated.Connection.request` | `(self, *a, **kw)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L63) | `test_redirect_to_private_host_is_revalidated.Connection.getresponse` | `(self)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L64) | `test_redirect_to_private_host_is_revalidated.Connection.close` | `(self)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L70) | `test_redirect_limit_length_overflow_and_partial_download` | `(monkeypatch)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L85) | `test_url_import_authorization_and_no_partial_records` | `(client, monkeypatch)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L98) | `test_url_import_authorization_and_no_partial_records.should_not_fetch` | `(url)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L110) | `test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host` | `(monkeypatch)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L114) | `test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.Raw` | `class` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L115) | `test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.Raw.close` | `(self)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L116) | `test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.connect` | `(address, timeout)` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L117) | `test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.TLS` | `class` |
+| [tests/test_upload_download.py](../../tests/test_upload_download.py#L118) | `test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.TLS.wrap_socket` | `(self, raw, server_hostname)` |
+| [tests/test_upload_proxy.py](../../tests/test_upload_proxy.py#L9) | `load` | `(name)` |
+| [tests/test_upload_proxy.py](../../tests/test_upload_proxy.py#L15) | `test_new_install_and_existing_public_one_megabyte_limit` | `(tmp_path)` |
+| [tests/test_workspace_browser.py](../../tests/test_workspace_browser.py#L8) | `test_workspace_header_and_slot_controls` | `(tmp_path)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L14) | `test_ip_headers_only_from_explicitly_trusted_loopback` | `(monkeypatch)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L27) | `test_myip_and_viewer_identity_use_the_http_request` | `(client, monkeypatch)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L39) | `test_indicators_can_be_enabled_only_on_one_owners_chart` | `(client)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L55) | `test_calendar_parser_filters_and_failed_source_is_backed_off` | `(tmp_path, monkeypatch)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L57) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Response` | `class` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L58) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Response.__enter__` | `(self)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L59) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Response.__exit__` | `(self, *args)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L60) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Response.read` | `(self, size)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L61) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Opener` | `class` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L62) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Opener.open` | `(self, request, timeout)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L69) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Failed` | `class` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L70) | `test_calendar_parser_filters_and_failed_source_is_backed_off.Failed.open` | `(self, *args, **kwargs)` |
+| [tests/test_workspace_support.py](../../tests/test_workspace_support.py#L77) | `test_managed_nginx_ip_patch_is_idempotent_and_preserves_unowned_files` | `(tmp_path)` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py#L5) | `make_zip` | `()` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py#L12) | `FakeDataManager` | `class` |
 | [tests_support/code_manager.py](../../tests_support/code_manager.py#L13) | `FakeDataManager.__init__` | `(self)` |
@@ -2465,19 +2846,25 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py#L69) | `SourceRegistryTests.test_hash_metadata_mismatch_is_rejected` | `(self)` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py#L81) | `SourceRegistryTests.test_empty_owner_is_rejected` | `(self)` |
 | [units/code-manager/tests/test_source_registry.py](../../units/code-manager/tests/test_source_registry.py#L90) | `test_new_owner_source_list_is_empty_without_hiding_detail_not_found` | `(tmp_path)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L28) | `load_themes` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L66) | `health` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L71) | `project_info` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L88) | `list_themes` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L104) | `get_theme` | `(theme_id: str)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L116) | `clock_time` | `(timezone: str \| None=None)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L126) | `execute_module` | `(module_id: str, data: dict)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L141) | `api_modules` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L147) | `dashboard` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2375) | `create_app` | `(*, credential_path=None, upstream_factory=None)` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2400) | `create_app.start_slot_workers` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2406) | `create_app.stop_slot_workers` | `()` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L2414) | `create_app.connected_dashboard` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L29) | `login_background` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L34) | `login_airless_background` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L38) | `load_themes` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L76) | `health` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L81) | `project_info` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L98) | `list_themes` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L114) | `get_theme` | `(theme_id: str)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L126) | `clock_time` | `(timezone: str \| None=None)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L136) | `execute_module` | `(module_id: str, data: dict)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L152) | `api_modules` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L158) | `dashboard` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3050) | `create_app` | `(*, credential_path=None, upstream_factory=None)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3063) | `create_app.DashboardBodyLimit` | `class` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3064) | `create_app.DashboardBodyLimit.__init__` | `(self, app)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3068) | `create_app.DashboardBodyLimit.__call__` | `(self, scope, receive, send)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3086) | `create_app.start_slot_workers` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3093) | `create_app.stop_slot_workers` | `()` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3102) | `create_app.login_context` | `(request: Request)` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py#L3108) | `create_app.connected_dashboard` | `()` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L8) | `create_app` | `()` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py#L12) | `create_app.upstreams` | `(owner, token)` |
 | [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L18) | `RunRequest` | `class` |
@@ -2493,56 +2880,89 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L131) | `create_router.account_users` | `(identity=Depends(admin_identity))` |
 | [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L135) | `create_router.account_create` | `(body: dict, identity=Depends(admin_identity))` |
 | [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L142) | `create_router.account_enable` | `(user_id: str, body: dict, identity=Depends(admin_identity))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L150) | `create_router.chat_users` | `(identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L156) | `create_router.chat_rooms` | `(identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L162) | `create_router.chat_requests` | `(identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L168) | `create_router.chat_request` | `(body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L176) | `create_router.chat_respond` | `(request_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L185) | `create_router.chat_messages` | `(room_id: str, limit: int=Query(default=50, ge=1, le=200), before: int \| None=Query(default=None, gt=0), identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L192) | `create_router.chat_send` | `(room_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L200) | `create_router.market_candles` | `(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, end_time: int \| None=Query(default=None, ge=0), interval: str='1m', include_indicators: bool=False, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L215) | `create_router.profile_list` | `(identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L219) | `create_router.profile_create` | `(body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L225) | `create_router.profile_save` | `(profile_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L232) | `create_router.profile_delete` | `(profile_id: str, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L238) | `create_router.signal_list` | `(identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L242) | `create_router.signal_create` | `(body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L248) | `create_router.signal_save` | `(rule_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L255) | `create_router.signal_delete` | `(rule_id: str, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L261) | `create_router.signal_evaluate` | `(rule_id: str, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L268) | `create_router.signal_worker` | `(worker_id: str, body: dict, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L285) | `create_router.read` | `(operation: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L292) | `create_router.market_sma` | `(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L307) | `create_router.indicators_endpoint` | `(name: str, limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=14, ge=1, le=500), fast: int=Query(default=12, ge=1, le=500), slow: int=Query(default=26, ge=1, le=500), signal: int=Query(default=9, ge=1, le=500), include_open: bool=True, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L325) | `create_router.market_database` | `(table: str, limit: int=Query(default=50, ge=1, le=200), offset: int=Query(default=0, ge=0, le=1000000), candle_state: str='all', indicator_name: str='all', identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L339) | `create_router.module_state` | `(module_id: str, body: dict, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L355) | `create_router.run_independent_module` | `(module_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L372) | `create_router.list_active_slots` | `(identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L379) | `create_router.create_slot` | `(body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L391) | `create_router.duplicate_slot` | `(slot_id: str, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L400) | `create_router.update_slot_overview` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L413) | `create_router.delete_slot` | `(slot_id: str, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L424) | `create_router.update_slot_appearance` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L439) | `create_router.configure_slot_worker` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L452) | `create_router.bind_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L467) | `create_router.read_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L486) | `create_router.execute_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L503) | `create_router.register` | `(body: RegisterBody, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L508) | `create_router.worker` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L512) | `create_router.configure` | `(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L518) | `create_router.remove` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L522) | `create_router.enable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L526) | `create_router.disable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L530) | `create_router.run` | `(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L541) | `create_router.execution` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
-| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L545) | `create_router.cancel` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L149) | `create_router.upload_error` | `(exc)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L154) | `create_router.upload_list` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L160) | `create_router.upload_create` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L167) | `create_router.upload_binary` | `(request: Request, name: str, visibility: str, recipient: str \| None=None, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L180) | `create_router.upload_from_url` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L190) | `create_router.upload_download` | `(file_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L200) | `create_router.upload_delete` | `(file_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L206) | `create_router.chat_users` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L212) | `create_router.chat_rooms` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L218) | `create_router.chat_requests` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L224) | `create_router.chat_request` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L232) | `create_router.chat_respond` | `(request_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L241) | `create_router.chat_messages` | `(room_id: str, limit: int=Query(default=50, ge=1, le=200), before: int \| None=Query(default=None, gt=0), identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L248) | `create_router.chat_send` | `(room_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L256) | `create_router.market_candles` | `(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, end_time: int \| None=Query(default=None, ge=0), interval: str='1m', include_indicators: bool=False, slot_id: str \| None=None, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L284) | `create_router.demo_call` | `(operation, *args, **kwargs)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L294) | `create_router.demo_slot` | `(identity, slot_id, kind=None)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L302) | `create_router.demo_state` | `(account_id: str \| None=None, slot_id: str \| None=None, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L307) | `create_router.demo_create` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L312) | `create_router.demo_select` | `(account_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L316) | `create_router.demo_settings` | `(account_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L321) | `create_router.demo_pin` | `(account_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L326) | `create_router.demo_manual` | `(body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L332) | `create_router.demo_bot` | `(body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L338) | `create_router.demo_trade_action` | `(trade_id: str, action: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L343) | `create_router.demo_reports` | `(account_id: str \| None=None, since: float=0, until: float \| None=None, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L347) | `create_router.demo_csv` | `(account_id: str \| None=None, since: float=0, until: float \| None=None, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L358) | `create_router.demo_execution` | `(body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L377) | `create_router.media_error` | `(exc)` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L382) | `create_router.music_get` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L389) | `create_router.music_save` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L397) | `create_router.media_describe` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L404) | `create_router.media_library` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L410) | `create_router.media_server` | `(filename: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L416) | `create_router.media_upload` | `(file_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L432) | `create_router.my_ip` | `(request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L436) | `create_router.dashboard_list` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L440) | `create_router.dashboard_save` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L447) | `create_router.dashboard_load` | `(dashboard_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L454) | `create_router.dashboard_delete` | `(dashboard_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L460) | `create_router.indicator_presets` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L464) | `create_router.profile_list` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L468) | `create_router.profile_create` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L474) | `create_router.profile_save` | `(profile_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L481) | `create_router.profile_delete` | `(profile_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L487) | `create_router.signal_list` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L491) | `create_router.signal_create` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L497) | `create_router.signal_save` | `(rule_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L504) | `create_router.signal_delete` | `(rule_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L510) | `create_router.signal_evaluate` | `(rule_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L517) | `create_router.signal_worker` | `(worker_id: str, body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L534) | `create_router.read` | `(operation: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L541) | `create_router.market_sma` | `(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L556) | `create_router.indicators_endpoint` | `(name: str, limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=14, ge=1, le=500), fast: int=Query(default=12, ge=1, le=500), slow: int=Query(default=26, ge=1, le=500), signal: int=Query(default=9, ge=1, le=500), include_open: bool=True, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L574) | `create_router.market_database` | `(table: str, limit: int=Query(default=50, ge=1, le=200), offset: int=Query(default=0, ge=0, le=1000000), candle_state: str='all', indicator_name: str='all', identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L588) | `create_router.module_state` | `(module_id: str, body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L604) | `create_router.run_independent_module` | `(module_id: str, body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L621) | `create_router.list_active_slots` | `(identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L628) | `create_router.create_slot` | `(body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L640) | `create_router.duplicate_slot` | `(slot_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L649) | `create_router.update_slot_overview` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L662) | `create_router.delete_slot` | `(slot_id: str, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L673) | `create_router.update_slot_appearance` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L688) | `create_router.configure_slot_worker` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L701) | `create_router.bind_slot` | `(slot_id: str, body: dict, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L716) | `create_router.read_slot` | `(slot_id: str, body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L735) | `create_router.execute_slot` | `(slot_id: str, body: dict, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L752) | `create_router.register` | `(body: RegisterBody, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L757) | `create_router.worker` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L761) | `create_router.configure` | `(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L767) | `create_router.remove` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L771) | `create_router.enable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L775) | `create_router.disable` | `(worker_id: str, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L779) | `create_router.run` | `(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L790) | `create_router.execution` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
+| [units/consumers/dashboard-core/dashboard/upstreams.py](../../units/consumers/dashboard-core/dashboard/upstreams.py#L794) | `create_router.cancel` | `(execution_id: UUID, request: Request, identity=Depends(owner))` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L13) | `test_health_endpoint` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L22) | `test_themes_endpoint` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L32) | `test_each_theme_has_colors` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L41) | `test_unknown_theme_is_not_found` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L45) | `test_module_catalog` | `()` |
-| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L54) | `test_module_catalog_endpoint` | `()` |
-| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L63) | `test_dashboard_contains_generic_branding` | `()` |
+| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L55) | `test_module_catalog_endpoint` | `()` |
+| [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py#L64) | `test_dashboard_contains_generic_branding` | `()` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../units/consumers/dashboard-core/legacy-tests/test_registry.py#L9) | `write_manifest` | `(root, directory, data, filename='manifest.json')` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../units/consumers/dashboard-core/legacy-tests/test_registry.py#L22) | `valid_manifest` | `(module_id='sample-module')` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../units/consumers/dashboard-core/legacy-tests/test_registry.py#L33) | `use_packages_dir` | `(monkeypatch, tmp_path)` |

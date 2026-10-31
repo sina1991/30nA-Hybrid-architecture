@@ -5,8 +5,8 @@ import re
 import subprocess
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 
 from modules.registry import list_modules
 from modules.execution import UnknownModule, run_module
@@ -21,8 +21,18 @@ PROJECT_ROOT = BASE_DIR.parents[3]
 app = FastAPI(
     title="Dashboard Core",
     description="Independent, theme-based dashboard workspace.",
-    version="1.0.0",
+    version="1.1.1",
 )
+
+
+@app.get('/assets/login-galaxy.png', include_in_schema=False)
+def login_background():
+    return FileResponse(BASE_DIR/'static/login-galaxy.png',media_type='image/png',headers={'Cache-Control':'public, max-age=86400','X-Content-Type-Options':'nosniff'})
+
+
+@app.get('/assets/login-airless.png', include_in_schema=False)
+def login_airless_background():
+    return FileResponse(BASE_DIR/'static/login-airless.png',media_type='image/png',headers={'Cache-Control':'public, max-age=86400','X-Content-Type-Options':'nosniff'})
 
 
 def load_themes() -> list[dict]:
@@ -127,7 +137,7 @@ def execute_module(module_id: str, data: dict) -> dict:
     try:
         from modules.execution import HOST_MONITORS, MARKET_MODULES
         from modules.technical import KINDS
-        if module_id in HOST_MONITORS or module_id in MARKET_MODULES or module_id in KINDS or module_id in ('myip','economic-calendar') or module_id.startswith('demo-') or module_id in ('media-player','media-image','media-audio','media-video'):
+        if module_id in HOST_MONITORS or module_id in MARKET_MODULES or module_id in KINDS or module_id in ('myip','economic-calendar') or module_id.startswith('demo-') or module_id in ('music-player','media-player','media-image','media-audio','media-video'):
             raise HTTPException(status_code=403, detail="Sign in to use this module")
         if any(str(key).startswith('_') for key in data):
             raise ValueError('reserved input field')
@@ -419,6 +429,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 .slot,.slot * {scrollbar-width:thin;scrollbar-color:rgba(145,162,187,.2) transparent}.slot::-webkit-scrollbar,.slot *::-webkit-scrollbar {width:5px;height:5px}.slot::-webkit-scrollbar-track,.slot *::-webkit-scrollbar-track,.slot::-webkit-scrollbar-corner,.slot *::-webkit-scrollbar-corner {background:transparent}.slot::-webkit-scrollbar-button,.slot *::-webkit-scrollbar-button {display:none;width:0;height:0}.slot::-webkit-scrollbar-thumb,.slot *::-webkit-scrollbar-thumb {background:rgba(145,162,187,.2);border-radius:8px}.slot::-webkit-scrollbar-thumb:hover,.slot *::-webkit-scrollbar-thumb:hover {background:rgba(145,162,187,.35)}
 #overview-grid .slot[data-slot-type="linear"] {grid-column:span 12;grid-row:span 2;min-height:0}#grid .slot[data-slot-type="linear"] {grid-column:1/-1;min-height:100px}.calendar-timeline {display:flex;gap:8px;overflow-x:auto;min-height:65px}.calendar-event {flex:0 0 235px;border-left:3px solid var(--accent);padding:5px 9px;background:var(--field);border-radius:5px;font-size:12px}.calendar-event strong,.calendar-event small {display:block}.calendar-footer {display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:10px}.calendar-footer p {margin:0}.slot[data-slot-type="linear"] .module-body {min-height:0;overflow:auto}.calendar-event[data-impact="High"] {border-color:#ef4444}.calendar-event[data-impact="Medium"] {border-color:#f59e0b}#viewer-identity,#workspace-status {font-size:12px;color:var(--muted)}
 .demo-metrics {display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}.demo-metric {display:grid;gap:6px;padding:10px;background:var(--field);border:1px solid var(--border);border-radius:8px}.demo-metric strong {font-size:18px}.demo-panels {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}.demo-entry-form {display:grid;gap:8px}.demo-entry-form input,.demo-entry-form select {padding:7px;background:var(--field);border:1px solid var(--border);color:var(--text);border-radius:6px}.demo-buy,.demo-sell {padding:9px 22px;border:0;border-radius:6px;color:white;font:inherit;cursor:pointer}.demo-buy {background:#15803d}.demo-sell {background:#b91c1c}.demo-buy:disabled,.demo-sell:disabled {opacity:.4;cursor:default}.demo-entry-price {font-size:12px;color:var(--muted)}.demo-mini-pnl {font-size:20px}
+.plain-note {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6;font-size:inherit;padding:4px;flex:1;min-height:0;overflow:auto}.slot[data-slot-type="note"] .module-body {gap:0}
 .slot-media {display:block;max-width:100%;max-height:100%;object-fit:contain}.media-player-host {min-height:0;overflow:auto}.media-player-host audio {width:100%}.youtube-player {width:100%;aspect-ratio:16/9;border:0}
 </style>
 </head>
@@ -477,6 +488,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <section class="page-view" data-page="slots" hidden>
   <h2 class="view-heading">Slots</h2><p class="view-description">Unpinned slots. Use the pin to show a slot on Overview.</p>
   <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
+  <button type="button" class="dice-roll-button" id="add-note-slot" disabled>+ Note</button>
   <button type="button" class="dice-roll-button" id="add-linear-slot" disabled>+ Linear slot</button>
   <button type="button" class="dice-roll-button" id="add-small-slot" disabled>+ Small slot</button>
   <button type="button" class="dice-roll-button" id="add-minimal-slot" disabled>+ Minimal slot</button>
@@ -503,7 +515,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <div id="module-catalog" class="module-catalog"></div>
   </section>
   <section class="page-view" data-page="media" hidden>
-    <h2>Media</h2><p class="view-description">Images: JPG, PNG, GIF, WebP · Audio: MP3, WAV, OGG, M4A · Video: MP4, WebM. Playback uses your browser; no autoplay or server transcoding.</p>
+    <h2>Media</h2><section id="music-mount" class="info-card"></section><p class="view-description">Images: JPG, PNG, GIF, WebP · Audio: MP3, WAV, OGG, M4A · Video: MP4, WebM. Playback uses your browser; no autoplay or server transcoding.</p>
     <div class="db-controls"><label>Component<select id="media-component"><option value="image">Image Viewer</option><option value="audio">Audio Player</option><option value="video">Video Player</option><option value="auto">Media Player (auto)</option></select></label>
       <label>Source<select id="media-tab-source"><option value="external">External link (HTTPS / YouTube)</option><option value="upload">Upload Center</option><option value="server">Shared server media</option></select></label>
       <label id="media-url-label">Media URL<input id="media-tab-url" type="url" placeholder="https://example.com/file.mp4"></label>
@@ -748,6 +760,7 @@ document.getElementById('demo-worker-form').addEventListener('submit',async even
 document.addEventListener('demo-change',()=>{if(document.body.dataset.view==='demo')refreshDemoTab();document.querySelectorAll('.market-chart').forEach(svg=>svg.closest('.module-body')?.dispatchEvent(new Event('slot-refresh')));});
 function demoTabTick(){if(document.body.dataset.view==='demo')refreshDemoTab();setTimeout(demoTabTick,3000);}setTimeout(demoTabTick,3000);
 
+document.addEventListener('music-slot-added',async()=>{slotGeneration++;await refreshActiveSlots();});
 let mediaLibrary=null;
 function mediaTabSettings(){const source=document.getElementById('media-tab-source').value,file=document.getElementById('media-tab-file').value;return {source,url:source==='external'?document.getElementById('media-tab-url').value:'',format:source==='external'?document.getElementById('media-tab-format').value:'auto',filename:source==='server'?file:'',file_id:source==='upload'?file:'',loop:document.getElementById('media-tab-loop').checked};}
 async function refreshMediaLibrary(){
@@ -1866,6 +1879,7 @@ function configureMediaPanel(panel,row,slot){
 
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
+  if(moduleId==='music-player'){window.dashboardMusic?.render(body);return;}
   const module = availableModules.find(item => item.id === moduleId);
 
   if (!module) {
@@ -1922,6 +1936,11 @@ function renderModuleContent(body, slot, moduleId) {
     return;
   }
 
+  if (module.type === "slot-note" && slot.slot_type==='note') {
+    const text=makeElement('div','plain-note');body.append(text);
+    async function refresh(){if(!window.dashboardModuleState?.ready()){text.textContent='Sign in to view this note.';return;}try{const result=await window.dashboardModuleState.read(slot.id,module.id);if(body.isConnected)text.textContent=result.text||'Right-click → Module to edit this note.';}catch(_){if(body.isConnected)text.textContent='Note unavailable.';}}
+    body.addEventListener('slot-refresh',refresh);function tick(){if(!body.isConnected)return;refresh();setTimeout(tick,2000);}setTimeout(tick,0);return;
+  }
   if (module.type === "slot-note") {
     body.append(makeElement("div", "module-title", module.name));
     const hint = makeElement("div", "module-detail", "Sign in to share this note with the terminal.");
@@ -2367,7 +2386,7 @@ function canRestoreSlot(card, layout) {
 
 function makeSlot(row, area) {
   const isChartSlot = ['chart','fix-chart'].includes(row.slot_type) && row.module_id === 'gold-chart';
-  const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
+  const slot = {id:row.slot, name:row.slot, slot_type:row.slot_type, display_theme:row.display_theme || 'visual',
     chat_room:row.chat_room, chart_period:row.chart_period, chart_interval:row.chart_interval, chart_indicators:row.chart_indicators, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live,profile_visibility:row.profile_visibility||{}};
   const card = makeElement('article', isChartSlot ? 'slot chart-slot' : 'slot');
   card.dataset.slotId = slot.id;
@@ -2409,7 +2428,7 @@ function makeSlot(row, area) {
   const actions = makeElement('div', 'slot-menu-actions');
   const typeLabel = makeElement('label', '', 'Slot type ');
   const slotType = makeElement('select', 'slot-display-theme');
-  [['standard','Standard'],['small','Small'],['minimal','Minimal'],['chart','Chart'],['fix-chart','Fix Chart'],['chat','Chat'],['linear','Linear']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
+  [['standard','Standard'],['small','Small'],['minimal','Minimal'],['chart','Chart'],['fix-chart','Fix Chart'],['chat','Chat'],['linear','Linear'],['note','Note']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
   slotType.value = row.slot_type || 'standard';
   slotType.addEventListener('change', async () => {
     slotType.disabled = true;
@@ -2610,7 +2629,7 @@ function makeSlot(row, area) {
       if (settingsDialog.open) settingsDialog.close();
       if(DEMO_KINDS.includes(row.module_id)){body.dispatchEvent(new CustomEvent('demo-result',{detail:result}));document.dispatchEvent(new Event('demo-change'));}
       else if (['session-clock','session-windows','price-levels'].includes(moduleInfo?.type)) body.dispatchEvent(new CustomEvent('technical-result',{detail:result}));
-      else if (['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar','media-player',...DEMO_KINDS].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
+      else if (['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar','media-player','music-player',...DEMO_KINDS].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
       else if (!['clock', 'counter', 'slot-note', 'empty', 'dashboard-health', 'theme-summary'].includes(row.module_id)) {
         let resultView = body.querySelector('.slot-quick-result');
         if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
@@ -2758,6 +2777,11 @@ function makeSlot(row, area) {
     save.addEventListener('click',async()=>{save.disabled=true;try{await window.dashboardModuleState.setSlotAppearance(slot.id,{calendar_settings:JSON.parse(config.value)});slotGeneration++;await refreshActiveSlots();}catch(_){status.textContent='Invalid calendar settings or save unavailable.';save.disabled=false;}});modulePanel.append(config,save,status);
   }
   if(['media-player','media-image','media-audio','media-video'].includes(row.module_id))configureMediaPanel(modulePanel,row,slot);
+  if(row.module_id==='slot-note'){
+    const edit=makeElement('textarea','module-note-input'),save=makeElement('button','','Save note'),status=makeElement('p','market-status');edit.setAttribute('aria-label','Note text');edit.maxLength=10000;edit.rows=8;save.type='button';modulePanel.append(makeElement('label','','Note text'),edit,save,status);
+    window.dashboardModuleState.read(slot.id,'slot-note').then(result=>{if(edit.isConnected)edit.value=result.text;}).catch(()=>{status.textContent='Could not load note.';});
+    save.addEventListener('click',async()=>{save.disabled=true;try{await window.dashboardModuleState.invoke('slot-note',{slot:slot.id,action:'set',text:edit.value});status.textContent='Note saved.';body.dispatchEvent(new Event('slot-refresh'));}catch(_){status.textContent='Could not save note.';}finally{save.disabled=false;}});
+  }
   const panels = [['Slot actions',actionsPanel],['Input',inputDrawer],['Commands',terminalDrawer],['Slot Worker',workerDrawer],['Output',outputDetails],['Module',modulePanel]];
   function selectSettingsTab(index) {
     panels.forEach(([,panel],i) => {panel.hidden=i!==index; tabs.children[i].setAttribute('aria-selected',String(i===index)); tabs.children[i].tabIndex=i===index?0:-1;});
@@ -2788,7 +2812,7 @@ function makeSlot(row, area) {
   if (!row.minimized && row.output_settings?.mode === 'summary') renderSlotSummary(body, row, moduleInfo);
   else if (!row.minimized && isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
   else if (!row.minimized) renderModuleContent(body, slot, selectedModule);
-  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar','media-player',...DEMO_KINDS].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
+  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar','media-player','music-player',...DEMO_KINDS].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 
@@ -2806,6 +2830,7 @@ function renderSlots() {
   const overview = document.getElementById('overview-grid');
   const ready = Boolean(window.dashboardModuleState?.ready());
   document.getElementById('add-slot').disabled = !ready;
+  document.getElementById('add-note-slot').disabled=!ready;
   document.getElementById('add-linear-slot').disabled = !ready;
   document.getElementById('add-chart-slot').disabled = !ready;
   document.getElementById('add-chat-slot').disabled = !ready;
@@ -2907,7 +2932,8 @@ document.getElementById('add-minimal-slot').addEventListener('click', async even
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add minimal slot.'; }
   finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
 });
-document.getElementById('add-linear-slot').addEventListener('click',async event=>{event.currentTarget.disabled=true;try{await window.dashboardModuleState.createSlot('linear');slotGeneration++;await refreshActiveSlots();}catch(_){document.getElementById('slots-message').textContent='Could not add linear slot.';}finally{event.currentTarget.disabled=!window.dashboardModuleState?.ready();}});
+document.getElementById('add-note-slot').addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{await window.dashboardModuleState.createSlot('note');slotGeneration++;await refreshActiveSlots();}catch(_){document.getElementById('slots-message').textContent='Could not add note.';}finally{button.disabled=!window.dashboardModuleState?.ready();}});
+document.getElementById('add-linear-slot').addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{await window.dashboardModuleState.createSlot('linear');slotGeneration++;await refreshActiveSlots();}catch(_){document.getElementById('slots-message').textContent='Could not add linear slot.';}finally{button.disabled=!window.dashboardModuleState?.ready();}});
 document.getElementById('add-small-slot').addEventListener('click', async event => {
   event.currentTarget.disabled = true;
   try { await window.dashboardModuleState.createSlot('small'); slotGeneration++; await refreshActiveSlots(); }
@@ -3023,7 +3049,7 @@ start();
 
 def create_app(*, credential_path=None, upstream_factory=None):
     """Return an isolated app; upstream access requires explicit identity setup."""
-    instance = FastAPI(title='Dashboard Core', version='0.1.1')
+    instance = FastAPI(title='Dashboard Core', version='1.1.1')
     configured = credential_path is not None and upstream_factory is not None
     for route in app.routes:
         path = getattr(route, 'path', '')
@@ -3046,6 +3072,7 @@ def create_app(*, credential_path=None, upstream_factory=None):
         register_error_handlers(instance)
         from .upstreams import create_router
         from .upstream_panel import ACCESS, PANEL
+        from .music_panel import MUSIC
         from modules.slot_workers import SlotWorkerScheduler
         from modules.signal_rules import SignalScheduler
         from market_data.collector import GoldCollector
@@ -3071,7 +3098,13 @@ def create_app(*, credential_path=None, upstream_factory=None):
 
         instance.include_router(create_router(credential_path, upstream_factory))
 
+        @instance.get('/api/login/context', include_in_schema=False)
+        def login_context(request: Request):
+            from modules.client_ip import address
+            return JSONResponse({'ip':address(request)},headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+        @instance.get('/login', response_class=HTMLResponse, include_in_schema=False)
         @instance.get('/', response_class=HTMLResponse)
         def connected_dashboard():
-            return dashboard().replace('<div id="account-access-mount"></div>', ACCESS, 1).replace('<div id="worker-panel-mount"></div>', PANEL, 1)
+            return dashboard().replace('<div id="account-access-mount"></div>', ACCESS, 1).replace('<div id="worker-panel-mount"></div>', PANEL, 1).replace('</body>',MUSIC+'</body>')
     return instance

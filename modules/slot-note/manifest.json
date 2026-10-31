@@ -1,7 +1,7 @@
 {
   "id": "slot-note",
   "name": "Slot Note",
-  "description": "A note saved locally in this browser for this slot.",
+  "description": "Plain text note stored for the owner and slot, shared with the terminal.",
   "version": "1.0.0",
   "api_version": "1",
   "type": "slot-note"

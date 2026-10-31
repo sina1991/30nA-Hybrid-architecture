@@ -18,7 +18,7 @@ await page.route('**/api/upstreams/**',async route=>{const req=route.request(),p
  if(path.endsWith('/dashboards/dashboard-abc/load')){loaded=true;rows.forEach(row=>row.overview=false);rows.push({slot:'loaded-counter',module_id:'counter',slot_type:'standard',overview:true,context:{},revision:'loaded'});return send({name:saved.name,theme:'midnight',slots:['loaded-counter'],unavailable_modules:[]});}
  return send({rooms:[],users:[],requests:[]});
 });
-await page.goto(`http://127.0.0.1:${server.address().port}`);await page.locator('[data-nav="account"]').click();await page.locator('#account-username').fill('alice');await page.locator('#account-password').fill('long test password');await page.locator('#account-password-form button').click();
+await page.goto(`http://127.0.0.1:${server.address().port}`);await page.locator('#account-username').fill('alice');await page.locator('#account-password').fill('long test password');await page.locator('#account-password-form button[type="submit"]').click();
 await page.waitForFunction(()=>document.getElementById('viewer-identity').textContent==='alice · 203.0.113.5');await page.locator('[data-nav="overview"]').click();
 const counter=page.locator('#overview-grid [data-slot-id="counter-one"]');await counter.waitFor();assert(!(await counter.locator('.slot-gear').isVisible()));
 await counter.click({button:'right',position:{x:5,y:5}});await page.locator('dialog[open]').getByRole('button',{name:'Close',exact:true}).click();

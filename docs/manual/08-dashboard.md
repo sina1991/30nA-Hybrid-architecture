@@ -4,11 +4,11 @@
 
 ## دو حالت مستقل
 
-`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، ورود کوچک را در header و Workspace حساب را پس از بخش اسلات‌ها قرار می‌دهد. Workspace تا دریافت موفق داده حساب پنهان است. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
+`dashboard.app:app`، shell مستقل با theme/moduleهای محلی است. `dashboard.production:create_app --factory` با `DASHBOARD_CREDENTIAL_FILE` و URL upstreamها، صفحهٔ ورود مستقل با Password/Token را پیش از نمایش Dashboard و Workspace حساب را پس از بخش اسلات‌ها قرار می‌دهد. Workspace تا دریافت موفق داده حساب پنهان است. نبود تنظیم upstream به ساخت endpoint فرضی یا fallback ناامن منجر نمی‌شود؛ درخواست مربوط 503 می‌گیرد.
 
 ## راهنمای کاربر
 
-۱. صفحه HTTPS را باز کنید؛ Access token اختصاصی حساب را وارد کنید. ۲. Worker enabled را انتخاب کنید. ۳. JSON object و timeout بین ۱ تا ۳۰۰ ثانیه بدهید. ۴. اجرای Worker را بزنید. ۵. وضعیت و execution ID را ببینید؛ خروجی موفق به‌صورت JSON نمایش داده می‌شود. ۶. در history، اجرای قبلی را انتخاب کنید. ۷. cancel، درخواست best-effort می‌فرستد؛ تا وضعیت terminal نیاید، cancelled ساخته نمی‌شود.
+۱. صفحه HTTPS را باز کنید؛ با Username/Password وارد شوید یا بخش Use an access token را باز کنید. ۲. Worker enabled را انتخاب کنید. ۳. JSON object و timeout بین ۱ تا ۳۰۰ ثانیه بدهید. ۴. اجرای Worker را بزنید. ۵. وضعیت و execution ID را ببینید؛ خروجی موفق به‌صورت JSON نمایش داده می‌شود. ۶. در history، اجرای قبلی را انتخاب کنید. ۷. cancel، درخواست best-effort می‌فرستد؛ تا وضعیت terminal نیاید، cancelled ساخته نمی‌شود.
 
 ورودی پیش‌فرض برای Worker نمونه `{"values":[10,20,30]}` است؛ همه Workerها الزاماً همین input را نمی‌پذیرند. پنل اکنون ثبت Worker با reference Artifact، جزئیات، ویرایش configuration/schedule، enable/disable و حذف دارد. UI هنوز source upload یا Build/Publication ندارد؛ reference باید برای اجرای موفق از Artifact منتشرشده همان owner باشد و وجود آن در لحظه ثبت بررسی نمی‌شود.
 
@@ -18,7 +18,7 @@
 
 Token در HTML server-rendered، URL، localStorage، sessionStorage یا cookie ذخیره نمی‌شود؛ فقط تا logout/reload در closure صفحه می‌ماند. درخواست‌ها bearer دارند و cookie ارسال نمی‌کنند. ورود روی HTTP غیرloopback در UI رد می‌شود. `textContent` برای نمایش داده استفاده می‌شود. defaultهای theme و یادداشت‌های slot در localStorage نگهداری می‌شوند؛ این storage مربوط به token حساب نیست.
 
-BFF قبل از تماس upstream، credential کاربر را از hash mapping احراز می‌کند و همان credential را forward می‌کند؛ token ادمین عمومی جایگزین نمی‌شود. owner در body قابل انتخاب نیست. پاسخ account `Cache-Control: no-store` و `Vary: Authorization` دارد. CSRF cookie session یا OAuth/OIDC در این نسخه وجود ندارد؛ این سیستم login/password عمومی نیست.
+BFF قبل از تماس upstream، credential کاربر را از hash mapping احراز می‌کند و همان credential را forward می‌کند؛ token ادمین عمومی جایگزین نمی‌شود. owner در body قابل انتخاب نیست. پاسخ account `Cache-Control: no-store` و `Vary: Authorization` دارد. CSRF cookie session یا OAuth/OIDC در این نسخه وجود ندارد؛ ورود Password داخلی پروژه است؛ OAuth/OIDC عمومی ندارد.
 
 ## routeهای اصلی
 
@@ -55,3 +55,8 @@ History فعلاً حداکثر ۱۰۰ اجرای اخیر است. فیلتر Wo
 ## چیدمان v0.1.1
 
 اسلات‌ها در بالای صفحه باقی می‌مانند؛ login/logout جای آن‌ها را تغییر نمی‌دهد. پس از ورود، مدیریت، اجرا و history زیر تمام اسلات‌ها نمایش داده می‌شوند. پیام‌های Worker داخل Workspace و پیام ورود در header قرار می‌گیرند. لینک header دسترسی مستقیم به Workspace پایین صفحه می‌دهد. [نسخه توسعه و روش بررسی روی VPS](../development/dashboard-v0.1.1.md).
+
+
+## امکانات Dashboard در v1.1.1
+
+[راهنمای کاربر](../../docs/dashboard/USER_GUIDE.md)، [معامله دمو](../../docs/dashboard/demo-trading.md)، [Signal Scripts](../../docs/dashboard/signal-scripts.md) و [دفترچهٔ کم‌توکن Agent](../../docs/DASHBOARD_AGENT.md) مسیرهای فعال استفاده و توسعه‌اند. Login پس‌زمینه‌های تصادفی/نوبتی دارد؛ ذخیرهٔ رمز تابع Password Manager مرورگر است. Music Player یک audio بیرون تب‌ها و Playlist شخصی حداکثر ۱۰ Track دارد. Demo با USD/XAUUSD شبیه‌سازی‌شده و شرط دادهٔ تازه کار می‌کند؛ Signal به‌تنهایی سفارش نمی‌سازد. Upload امن تا ۲۰ MiB و Import HTTPS با Public/Direct در دسترس است.

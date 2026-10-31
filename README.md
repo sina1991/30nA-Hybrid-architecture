@@ -2,9 +2,9 @@
 
 Monorepo سرویس‌های DATA MANAGER، CODE MANAGER، WORKER MANAGER، WORKER RUNTIME و Dashboard.
 
-[قابلیت‌های تازه v1.1.0](docs/releases/v1.1.0.md) · [راهنمای حساب‌ها و Chat](docs/deployment/multiuser-chat.md)
+[قابلیت‌های تازه v1.1.1](docs/releases/v1.1.1.md) · [راهنمای حساب‌ها و Chat](docs/deployment/multiuser-chat.md)
 
-**وضعیت: نسخه v1.1.0؛ پذیرش نهایی Production روی VPS همچنان نیازمند بررسی مستقل است.**
+**وضعیت: نسخه v1.1.1؛ پذیرش نهایی Production روی VPS همچنان نیازمند بررسی مستقل است.**
 
 ## نصب کامل روی Ubuntu VPS
 
@@ -91,3 +91,5 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-archite
 این فرمان فقط release و سرویس Dashboard را به‌روز می‌کند؛ [راهنمای update و rollback](docs/deployment/dashboard-update.md) را بخوانید. Token موجود معتبر می‌ماند؛ پس از reload دوباره وارد حساب شوید.
 
 [اجرای ماژول‌ها در ترمینال و قرارداد ماژول جدید](docs/development/modules-terminal.md)
+
+راهنماهای Dashboard: [استفادهٔ کاربر](docs/dashboard/USER_GUIDE.md) · [Demo Trading](docs/dashboard/demo-trading.md) · [Signal Scripts](docs/dashboard/signal-scripts.md) · [دفترچهٔ کم‌توکن Agent](docs/DASHBOARD_AGENT.md).

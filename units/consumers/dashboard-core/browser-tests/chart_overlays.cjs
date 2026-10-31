@@ -28,7 +28,7 @@ const server=http.createServer((req,res)=>{
   return send({rooms:[],users:[],requests:[]});
  });
  await page.goto(`http://127.0.0.1:${server.address().port}`);
- await page.locator('[data-nav="account"]').click();await page.locator('#account-username').fill('alice');await page.locator('#account-password').fill('long test password');await page.locator('#account-password-form button').click();
+ await page.locator('#account-username').fill('alice');await page.locator('#account-password').fill('long test password');await page.locator('#account-password-form button[type="submit"]').click();
  await page.locator('[data-nav="indicators"]').click();
  await page.locator('[data-profile-type="round-levels"]').waitFor();
  assert.equal(await page.locator('#indicator-list [data-profile-id]').count(),5);

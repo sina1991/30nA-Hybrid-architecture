@@ -97,14 +97,14 @@ def list_active(owner):
 
 
 def create(owner, slot_type='standard'):
-    if slot_type not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat', 'linear'): raise ValueError('invalid slot type')
+    if slot_type not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat', 'linear', 'note'): raise ValueError('invalid slot type')
     db = _layout_db(owner)
     try:
         count = db.execute("SELECT count(*) FROM module_state WHERE owner=? AND module='slot-meta'", (owner,)).fetchone()[0]
         if count >= 100:
             raise ValueError('slot limit reached')
         slot = 'slot-' + uuid4().hex[:12]
-        config = {'module_id': 'gold-chart' if slot_type in ('chart', 'fix-chart') else 'chat-box' if slot_type == 'chat' else 'economic-calendar' if slot_type=='linear' else 'empty', 'context': {}, 'revision': str(uuid4())}
+        config = {'module_id': 'gold-chart' if slot_type in ('chart', 'fix-chart') else 'chat-box' if slot_type == 'chat' else 'economic-calendar' if slot_type=='linear' else 'slot-note' if slot_type=='note' else 'empty', 'context': {}, 'revision': str(uuid4())}
         db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-binding',?,?)", (owner, slot, json.dumps(config)))
         db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-meta',?,?)", (owner, slot, json.dumps({'overview': False, 'slot_type':slot_type})))
         db.commit()
@@ -225,7 +225,7 @@ def update_appearance(owner, slot, updates):
     if 'chat_room' in updates:
         if not isinstance(updates['chat_room'], str): raise ValueError('invalid chat room')
         if updates['chat_room'] not in {room['id'] for room in chat_store.list_rooms(owner)}: raise ValueError('invalid chat room')
-    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat', 'linear'):
+    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat', 'linear', 'note'):
         raise ValueError('invalid slot type')
     if 'chart_indicators' in updates and (not isinstance(updates['chart_indicators'], list) or len(updates['chart_indicators']) > len(CHART_DEFAULTS) or any(not isinstance(item, str) or item not in CHART_DEFAULTS for item in updates['chart_indicators']) or len(set(updates['chart_indicators'])) != len(updates['chart_indicators'])):
         raise ValueError('invalid chart indicators')
@@ -258,7 +258,7 @@ def update_appearance(owner, slot, updates):
         resulting_type = updates.get('slot_type', meta.get('slot_type', 'standard'))
         if 'layout' in updates:
             minimum_width = 1 if resulting_type == 'minimal' else 2
-            minimum_height = 1 if resulting_type in ('minimal','linear') else 3 if resulting_type == 'small' else 4
+            minimum_height = 1 if resulting_type in ('minimal','linear','note') else 3 if resulting_type == 'small' else 4
             if updates['layout']['w'] < minimum_width or updates['layout']['h'] < minimum_height:
                 raise ValueError('layout out of bounds')
         if resulting_type == 'fix-chart' and 'layout' in updates and (updates['layout']['w'], updates['layout']['h']) != (8, 8):
@@ -315,6 +315,7 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None, req
     defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
     if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
     payload = {**defaults, **config.get('context', {}), **data}
+    if module_id=='music-player':payload={'action':data.get('action','get'),'_state_owner':owner,**({'tracks':data['tracks']} if 'tracks' in data else {})}
     if module_id in media.KINDS:
         meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}
         payload={'settings':meta.get('media_settings',{}),'_state_owner':owner,**data}
@@ -331,7 +332,7 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None, req
         meta = change(owner, 'slot-meta', slot, None, lambda old:(old,False)) or {}
         payload.setdefault('room', meta.get('chat_room','public'))
     result = run_module(module_id, payload)
-    if module_id not in ('clock', 'counter', 'slot-note', 'chat-box','myip','economic-calendar',*media.KINDS) and module_id not in demo_components.KINDS:
+    if module_id not in ('clock', 'counter', 'slot-note', 'chat-box','myip','economic-calendar','music-player',*media.KINDS) and module_id not in demo_components.KINDS:
         change(owner, 'slot-output', slot, None, lambda _: ({'module_id':module_id, 'binding_revision':config.get('revision'), 'result':result}, True))
     return {'slot':slot, 'module_id':module_id, 'result':result}
 
@@ -342,12 +343,13 @@ def read(owner, slot, request_ip=None):
         raise LookupError('slot is not configured')
     module_id = config['module_id']
     _authorize_host_monitor(owner, module_id)
-    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id in technical.KINDS or module_id in ('chat-box','myip','economic-calendar',*media.KINDS) or module_id in demo_components.KINDS:
+    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id in technical.KINDS or module_id in ('chat-box','myip','economic-calendar','music-player',*media.KINDS) or module_id in demo_components.KINDS:
         data = {'action':'get'} if module_id in ('counter','slot-note') else {}
         # Reads never change the saved output or execute arbitrary code.
         defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
         if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
         payload = {**defaults, **config.get('context', {}), **data}
+        if module_id=='music-player':payload={'action':'get','_state_owner':owner}
         if module_id in media.KINDS:
             meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}
             payload={'settings':meta.get('media_settings',{}),'_state_owner':owner}

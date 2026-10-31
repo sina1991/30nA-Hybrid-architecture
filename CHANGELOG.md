@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.1.1 — 2026-11-01
+
+- Login وسط‌چین با دو پس‌زمینهٔ تولیدشده و پشتیبانی Password Manager مرورگر.
+- Music Player ماژولار با Playlist شخصی ۱۰ Track و پخش پیوسته بین تب‌ها.
+- Media/YouTube، Upload امن و دریافت URL، رفع سقف Nginx عمومی، Demo Trading ماژولار و گزارش‌ها.
+- قالب‌های مشترک Dashboard، کنترل Indicator روی Chart و اسلات‌های قابل تنظیم.
+- راهنماهای کاربر Demo/Signals و نقشهٔ کم‌توکن Agent؛ [جزئیات انتشار](docs/releases/v1.1.1.md).
+
 ## v1.1.0 — 2026-10-30
 
 - اضافه‌شدن حساب‌های Admin/User، ورود با Password، Session قابل ابطال و Workspace مستقل.

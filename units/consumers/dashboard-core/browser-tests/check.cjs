@@ -73,7 +73,7 @@ async function main() {
     });
     await page.goto(base);
     await require('./layout.cjs')(page,false);
-    await page.locator('#account-shortcut').click();
+    await page.locator('#login-advanced summary').click();
     await page.locator('#account-token').fill(isReal?input.token:'wrong');
     await page.locator('#account-connect').click();
     if(!isReal) {
@@ -85,17 +85,12 @@ async function main() {
     await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
     await require('./layout.cjs')(page,true);
     await page.locator('[data-nav="slots"]').click();
-    await page.locator('#grid .slot .slot-gear').first().click();
-    const slotSearch = page.locator('.slot').first().locator('.module-search');
-    const slotSelect = page.locator('.slot').first().locator('.module-select');
-    const initiallySelected = await slotSelect.inputValue();
-    await slotSearch.fill('system-monitor');
-    assert((await slotSelect.locator('option').allTextContents()).some(text => text.includes('System Monitor')));
-    assert.equal(await slotSelect.inputValue(), initiallySelected);
-    await slotSearch.fill('no-such-module-123');
-    assert.equal(await slotSelect.inputValue(), initiallySelected);
-    assert((await page.locator('.slot').first().locator('.module-search-hint').textContent()).includes('No matching'));
-    await slotSearch.fill('');
+    await page.locator('#grid .slot').first().click({button:'right',position:{x:5,y:5}});
+    const dialog=page.locator('.slot-options-dialog[open]');
+    assert.equal(await dialog.getByRole('tab').count(),6);
+    assert.equal(await dialog.getByRole('tab',{name:'Slot actions',exact:true}).getAttribute('aria-selected'),'true');
+    const slotSelect=dialog.locator('.module-select');
+    assert((await slotSelect.locator('option').allTextContents()).some(text=>text.includes('System Monitor')));
     if(input.layoutScreenshot) await page.screenshot({path:input.layoutScreenshot});
     await page.locator('.slot-options-dialog[open] .slot-dialog-close').click();
     await page.locator('[data-nav="workers"]').click();

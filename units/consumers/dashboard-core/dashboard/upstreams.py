@@ -378,6 +378,21 @@ def create_router(credential_path, upstream_factory):
         status=404 if isinstance(exc,LookupError) else 403 if isinstance(exc,PermissionError) else 422 if isinstance(exc,ValueError) else 503
         raise HTTPException(status,{404:'Media not found',403:'Media access denied',422:'Unsupported media or invalid source',503:'Media storage unavailable'}[status]) from None
 
+    @router.get('/music')
+    def music_get(identity=Depends(owner)):
+        from modules.music import playlist
+        try:result=playlist(identity)
+        except (ValueError,PermissionError,OSError,sqlite3.Error) as exc:media_error(exc)
+        return JSONResponse(envelope(result),headers={'Cache-Control':'no-store'})
+
+    @router.put('/music')
+    def music_save(body: dict,identity=Depends(owner)):
+        from modules.music import playlist
+        if set(body)!={'tracks'} or not isinstance(body.get('tracks'),list):raise HTTPException(422,'Invalid playlist')
+        try:result=playlist(identity,body['tracks'])
+        except (ValueError,LookupError,PermissionError,OSError,sqlite3.Error) as exc:media_error(exc)
+        return JSONResponse(envelope(result),headers={'Cache-Control':'no-store'})
+
     @router.post('/media/describe')
     def media_describe(body: dict,identity=Depends(owner)):
         if set(body)-{'settings','kind'} or body.get('kind') not in (None,'image','audio','video'):raise HTTPException(422,'Invalid media descriptor')
@@ -592,7 +607,7 @@ def create_router(credential_path, upstream_factory):
             raise HTTPException(422, 'Invalid module input')
         try:
             slots._authorize_host_monitor(identity, module_id)
-            result = (lambda data: demo_call(run_module,module_id,data) if module_id in demo_components.KINDS else run_module(module_id,data))({**body['input'],**({'_request_ip':client_ip.address(request)} if module_id=='myip' else {}),**({'_state_owner':identity} if module_id in demo_components.KINDS or module_id in media.KINDS else {})})
+            result = (lambda data: demo_call(run_module,module_id,data) if module_id in demo_components.KINDS else run_module(module_id,data))({**body['input'],**({'_request_ip':client_ip.address(request)} if module_id=='myip' else {}),**({'_state_owner':identity} if module_id in demo_components.KINDS or module_id in media.KINDS or module_id=='music-player' else {})})
         except LookupError:
             raise HTTPException(404, 'Unknown module') from None
         except (ValueError, TypeError, OverflowError, KeyError, ZeroDivisionError):

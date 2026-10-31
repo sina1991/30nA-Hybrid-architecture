@@ -1,27 +1,32 @@
 """Account workspace for trusted, pre-registered workers; credentials stay in memory."""
 ACCESS = r'''
 <div class="account-access" dir="ltr" aria-label="Account">
-  <form id="account-form">
-    <label class="account-label" for="account-token">Account access token</label>
-    <input id="account-token" type="password" autocomplete="off" placeholder="Access token" required>
-    <button id="account-connect" type="submit">Sign in</button>
-  </form>
-  <form id="account-password-form">
-    <label class="account-label" for="account-username">Username</label><input id="account-username" autocomplete="username" required>
-    <label class="account-label" for="account-password">Password</label><input id="account-password" type="password" autocomplete="current-password" required>
-    <button type="submit">Sign in with password</button>
-  </form>
-  <div id="account-actions" class="account-actions" hidden>
-    <a id="worker-workspace-link" href="#workers">Manage Workers</a>
-    <button id="account-refresh" type="button">Refresh</button>
-    <button id="account-disconnect" type="button">Sign out</button>
-  </div>
-  <div id="account-notices"><p id="account-status" role="status" aria-live="polite"></p></div>
+  <section id="login-screen" aria-label="Sign in" role="main">
+    <div class="login-card"><div class="login-mark" aria-hidden="true">◈</div><p class="login-brand">30nA</p><h1>Welcome back</h1><p class="login-subtitle">Sign in to your workspace</p>
+      <form id="account-password-form" method="post" action="/login" autocomplete="on">
+        <label for="account-username">Username</label><input id="account-username" name="username" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+        <label for="account-password">Password</label><div class="login-password"><input id="account-password" name="password" type="password" autocomplete="current-password" required><button id="login-show-password" type="button" aria-label="Show password" aria-pressed="false">Show</button></div>
+        <button id="login-submit" type="submit">Sign in</button>
+      </form>
+      <details id="login-advanced"><summary>Use an access token</summary><form id="account-form"><label for="account-token">Account access token</label><input id="account-token" type="password" autocomplete="off" placeholder="Access token" required><button id="account-connect" type="submit">Sign in</button></form></details>
+      <div id="account-notices"><p id="account-status" role="status" aria-live="polite"></p></div><p id="login-ip" class="login-subtitle" aria-live="polite">Your IP · …</p>
+    </div><p class="login-footer">30nA · v1.1.1</p>
+  </section>
+  <div id="account-actions" class="account-actions" hidden><a id="worker-workspace-link" href="#workers">Manage Workers</a><button id="account-refresh" type="button">Refresh</button><button id="account-disconnect" type="button">Sign out</button></div>
 </div>
 '''
 
 PANEL = r'''
 <style>
+#login-screen {position:fixed;inset:0;z-index:10000;overflow:auto;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:24px;padding:32px 18px;box-sizing:border-box;background:#020813 url('/assets/login-galaxy.png') center/cover no-repeat;color:#eef5ff;font-family:system-ui,sans-serif;isolation:isolate}
+#login-screen:before {content:"";position:fixed;inset:0;background:linear-gradient(90deg,rgba(2,8,19,.2),rgba(2,8,19,.12));z-index:-1}
+#login-screen[hidden] {display:none!important}.login-card {width:min(360px,100%);box-sizing:border-box;padding:32px;background:rgba(7,15,30,.8);border:1px solid rgba(215,234,255,.2);border-radius:18px;box-shadow:0 20px 80px #0008;backdrop-filter:blur(14px)}
+.login-mark {font-size:40px;text-align:center;color:#b2dbff}.login-brand {text-align:center;font-weight:700;letter-spacing:.18em;margin:0 0 18px}.login-card h1 {font-size:25px;text-align:center;margin:0}.login-subtitle,.login-footer {text-align:center;color:#bed0e2;font-size:13px}.login-subtitle {margin:8px 0 24px}
+#login-screen form {display:grid;gap:9px}#login-screen label {font-size:13px;color:#d5e4f5}#login-screen input {width:100%;box-sizing:border-box;min-width:0;padding:12px;border-radius:8px;border:1px solid #607087;background:#061120a8;color:#fff;font:inherit}#login-screen input:focus {outline:2px solid #a2d6ff;outline-offset:2px}
+#login-screen button {cursor:pointer;font:inherit;border-radius:8px;padding:12px;border:1px solid #9bd0ff;background:#b7dcff;color:#081626}#login-submit {margin-top:12px;font-weight:700!important}#login-screen button:disabled {opacity:.65;cursor:wait}.login-password {display:flex;position:relative}.login-password input {padding-right:64px!important}#login-show-password {position:absolute;right:2px;top:2px;bottom:2px;background:transparent!important;color:#c6ddf4!important;border:0!important;padding:8px!important;font-size:12px!important}
+#login-advanced {font-size:12px;color:#b8cce0;margin-top:20px}#login-advanced summary {cursor:pointer}#login-advanced form {margin-top:12px}#login-screen #account-status {color:#f0cda7;font-size:13px;overflow-wrap:anywhere;margin:18px 0 0}.login-footer {margin:0;text-shadow:0 1px 6px #000}
+body[data-authenticated="false"] {overflow:hidden}body[data-authenticated="false"] > :not(#login-screen):not(script):not(style) {visibility:hidden}body[data-authenticated="false"] #login-screen {visibility:visible}
+
 .account-panel {width:100%;max-width:none;margin:0;padding:0;border:0;direction:ltr}
 .account-panel form,.account-panel fieldset {display:grid;gap:12px}
 .account-panel fieldset {border:0;padding:0;margin:0;min-width:0}
@@ -175,6 +180,11 @@ PANEL = r'''
 (function () {
   "use strict";
   const el = id => document.getElementById(id);
+  document.body.append(el('login-screen'));
+  const loginImages=['/assets/login-galaxy.png','/assets/login-airless.png'];let loginImage=crypto.getRandomValues(new Uint32Array(1))[0]%2;
+  fetch('/api/login/context',{cache:'no-store',credentials:'omit',redirect:'error'}).then(response=>response.ok?response.json():Promise.reject()).then(data=>{el('login-ip').textContent='Your IP · '+(data.ip||'unavailable');}).catch(()=>{el('login-ip').textContent='Your IP · unavailable';});
+  function paintLogin(){el('login-screen').style.backgroundImage='url("'+loginImages[loginImage]+'")';}paintLogin();
+  setInterval(()=>{if(!el('login-screen').hidden&&!document.hidden&&!matchMedia('(prefers-reduced-motion: reduce)').matches){loginImage=1-loginImage;paintLogin();}},35000);
   const labels = {accepted:'Queued',running:'Running',succeeded:'Succeeded',failed:'Failed',cancelled:'Cancelled'};
   const terminal = job => ['succeeded','failed','cancelled'].includes(job.status);
   let token = '', generation = 0, watcher = 0, timer = null, pending = null, sending = false, slotOwner = '';
@@ -185,6 +195,7 @@ PANEL = r'''
   function status(message) { el('account-status').textContent = message; }
   function controls() {
     const ready = Boolean(token) && authenticated;
+    document.body.dataset.authenticated=String(ready);el('login-screen').hidden=ready;
     el('worker-workspace').hidden = !ready;
     if (ready !== previousReady) { previousReady = ready; document.dispatchEvent(new CustomEvent('dashboard-account-state', {detail:{ready}})); }
     el('worker-workspace-link').hidden = !ready;
@@ -205,7 +216,7 @@ PANEL = r'''
     el('worker-retry').disabled = sending;
     el('execution-cancel').disabled = sending;
   }
-  function disconnect(message = 'Signed out. Accepted executions continue on the server.') {
+  function disconnect(message = 'Signed out. Accepted executions continue on the server.', keepLoginFields = false) {
     generation++; watcher++; clearTimeout(timer); clearTimeout(credentialTimer); session.abort(); session = new AbortController();
     authenticated = false; workerAccess = false; refreshTicket++; allWorkers = []; historyRows = []; editing = null; confirmation = null; managing = false;
     el('worker-editor').close(); el('worker-confirm').close();
@@ -216,7 +227,7 @@ PANEL = r'''
     document.dispatchEvent(new CustomEvent('dashboard-viewer',{detail:{username:'',ip:null}}));
     token = ''; slotOwner = ''; pending = null; sending = false; active = null; enabledWorkers = [];
     document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:false}}));
-    el('account-token').value = ''; el('account-password').value = '';
+    el('account-token').value = ''; if(!keepLoginFields){el('account-password').value = '';el('account-password').type='password';el('login-show-password').textContent='Show';el('login-show-password').setAttribute('aria-label','Show password');el('login-show-password').setAttribute('aria-pressed','false');}
     el('account-worker').replaceChildren(); el('account-executions').replaceChildren();
     el('worker-input').value = '{}'; el('run-text').value = ''; el('run-numbers').value = '';
     el('execution-output').textContent = ''; el('execution-id').textContent = '';
@@ -785,13 +796,16 @@ PANEL = r'''
     event.preventDefault();
     if (location.protocol !== 'https:' && !['localhost','127.0.0.1','[::1]'].includes(location.hostname)) { status('Sign-in requires HTTPS.'); return; }
     const username=el('account-username').value.trim(), password=el('account-password').value;
-    disconnect('Signing in...');
+    disconnect('Signing in...',true);const button=el('login-submit');button.disabled=true;button.textContent='Signing in…';
     try {
       const response=await fetch('/api/upstreams/account/login',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({username,password}),cache:'no-store',credentials:'omit',redirect:'error'});
       if (!response.ok) throw Error('Invalid credentials or sign-in unavailable.');
-      const data=await response.json(); token=data.payload.token; el('account-password').value=''; controls(); await refresh();
-    } catch (_) { el('account-password').value=''; disconnect('Invalid credentials or sign-in unavailable.'); }
+      const data=await response.json(); token=data.payload.token; controls(); await refresh();
+      if(authenticated&&window.PasswordCredential&&navigator.credentials){try{await navigator.credentials.store(new PasswordCredential({id:username,password,name:username}));}catch(_){}}
+      el('account-password').value='';
+    } catch (_) { el('account-password').value=''; disconnect('Invalid credentials or sign-in unavailable.'); }finally{button.disabled=false;button.textContent='Sign in';}
   });
+  el('login-show-password').addEventListener('click',()=>{const field=el('account-password'),show=field.type==='password';field.type=show?'text':'password';el('login-show-password').textContent=show?'Hide':'Show';el('login-show-password').setAttribute('aria-label',show?'Hide password':'Show password');el('login-show-password').setAttribute('aria-pressed',String(show));});
   el('worker-run-form').addEventListener('submit', async event => {
     event.preventDefault(); if (pending || sending || (active && !terminal(active))) return;
     try {

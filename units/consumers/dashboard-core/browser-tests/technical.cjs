@@ -32,7 +32,7 @@ const server=http.createServer((req,res)=>{
   return send({rooms:[],requests:[],users:[]});
  });
  await page.goto(`http://127.0.0.1:${server.address().port}`);
- await page.locator('[data-nav="account"]').click();await page.locator('#account-username').fill('alice');await page.locator('#account-password').fill('long test password');await page.locator('#account-password-form button').click();
+ await page.locator('#account-username').fill('alice');await page.locator('#account-password').fill('long test password');await page.locator('#account-password-form button[type="submit"]').click();
  await page.locator('[data-nav="overview"]').click();await page.locator('.technical-view').waitFor();
  assert(await page.getByRole('img',{name:'Session windows on market chart'}).isVisible());
  assert((await page.locator('.session-live-panel').textContent()).includes('Example NY open'));

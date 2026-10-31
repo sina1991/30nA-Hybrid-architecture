@@ -45,7 +45,8 @@ def test_unknown_theme_is_not_found():
 def test_module_catalog():
     modules = list_modules()
     assert len({item["id"] for item in modules}) == len(modules)
-    assert {"clock", "calculator", "counter", "slot-note", "dice-roller", "system-monitor"} <= {item["id"] for item in modules}
+    assert {"clock", "slot-note", "system-monitor", "music-player"} <= {item["id"] for item in modules}
+    assert not {"calculator", "counter", "dice-roller"} & {item["id"] for item in modules}
     assert get_module("slot-note")["type"] == "slot-note"
     assert get_module("dice-roller")["type"] == "dice-roller"
     assert get_module("missing-module") is None

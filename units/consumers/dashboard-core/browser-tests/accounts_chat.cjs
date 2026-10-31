@@ -39,9 +39,8 @@ const server = http.createServer((req,res) => {
       return route.fulfill({status:404,json:{error:{code:'NOT_FOUND'}}});
     });
     await page.goto(`http://127.0.0.1:${server.address().port}`);
-    await page.locator('[data-nav="account"]').click();
     await page.locator('#account-username').fill('alice');await page.locator('#account-password').fill('a password with length');
-    await page.locator('#account-password-form button').click();
+    await page.locator('#account-password-form button[type="submit"]').click();
     await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('being provisioned'));
     await page.locator('[data-nav="overview"]').click();
     await page.waitForSelector('.chat-box');

@@ -8,7 +8,7 @@ MODULE_FILES = {
     **{name: name + '/module.py' for name in ('session-windows','session-clock','round-levels','previous-day-levels','previous-day-session-levels')},
     **{name:name+'/module.py' for name in ('demo-account','demo-trade','demo-bot','demo-positions','demo-reports')},
     **{name:name+'/module.py' for name in ('media-image','media-audio','media-video')},
-    'media-player':'media-player/module.py',
+    'media-player':'media-player/module.py','music-player':'music-player/module.py',
     'myip':'myip/module.py','economic-calendar':'economic-calendar/module.py',
     'clock': 'clock/clock.py', 'calculator': 'calculator/module.py',
     'counter': 'counter/module.py', 'dice-roller': 'dice-roller/module.py',

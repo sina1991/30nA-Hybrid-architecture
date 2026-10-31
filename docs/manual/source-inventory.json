@@ -22,22 +22,22 @@
     ],
     [
       "scripts/deployment/provision.py",
-      132,
+      133,
       "--domain"
     ],
     [
       "scripts/deployment/provision.py",
-      133,
+      134,
       "--image"
     ],
     [
       "scripts/deployment/provision.py",
-      134,
+      135,
       "--sandbox-uid"
     ],
     [
       "scripts/deployment/provision.py",
-      135,
+      136,
       "--public-tls"
     ],
     [
@@ -275,6 +275,24 @@
     ],
     [
       "DASHBOARD_MODULE_STATE_DIR",
+      "modules/demo_trading.py",
+      64,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/economic_calendar.py",
+      49,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/media.py",
+      50,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
       "modules/module_state.py",
       14,
       "optional lookup"
@@ -294,13 +312,13 @@
     [
       "DASHBOARD_MODULE_STATE_DIR",
       "modules/slot_workers.py",
-      79,
+      83,
       "optional lookup"
     ],
     [
       "DASHBOARD_MODULE_STATE_DIR",
       "modules/slot_workers.py",
-      146,
+      150,
       "optional lookup"
     ],
     [
@@ -313,6 +331,12 @@
       "DASHBOARD_MODULE_STATE_DIR",
       "modules/slots.py",
       61,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_MODULE_STATE_DIR",
+      "modules/uploads.py",
+      19,
       "optional lookup"
     ],
     [
@@ -337,6 +361,12 @@
       "DASHBOARD_SKIP_BROWSER",
       "units/worker-runtime/tests/control_plane_helper.py",
       110,
+      "optional lookup"
+    ],
+    [
+      "DASHBOARD_TRUST_LOCAL_PROXY",
+      "modules/client_ip.py",
+      10,
       "optional lookup"
     ],
     [
@@ -848,6 +878,11 @@
     ],
     [
       "NOT_FOUND",
+      "tests/test_demo_trading.py",
+      164
+    ],
+    [
+      "NOT_FOUND",
       "units/consumers/dashboard-core/tests/test_upstreams.py",
       60
     ],
@@ -1064,9 +1099,9 @@
       "sha256": "889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf"
     },
     {
-      "bytes": 2995,
+      "bytes": 3091,
       "path": ".github/workflows/release.yml",
-      "sha256": "3bd849d3a5468419d50a6d21ac431f9d552580595629e5cdfdcbf6206843f8f1"
+      "sha256": "f509fd3ba0721c1991a598ebfa4f376d77225c96ba18f11206ae5ab24c7b6052"
     },
     {
       "bytes": 265,
@@ -1074,19 +1109,19 @@
       "sha256": "0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e"
     },
     {
-      "bytes": 20177,
+      "bytes": 23425,
       "path": "30na",
-      "sha256": "273a9019ec0a2dd1b8ecb555604ef892cab994c0705692217885368f526e29dd"
+      "sha256": "da6ed0a5cb32962c36e637593db0dd3e92ca0657426772a2fc4bc5216d84119e"
     },
     {
-      "bytes": 2124,
+      "bytes": 2381,
       "path": "AGENTS.md",
-      "sha256": "abff7ec1d833f288225af6ad93ec95436b0187fd05c0a1f953d7e53e5ddbea2c"
+      "sha256": "8a436c29913fe45dee2d6ebb4de73ee58e30fae33f1df9773988a401e4208b05"
     },
     {
-      "bytes": 5504,
+      "bytes": 6155,
       "path": "CHANGELOG.md",
-      "sha256": "bedb47a35a693f0fd92e01588ddcdfc53e7c684a3e7b9cff9e6e09c069ef405d"
+      "sha256": "78eeea764662138e0cb7299f6aa5aa9c748852c3ddb9a52e74f3f42293196dd5"
     },
     {
       "bytes": 2817,
@@ -1094,9 +1129,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 7508,
+      "bytes": 7771,
       "path": "README.md",
-      "sha256": "1b7f68a8a03babf23ffafec46debd676456d75b7cb557354282315f334e5680e"
+      "sha256": "c7221479d9173c15d9a763bbb8f3024efd5fd3b97e01b17e519c07658dd1e78a"
     },
     {
       "bytes": 1866,
@@ -1106,7 +1141,7 @@
     {
       "bytes": 6,
       "path": "VERSION",
-      "sha256": "1575e1af4a95f12f70b4ee6a6adce8160953d93ea17dc2611b90883ccc3ad3b8"
+      "sha256": "cc52f678848b814373757b460383bf61960e4943c203735adde0a350b3e50989"
     },
     {
       "bytes": 4234,
@@ -1344,9 +1379,9 @@
       "sha256": "595bb8311728b0f10aa4695992cad683ca78847d8dfa4c09e551d7035f001488"
     },
     {
-      "bytes": 819,
+      "bytes": 861,
       "path": "deployment/systemd/30na-dashboard.service",
-      "sha256": "4208a90b065f01c6ee967b14e85a8fed09233de712c822cb1bf3dc4204e972f5"
+      "sha256": "d5214ad3a1bba29384d96bdf1f1c31a2b031fcb27b1a15b9d7a163b4a48202ba"
     },
     {
       "bytes": 734,
@@ -1489,6 +1524,11 @@
       "sha256": "88256927623eec9529c986f7543aa179e55349b517574d44dc8f818836de18c8"
     },
     {
+      "bytes": 1875,
+      "path": "modules/chart_overlays.py",
+      "sha256": "86618085cfacba3a9efc32ea3af750bb3087d895f66fa4a891a9c2654cce19e2"
+    },
+    {
       "bytes": 150,
       "path": "modules/chat-box/manifest.json",
       "sha256": "10429340f56d582794adc6f252cc7235cf862023a773dfd98b270d4acb33ff58"
@@ -1502,6 +1542,11 @@
       "bytes": 7264,
       "path": "modules/chat_store.py",
       "sha256": "d821d3cf7aaedb47aff533894a06a941dcc2114517eefcb234e54f5ebccaf1a2"
+    },
+    {
+      "bytes": 479,
+      "path": "modules/client_ip.py",
+      "sha256": "b28aebb4057568f92ab628cd627d4a68d732d24ec1d3a0401d858012f3e2fbf6"
     },
     {
       "bytes": 794,
@@ -1534,6 +1579,66 @@
       "sha256": "db799d1f4ac897f5d56febd2628f1e06548232f73350f946453c05f3fbb0bcb9"
     },
     {
+      "bytes": 197,
+      "path": "modules/demo-account/manifest.json",
+      "sha256": "10285e68fa8ff2915de5ba4dbfcd478ceadbf9ddb42b552b025047ac4bad653e"
+    },
+    {
+      "bytes": 363,
+      "path": "modules/demo-account/module.py",
+      "sha256": "aac9310dbcdf9737e8cd54f2edd5cbeafa33a590e5e111044d419a16e9df1be9"
+    },
+    {
+      "bytes": 201,
+      "path": "modules/demo-bot/manifest.json",
+      "sha256": "64aa32f9300093f61a8fd7cde2e366d23bb1ec01789b7315016a06fed7d09bcd"
+    },
+    {
+      "bytes": 359,
+      "path": "modules/demo-bot/module.py",
+      "sha256": "fe7441ec78e13dce46b494b8e01261ad1fb67020e6dde699b73b1c10e44c4a6e"
+    },
+    {
+      "bytes": 202,
+      "path": "modules/demo-positions/manifest.json",
+      "sha256": "c5e92bcde8d2a584c8b6bf322729debf630cbbc2137bff53c7a93d2a1dd1747c"
+    },
+    {
+      "bytes": 365,
+      "path": "modules/demo-positions/module.py",
+      "sha256": "8b2625df2aedc43397c72daef6086b70a48733dee0cb84032908b415d9eeceba"
+    },
+    {
+      "bytes": 201,
+      "path": "modules/demo-reports/manifest.json",
+      "sha256": "6b7e1096d0fb7355e7739b5919559afef8baf014af68b8a2a2fb761afcbf2c5b"
+    },
+    {
+      "bytes": 363,
+      "path": "modules/demo-reports/module.py",
+      "sha256": "2d290ad396b5a71e679eded9e80f6cc2f4e99be03a7f7e80b396d27cf44013bb"
+    },
+    {
+      "bytes": 197,
+      "path": "modules/demo-trade/manifest.json",
+      "sha256": "df5305a0be0343f249dcbf77983d10944a7b4138acdc8ab6523b85ff60f845d5"
+    },
+    {
+      "bytes": 361,
+      "path": "modules/demo-trade/module.py",
+      "sha256": "0e7d7b6066ea3ea086187000de96b8a3b5bd671cf3e6943d56ad241e0003b8c7"
+    },
+    {
+      "bytes": 2363,
+      "path": "modules/demo_components.py",
+      "sha256": "302de92670cae96e3d9396ffd075faa4ebec3c1cb9bbd4735b802543f5c30bac"
+    },
+    {
+      "bytes": 31440,
+      "path": "modules/demo_trading.py",
+      "sha256": "df2c4116b565ca1396e9966e980821e033f03d7ba0590a496a189d8443698a3b"
+    },
+    {
       "bytes": 199,
       "path": "modules/dice-roller/manifest.json",
       "sha256": "ead3dda45d00b8d1e8582ccd2d859486385ef0c682aa3b1a6d750cf1c0a3c33b"
@@ -1564,6 +1669,21 @@
       "sha256": "3deefa3ab19f99355fe88500ba6f297d3a87ad28713a2814ad4323af27c3b7e3"
     },
     {
+      "bytes": 222,
+      "path": "modules/economic-calendar/manifest.json",
+      "sha256": "53b38739fe81e550a79b6a97f80c467d2e2b4df76bdfaa5ef2c23523808438d8"
+    },
+    {
+      "bytes": 292,
+      "path": "modules/economic-calendar/module.py",
+      "sha256": "7ab1bf99528ed57d706997786e413cef58455d7dbdfaf0e36ca87954eedc694e"
+    },
+    {
+      "bytes": 4466,
+      "path": "modules/economic_calendar.py",
+      "sha256": "edc5c28fdf77792ca4947b95bd88388e308b507754a305d97f7314679c40d150"
+    },
+    {
       "bytes": 150,
       "path": "modules/empty/manifest.json",
       "sha256": "2fb5fa5c447ca6edca494b8632322031604d9a2ff095c8e78d38467eff2be1a7"
@@ -1574,9 +1694,9 @@
       "sha256": "18663f5ed9b09efec95efd6aa3a632844f076aea9e3cbeb3fc15da3f6ca961c9"
     },
     {
-      "bytes": 2085,
+      "bytes": 2604,
       "path": "modules/execution.py",
-      "sha256": "e6c5a916b2c286668abd8c9721211af67a78d8bcfe811a3e26a22e9bc9d4f0cd"
+      "sha256": "6aec4b7207369beb10a53427ad07d9b6ea9c5502d5e64972c0908292e854f276"
     },
     {
       "bytes": 198,
@@ -1594,9 +1714,9 @@
       "sha256": "cc76c577110d8acc5a0e7c30b8fa759e96be91812cfbaedfaff0e49a727e12a6"
     },
     {
-      "bytes": 2161,
+      "bytes": 2262,
       "path": "modules/indicator_profiles.py",
-      "sha256": "1688916f16d805cda4b9ee5d90de1c76054388329a6cdd2d7588cfd3efe302b7"
+      "sha256": "ea617a387f241b3615fc1de2946e93805b4a6a51ff8257eb49f5bdd1a44536d8"
     },
     {
       "bytes": 163,
@@ -1619,14 +1739,59 @@
       "sha256": "8ff6c9b3fcd17e247fd9e9f52a610404fd9880bfad2e633e378e86839faabe42"
     },
     {
+      "bytes": 208,
+      "path": "modules/media-audio/manifest.json",
+      "sha256": "a1b20a8cef60f8eebba216a3b469faae41811690825ecf9512c960a3fdb351fe"
+    },
+    {
+      "bytes": 346,
+      "path": "modules/media-audio/module.py",
+      "sha256": "1d83ad24ec3c8dd3b82ba28ec4ea6b886708a59601776bc7b7fe5e3b56df01fb"
+    },
+    {
+      "bytes": 208,
+      "path": "modules/media-image/manifest.json",
+      "sha256": "a771583fa304a3286b2b09a2789b7db3d39b4d39049972057d1b34fc3b98de34"
+    },
+    {
+      "bytes": 346,
+      "path": "modules/media-image/module.py",
+      "sha256": "06fcdbdacf2da220000b67749c4282eebb89a10bfa3337be01cd7ac0c3a3ba13"
+    },
+    {
+      "bytes": 218,
+      "path": "modules/media-player/manifest.json",
+      "sha256": "61c8e4f7c6573a05ad9288c8048e108594f3ca55bc2a8097b96c176cf73d8bb6"
+    },
+    {
+      "bytes": 290,
+      "path": "modules/media-player/module.py",
+      "sha256": "7e3683328722ddc14af4a8f2184e9f0107e1b166e2f02ce333b1bd7c0124a904"
+    },
+    {
+      "bytes": 216,
+      "path": "modules/media-video/manifest.json",
+      "sha256": "213e3379cd2489b66a92445ca904a74a2e3161ff766403e49a0962e54f8db5a9"
+    },
+    {
+      "bytes": 346,
+      "path": "modules/media-video/module.py",
+      "sha256": "91c4e16795d851ce8e47ae46aee9af12d4e26c7912487ac72ccb982957961dfc"
+    },
+    {
+      "bytes": 7590,
+      "path": "modules/media.py",
+      "sha256": "ba7c43b0fbafa4f8ef08cdda4ab9b143006694ecfca4330be9c68eb6f2a24af2"
+    },
+    {
       "bytes": 1543,
       "path": "modules/module_state.py",
       "sha256": "0b24fbd1ea8fe464e1bed8a9833e4351762644e2eb5de71a2b48f7035edce93a"
     },
     {
-      "bytes": 1349,
+      "bytes": 1496,
       "path": "modules/module_support.py",
-      "sha256": "0c670fd5d6e6900321909f5af8bebcb8cdb8db747696eebc42ca1358942b1431"
+      "sha256": "7c2b1a85e8741db0fc0d53614f93e60320f7a21447c7c14a5eda872a7c3c99d3"
     },
     {
       "bytes": 198,
@@ -1639,6 +1804,31 @@
       "sha256": "cb4426dfd02522e3db5ddb775db16120cf870eaad46c616261051daed6ecc671"
     },
     {
+      "bytes": 192,
+      "path": "modules/music-player/manifest.json",
+      "sha256": "0341f0b5fe84397f38b819dc699902ca000f79a69cd7d18e6ea9cd46958924c2"
+    },
+    {
+      "bytes": 290,
+      "path": "modules/music-player/module.py",
+      "sha256": "dbc22fb6ebb5c0531f6049e4c38d2652268c8aa919dab7639c913d0c6913825c"
+    },
+    {
+      "bytes": 1945,
+      "path": "modules/music.py",
+      "sha256": "dcec2a944d16e4192296150a146e39fab42e9ef1549cbe71eddbad991ceb6eb8"
+    },
+    {
+      "bytes": 165,
+      "path": "modules/myip/manifest.json",
+      "sha256": "c1b2d1f33d5ed7a8f12b364249b77e117636d73b9f44bf85c43e283fd949bc9f"
+    },
+    {
+      "bytes": 819,
+      "path": "modules/myip/module.py",
+      "sha256": "31dd2ec1a44736b715a0fe37b34b8f4c9e832a00273a6091c86e23ac4545d5d2"
+    },
+    {
       "bytes": 177,
       "path": "modules/network-monitor/manifest.json",
       "sha256": "2b29dfd7b49a487ec6a7c0c4737df2ed61d1f9728231b8bfa1fdca79930bac72"
@@ -1647,6 +1837,26 @@
       "bytes": 264,
       "path": "modules/network-monitor/module.py",
       "sha256": "bd094bbe764aa10879b727b6071a964f87c8a1e916c010e9cc8e133b17c716dc"
+    },
+    {
+      "bytes": 210,
+      "path": "modules/previous-day-levels/manifest.json",
+      "sha256": "c9e867b61ff5939f8dd9caeabeeabd26cb0924f30a3c1d10093d1202952c2fb1"
+    },
+    {
+      "bytes": 361,
+      "path": "modules/previous-day-levels/module.py",
+      "sha256": "b372b3dc1eea23de242d931bb4b434e43882369067c8793fefec5facd656a6fc"
+    },
+    {
+      "bytes": 241,
+      "path": "modules/previous-day-session-levels/manifest.json",
+      "sha256": "7763d6026a2d67a1ba12799a66f994b6c82f2b2d5a6270f951eb0bfb397e4838"
+    },
+    {
+      "bytes": 369,
+      "path": "modules/previous-day-session-levels/module.py",
+      "sha256": "e91555c404faf14bb90acfa33785a9b11dcb7d0a674ae8807772aa41b6fc14ec"
     },
     {
       "bytes": 182,
@@ -1659,9 +1869,19 @@
       "sha256": "a6d553bad61ab7fb92bfeca8383aabd131dacd1ecbd5233bbc72f54c2f48378b"
     },
     {
-      "bytes": 3488,
+      "bytes": 3947,
       "path": "modules/registry.py",
-      "sha256": "408d4e2a8679be6f7858b13cc6585edabdb6286f5da52e6d8949b71dc61fd7bc"
+      "sha256": "d3a0e8588b81e3c1baf1e8b4b003911e48a6e098c657fa723a5bb577e3b11cee"
+    },
+    {
+      "bytes": 205,
+      "path": "modules/round-levels/manifest.json",
+      "sha256": "7d64f005e1278b43d118ffca5b8f1939a3f657098e73510d055d2164a0990886"
+    },
+    {
+      "bytes": 354,
+      "path": "modules/round-levels/module.py",
+      "sha256": "7ad80c024f6552cf8c61856d8d80167d8bcd46e9d3ad35ec0122285b10038626"
     },
     {
       "bytes": 144,
@@ -1684,14 +1904,39 @@
       "sha256": "57d93d44f8007d8e7816453f1d47f7388527e53f94eabb67f400b8b2fb5aa676"
     },
     {
-      "bytes": 9666,
-      "path": "modules/signal_rules.py",
-      "sha256": "7a74b9fbc599f183a4a62bc72fd82df4e974a574d2e26960c3456e045f74497c"
+      "bytes": 200,
+      "path": "modules/session-clock/manifest.json",
+      "sha256": "511902f55fcae6893eb740577379653dd6df7c200f12a8b7746591e23f70e72d"
     },
     {
-      "bytes": 186,
+      "bytes": 355,
+      "path": "modules/session-clock/module.py",
+      "sha256": "d0dd3a3ff82926db4a8ec7cacd465b0d570172ec8202370ce922bd50d498624d"
+    },
+    {
+      "bytes": 232,
+      "path": "modules/session-windows/manifest.json",
+      "sha256": "745aa8f319fb7177b729590537a2a0d75007a7da4304375176fb8f0fbe3f5026"
+    },
+    {
+      "bytes": 357,
+      "path": "modules/session-windows/module.py",
+      "sha256": "d506e53fd01515159a09b97b430080c8feeefdcbfac3b4bd9197f888d5765190"
+    },
+    {
+      "bytes": 1916,
+      "path": "modules/session_presets.py",
+      "sha256": "79518228e1942aff777f1e86fe124a219b846ae382a169da0b780ab6b6f31338"
+    },
+    {
+      "bytes": 9719,
+      "path": "modules/signal_rules.py",
+      "sha256": "55e4c7fd1c8ea052f6953e6594d8838a0eb93096131176d89f8ed97084cfedd3"
+    },
+    {
+      "bytes": 207,
       "path": "modules/slot-note/manifest.json",
-      "sha256": "f4b599ff9d1ca2a7e6175cfec3d779ed9ae8d26d4ee4ff30861d38fb41e659cf"
+      "sha256": "8b1aa1c8b6d090b1f2352882fd17fbf1cb95a60212133dd18d14bea297cda3e6"
     },
     {
       "bytes": 1080,
@@ -1699,14 +1944,14 @@
       "sha256": "3cdc5fe1b4abf488de8aa800c4f81259bb28f2706e5ae18499ed07b1b61a9355"
     },
     {
-      "bytes": 9406,
+      "bytes": 10074,
       "path": "modules/slot_workers.py",
-      "sha256": "0ed77c14d28a223c61bec5e9014c997de0929d6087abacd61ed95b29f903c190"
+      "sha256": "7c1e051e86b8e5b3805b38475c3eca7d358af79ae9b535e58ce1f22d32c19790"
     },
     {
-      "bytes": 20179,
+      "bytes": 24203,
       "path": "modules/slots.py",
-      "sha256": "0184c5d09772136d0483303098d29d26019b6123f93868ece663ee179983bf3a"
+      "sha256": "64b4ae945b3986950dd87af5afb9463ab9665fd7a7e7191a3eb8acb3dbc342e6"
     },
     {
       "bytes": 182,
@@ -1717,6 +1962,11 @@
       "bytes": 263,
       "path": "modules/system-monitor/module.py",
       "sha256": "50a175a66728611bd03a6355154ac6c9bd75f683f59dbd21dbf0deae690b9756"
+    },
+    {
+      "bytes": 24134,
+      "path": "modules/technical.py",
+      "sha256": "fb3df6791da7fd35ecbe5cad441a5f931e119bc34fededa456b19416d33e8c1b"
     },
     {
       "bytes": 184,
@@ -1742,6 +1992,21 @@
       "bytes": 366,
       "path": "modules/theme-summary/themes/midnight.json",
       "sha256": "7781c016ac10996f7b69340c1b50fd6e1ddee61e9cc322c6fe1b6ceb10538850"
+    },
+    {
+      "bytes": 5951,
+      "path": "modules/upload_download.py",
+      "sha256": "4c08639d689a874ac7a0c2672b6140570567e50e61b6bf8ac8d3e989b607b89c"
+    },
+    {
+      "bytes": 4067,
+      "path": "modules/uploads.py",
+      "sha256": "6aff0782575aa311d1c5e0dc0af3b00dd3a67a5cac66292451a030b196998275"
+    },
+    {
+      "bytes": 8672,
+      "path": "modules/workspaces.py",
+      "sha256": "3912ae8e96f72adeb892dbda4802217377a1695fdc6416a4745336ad6aa5bdb1"
     },
     {
       "bytes": 191,
@@ -1779,14 +2044,19 @@
       "sha256": "4df657a15a0d990dd2133c14ebbc28d9e12a2bff0c7dc549f20ac38ea7ea24d0"
     },
     {
+      "bytes": 1764,
+      "path": "scripts/deployment/configure_client_ip.py",
+      "sha256": "51759f61f37775d66a5c9a848838cb49998eaf918b985eae80de244c652652fd"
+    },
+    {
       "bytes": 266,
       "path": "scripts/deployment/prepare.sh",
       "sha256": "b257cb69651bdb04f156083b51360ea30467afda1e598fab40322889e2cc7bc1"
     },
     {
-      "bytes": 7585,
+      "bytes": 7621,
       "path": "scripts/deployment/provision.py",
-      "sha256": "9aa72de47fd16b933d9cafce4204a23c66fa447c5c104abb5e7d2d2ab9dacbb3"
+      "sha256": "b91b358cea6aa386e7ea7bdef518cb37c4099677dc19ee3fcb208617731edd01"
     },
     {
       "bytes": 4454,
@@ -1804,9 +2074,9 @@
       "sha256": "cec67692dc01cedb413d443e599e139702a7d89a7c7c22f6f3b67ec942c99fa5"
     },
     {
-      "bytes": 6167,
+      "bytes": 7106,
       "path": "scripts/deployment/update_dashboard.sh",
-      "sha256": "b165da6cceb04b6fb8eda606308c3f414de073bb1beb1baf98ee27c149b126e7"
+      "sha256": "a45174a998d68fe4a8a0f7d221a7916f98c733586e2bde3b08e3ef14c5970e58"
     },
     {
       "bytes": 3205,
@@ -1882,6 +2152,86 @@
       "bytes": 5328,
       "path": "tests/test_accounts_chat.py",
       "sha256": "aa209ce5608616ee6f918f35723e2614c9c757b1491a511594a0ff42b24f9f6e"
+    },
+    {
+      "bytes": 2047,
+      "path": "tests/test_chart_overlay_browser.py",
+      "sha256": "eff72cfe506ef5df18fafbcf0a46890fda627e320a080036416a5f51602c221c"
+    },
+    {
+      "bytes": 4094,
+      "path": "tests/test_chart_overlays.py",
+      "sha256": "f173efecc67ad5a6a5a55fd1d97125ae7b3d45412f2caf0b828abaa03dc1f908"
+    },
+    {
+      "bytes": 2103,
+      "path": "tests/test_dashboard_update_ref.py",
+      "sha256": "ca8d91ccddcb5f015eb01907746ad08d6dc70926b584f6499d98afd62509ecc3"
+    },
+    {
+      "bytes": 3148,
+      "path": "tests/test_demo_cli.py",
+      "sha256": "0b76967bd7be68f09f7b8b6bdd1e8b97264adb8982a217324867c30c54f8d6d0"
+    },
+    {
+      "bytes": 875,
+      "path": "tests/test_demo_media_browser.py",
+      "sha256": "b279277b148a80113eb2845c5eaa0650757e61a830d2506e7d3882dbc903242f"
+    },
+    {
+      "bytes": 15857,
+      "path": "tests/test_demo_trading.py",
+      "sha256": "fbb44987bff21b037025bafd55a203b4a3a19b9a207c64beecdd7f05dacc54dd"
+    },
+    {
+      "bytes": 4853,
+      "path": "tests/test_media_modules.py",
+      "sha256": "c0bbebc0b8738f5977ae97e8508adf0e722ce67d9ce42f6d2c80c578b8e37a3a"
+    },
+    {
+      "bytes": 4874,
+      "path": "tests/test_music_player.py",
+      "sha256": "1431ea99cad7a8d561cd5430d0a9e6f80715e0258e312bb794903c79f489df6f"
+    },
+    {
+      "bytes": 5561,
+      "path": "tests/test_shared_dashboards.py",
+      "sha256": "5276012acd538bf3ca04503220e77c9741cc8261648b7803ec405975dabd505d"
+    },
+    {
+      "bytes": 1692,
+      "path": "tests/test_technical_browser.py",
+      "sha256": "ab5ec16655b559d6a851e0c23a3af60689052ffb92e3f761ad515cd1ffb8e387"
+    },
+    {
+      "bytes": 12736,
+      "path": "tests/test_technical_indicators.py",
+      "sha256": "39242133dc7559ef9938572177968128fd01fd3316e7dad0072ecfd6a421742a"
+    },
+    {
+      "bytes": 6565,
+      "path": "tests/test_upload_center.py",
+      "sha256": "2eb673e47531cbba59f54e316ad343493e9f45ba917bcd758d16c98843a6bb26"
+    },
+    {
+      "bytes": 6758,
+      "path": "tests/test_upload_download.py",
+      "sha256": "788d19dca5fd556e0850bd8c3f7726ff849f4f38d411e44fead1b0b2c25fac72"
+    },
+    {
+      "bytes": 1510,
+      "path": "tests/test_upload_proxy.py",
+      "sha256": "4856e07f54ef0ba5c8f13113565927914b5584f838483f727baa32bba2a6d3c4"
+    },
+    {
+      "bytes": 825,
+      "path": "tests/test_workspace_browser.py",
+      "sha256": "a4f497d00bad2df21a046a16bee1c659e187a64699e29961121110bf3e709ca5"
+    },
+    {
+      "bytes": 5825,
+      "path": "tests/test_workspace_support.py",
+      "sha256": "caf51c481526777016edd5788e586c5b85408e22c0c3f48fcddde7297bb62e8c"
     },
     {
       "bytes": 2220,
@@ -2034,14 +2384,24 @@
       "sha256": "f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496"
     },
     {
-      "bytes": 5477,
+      "bytes": 6982,
       "path": "units/consumers/dashboard-core/browser-tests/accounts_chat.cjs",
-      "sha256": "fca4c960cd1a538ffe54a47ab757e7e76719266868b07354547e6c1bad177fc0"
+      "sha256": "fbef0ce3d952e56fb5afb39bdc19effca7fd40be58f9b7e0c9e5edaef81687f0"
     },
     {
-      "bytes": 11423,
+      "bytes": 5028,
+      "path": "units/consumers/dashboard-core/browser-tests/chart_overlays.cjs",
+      "sha256": "efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f"
+    },
+    {
+      "bytes": 11143,
       "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "827955fd672363a90ea467576e7d234fa6798d08ab3fe77c8459382d47525191"
+      "sha256": "2d8310840435e4f53625c7221a238b4d5122d8c5cde7c6846680a2693df279e7"
+    },
+    {
+      "bytes": 19069,
+      "path": "units/consumers/dashboard-core/browser-tests/demo_media.cjs",
+      "sha256": "29dd2b4fdf7aa9d15d090eb51186d9f756473d27520d0c6f4e04106116ac4076"
     },
     {
       "bytes": 1242,
@@ -2064,14 +2424,24 @@
       "sha256": "fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f"
     },
     {
+      "bytes": 5082,
+      "path": "units/consumers/dashboard-core/browser-tests/technical.cjs",
+      "sha256": "7f9b0eb8e333fb7f2c1c21867c653e04d9ab5a8322b40b82eef9c4224b2fd441"
+    },
+    {
+      "bytes": 6474,
+      "path": "units/consumers/dashboard-core/browser-tests/workspaces.cjs",
+      "sha256": "96a9fe151a972e6fd4a1e611f1fb705997aafa0b5dc519b6f4aaf55d9d537f43"
+    },
+    {
       "bytes": 34,
       "path": "units/consumers/dashboard-core/dashboard/__init__.py",
       "sha256": "df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048"
     },
     {
-      "bytes": 172468,
+      "bytes": 271932,
       "path": "units/consumers/dashboard-core/dashboard/app.py",
-      "sha256": "e6f687316c6674a1ffa581ec60903dbfa5afe577499c23c1c4d907ba2c7b9bea"
+      "sha256": "8eb40500a261861fcf8c2de5f7e6633243ecf3b704db3ddd02043ed5a391698f"
     },
     {
       "bytes": 41,
@@ -2099,24 +2469,39 @@
       "sha256": "b920ecb3337de92010152921ce7891951d132b65330c992e015682887f3fb631"
     },
     {
+      "bytes": 9483,
+      "path": "units/consumers/dashboard-core/dashboard/music_panel.py",
+      "sha256": "de7cfbf704ccac5bc385af1e9677fc0bc46bc770df79d57250a605624c0e0561"
+    },
+    {
       "bytes": 696,
       "path": "units/consumers/dashboard-core/dashboard/production.py",
       "sha256": "3cb7072b852490b9539315bc26d695448049bd26e946226a4655d4b0d98b44fd"
     },
     {
-      "bytes": 55255,
+      "bytes": 3282622,
+      "path": "units/consumers/dashboard-core/dashboard/static/login-airless.png",
+      "sha256": "7d67839c7df7371083a3b28c3052396e25bc90265b31d4e9bd462ea6f099d4f5"
+    },
+    {
+      "bytes": 2659793,
+      "path": "units/consumers/dashboard-core/dashboard/static/login-galaxy.png",
+      "sha256": "b3fbd8a0b7086d9dc7667dbde7b84b415442173e4afa6e297718f9d82cedf64b"
+    },
+    {
+      "bytes": 65218,
       "path": "units/consumers/dashboard-core/dashboard/upstream_panel.py",
-      "sha256": "2d77a2472c5027243626b4d3f20de722deabfc28f532c5e1ffbd31decbbab11d"
+      "sha256": "59ffda66b5406b3649ba4e7b7caf88e4c755c93c66f053f1eee6ef2068e436e2"
     },
     {
-      "bytes": 31440,
+      "bytes": 50083,
       "path": "units/consumers/dashboard-core/dashboard/upstreams.py",
-      "sha256": "b8be5fa8ea99c1e9d73eb4c8f1d0dfa79cd815554b2cfec9510b2b8d076fda64"
+      "sha256": "22c9657242af7143787f0273a6cbffb31cf6d10a019daf6bcfccba7a0c19a782"
     },
     {
-      "bytes": 2075,
+      "bytes": 2142,
       "path": "units/consumers/dashboard-core/legacy-tests/test_dashboard.py",
-      "sha256": "989cab754c511a6474dbfdb45763a22d957229624715f67c9cca892ed9ce423f"
+      "sha256": "a2f3ff7914c9cc00a36293a12d74d66180967543225c0691fdf16d270eaf3ce6"
     },
     {
       "bytes": 3954,
@@ -2945,6 +3330,12 @@
       "(data)"
     ],
     [
+      "modules/chart_overlays.py",
+      6,
+      "calculate",
+      "(owner, profiles, chart, end_time=None)"
+    ],
+    [
       "modules/chat-box/module.py",
       10,
       "run",
@@ -3005,6 +3396,12 @@
       "(owner, room, limit=50, before=None)"
     ],
     [
+      "modules/client_ip.py",
+      6,
+      "address",
+      "(request)"
+    ],
+    [
       "modules/clock/clock.py",
       7,
       "current_time",
@@ -3041,8 +3438,314 @@
       "(data)"
     ],
     [
+      "modules/demo-account/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/demo-bot/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/demo-positions/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/demo-reports/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/demo-trade/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/demo_components.py",
+      7,
+      "run",
+      "(kind, data)"
+    ],
+    [
+      "modules/demo_trading.py",
+      27,
+      "Conflict",
+      "class"
+    ],
+    [
+      "modules/demo_trading.py",
+      28,
+      "Unavailable",
+      "class"
+    ],
+    [
+      "modules/demo_trading.py",
+      29,
+      "RateLimited",
+      "class"
+    ],
+    [
+      "modules/demo_trading.py",
+      32,
+      "dec",
+      "(value, minimum=None, maximum=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      40,
+      "cents",
+      "(value)"
+    ],
+    [
+      "modules/demo_trading.py",
+      41,
+      "dollars",
+      "(value)"
+    ],
+    [
+      "modules/demo_trading.py",
+      42,
+      "tick",
+      "(cfg)"
+    ],
+    [
+      "modules/demo_trading.py",
+      45,
+      "configuration",
+      "(raw=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      58,
+      "owner_key",
+      "(owner)"
+    ],
+    [
+      "modules/demo_trading.py",
+      63,
+      "database",
+      "()"
+    ],
+    [
+      "modules/demo_trading.py",
+      98,
+      "account",
+      "(db, owner, ident=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      109,
+      "public_account",
+      "(row)"
+    ],
+    [
+      "modules/demo_trading.py",
+      114,
+      "pin_hash",
+      "(pin, salt)"
+    ],
+    [
+      "modules/demo_trading.py",
+      115,
+      "valid_pin",
+      "(pin)"
+    ],
+    [
+      "modules/demo_trading.py",
+      118,
+      "check_pin",
+      "(db, row, pin)"
+    ],
+    [
+      "modules/demo_trading.py",
+      127,
+      "create_account",
+      "(owner, name, initial_balance, pin, settings=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      142,
+      "select_account",
+      "(owner, ident)"
+    ],
+    [
+      "modules/demo_trading.py",
+      149,
+      "update_settings",
+      "(owner, ident, raw)"
+    ],
+    [
+      "modules/demo_trading.py",
+      158,
+      "set_pin",
+      "(owner, ident, pin)"
+    ],
+    [
+      "modules/demo_trading.py",
+      167,
+      "observed_quote",
+      "(cfg)"
+    ],
+    [
+      "modules/demo_trading.py",
+      192,
+      "orders",
+      "(db, row, status=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      198,
+      "floating",
+      "(order, quote)"
+    ],
+    [
+      "modules/demo_trading.py",
+      203,
+      "metrics",
+      "(db, row, quote)"
+    ],
+    [
+      "modules/demo_trading.py",
+      211,
+      "free_cents",
+      "(db, row, quote)"
+    ],
+    [
+      "modules/demo_trading.py",
+      216,
+      "deal",
+      "(db, row, order, kind, amount, price=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      221,
+      "close_fill",
+      "(db, row, order, quote, reason)"
+    ],
+    [
+      "modules/demo_trading.py",
+      229,
+      "fill",
+      "(db, row, order, quote)"
+    ],
+    [
+      "modules/demo_trading.py",
+      241,
+      "process",
+      "(db, row, quote)"
+    ],
+    [
+      "modules/demo_trading.py",
+      278,
+      "price_value",
+      "(value, cfg)"
+    ],
+    [
+      "modules/demo_trading.py",
+      284,
+      "public_order",
+      "(row, quote=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      292,
+      "submit",
+      "(owner, data, source='manual', source_slot=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      353,
+      "alter_order",
+      "(owner, ident, action, value=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      374,
+      "state",
+      "(owner, account_id=None, source_slot=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      397,
+      "report",
+      "(owner, account_id=None, since=0, until=None)"
+    ],
+    [
+      "modules/demo_trading.py",
+      420,
+      "DemoScheduler",
+      "class"
+    ],
+    [
+      "modules/demo_trading.py",
+      421,
+      "DemoScheduler.__init__",
+      "(self)"
+    ],
+    [
+      "modules/demo_trading.py",
+      422,
+      "DemoScheduler.start",
+      "(self)"
+    ],
+    [
+      "modules/demo_trading.py",
+      424,
+      "DemoScheduler.stop",
+      "(self)"
+    ],
+    [
+      "modules/demo_trading.py",
+      427,
+      "DemoScheduler.loop",
+      "(self)"
+    ],
+    [
       "modules/dice-roller/module.py",
       11,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/economic_calendar.py",
+      15,
+      "NoRedirect",
+      "class"
+    ],
+    [
+      "modules/economic_calendar.py",
+      16,
+      "NoRedirect.redirect_request",
+      "(self, *args, **kwargs)"
+    ],
+    [
+      "modules/economic_calendar.py",
+      19,
+      "settings",
+      "(raw=None)"
+    ],
+    [
+      "modules/economic_calendar.py",
+      30,
+      "parse",
+      "(rows)"
+    ],
+    [
+      "modules/economic_calendar.py",
+      46,
+      "_run",
+      "(data)"
+    ],
+    [
+      "modules/economic_calendar.py",
+      83,
       "run",
       "(data)"
     ],
@@ -3054,19 +3757,19 @@
     ],
     [
       "modules/execution.py",
-      24,
+      29,
       "UnknownModule",
       "class"
     ],
     [
       "modules/execution.py",
-      29,
+      34,
       "_load",
       "(module_id)"
     ],
     [
       "modules/execution.py",
-      36,
+      41,
       "run_module",
       "(module_id, data)"
     ],
@@ -3144,31 +3847,31 @@
     ],
     [
       "modules/indicator_profiles.py",
-      13,
+      14,
       "list_profiles",
       "(owner)"
     ],
     [
       "modules/indicator_profiles.py",
-      17,
+      18,
       "save",
       "(owner, data, profile_id=None)"
     ],
     [
       "modules/indicator_profiles.py",
-      27,
+      28,
       "save.update",
       "(old)"
     ],
     [
       "modules/indicator_profiles.py",
-      40,
+      41,
       "delete",
       "(owner, profile_id)"
     ],
     [
       "modules/indicator_profiles.py",
-      41,
+      42,
       "delete.update",
       "(old)"
     ],
@@ -3177,6 +3880,84 @@
       10,
       "run",
       "(data)"
+    ],
+    [
+      "modules/media-audio/module.py",
+      7,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/media-image/module.py",
+      7,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/media-video/module.py",
+      7,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/media.py",
+      16,
+      "settings",
+      "(raw=None)"
+    ],
+    [
+      "modules/media.py",
+      30,
+      "extension",
+      "(name)"
+    ],
+    [
+      "modules/media.py",
+      36,
+      "signature",
+      "(fmt, head)"
+    ],
+    [
+      "modules/media.py",
+      49,
+      "root",
+      "()"
+    ],
+    [
+      "modules/media.py",
+      58,
+      "server_file",
+      "(name)"
+    ],
+    [
+      "modules/media.py",
+      70,
+      "uploaded",
+      "(owner, ident)"
+    ],
+    [
+      "modules/media.py",
+      76,
+      "library",
+      "(owner)"
+    ],
+    [
+      "modules/media.py",
+      93,
+      "youtube_video",
+      "(url)"
+    ],
+    [
+      "modules/media.py",
+      107,
+      "describe",
+      "(owner, cfg, expected_kind=None)"
+    ],
+    [
+      "modules/media.py",
+      133,
+      "run",
+      "(data, kind=None)"
     ],
     [
       "modules/module_state.py",
@@ -3197,34 +3978,88 @@
       "(data)"
     ],
     [
+      "modules/music.py",
+      6,
+      "playlist",
+      "(owner, tracks=None)"
+    ],
+    [
+      "modules/music.py",
+      27,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/myip/module.py",
+      9,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/previous-day-levels/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/previous-day-session-levels/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
       "modules/registry.py",
-      30,
+      39,
       "ModuleManifestError",
       "class"
     ],
     [
       "modules/registry.py",
-      34,
+      43,
       "load_modules",
       "()"
     ],
     [
       "modules/registry.py",
-      108,
+      118,
       "list_modules",
-      "()"
+      "(include_archived=False)"
     ],
     [
       "modules/registry.py",
-      113,
+      123,
       "get_module",
       "(module_id: str)"
+    ],
+    [
+      "modules/round-levels/module.py",
+      8,
+      "run",
+      "(data)"
     ],
     [
       "modules/rsi/module.py",
       10,
       "run",
       "(data)"
+    ],
+    [
+      "modules/session-clock/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/session-windows/module.py",
+      8,
+      "run",
+      "(data)"
+    ],
+    [
+      "modules/session_presets.py",
+      7,
+      "mt5_color",
+      "(value)"
     ],
     [
       "modules/signal_rules.py",
@@ -3342,55 +4177,55 @@
     ],
     [
       "modules/slot_workers.py",
-      64,
+      68,
       "SlotWorkerScheduler",
       "class"
     ],
     [
       "modules/slot_workers.py",
-      65,
+      69,
       "SlotWorkerScheduler.__init__",
       "(self)"
     ],
     [
       "modules/slot_workers.py",
-      69,
+      73,
       "SlotWorkerScheduler.start",
       "(self)"
     ],
     [
       "modules/slot_workers.py",
-      74,
+      78,
       "SlotWorkerScheduler.stop",
       "(self)"
     ],
     [
       "modules/slot_workers.py",
-      78,
+      82,
       "SlotWorkerScheduler._connect",
       "(self)"
     ],
     [
       "modules/slot_workers.py",
-      85,
+      89,
       "SlotWorkerScheduler._recover",
       "(self)"
     ],
     [
       "modules/slot_workers.py",
-      98,
+      102,
       "SlotWorkerScheduler._claim",
       "(self)"
     ],
     [
       "modules/slot_workers.py",
-      124,
+      128,
       "SlotWorkerScheduler._finish",
       "(self, owner, slot, revision, error)"
     ],
     [
       "modules/slot_workers.py",
-      141,
+      145,
       "SlotWorkerScheduler._loop",
       "(self)"
     ],
@@ -3438,63 +4273,357 @@
     ],
     [
       "modules/slots.py",
-      97,
+      99,
       "create",
       "(owner, slot_type='standard')"
     ],
     [
       "modules/slots.py",
-      114,
+      116,
       "duplicate",
       "(owner, slot)"
     ],
     [
       "modules/slots.py",
-      141,
+      143,
       "bind_active",
       "(owner, slot, module_id, context, only_if_missing=False)"
     ],
     [
       "modules/slots.py",
-      165,
+      167,
       "set_overview",
       "(owner, slot, visible)"
     ],
     [
       "modules/slots.py",
-      179,
+      181,
       "update_appearance",
       "(owner, slot, updates)"
     ],
     [
       "modules/slots.py",
-      263,
+      278,
       "delete",
       "(owner, slot)"
     ],
     [
       "modules/slots.py",
-      274,
+      289,
       "_market_preferences",
       "(owner, slot, module_id)"
     ],
     [
       "modules/slots.py",
-      283,
-      "execute",
-      "(owner, slot, data, expected_module=None, expected_revision=None)"
+      298,
+      "_technical_preferences",
+      "(owner, slot, module_id)"
     ],
     [
       "modules/slots.py",
-      308,
+      303,
+      "execute",
+      "(owner, slot, data, expected_module=None, expected_revision=None, request_ip=None)"
+    ],
+    [
+      "modules/slots.py",
+      340,
       "read",
-      "(owner, slot)"
+      "(owner, slot, request_ip=None)"
+    ],
+    [
+      "modules/technical.py",
+      40,
+      "number",
+      "(value, low, high, name)"
+    ],
+    [
+      "modules/technical.py",
+      46,
+      "integer",
+      "(value, low, high, name)"
+    ],
+    [
+      "modules/technical.py",
+      51,
+      "minute",
+      "(value)"
+    ],
+    [
+      "modules/technical.py",
+      58,
+      "color",
+      "(value)"
+    ],
+    [
+      "modules/technical.py",
+      62,
+      "line_style",
+      "(value)"
+    ],
+    [
+      "modules/technical.py",
+      69,
+      "settings",
+      "(kind, raw=None)"
+    ],
+    [
+      "modules/technical.py",
+      138,
+      "dst_seconds",
+      "(stamp, rule)"
+    ],
+    [
+      "modules/technical.py",
+      142,
+      "dst_seconds.last_sunday",
+      "(month)"
+    ],
+    [
+      "modules/technical.py",
+      149,
+      "wall",
+      "(stamp, cfg)"
+    ],
+    [
+      "modules/technical.py",
+      153,
+      "epoch",
+      "(local, cfg)"
+    ],
+    [
+      "modules/technical.py",
+      162,
+      "timestamp",
+      "(value)"
+    ],
+    [
+      "modules/technical.py",
+      166,
+      "reference_wall",
+      "(stamp, cfg)"
+    ],
+    [
+      "modules/technical.py",
+      170,
+      "scheduled",
+      "(day, minutes, cfg)"
+    ],
+    [
+      "modules/technical.py",
+      180,
+      "selected",
+      "(item, cfg)"
+    ],
+    [
+      "modules/technical.py",
+      185,
+      "occurrences",
+      "(cfg, day)"
+    ],
+    [
+      "modules/technical.py",
+      200,
+      "clock_result",
+      "(cfg, now)"
+    ],
+    [
+      "modules/technical.py",
+      234,
+      "session_chart",
+      "(cfg, data, now)"
+    ],
+    [
+      "modules/technical.py",
+      257,
+      "round_result",
+      "(cfg, price, low, high, previous=None)"
+    ],
+    [
+      "modules/technical.py",
+      278,
+      "candle",
+      "(raw)"
+    ],
+    [
+      "modules/technical.py",
+      288,
+      "bars",
+      "(data, now, days)"
+    ],
+    [
+      "modules/technical.py",
+      306,
+      "merge",
+      "(aggregate, row)"
+    ],
+    [
+      "modules/technical.py",
+      313,
+      "previous_result",
+      "(kind, cfg, data, now)"
+    ],
+    [
+      "modules/technical.py",
+      356,
+      "run",
+      "(kind, data)"
+    ],
+    [
+      "modules/technical.py",
+      381,
+      "run.update",
+      "(old)"
     ],
     [
       "modules/theme-summary/module.py",
       12,
       "run",
       "(data)"
+    ],
+    [
+      "modules/upload_download.py",
+      19,
+      "DownloadError",
+      "class"
+    ],
+    [
+      "modules/upload_download.py",
+      20,
+      "DownloadBusy",
+      "class"
+    ],
+    [
+      "modules/upload_download.py",
+      23,
+      "target",
+      "(url)"
+    ],
+    [
+      "modules/upload_download.py",
+      34,
+      "public_address",
+      "(host)"
+    ],
+    [
+      "modules/upload_download.py",
+      49,
+      "PinnedHTTPS",
+      "class"
+    ],
+    [
+      "modules/upload_download.py",
+      50,
+      "PinnedHTTPS.__init__",
+      "(self, host, address)"
+    ],
+    [
+      "modules/upload_download.py",
+      54,
+      "PinnedHTTPS.connect",
+      "(self)"
+    ],
+    [
+      "modules/upload_download.py",
+      63,
+      "response_for",
+      "(url)"
+    ],
+    [
+      "modules/upload_download.py",
+      75,
+      "download",
+      "(url)"
+    ],
+    [
+      "modules/upload_download.py",
+      111,
+      "import_url",
+      "(owner, url, name='', visibility='public', recipient=None)"
+    ],
+    [
+      "modules/uploads.py",
+      18,
+      "database",
+      "()"
+    ],
+    [
+      "modules/uploads.py",
+      40,
+      "principal",
+      "(owner)"
+    ],
+    [
+      "modules/uploads.py",
+      45,
+      "create",
+      "(owner, name, visibility, recipient, content)"
+    ],
+    [
+      "modules/uploads.py",
+      56,
+      "validate_metadata",
+      "(owner, name, visibility, recipient)"
+    ],
+    [
+      "modules/uploads.py",
+      68,
+      "create_bytes",
+      "(owner, name, visibility, recipient, data)"
+    ],
+    [
+      "modules/uploads.py",
+      78,
+      "list_files",
+      "(owner)"
+    ],
+    [
+      "modules/uploads.py",
+      84,
+      "access",
+      "(owner, file_id, delete=False)"
+    ],
+    [
+      "modules/workspaces.py",
+      13,
+      "connect",
+      "(owner)"
+    ],
+    [
+      "modules/workspaces.py",
+      19,
+      "catalog",
+      "(owner)"
+    ],
+    [
+      "modules/workspaces.py",
+      30,
+      "save",
+      "(owner, name, theme)"
+    ],
+    [
+      "modules/workspaces.py",
+      71,
+      "load",
+      "(owner, ident)"
+    ],
+    [
+      "modules/workspaces.py",
+      120,
+      "delete",
+      "(owner, ident)"
+    ],
+    [
+      "scripts/deployment/configure_client_ip.py",
+      10,
+      "configure",
+      "(path)"
+    ],
+    [
+      "scripts/deployment/configure_client_ip.py",
+      20,
+      "configure.upload_limit",
+      "(match)"
     ],
     [
       "scripts/deployment/provision.py",
@@ -3516,19 +4645,19 @@
     ],
     [
       "scripts/deployment/provision.py",
-      87,
+      88,
       "environments",
       "(image, sandbox_uid)"
     ],
     [
       "scripts/deployment/provision.py",
-      98,
+      99,
       "provision",
       "(config, nginx_path, *, domain, image, sandbox_uid, service_gid, sandbox_gid, owner_uid=0, public_tls=False)"
     ],
     [
       "scripts/deployment/provision.py",
-      130,
+      131,
       "main",
       "()"
     ],
@@ -4185,6 +5314,786 @@
       95,
       "test_login_throttle_expires",
       "(users, monkeypatch)"
+    ],
+    [
+      "tests/test_chart_overlay_browser.py",
+      10,
+      "test_actual_chart_overlays_and_profile_controls",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_chart_overlays.py",
+      8,
+      "seed",
+      "()"
+    ],
+    [
+      "tests/test_chart_overlays.py",
+      20,
+      "test_all_profiles_render_through_authenticated_market_api",
+      "(client)"
+    ],
+    [
+      "tests/test_chart_overlays.py",
+      45,
+      "test_signal_rules_reject_chart_only_profile_without_breaking_existing_rules",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_chart_overlays.py",
+      52,
+      "test_old_empty_session_profile_can_load_supplied_preset",
+      "(client)"
+    ],
+    [
+      "tests/test_dashboard_update_ref.py",
+      9,
+      "git",
+      "(path, *args)"
+    ],
+    [
+      "tests/test_dashboard_update_ref.py",
+      14,
+      "history",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_dashboard_update_ref.py",
+      33,
+      "test_resolves_commit_branch_and_tag",
+      "(history, name)"
+    ],
+    [
+      "tests/test_dashboard_update_ref.py",
+      41,
+      "test_missing_short_commit_fails_instead_of_using_head",
+      "(history)"
+    ],
+    [
+      "tests/test_demo_cli.py",
+      12,
+      "run",
+      "(args, root, data=None)"
+    ],
+    [
+      "tests/test_demo_cli.py",
+      17,
+      "test_standalone_account_and_reports",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_demo_cli.py",
+      28,
+      "test_bot_module_uses_simple_action_contract_and_real_quote_fixture",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_demo_cli.py",
+      51,
+      "test_media_descriptors_run_without_browser",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_demo_media_browser.py",
+      9,
+      "test_demo_and_media_workflow",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      15,
+      "market",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      18,
+      "market.quote",
+      "(cfg)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      23,
+      "new",
+      "(owner='alice', settings=None)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      24,
+      "trade",
+      "(**extra)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      27,
+      "test_buy_spread_margin_commission_and_close_ledger",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      40,
+      "test_sell_and_both_bot_contracts",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      53,
+      "test_pending_sell_stop_triggers_and_stop_loss_uses_observed_gap_price",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      63,
+      "test_take_profit_and_invalid_pending_gap",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      70,
+      "test_ownership_idempotency_slot_uniqueness_and_settings_lock",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      81,
+      "test_parallel_replay_creates_one_order",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      87,
+      "test_pin_hash_rate_limit_and_no_secret_in_public_results",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      98,
+      "test_insufficient_margin_rolls_back_and_stop_out_liquidates",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      107,
+      "test_swap_triple_day_and_repeated_reads_are_not_double_charged",
+      "(market, monkeypatch)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      114,
+      "test_stale_quotes_block_mutation_without_fabricated_execution",
+      "(market, monkeypatch)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      123,
+      "test_invalid_price_directions_and_precision",
+      "(market, data)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      128,
+      "test_api_bot_aliases_owner_scope_csv_and_scheduler_secret_policy",
+      "(client, monkeypatch)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      151,
+      "test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      161,
+      "test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.Adapter",
+      "class"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      162,
+      "test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.Adapter.__init__",
+      "(self, owner)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      163,
+      "test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.Adapter.get",
+      "(self, path)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      166,
+      "test_worker_result_bridge_uses_owner_credential_and_refuses_pin_in_output.factory",
+      "(owner, token)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      179,
+      "test_quote_adapter_requires_current_collector_and_prices",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      193,
+      "test_archived_prototypes_are_not_in_new_module_catalog",
+      "()"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      201,
+      "test_replay_stays_bound_to_original_account_after_selection_change",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      210,
+      "test_long_lived_active_position_survives_history_window",
+      "(market)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      221,
+      "test_account_quota_and_ownership_are_checked_before_expensive_pin_hash",
+      "(market, monkeypatch)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      223,
+      "test_account_quota_and_ownership_are_checked_before_expensive_pin_hash.measured",
+      "(pin, salt)"
+    ],
+    [
+      "tests/test_demo_trading.py",
+      233,
+      "test_quote_diagnostics_distinguish_closed_or_delayed_market_from_collector_failure",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_media_modules.py",
+      12,
+      "test_external_media_is_a_descriptor_not_a_server_fetch",
+      "()"
+    ],
+    [
+      "tests/test_media_modules.py",
+      22,
+      "test_server_media_is_bounded_to_shared_folder_and_validated",
+      "(client, tmp_path)"
+    ],
+    [
+      "tests/test_media_modules.py",
+      38,
+      "test_direct_media_checks_each_request_and_is_not_copied_into_shared_templates",
+      "(client)"
+    ],
+    [
+      "tests/test_media_modules.py",
+      55,
+      "test_youtube_links_generate_only_allowlisted_non_autoplay_embeds",
+      "()"
+    ],
+    [
+      "tests/test_music_player.py",
+      12,
+      "track",
+      "(url='https://example.com/music.mp3')"
+    ],
+    [
+      "tests/test_music_player.py",
+      16,
+      "test_personal_playlist_limits_and_no_owner_override",
+      "(client)"
+    ],
+    [
+      "tests/test_music_player.py",
+      28,
+      "test_direct_audio_does_not_transfer_via_shared_dashboard_and_cli_reads_same_playlist",
+      "(client)"
+    ],
+    [
+      "tests/test_music_player.py",
+      46,
+      "test_login_routes_and_backgrounds_are_public_without_exposing_credentials",
+      "(client)"
+    ],
+    [
+      "tests/test_music_player.py",
+      56,
+      "test_login_ip_uses_trusted_request_without_authentication",
+      "(client, monkeypatch)"
+    ],
+    [
+      "tests/test_music_player.py",
+      68,
+      "test_note_slot_keeps_plain_text_owner_and_shared_copy",
+      "(client)"
+    ],
+    [
+      "tests/test_shared_dashboards.py",
+      7,
+      "test_named_shared_dashboard_copies_layout_notes_and_profiles",
+      "(client)"
+    ],
+    [
+      "tests/test_shared_dashboards.py",
+      45,
+      "test_restricted_modules_and_private_chat_do_not_grant_access_on_load",
+      "(client)"
+    ],
+    [
+      "tests/test_shared_dashboards.py",
+      60,
+      "test_failed_load_is_atomic_and_same_name_only_updates_own_template",
+      "(client)"
+    ],
+    [
+      "tests/test_shared_dashboards.py",
+      71,
+      "test_portable_calculator_content_is_copied_with_a_new_revision",
+      "(client)"
+    ],
+    [
+      "tests/test_technical_browser.py",
+      10,
+      "test_five_independent_indicators_in_chromium",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      14,
+      "isolated_state",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      18,
+      "ts",
+      "(value)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      21,
+      "bar",
+      "(stamp, op=100, high=110, low=90, close=105, **extra)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      26,
+      "test_documented_auto_examples",
+      "(price, step)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      32,
+      "test_spacing_stability_and_recalculation",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      44,
+      "test_previous_trading_day_friday_to_monday",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      54,
+      "test_session_only_scan_open_and_end_exclusion",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      62,
+      "test_overnight_session_is_provisional_until_end",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      74,
+      "test_no_fallback_from_missing_sunday_session",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      81,
+      "test_dst_rules_at_real_transition_instants",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      91,
+      "schedule",
+      "(**updates)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      97,
+      "test_clock_uses_reference_dst_independent_of_broker",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      109,
+      "test_windows_and_clock_share_the_same_schedule_and_only_traded_dates",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      121,
+      "test_supplied_schedule_is_default_and_explicit_empty_configuration_is_honored",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      137,
+      "test_nonexistent_dst_wall_time_is_not_invented",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      143,
+      "test_persistent_settings_and_spacing_are_owner_and_slot_scoped",
+      "(client)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      165,
+      "test_standalone_cli",
+      "(kind, tmp_path)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      178,
+      "test_rejects_invalid_inputs",
+      "(kind, data)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      182,
+      "test_authenticated_module_api_and_reserved_fields",
+      "(client)"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      193,
+      "test_broker_day_duration_respects_dst",
+      "()"
+    ],
+    [
+      "tests/test_technical_indicators.py",
+      203,
+      "test_local_market_data_and_owner_scoped_round_anchor",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_upload_center.py",
+      8,
+      "put",
+      "(client, token, **updates)"
+    ],
+    [
+      "tests/test_upload_center.py",
+      14,
+      "test_direct_access_delete_and_safe_download",
+      "(client)"
+    ],
+    [
+      "tests/test_upload_center.py",
+      35,
+      "test_public_limits_names_and_disabled_accounts",
+      "(client)"
+    ],
+    [
+      "tests/test_upload_center.py",
+      49,
+      "test_upload_state_cannot_live_in_checkout",
+      "(monkeypatch)"
+    ],
+    [
+      "tests/test_upload_center.py",
+      56,
+      "test_output_is_owner_scoped_and_does_not_change_result",
+      "(client)"
+    ],
+    [
+      "tests/test_upload_center.py",
+      71,
+      "test_binary_upload_larger_than_legacy_limit_and_private_media",
+      "(client)"
+    ],
+    [
+      "tests/test_upload_center.py",
+      92,
+      "test_binary_size_boundary_and_chunked_enforcement",
+      "(client, monkeypatch)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      10,
+      "Response",
+      "class"
+    ],
+    [
+      "tests/test_upload_download.py",
+      11,
+      "Response.__init__",
+      "(self, body=b'file', status=200, **headers)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      13,
+      "Response.getheader",
+      "(self, name, default=None)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      16,
+      "fake_response",
+      "(monkeypatch, factory)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      18,
+      "fake_response.response",
+      "(url)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      28,
+      "test_reject_unsafe_url",
+      "(url)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      35,
+      "test_dns_blocks_internal_reserved_and_mapped_addresses",
+      "(monkeypatch, address)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      40,
+      "test_dns_is_pinned_without_forwarding_credentials",
+      "(monkeypatch)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      42,
+      "test_dns_is_pinned_without_forwarding_credentials.resolve",
+      "(*a, **kw)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      45,
+      "test_dns_is_pinned_without_forwarding_credentials.Connection",
+      "class"
+    ],
+    [
+      "tests/test_upload_download.py",
+      46,
+      "test_dns_is_pinned_without_forwarding_credentials.Connection.__init__",
+      "(self, host, address)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      47,
+      "test_dns_is_pinned_without_forwarding_credentials.Connection.request",
+      "(self, method, path, headers)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      50,
+      "test_dns_is_pinned_without_forwarding_credentials.Connection.getresponse",
+      "(self)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      51,
+      "test_dns_is_pinned_without_forwarding_credentials.Connection.close",
+      "(self)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      57,
+      "test_redirect_to_private_host_is_revalidated",
+      "(monkeypatch)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      60,
+      "test_redirect_to_private_host_is_revalidated.Connection",
+      "class"
+    ],
+    [
+      "tests/test_upload_download.py",
+      61,
+      "test_redirect_to_private_host_is_revalidated.Connection.__init__",
+      "(self, host, address)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      62,
+      "test_redirect_to_private_host_is_revalidated.Connection.request",
+      "(self, *a, **kw)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      63,
+      "test_redirect_to_private_host_is_revalidated.Connection.getresponse",
+      "(self)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      64,
+      "test_redirect_to_private_host_is_revalidated.Connection.close",
+      "(self)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      70,
+      "test_redirect_limit_length_overflow_and_partial_download",
+      "(monkeypatch)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      85,
+      "test_url_import_authorization_and_no_partial_records",
+      "(client, monkeypatch)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      98,
+      "test_url_import_authorization_and_no_partial_records.should_not_fetch",
+      "(url)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      110,
+      "test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host",
+      "(monkeypatch)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      114,
+      "test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.Raw",
+      "class"
+    ],
+    [
+      "tests/test_upload_download.py",
+      115,
+      "test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.Raw.close",
+      "(self)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      116,
+      "test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.connect",
+      "(address, timeout)"
+    ],
+    [
+      "tests/test_upload_download.py",
+      117,
+      "test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.TLS",
+      "class"
+    ],
+    [
+      "tests/test_upload_download.py",
+      118,
+      "test_public_ipv4_preferred_for_managed_service_and_tls_keeps_original_host.TLS.wrap_socket",
+      "(self, raw, server_hostname)"
+    ],
+    [
+      "tests/test_upload_proxy.py",
+      9,
+      "load",
+      "(name)"
+    ],
+    [
+      "tests/test_upload_proxy.py",
+      15,
+      "test_new_install_and_existing_public_one_megabyte_limit",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_workspace_browser.py",
+      8,
+      "test_workspace_header_and_slot_controls",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      14,
+      "test_ip_headers_only_from_explicitly_trusted_loopback",
+      "(monkeypatch)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      27,
+      "test_myip_and_viewer_identity_use_the_http_request",
+      "(client, monkeypatch)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      39,
+      "test_indicators_can_be_enabled_only_on_one_owners_chart",
+      "(client)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      55,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off",
+      "(tmp_path, monkeypatch)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      57,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Response",
+      "class"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      58,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Response.__enter__",
+      "(self)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      59,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Response.__exit__",
+      "(self, *args)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      60,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Response.read",
+      "(self, size)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      61,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Opener",
+      "class"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      62,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Opener.open",
+      "(self, request, timeout)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      69,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Failed",
+      "class"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      70,
+      "test_calendar_parser_filters_and_failed_source_is_backed_off.Failed.open",
+      "(self, *args, **kwargs)"
+    ],
+    [
+      "tests/test_workspace_support.py",
+      77,
+      "test_managed_nginx_ip_patch_is_idempotent_and_preserves_unowned_files",
+      "(tmp_path)"
     ],
     [
       "tests_support/code_manager.py",
@@ -5862,79 +7771,115 @@
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      28,
+      29,
+      "login_background",
+      "()"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      34,
+      "login_airless_background",
+      "()"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      38,
       "load_themes",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      66,
+      76,
       "health",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      71,
+      81,
       "project_info",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      88,
+      98,
       "list_themes",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      104,
+      114,
       "get_theme",
       "(theme_id: str)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      116,
+      126,
       "clock_time",
       "(timezone: str | None=None)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      126,
+      136,
       "execute_module",
       "(module_id: str, data: dict)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      141,
+      152,
       "api_modules",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      147,
+      158,
       "dashboard",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      2375,
+      3050,
       "create_app",
       "(*, credential_path=None, upstream_factory=None)"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      2400,
+      3063,
+      "create_app.DashboardBodyLimit",
+      "class"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      3064,
+      "create_app.DashboardBodyLimit.__init__",
+      "(self, app)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      3068,
+      "create_app.DashboardBodyLimit.__call__",
+      "(self, scope, receive, send)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      3086,
       "create_app.start_slot_workers",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      2406,
+      3093,
       "create_app.stop_slot_workers",
       "()"
     ],
     [
       "units/consumers/dashboard-core/dashboard/app.py",
-      2414,
+      3102,
+      "create_app.login_context",
+      "(request: Request)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/app.py",
+      3108,
       "create_app.connected_dashboard",
       "()"
     ],
@@ -6030,259 +7975,457 @@
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      150,
+      149,
+      "create_router.upload_error",
+      "(exc)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      154,
+      "create_router.upload_list",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      160,
+      "create_router.upload_create",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      167,
+      "create_router.upload_binary",
+      "(request: Request, name: str, visibility: str, recipient: str | None=None, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      180,
+      "create_router.upload_from_url",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      190,
+      "create_router.upload_download",
+      "(file_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      200,
+      "create_router.upload_delete",
+      "(file_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      206,
       "create_router.chat_users",
       "(identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      156,
+      212,
       "create_router.chat_rooms",
       "(identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      162,
+      218,
       "create_router.chat_requests",
       "(identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      168,
+      224,
       "create_router.chat_request",
       "(body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      176,
+      232,
       "create_router.chat_respond",
       "(request_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      185,
+      241,
       "create_router.chat_messages",
       "(room_id: str, limit: int=Query(default=50, ge=1, le=200), before: int | None=Query(default=None, gt=0), identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      192,
+      248,
       "create_router.chat_send",
       "(room_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      200,
+      256,
       "create_router.market_candles",
-      "(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, end_time: int | None=Query(default=None, ge=0), interval: str='1m', include_indicators: bool=False, identity=Depends(owner))"
+      "(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, end_time: int | None=Query(default=None, ge=0), interval: str='1m', include_indicators: bool=False, slot_id: str | None=None, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      215,
+      284,
+      "create_router.demo_call",
+      "(operation, *args, **kwargs)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      294,
+      "create_router.demo_slot",
+      "(identity, slot_id, kind=None)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      302,
+      "create_router.demo_state",
+      "(account_id: str | None=None, slot_id: str | None=None, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      307,
+      "create_router.demo_create",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      312,
+      "create_router.demo_select",
+      "(account_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      316,
+      "create_router.demo_settings",
+      "(account_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      321,
+      "create_router.demo_pin",
+      "(account_id: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      326,
+      "create_router.demo_manual",
+      "(body: dict, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      332,
+      "create_router.demo_bot",
+      "(body: dict, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      338,
+      "create_router.demo_trade_action",
+      "(trade_id: str, action: str, body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      343,
+      "create_router.demo_reports",
+      "(account_id: str | None=None, since: float=0, until: float | None=None, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      347,
+      "create_router.demo_csv",
+      "(account_id: str | None=None, since: float=0, until: float | None=None, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      358,
+      "create_router.demo_execution",
+      "(body: dict, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      377,
+      "create_router.media_error",
+      "(exc)"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      382,
+      "create_router.music_get",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      389,
+      "create_router.music_save",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      397,
+      "create_router.media_describe",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      404,
+      "create_router.media_library",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      410,
+      "create_router.media_server",
+      "(filename: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      416,
+      "create_router.media_upload",
+      "(file_id: str, request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      432,
+      "create_router.my_ip",
+      "(request: Request, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      436,
+      "create_router.dashboard_list",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      440,
+      "create_router.dashboard_save",
+      "(body: dict, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      447,
+      "create_router.dashboard_load",
+      "(dashboard_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      454,
+      "create_router.dashboard_delete",
+      "(dashboard_id: str, identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      460,
+      "create_router.indicator_presets",
+      "(identity=Depends(owner))"
+    ],
+    [
+      "units/consumers/dashboard-core/dashboard/upstreams.py",
+      464,
       "create_router.profile_list",
       "(identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      219,
+      468,
       "create_router.profile_create",
       "(body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      225,
+      474,
       "create_router.profile_save",
       "(profile_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      232,
+      481,
       "create_router.profile_delete",
       "(profile_id: str, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      238,
+      487,
       "create_router.signal_list",
       "(identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      242,
+      491,
       "create_router.signal_create",
       "(body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      248,
+      497,
       "create_router.signal_save",
       "(rule_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      255,
+      504,
       "create_router.signal_delete",
       "(rule_id: str, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      261,
+      510,
       "create_router.signal_evaluate",
       "(rule_id: str, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      268,
+      517,
       "create_router.signal_worker",
       "(worker_id: str, body: dict, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      285,
+      534,
       "create_router.read",
       "(operation: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      292,
+      541,
       "create_router.market_sma",
       "(limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=20, ge=1, le=500), include_open: bool=True, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      307,
+      556,
       "create_router.indicators_endpoint",
       "(name: str, limit: int=Query(default=200, ge=1, le=1000), period: int=Query(default=14, ge=1, le=500), fast: int=Query(default=12, ge=1, le=500), slow: int=Query(default=26, ge=1, le=500), signal: int=Query(default=9, ge=1, le=500), include_open: bool=True, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      325,
+      574,
       "create_router.market_database",
       "(table: str, limit: int=Query(default=50, ge=1, le=200), offset: int=Query(default=0, ge=0, le=1000000), candle_state: str='all', indicator_name: str='all', identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      339,
+      588,
       "create_router.module_state",
       "(module_id: str, body: dict, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      355,
+      604,
       "create_router.run_independent_module",
-      "(module_id: str, body: dict, identity=Depends(owner))"
+      "(module_id: str, body: dict, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      372,
+      621,
       "create_router.list_active_slots",
       "(identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      379,
+      628,
       "create_router.create_slot",
       "(body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      391,
+      640,
       "create_router.duplicate_slot",
       "(slot_id: str, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      400,
+      649,
       "create_router.update_slot_overview",
       "(slot_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      413,
+      662,
       "create_router.delete_slot",
       "(slot_id: str, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      424,
+      673,
       "create_router.update_slot_appearance",
       "(slot_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      439,
+      688,
       "create_router.configure_slot_worker",
       "(slot_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      452,
+      701,
       "create_router.bind_slot",
       "(slot_id: str, body: dict, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      467,
+      716,
       "create_router.read_slot",
-      "(slot_id: str, body: dict, identity=Depends(owner))"
+      "(slot_id: str, body: dict, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      486,
+      735,
       "create_router.execute_slot",
-      "(slot_id: str, body: dict, identity=Depends(owner))"
+      "(slot_id: str, body: dict, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      503,
+      752,
       "create_router.register",
       "(body: RegisterBody, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      508,
+      757,
       "create_router.worker",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      512,
+      761,
       "create_router.configure",
       "(worker_id: str, body: ConfigureBody, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      518,
+      767,
       "create_router.remove",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      522,
+      771,
       "create_router.enable",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      526,
+      775,
       "create_router.disable",
       "(worker_id: str, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      530,
+      779,
       "create_router.run",
       "(worker_id: str, body: RunRequest, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      541,
+      790,
       "create_router.execution",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
     [
       "units/consumers/dashboard-core/dashboard/upstreams.py",
-      545,
+      794,
       "create_router.cancel",
       "(execution_id: UUID, request: Request, identity=Depends(owner))"
     ],
@@ -6318,13 +8461,13 @@
     ],
     [
       "units/consumers/dashboard-core/legacy-tests/test_dashboard.py",
-      54,
+      55,
       "test_module_catalog_endpoint",
       "()"
     ],
     [
       "units/consumers/dashboard-core/legacy-tests/test_dashboard.py",
-      63,
+      64,
       "test_dashboard_contains_generic_branding",
       "()"
     ],
@@ -9415,6 +11558,12 @@
       "CREATE TABLE IF NOT EXISTS messages (\n        id INTEGER PRIMARY KEY AUTOINCREMENT, room_id TEXT NOT NULL, author TEXT NOT NULL,\n        body TEXT NOT NULL, created_at INTEGER NOT NULL)"
     ],
     [
+      "modules/demo_trading.py",
+      73,
+      "demo_accounts",
+      "CREATE TABLE IF NOT EXISTS demo_accounts (\n          id TEXT PRIMARY KEY,owner TEXT NOT NULL,name TEXT NOT NULL,initial_cents INTEGER NOT NULL,balance_cents INTEGER NOT NULL,\n          settings TEXT NOT NULL,pin_salt BLOB NOT NULL,pin_hash BLOB NOT NULL,pin_window REAL NOT NULL DEFAULT 0,pin_attempts INTEGER NOT NULL DEFAULT 0,\n          created_at REAL NOT NULL,last_bid TEXT,last_quote_at REAL);\n        CREATE INDEX IF NOT EXISTS demo_account_owner ON demo_accounts(owner);\n        CREATE TABLE IF NOT EXISTS demo_preferences(owner TEXT PRIMARY KEY,active_account TEXT NOT NULL REFERENCES demo_accounts(id));\n        CREATE TABLE IF NOT EXISTS demo_orders (\n          id TEXT PRIMARY KEY,owner TEXT NOT NULL,account_id TEXT NOT NULL REFERENCES demo_accounts(id),side TEXT NOT NULL,status TEXT NOT NULL,\n          order_type TEXT NOT NULL,entry_requested TEXT,entry_fill TEXT,sl TEXT NOT NULL,tp TEXT NOT NULL,volume TEXT NOT NULL,contract_size TEXT NOT NULL,\n          leverage INTEGER NOT NULL,commission_rate TEXT NOT NULL,swap_rate TEXT NOT NULL,margin_cents INTEGER NOT NULL DEFAULT 0,\n          commission_cents INTEGER NOT NULL DEFAULT 0,swap_cents INTEGER NOT NULL DEFAULT 0,profit_cents INTEGER NOT NULL DEFAULT 0,\n          created_at REAL NOT NULL,opened_at REAL,closed_at REAL,close_price TEXT,close_reason TEXT,source TEXT NOT NULL,\n          source_slot TEXT,show_on_chart INTEGER NOT NULL,request_id TEXT NOT NULL,signature TEXT NOT NULL,last_swap_day INTEGER,\n          UNIQUE(owner,account_id,request_id));\n        CREATE INDEX IF NOT EXISTS demo_order_scope ON demo_orders(owner,account_id,status);\n        CREATE UNIQUE INDEX IF NOT EXISTS demo_request_owner ON demo_orders(owner,request_id);\n        CREATE UNIQUE INDEX IF NOT EXISTS demo_active_slot ON demo_orders(owner,source_slot) WHERE source_slot IS NOT NULL AND status IN ('open','pending');\n        CREATE TABLE IF NOT EXISTS demo_deals(id INTEGER PRIMARY KEY AUTOINCREMENT,owner TEXT NOT NULL,account_id TEXT NOT NULL,order_id TEXT,\n          kind TEXT NOT NULL,amount_cents INTEGER NOT NULL,price TEXT,created_at REAL NOT NULL);\n        CREATE TABLE IF NOT EXISTS demo_equity(owner TEXT NOT NULL,account_id TEXT NOT NULL,time INTEGER NOT NULL,equity_cents INTEGER NOT NULL,\n          PRIMARY KEY(owner,account_id,time));"
+    ],
+    [
       "modules/module_state.py",
       19,
       "module_state",
@@ -9422,9 +11571,21 @@
     ],
     [
       "modules/slot_workers.py",
-      82,
+      86,
       "module_state",
       "CREATE TABLE IF NOT EXISTS module_state (owner TEXT NOT NULL, module TEXT NOT NULL, slot TEXT NOT NULL, value TEXT NOT NULL, PRIMARY KEY(owner,module,slot))"
+    ],
+    [
+      "modules/uploads.py",
+      31,
+      "uploads",
+      "CREATE TABLE IF NOT EXISTS uploads (\n            id TEXT PRIMARY KEY, name TEXT NOT NULL, size INTEGER NOT NULL,\n            sender TEXT NOT NULL, recipient TEXT, created_at INTEGER NOT NULL, content BLOB NOT NULL)"
+    ],
+    [
+      "modules/workspaces.py",
+      15,
+      "shared_dashboards",
+      "CREATE TABLE IF NOT EXISTS shared_dashboards (id TEXT PRIMARY KEY, sender TEXT NOT NULL, name TEXT NOT NULL, created_at INTEGER NOT NULL, payload TEXT NOT NULL, UNIQUE(sender,name))"
     ],
     [
       "units/code-manager/code_manager/build_pipeline.py",

@@ -4,6 +4,8 @@
 
 ## روش استفاده سریع
 
+برای کار روی Dashboard ابتدا [دفترچهٔ کم‌توکن Agent](DASHBOARD_AGENT.md) را بخوانید؛ نقشهٔ Login، اسلات، Media/Music، Upload، Demo و Signal همراه API/state/test در آن است. راهنمای انسان در [Dashboard](dashboard/USER_GUIDE.md)، [Demo Trading](dashboard/demo-trading.md) و [Signal Scripts](dashboard/signal-scripts.md) قرار دارد. Password Manager مرورگر در Login پشتیبانی می‌شود؛ برنامه Password یا Token را در localStorage ذخیره نمی‌کند.
+
 ۱. در جدول مسیریابی، نوع تغییر را پیدا کنید. ۲. symbol یا endpoint را در همین فایل جست‌وجو کنید. ۳. فایل مقصد و تست مجاور را بخوانید. ۴. کوچک‌ترین اصلاح سازگار را انجام و تست مرتبط را اجرا کنید. ۵. اگر API، persistence، security یا wiring تغییر کرد، integration مناسب را هم اجرا کنید. برای bug ناشناخته، trace همان مسیر را گسترش دهید؛ بدون خواندن implementation مرتبط patch نزنید.
 
 این فایل اطلاعات شروع و قرارداد را یکجا می‌دهد؛ تحلیل اثر تغییر، خواندن بدنه تابع مرتبط و اعتبارسنجی واقعی همچنان ضروری است. signature به‌تنهایی معنای side effect یا تضمین امنیتی نیست. نمادهای private و test در پیوست، API عمومی محسوب نمی‌شوند.

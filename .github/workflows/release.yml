@@ -49,7 +49,7 @@ jobs:
           set -euo pipefail
           directory="$RUNNER_TEMP/30na-release"
           mkdir -p "$directory"
-          cp install.sh scripts/deployment/update_dashboard.sh docs/AGENT_GUIDE.md docs/manual/PROJECT_MANUAL.pdf docs/manual/PROJECT_MANUAL.html docs/manual/BOOK.md docs/manual/source-inventory.json "$directory/"
+          cp install.sh scripts/deployment/update_dashboard.sh docs/AGENT_GUIDE.md docs/manual/PROJECT_MANUAL.pdf docs/manual/PROJECT_MANUAL.html docs/manual/BOOK.md docs/manual/source-inventory.json docs/DASHBOARD_AGENT.md docs/dashboard/USER_GUIDE.md docs/dashboard/demo-trading.md docs/dashboard/signal-scripts.md "$directory/"
           python - "$directory" <<'PY'
           import hashlib,pathlib,sys
           root=pathlib.Path(sys.argv[1])
@@ -66,4 +66,4 @@ jobs:
             echo 'Release already exists; no assets overwritten.'
             exit 0
           fi
-          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/30na-release/"* --verify-tag --latest --title "$GITHUB_REF_NAME — مدیریت Worker و اجراها" --notes-file "docs/releases/$GITHUB_REF_NAME.md" --repo "$GITHUB_REPOSITORY"
+          gh release create "$GITHUB_REF_NAME" "$RUNNER_TEMP/30na-release/"* --verify-tag --latest --title "$GITHUB_REF_NAME — 30nA Dashboard" --notes-file "docs/releases/$GITHUB_REF_NAME.md" --repo "$GITHUB_REPOSITORY"

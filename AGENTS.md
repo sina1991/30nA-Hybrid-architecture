@@ -1,6 +1,7 @@
 # راهنمای ورود Agent به 30nA
 
 - پاسخ و مستندات توضیحی فارسی؛ identifier، API، command و اصطلاح فنی به زبان اصلی.
+- برای تغییر Dashboard، ابتدا [نقشهٔ کم‌توکن Dashboard](docs/DASHBOARD_AGENT.md) و فقط ردیف مرتبط آن را بخوانید؛ برای جزئیات فراتر از آن از مرجع جامع استفاده کنید.
 - نقطه شروع مستقل: [راهنمای فنی Agent](docs/AGENT_GUIDE.md). ابتدا بخش «مسیریابی تغییر» و «قواعد تغییر» را بخوانید؛ سپس فقط فایل و تست مربوط به درخواست را بررسی کنید. مرجع شامل signature همه نمادهای Python، قراردادها، API، env، DDL و errorهاست.
 - خروجی `docs/AGENT_GUIDE.md` تولیدشده است؛ توضیحات را در [منبع راهنما](docs/AGENT_GUIDE.source.md) و داده فنی را در کد/قرارداد اصلاح کنید، سپس `scripts/documentation/build_manual.py` را اجرا کنید.
 - owner binding، Artifact immutability، Sandbox اجباری HTTP و صداقت status/result باید حفظ شوند. نتیجه نامعلوم اجرا را خودکار retry نکنید.
