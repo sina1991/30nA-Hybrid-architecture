@@ -2409,9 +2409,9 @@
       "sha256": "399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc"
     },
     {
-      "bytes": 3539,
+      "bytes": 3734,
       "path": "units/consumers/dashboard-core/browser-tests/management.cjs",
-      "sha256": "cf2d3f38708c55323217624cbcafec8fac4a27e370c1247a892d464919d3aa98"
+      "sha256": "8a94dc16602fe8ed4b8da465c1eacea05c5f4d589db31977fd33a45658a821aa"
     },
     {
       "bytes": 1765,

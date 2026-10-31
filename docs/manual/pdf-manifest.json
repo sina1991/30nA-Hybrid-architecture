@@ -1,6 +1,6 @@
 {
-  "html_sha256": "3ccb1824d031a4a8deafa89bbe036f5b0ca79a53550553b313cad664617017cf",
-  "pdf_sha256": "3bddab8c49ae890e84232b346aeab44a0f577d458d2d45f5f5e825f2ed384143",
-  "bytes": 6887987,
+  "html_sha256": "6da4083275977fb813f5983cc9b3ad1e7e85732bb7afcc27ab7a33181a0eeafb",
+  "pdf_sha256": "46fc4746e52088e6b3b9000b4d819ef58f8580812016825271dd40c305575db3",
+  "bytes": 6887993,
   "renderer": "Playwright 1.62.1 with host Chromium; offline HTML printing"
 }

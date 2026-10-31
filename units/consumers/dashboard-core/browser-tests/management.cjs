@@ -10,6 +10,7 @@ module.exports=async function checkManagement(page) {
   await page.locator('#worker-editor-close').click();
   await page.locator('#worker-create').click();
   await page.locator('#edit-worker-id').fill('browser-managed');
+  await page.locator('#artifact-template').selectOption('');
   for(const [id,value] of Object.entries(fields))await page.locator('#'+id).fill(value);
   await page.locator('#edit-config-mode').selectOption('json');
   await page.locator('#edit-configuration').fill('[]');
@@ -28,7 +29,9 @@ module.exports=async function checkManagement(page) {
   await page.locator('#worker-editor').waitFor({state:'hidden'});
   await row('browser-managed').click();
   await page.locator('#edit-schedule').selectOption('interval');
+  await page.locator('#edit-interval-preset').selectOption('custom');
   await page.locator('#edit-interval').fill('60');
+  await page.locator('#edit-config-mode').selectOption('json');
   await page.locator('#edit-configuration').fill('{"updated":2}');
   await page.locator('#worker-save').click();await page.locator('#worker-editor').waitFor({state:'hidden'});
   await row('browser-managed').click();

@@ -1380,7 +1380,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11198 | `9c804b0858ff720450a6b074a1ca39a5e6e9ca80ea344bbdecaa3444bf498b2e` |
 | [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19069 | `29dd2b4fdf7aa9d15d090eb51186d9f756473d27520d0c6f4e04106116ac4076` |
 | [units/consumers/dashboard-core/browser-tests/layout.cjs](../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1242 | `399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc` |
-| [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3539 | `cf2d3f38708c55323217624cbcafec8fac4a27e370c1247a892d464919d3aa98` |
+| [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3734 | `8a94dc16602fe8ed4b8da465c1eacea05c5f4d589db31977fd33a45658a821aa` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
 | [units/consumers/dashboard-core/browser-tests/technical.cjs](../../units/consumers/dashboard-core/browser-tests/technical.cjs) | 5082 | `7f9b0eb8e333fb7f2c1c21867c653e04d9ab5a8322b40b82eef9c4224b2fd441` |
