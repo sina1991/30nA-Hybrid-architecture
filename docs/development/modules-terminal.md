@@ -163,3 +163,33 @@ My IP در HTTP، IP مشاهده‌شده برای درخواست احراز‌
 اسلات `Linear` به‌صورت پیش‌فرض Economic Calendar دارد؛ همان سایر Moduleها را هم می‌توان در آن انتخاب کرد. منبع ثابت تقویم، feed عمومی هفتگی Forex Factory است؛ بدون iframe و بدون پذیرش URL یا فایل دلخواه از کاربر. داده ۱۵ دقیقه cache می‌شود و شکست منبع هم backoff دارد. در تب Module تنظیمات فیلتر کشور/ارز، اهمیت، تعداد و نمایش رویدادهای گذشته ذخیره می‌شوند. زمان در UI به timezone مرورگر نمایش داده می‌شود. نتیجهٔ `stale/unavailable` با موفقیت دریافت داده اشتباه گرفته نمی‌شود.
 
 دکمه‌های Save/Load کنار Edit layout قالب‌های نام‌دار مشترک می‌سازند. یادداشت‌ها و شمارنده‌ها، چیدمان و تنظیمات اسلات‌ها و محاسبات قابل انتقال Calculator/Dice ذخیره می‌شوند؛ تاریخچهٔ Chat خصوصی، Credential، ورودی Worker و خروجی مانیتور میزبان منتشر نمی‌شوند. Load برای گیرنده شناسه‌های جدید می‌سازد، اسلات‌های فعلی را در Slots نگه می‌دارد و Worker جدیدی فعال نمی‌کند. تنظیم نمایش اندیکاتورها در هر Chart مستقل است و شناسهٔ profile هنگام انتقال قالب به مالک جدید remap می‌شود.
+
+## ورودی‌های مستقل Demo و Media — راهنمای اجرای اولیه
+
+این بخش فقط دستورهای لازم برای اجرای Moduleهای جدید است؛ مستندات نهایی تب‌ها بعد از پذیرش نسخه روی سرور تکمیل می‌شود.
+
+```bash
+30na demo state
+30na demo report
+30na demo create --input -
+30na demo market --input -
+30na demo bot --input -
+30na demo from-worker --input -
+runuser -u 30na -- 30na modules run demo-account --owner customer --slot cli --input '{}'
+runuser -u 30na -- 30na modules run demo-positions --owner customer --slot cli --input '{}'
+runuser -u 30na -- 30na modules run demo-reports --owner customer --slot cli --input '{}'
+python3 /opt/30na/dashboard-current/modules/demo-bot/module.py --owner customer --slot bot-cli --input -
+python3 /opt/30na/dashboard-current/modules/media-image/module.py --input '{"settings":{"url":"https://example.com/image.png"}}'
+python3 /opt/30na/dashboard-current/modules/media-audio/module.py --input '{"settings":{"url":"https://example.com/audio.mp3"}}'
+python3 /opt/30na/dashboard-current/modules/media-video/module.py --input '{"settings":{"url":"https://example.com/video.mp4"}}'
+```
+
+`30na demo` از Session حساب و همان HTTPS API داشبورد استفاده می‌کند؛ گزینه‌های `--dashboard-url`، `--token-file` و `--ca-file` قبل از زیر‌فرمان می‌آیند. ورودی حساس با `--input -` از stdin خوانده می‌شود؛ PIN را در argument یا Git قرار ندهید. `modules run ... --owner` و entrypoint مستقیم، ابزار اپراتور محلی مورد اعتمادند. رابط مستقیم Python نیز در `modules/demo_components.py` و `modules/demo_trading.py` است.
+
+ورودی ایجاد حساب شامل `name/initial_balance/tradePIN` است؛ موجودی فقط ۱۰۰۰، ۳۰۰۰ یا ۵۰۰۰ دلار است. ورودی دستی `side: buy|sell`، `sl` و `tp` دارد. ورودی ربات `ACTION: BUY|SELL` یا `price`، به همراه `sl/tp/tradePIN` دارد. در حالت price، جهت از ترتیب SL/Entry/TP تشخیص داده می‌شود. `request_id` یکتای هر دستور برای Retry ایمن استفاده می‌شود؛ CLI آن را در stderr اعلام می‌کند و درخواست نامعلوم خودکار با شناسه تازه تکرار نمی‌شود. PIN چهاررقمی، جایگزین احراز هویت owner نیست. برای Worker، خروجی موفق فقط intent شامل price/ACTION و SL/TP است؛ PIN در مرحلهٔ ارسال نتیجه و خارج از Sandbox داده می‌شود.
+
+موتور فعلی paper trading برای USD/XAUUSD و Hedging است. Bid از آخرین close مشاهده‌شده و Ask با spread شبیه‌سازی‌شده محاسبه می‌شود. دادهٔ stale مانع اجراست. SL/TP، Pending و Stop-out با قیمت مشاهده‌شده پردازش می‌شوند؛ تیک دیده‌نشده بازسازی نمی‌شود. حساب دارای حجم ثابت، leverage، contract size، digits، Stop Level، commission، swap، زمان rollover و margin thresholds است. تغییر تنظیمات مالی هنگام وجود سفارش فعال پذیرفته نمی‌شود. ledger خارج از checkout در `demo-trading.sqlite3` نگهداری می‌شود؛ پول واقعی یا اتصال به بروکر MT5 ندارد.
+
+Moduleهای `demo-account/demo-trade/demo-bot/demo-positions/demo-reports` در اسلات هم همان منطق را فراخوانی می‌کنند. ورودی PIN یا عملیات معاملاتی در Slot Worker ذخیره و زمان‌بندی نمی‌شود. source کاربر فقط از مسیر Artifact/Worker/Sandbox اجرا می‌شود. ماژول‌های prototype از Catalog و انتخاب‌های جدید کنار گذاشته شده‌اند؛ مسیرهای قبلی برای حفظ دادهٔ اسلات‌های موجود سازگار مانده‌اند.
+
+رسانه در مرورگر پخش می‌شود؛ خروجی CLI فقط descriptor است. `Media` شامل Media Player عمومی و Image/Audio/Video مستقل است. فایل سرور باید در `DASHBOARD_MODULE_STATE_DIR/media` باشد؛ مسیر دلخواه سیستم، symlink، SVG/HTML و فایل نامعتبر پذیرفته نمی‌شوند. سقف فایل سرور ۳۲ MiB است؛ سقف Upload Center همان حد مستقل آن است. فایل Direct در هر درخواست مجدداً authorize می‌شود و reference خصوصی آن در قالب داشبورد مشترک انتقال نمی‌یابد. بارگیری و پخش خودکار نداریم؛ native codec مرورگر و محدودیت منبع خارجی همچنان اعمال می‌شوند.

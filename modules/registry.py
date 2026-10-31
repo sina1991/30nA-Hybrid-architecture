@@ -10,10 +10,14 @@ from pathlib import Path
 
 PACKAGES_DIR = Path(__file__).resolve().parent
 MODULE_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+ARCHIVED_MODULES=frozenset(('calculator','counter','dice-roller','theme-summary','dashboard-health','empty'))
+
 SUPPORTED_TYPES = {
     "session-windows",
     "session-clock",
     "price-levels",
+    "demo-account", "demo-trade", "demo-bot", "demo-positions", "demo-reports",
+    "media-player",
     "myip",
     "economic-calendar",
     "empty",
@@ -36,7 +40,7 @@ class ModuleManifestError(ValueError):
     """Raised when a module manifest is invalid."""
 
 
-def load_modules() -> list[dict[str, str]]:
+def load_modules() -> list[dict[str, object]]:
     """Discover and validate module manifests in deterministic order."""
     if not PACKAGES_DIR.is_dir():
         raise ModuleManifestError("Module packages directory is missing")
@@ -102,6 +106,7 @@ def load_modules() -> list[dict[str, str]]:
             "version": data["version"],
             "api_version": data["api_version"],
             "type": data["type"],
+            "archived":module_id in ARCHIVED_MODULES,
         })
 
     if not modules:
@@ -110,12 +115,12 @@ def load_modules() -> list[dict[str, str]]:
     return modules
 
 
-def list_modules() -> list[dict[str, str]]:
+def list_modules(include_archived=False) -> list[dict[str, object]]:
     """Return the validated module catalog."""
-    return [dict(module) for module in load_modules()]
+    return [dict(module) for module in load_modules() if include_archived or not module["archived"]]
 
 
-def get_module(module_id: str) -> dict[str, str] | None:
+def get_module(module_id: str) -> dict[str, object] | None:
     """Return one validated module, or None if it is not registered."""
     for module in load_modules():
         if module["id"] == module_id:

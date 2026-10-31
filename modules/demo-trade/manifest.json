@@ -1,0 +1,8 @@
+{
+  "id": "demo-trade",
+  "name": "Demo Trade",
+  "description": "Manual Buy/Sell with SL, TP and source-slot position state.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "demo-trade"
+}

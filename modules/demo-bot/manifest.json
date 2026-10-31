@@ -1,0 +1,8 @@
+{
+  "id": "demo-bot",
+  "name": "Demo Bot",
+  "description": "Authenticated Market or Pending bot intents protected by a trade PIN.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "demo-bot"
+}

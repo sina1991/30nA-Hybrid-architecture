@@ -3,13 +3,13 @@ from uuid import UUID
 import sqlite3
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from fastapi.responses import JSONResponse, Response
+from fastapi.responses import JSONResponse, Response, FileResponse
 from pydantic import BaseModel, ConfigDict, Field
 from worker_manager.api import RegisterBody, ConfigureBody
 from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, owner_dependency
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
-from modules import slots, uploads, technical, chart_overlays, workspaces, client_ip
+from modules import slots, uploads, technical, chart_overlays, workspaces, client_ip, demo_trading, demo_components, media
 from modules import slot_workers, indicator_profiles, signal_rules, accounts, chat_store
 from market_data.data import chart as gold_chart
 from market_data.data import indicator as market_indicator, database_table
@@ -246,12 +246,149 @@ def create_router(credential_path, upstream_factory):
             profiles = [profile for profile in profiles if profile['enabled']]
             result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time, interval=interval, include_indicators=include_indicators, profiles=[profile for profile in profiles if profile['type'] not in technical.KINDS] if include_indicators else None)
             if include_indicators: result['technical_overlays']=chart_overlays.calculate(identity,profiles,result,end_time)
+            if include_indicators:
+                try:
+                    demo_state=demo_trading.state(identity)
+                    result['demo_trades']=[trade for trade in demo_state['orders'] if trade['status'] in ('open','pending') and trade['show_on_chart']]
+                except (OSError,sqlite3.Error,ValueError):result['demo_trades']=[]
         except (ValueError, OSError, sqlite3.Error):
             raise HTTPException(503, 'Market data is unavailable') from None
         response = JSONResponse(envelope(result))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
         return response
+
+    def demo_call(operation,*args,**kwargs):
+        try:return operation(*args,**kwargs)
+        except demo_trading.RateLimited as exc:raise HTTPException(429,str(exc)) from None
+        except PermissionError as exc:raise HTTPException(403,str(exc)) from None
+        except LookupError:raise HTTPException(404,'Demo account or trade not found') from None
+        except demo_trading.Unavailable as exc:raise HTTPException(503,str(exc)) from None
+        except demo_trading.Conflict as exc:raise HTTPException(409,str(exc)) from None
+        except (ValueError,TypeError):raise HTTPException(422,'Invalid demo request; check prices, settings and request_id') from None
+        except (sqlite3.Error,OSError):raise HTTPException(503,'Demo storage unavailable') from None
+
+    def demo_slot(identity,slot_id,kind=None):
+        if slot_id is None:return None
+        try:binding=slots.binding(identity,slot_id)
+        except ValueError:raise HTTPException(422,'Invalid slot') from None
+        if not binding or binding['module_id'] not in ((kind,) if kind else demo_components.KINDS):raise HTTPException(404,'Demo slot not found')
+        return slot_id
+
+    @router.get('/demo/state')
+    def demo_state(account_id: str | None=None,slot_id: str | None=None,identity=Depends(owner)):
+        result=demo_call(demo_trading.state,identity,account_id,demo_slot(identity,slot_id))
+        return JSONResponse(envelope(result),headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+    @router.post('/demo/accounts')
+    def demo_create(body: dict,identity=Depends(owner)):
+        if set(body)-{'name','initial_balance','tradePIN','settings'}:raise HTTPException(422,'Invalid account')
+        return envelope({'account':demo_call(demo_trading.create_account,identity,body.get('name'),body.get('initial_balance'),body.get('tradePIN'),body.get('settings'))})
+
+    @router.post('/demo/accounts/{account_id}/select')
+    def demo_select(account_id: str,identity=Depends(owner)):
+        return envelope({'account':demo_call(demo_trading.select_account,identity,account_id)})
+
+    @router.put('/demo/accounts/{account_id}/settings')
+    def demo_settings(account_id: str,body: dict,identity=Depends(owner)):
+        if set(body)!={'settings'}:raise HTTPException(422,'Invalid settings')
+        return envelope({'account':demo_call(demo_trading.update_settings,identity,account_id,body['settings'])})
+
+    @router.post('/demo/accounts/{account_id}/pin')
+    def demo_pin(account_id: str,body: dict,identity=Depends(owner)):
+        if set(body)!={'tradePIN'}:raise HTTPException(422,'Invalid PIN request')
+        return envelope(demo_call(demo_trading.set_pin,identity,account_id,body['tradePIN']))
+
+    @router.post('/demo/trades')
+    def demo_manual(body: dict,request: Request,identity=Depends(owner)):
+        data=dict(body);slot=demo_slot(identity,data.pop('slot_id',None),'demo-trade')
+        if 'request_id' not in data and request.headers.get('idempotency-key'):data['request_id']=request.headers['idempotency-key']
+        return envelope(demo_call(demo_trading.submit,identity,data,'manual',slot))
+
+    @router.post('/demo/bot')
+    def demo_bot(body: dict,request: Request,identity=Depends(owner)):
+        data=dict(body);slot=demo_slot(identity,data.pop('slot_id',None),'demo-bot')
+        if 'request_id' not in data and request.headers.get('idempotency-key'):data['request_id']=request.headers['idempotency-key']
+        return envelope(demo_call(demo_trading.submit,identity,data,'bot',slot))
+
+    @router.post('/demo/trades/{trade_id}/{action}')
+    def demo_trade_action(trade_id: str,action: str,body: dict,identity=Depends(owner)):
+        if action not in ('close','cancel','chart') or set(body)-{'show_on_chart'}:raise HTTPException(422,'Invalid trade action')
+        return envelope({'trade':demo_call(demo_trading.alter_order,identity,trade_id,action,body.get('show_on_chart'))})
+
+    @router.get('/demo/reports')
+    def demo_reports(account_id: str | None=None,since: float=0,until: float | None=None,identity=Depends(owner)):
+        return JSONResponse(envelope(demo_call(demo_trading.report,identity,account_id,since,until)),headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+    @router.get('/demo/report.csv')
+    def demo_csv(account_id: str | None=None,since: float=0,until: float | None=None,identity=Depends(owner)):
+        import csv,io
+        report=demo_call(demo_trading.report,identity,account_id,since,until)
+        if report['history_truncated']:raise HTTPException(422,'Narrow the date range to at most 5000 closed trades for CSV export')
+        stream=io.StringIO();writer=csv.writer(stream)
+        columns=('id','side','source','entry_fill','close_price','sl','tp','volume','profit','commission','swap','opened_at','closed_at','close_reason')
+        writer.writerow(columns)
+        for trade in report['history']:writer.writerow([trade.get(key,'') for key in columns])
+        return Response(stream.getvalue(),media_type='text/csv',headers={'Content-Disposition':'attachment; filename="demo-report.csv"','Cache-Control':'no-store','X-Content-Type-Options':'nosniff'})
+
+    @router.post('/demo/from-execution')
+    def demo_execution(body: dict,request: Request,identity=Depends(owner)):
+        if set(body)-{'execution_id','account_id','tradePIN','show_on_chart'}:raise HTTPException(422,'Invalid Worker trade request')
+        try:execution=str(UUID(body['execution_id']))
+        except (KeyError,ValueError,TypeError):raise HTTPException(422,'Invalid execution ID') from None
+        credential=accounts.upstream_credential(identity) if request.state.account_session else request.headers['authorization'][7:]
+        if credential is None:raise HTTPException(503,'Worker credentials are not provisioned')
+        adapter=upstream_factory(identity,credential).get('worker-manager')
+        if adapter is None:raise HTTPException(503,'Worker Manager unavailable')
+        try:job=adapter.get('/api/v1/executions/'+execution)
+        except ConsumerAPIError as exc:raise HTTPException(exc.status if exc.status in (401,403,404) else 503,'Worker execution unavailable') from None
+        if not isinstance(job,dict):raise HTTPException(503,'Invalid Worker execution response')
+        if job.get('status')!='succeeded':raise HTTPException(409,'Worker execution must succeed before submitting its intent')
+        result=job.get('result')
+        if isinstance(result,dict) and result.get('status')=='succeeded' and 'result' in result:result=result['result']
+        intent=result.get('demo_trade',result) if isinstance(result,dict) else None
+        if not isinstance(intent,dict) or set(intent)-{'price','entry','sl','tp','ACTION','action','side'}:raise HTTPException(422,'Worker must return a price or ACTION with SL and TP; no PIN in Worker output')
+        data={**intent,'account_id':body.get('account_id'),'tradePIN':body.get('tradePIN'),'request_id':'worker:'+execution,'show_on_chart':body.get('show_on_chart',True)}
+        return envelope(demo_call(demo_trading.submit,identity,data,'worker'))
+
+    def media_error(exc):
+        status=404 if isinstance(exc,LookupError) else 403 if isinstance(exc,PermissionError) else 422 if isinstance(exc,ValueError) else 503
+        raise HTTPException(status,{404:'Media not found',403:'Media access denied',422:'Unsupported media or invalid source',503:'Media storage unavailable'}[status]) from None
+
+    @router.post('/media/describe')
+    def media_describe(body: dict,identity=Depends(owner)):
+        if set(body)-{'settings','kind'} or body.get('kind') not in (None,'image','audio','video'):raise HTTPException(422,'Invalid media descriptor')
+        try:result=media.describe(identity,body.get('settings'),body.get('kind'))
+        except (ValueError,LookupError,PermissionError,OSError,sqlite3.Error) as exc:media_error(exc)
+        return JSONResponse(envelope(result),headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+    @router.get('/media/library')
+    def media_library(identity=Depends(owner)):
+        try:result=media.library(identity)
+        except (ValueError,LookupError,PermissionError,OSError,sqlite3.Error) as exc:media_error(exc)
+        return JSONResponse(envelope(result),headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+    @router.get('/media/server/{filename}')
+    def media_server(filename: str,identity=Depends(owner)):
+        try:path,fmt,size=media.server_file(filename)
+        except (ValueError,LookupError,OSError) as exc:media_error(exc)
+        return FileResponse(path,media_type=media.FORMATS[fmt][1],headers={'Cache-Control':'no-store','Vary':'Authorization','X-Content-Type-Options':'nosniff','Content-Security-Policy':"sandbox; default-src 'none'"})
+
+    @router.get('/media/upload/{file_id}')
+    def media_upload(file_id: str,request: Request,identity=Depends(owner)):
+        try:item,fmt=media.uploaded(identity,file_id)
+        except (ValueError,LookupError,PermissionError,OSError,sqlite3.Error) as exc:media_error(exc)
+        content=item['content'];total=len(content);headers={'Cache-Control':'no-store','Vary':'Authorization','X-Content-Type-Options':'nosniff','Accept-Ranges':'bytes','Content-Security-Policy':"sandbox; default-src 'none'"}
+        requested=request.headers.get('range')
+        if requested:
+            import re
+            match=re.fullmatch(r'bytes=(\d*)-(\d*)',requested)
+            if not match or not any(match.groups()):raise HTTPException(416,'Invalid media range',headers={'Content-Range':f'bytes */{total}'})
+            left,right=match.groups();start=int(left) if left else max(0,total-int(right));end=min(total-1,int(right)) if left and right else total-1
+            if start>end or start>=total:raise HTTPException(416,'Invalid media range',headers={'Content-Range':f'bytes */{total}'})
+            headers['Content-Range']=f'bytes {start}-{end}/{total}'
+            return Response(content[start:end+1],status_code=206,media_type=media.FORMATS[fmt][1],headers=headers)
+        return Response(content,media_type=media.FORMATS[fmt][1],headers=headers)
 
     @router.get('/myip')
     def my_ip(request: Request, identity=Depends(owner)):
@@ -432,7 +569,7 @@ def create_router(credential_path, upstream_factory):
             raise HTTPException(422, 'Invalid module input')
         try:
             slots._authorize_host_monitor(identity, module_id)
-            result = run_module(module_id, {**body['input'],**({'_request_ip':client_ip.address(request)} if module_id=='myip' else {})})
+            result = (lambda data: demo_call(run_module,module_id,data) if module_id in demo_components.KINDS else run_module(module_id,data))({**body['input'],**({'_request_ip':client_ip.address(request)} if module_id=='myip' else {}),**({'_state_owner':identity} if module_id in demo_components.KINDS or module_id in media.KINDS else {})})
         except LookupError:
             raise HTTPException(404, 'Unknown module') from None
         except (ValueError, TypeError, OverflowError, KeyError, ZeroDivisionError):
@@ -542,7 +679,7 @@ def create_router(credential_path, upstream_factory):
         if set(body) != {'module_id'} or not isinstance(body['module_id'], str):
             raise HTTPException(422, 'Invalid slot request')
         try:
-            value = slots.read(identity, slot_id, request_ip=client_ip.address(request))
+            value = demo_call(slots.read,identity,slot_id,request_ip=client_ip.address(request)) if body['module_id'] in demo_components.KINDS else slots.read(identity,slot_id,request_ip=client_ip.address(request))
             if value['module_id'] != body['module_id']:
                 raise ValueError('slot binding changed')
         except PermissionError:
@@ -561,7 +698,7 @@ def create_router(credential_path, upstream_factory):
         if set(body) != {'module_id', 'input'} or not isinstance(body['input'], dict):
             raise HTTPException(422, 'Invalid module input')
         try:
-            value = slots.execute(identity, slot_id, body['input'], expected_module=body['module_id'],request_ip=client_ip.address(request))
+            value = demo_call(slots.execute,identity,slot_id,body['input'],expected_module=body['module_id'],request_ip=client_ip.address(request)) if body['module_id'] in demo_components.KINDS else slots.execute(identity,slot_id,body['input'],expected_module=body['module_id'],request_ip=client_ip.address(request))
         except PermissionError:
             raise HTTPException(403, 'Room unavailable') from None
         except LookupError:

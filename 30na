@@ -75,7 +75,7 @@ def worker_request(args, method, path, payload=None):
             if len(body) > 2000000:
                 raise ValueError('Response too large')
     except HTTPError as error:
-        raise ValueError('Manager returned HTTP ' + str(error.code)) from None
+        raise ValueError(('Demo' if path.startswith('/api/upstreams/demo/') else 'Manager')+' returned HTTP '+str(error.code)) from None
     except (URLError, TimeoutError, OSError):
         raise ValueError('Manager request did not complete; inspect history before retrying') from None
     result = json.loads(body)
@@ -184,6 +184,21 @@ def main():
     respond=chat_commands.add_parser('respond');respond.add_argument('request_id');respond.add_argument('response',choices=('accept','reject'))
     messages=chat_commands.add_parser('messages');messages.add_argument('room');messages.add_argument('--limit',type=int,default=50)
     send=chat_commands.add_parser('send');send.add_argument('room');send.add_argument('--text',required=True)
+    demo=categories.add_parser('demo',help='Authenticated paper-trading API')
+    demo.add_argument('--dashboard-url',default='https://localhost:18446')
+    demo.add_argument('--token-file',default=default_session)
+    demo.add_argument('--ca-file',default='/etc/30na/ca/trust.pem')
+    demo_commands=demo.add_subparsers(dest='action',required=True)
+    for name in ('state','report'):
+        command=demo_commands.add_parser(name);command.add_argument('--account-id')
+        if name=='report':command.add_argument('--since',type=float,default=0);command.add_argument('--until',type=float)
+    for name in ('create','market','bot','from-worker'):
+        command=demo_commands.add_parser(name);command.add_argument('--input',type=json_object,default={},help='JSON input; use - for stdin when supplying tradePIN')
+    for name in ('select','settings','pin'):
+        command=demo_commands.add_parser(name);command.add_argument('account_id')
+        if name in ('settings','pin'):command.add_argument('--input',type=json_object,default={})
+    for name in ('close','cancel'):
+        demo_commands.add_parser(name).add_argument('trade_id')
     workers = categories.add_parser('workers')
     workers.add_argument('--manager-url', default='https://localhost:18444')
     workers.add_argument('--token-file', default='/etc/30na/customer-token')
@@ -232,11 +247,34 @@ def main():
                 if bool(args.owner) != bool(args.slot):
                     raise ValueError('--owner and --slot must be supplied together')
                 data = dict(args.input)
-                if args.owner and args.module_id not in ('counter','slot-note','chat-box','session-windows','session-clock','round-levels','previous-day-levels','previous-day-session-levels'):
+                if args.owner and args.module_id not in ('counter','slot-note','chat-box','media-image','media-audio','media-video','media-player','demo-account','demo-trade','demo-bot','demo-positions','demo-reports','session-windows','session-clock','round-levels','previous-day-levels','previous-day-session-levels'):
                     raise ValueError('Shared state is supported for stateful trusted modules and technical indicators')
                 if args.owner:
                     data.update(_state_owner=args.owner, _state_slot=args.slot)
                 result = run_module(args.module_id, data)
+        elif args.category=='demo':
+            from urllib.parse import urlencode
+            args.manager_url=args.dashboard_url
+            if args.action in ('state','report'):
+                query={}
+                if args.account_id:query['account_id']=args.account_id
+                if args.action=='report':
+                    query['since']=args.since
+                    if args.until is not None:query['until']=args.until
+                result=worker_request(args,'GET','/api/upstreams/demo/'+('reports' if args.action=='report' else 'state')+('?' + urlencode(query) if query else ''))
+            elif args.action in ('create','market','bot','from-worker'):
+                body=dict(args.input)
+                if args.action in ('market','bot'):
+                    body.setdefault('request_id',str(uuid4()));print('Request ID: '+str(body['request_id']),file=sys.stderr)
+                path={'create':'accounts','market':'trades','bot':'bot','from-worker':'from-execution'}[args.action]
+                result=worker_request(args,'POST','/api/upstreams/demo/'+path,body)
+            elif args.action in ('select','settings','pin'):
+                if not re.fullmatch(r'demo-[0-9a-f]{32}',args.account_id):raise ValueError('Invalid demo account ID')
+                body={'settings':args.input} if args.action=='settings' else args.input if args.action=='pin' else {}
+                result=worker_request(args,'PUT' if args.action=='settings' else 'POST','/api/upstreams/demo/accounts/'+args.account_id+'/'+args.action,body)
+            else:
+                if not re.fullmatch(r'trade-[0-9a-f]{32}',args.trade_id):raise ValueError('Invalid trade ID')
+                result=worker_request(args,'POST','/api/upstreams/demo/trades/'+args.trade_id+'/'+args.action,{})
         elif args.category == 'account':
             if args.action == 'login': result = account_login(args)
             else:

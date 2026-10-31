@@ -1,0 +1,8 @@
+{
+  "id": "demo-account",
+  "name": "Demo Account",
+  "description": "Demo balances, equity, margin and account management.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "demo-account"
+}

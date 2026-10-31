@@ -3,11 +3,11 @@ import json
 import re
 import time
 from uuid import uuid4
-from . import slots,indicator_profiles,accounts
+from . import slots,indicator_profiles,accounts,uploads,media
 
 META_KEYS = {'overview','layout','minimized','output_settings','frame_color','display_theme','slot_type','chat_room',
              'chart_period','chart_interval','indicator_period','chart_overlay','chart_live','chart_indicators',
-             'technical_settings','profile_visibility','calendar_settings'}
+             'technical_settings','profile_visibility','calendar_settings','media_settings'}
 
 
 def connect(owner):
@@ -39,6 +39,11 @@ def save(owner,name,theme):
             # Private room membership, credentials, worker input, results and
             # execution history are deliberately not transferable templates.
             if binding['module_id']=='chat-box':meta['chat_room']='public'
+            media_cfg=meta.get('media_settings',{})
+            if binding['module_id'] in media.KINDS and media_cfg.get('source')=='upload':
+                try:visible=next((item for item in uploads.list_files(owner) if item['id']==media_cfg.get('file_id')),None)
+                except PermissionError:visible=None
+                if not visible or visible['recipient'] is not None:meta.pop('media_settings',None)
             state={}
             for module in ('counter','slot-note'):
                 if module==binding['module_id']:

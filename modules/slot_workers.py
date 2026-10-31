@@ -18,7 +18,7 @@ from . import slots
 LOG = logging.getLogger(__name__)
 MONITORS = frozenset(('clock', 'dashboard-health', 'system-monitor', 'service-monitor',
                       'disk-usage', 'network-monitor', 'process-monitor', 'log-viewer',
-                      'docker-monitor', 'economic-calendar', 'alerts', 'session-windows','session-clock', 'round-levels', 'previous-day-levels', 'previous-day-session-levels', 'gold-chart', 'moving-average', 'rsi', 'macd'))
+                      'docker-monitor', 'demo-account','demo-positions','demo-reports','economic-calendar', 'alerts', 'session-windows','session-clock', 'round-levels', 'previous-day-levels', 'previous-day-session-levels', 'gold-chart', 'moving-average', 'rsi', 'macd'))
 
 
 def configure(owner, slot, payload):
@@ -45,6 +45,10 @@ def configure(owner, slot, payload):
             raise ValueError('monitor worker requires a monitoring module')
         if enabled and binding['module_id'] == 'empty':
             raise ValueError('select a module before starting a worker')
+        if binding['module_id'] in ('demo-trade','demo-bot') or (binding['module_id'].startswith('demo-') and data.get('action','state') not in ('state','get','report')):
+            raise ValueError('Trade operations and trade PINs cannot be stored in slot workers')
+        if binding['module_id'] in ('demo-account','demo-positions','demo-reports') and set(data)-{'action','account_id','since','until'}:
+            raise ValueError('Only read-only demo input may be stored in slot workers')
         # Validate host-monitor ownership before scheduling anything.
         if enabled: slots._authorize_host_monitor(owner, binding['module_id'])
         meta = json.loads(meta_row[0]); old = meta.get('worker') or {}

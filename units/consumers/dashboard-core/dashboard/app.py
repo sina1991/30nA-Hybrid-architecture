@@ -127,7 +127,7 @@ def execute_module(module_id: str, data: dict) -> dict:
     try:
         from modules.execution import HOST_MONITORS, MARKET_MODULES
         from modules.technical import KINDS
-        if module_id in HOST_MONITORS or module_id in MARKET_MODULES or module_id in KINDS or module_id in ('myip','economic-calendar'):
+        if module_id in HOST_MONITORS or module_id in MARKET_MODULES or module_id in KINDS or module_id in ('myip','economic-calendar') or module_id.startswith('demo-') or module_id in ('media-player','media-image','media-audio','media-video'):
             raise HTTPException(status_code=403, detail="Sign in to use this module")
         if any(str(key).startswith('_') for key in data):
             raise ValueError('reserved input field')
@@ -140,7 +140,7 @@ def execute_module(module_id: str, data: dict) -> dict:
 
 @app.get("/api/modules")
 def api_modules() -> dict:
-    modules = list_modules()
+    modules = list_modules(include_archived=True)
     return {"count": len(modules), "modules": modules}
 
 
@@ -418,6 +418,8 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 .slot[data-technical] .module-body {min-height:0;overflow:auto}.slot-settings-panel > .slot-icon {width:auto;padding:6px 10px;font-size:12px}.technical-view {overflow:auto;flex-shrink:0;touch-action:pan-y}.technical-details {overflow:auto;max-height:260px}.technical-details td,.technical-details th {padding:5px;white-space:nowrap;font-size:11px}.technical-view svg {display:block}
 .slot,.slot * {scrollbar-width:thin;scrollbar-color:rgba(145,162,187,.2) transparent}.slot::-webkit-scrollbar,.slot *::-webkit-scrollbar {width:5px;height:5px}.slot::-webkit-scrollbar-track,.slot *::-webkit-scrollbar-track,.slot::-webkit-scrollbar-corner,.slot *::-webkit-scrollbar-corner {background:transparent}.slot::-webkit-scrollbar-button,.slot *::-webkit-scrollbar-button {display:none;width:0;height:0}.slot::-webkit-scrollbar-thumb,.slot *::-webkit-scrollbar-thumb {background:rgba(145,162,187,.2);border-radius:8px}.slot::-webkit-scrollbar-thumb:hover,.slot *::-webkit-scrollbar-thumb:hover {background:rgba(145,162,187,.35)}
 #overview-grid .slot[data-slot-type="linear"] {grid-column:span 12;grid-row:span 2;min-height:0}#grid .slot[data-slot-type="linear"] {grid-column:1/-1;min-height:100px}.calendar-timeline {display:flex;gap:8px;overflow-x:auto;min-height:65px}.calendar-event {flex:0 0 235px;border-left:3px solid var(--accent);padding:5px 9px;background:var(--field);border-radius:5px;font-size:12px}.calendar-event strong,.calendar-event small {display:block}.calendar-footer {display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:10px}.calendar-footer p {margin:0}.slot[data-slot-type="linear"] .module-body {min-height:0;overflow:auto}.calendar-event[data-impact="High"] {border-color:#ef4444}.calendar-event[data-impact="Medium"] {border-color:#f59e0b}#viewer-identity,#workspace-status {font-size:12px;color:var(--muted)}
+.demo-metrics {display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}.demo-metric {display:grid;gap:6px;padding:10px;background:var(--field);border:1px solid var(--border);border-radius:8px}.demo-metric strong {font-size:18px}.demo-panels {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}.demo-entry-form {display:grid;gap:8px}.demo-entry-form input,.demo-entry-form select {padding:7px;background:var(--field);border:1px solid var(--border);color:var(--text);border-radius:6px}.demo-buy,.demo-sell {padding:9px 22px;border:0;border-radius:6px;color:white;font:inherit;cursor:pointer}.demo-buy {background:#15803d}.demo-sell {background:#b91c1c}.demo-buy:disabled,.demo-sell:disabled {opacity:.4;cursor:default}.demo-entry-price {font-size:12px;color:var(--muted)}.demo-mini-pnl {font-size:20px}
+.slot-media {display:block;max-width:100%;max-height:100%;object-fit:contain}.media-player-host {min-height:0;overflow:auto}.media-player-host audio {width:100%}
 </style>
 </head>
 <body data-view="overview">
@@ -426,8 +428,10 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <nav aria-label="Dashboard sections">
     <button class="nav-button" type="button" data-nav="overview" aria-current="page">Overview</button>
     <button class="nav-button" type="button" data-nav="slots">Slots</button>
+    <button class="nav-button" type="button" data-nav="media">Media</button>
     <button class="nav-button" type="button" data-nav="uploads">Upload Center</button>
     <button class="nav-button" type="button" data-nav="modules">Modules</button>
+    <button class="nav-button" type="button" data-nav="demo">Demo Trading</button>
     <button class="nav-button" type="button" data-nav="workers">Workers</button>
     <button class="nav-button" type="button" data-nav="executions">Executions</button>
     <button class="nav-button" type="button" data-nav="indicators">Indicators</button>
@@ -492,6 +496,37 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     </div>
     <div id="module-catalog" class="module-catalog"></div>
   </section>
+  <section class="page-view" data-page="media" hidden>
+    <h2>Media</h2><p class="view-description">Images: JPG, PNG, GIF, WebP · Audio: MP3, WAV, OGG, M4A · Video: MP4, WebM. Playback uses your browser; no autoplay or server transcoding.</p>
+    <div class="db-controls"><label>Component<select id="media-component"><option value="image">Image Viewer</option><option value="audio">Audio Player</option><option value="video">Video Player</option><option value="auto">Media Player (auto)</option></select></label>
+      <label>Source<select id="media-tab-source"><option value="external">External HTTPS link</option><option value="upload">Upload Center</option><option value="server">Shared server media</option></select></label>
+      <label id="media-url-label">Direct URL<input id="media-tab-url" type="url" placeholder="https://example.com/file.mp4"></label>
+      <label id="media-file-label" hidden>File<select id="media-tab-file"></select></label>
+      <label>Format<select id="media-tab-format"><option>auto</option><option>jpg</option><option>png</option><option>gif</option><option>webp</option><option>mp3</option><option>wav</option><option>ogg</option><option>m4a</option><option>mp4</option><option>webm</option></select></label>
+      <label><input id="media-tab-loop" type="checkbox">Loop</label><button type="button" id="media-refresh-library">Refresh library</button><button type="button" id="media-add-slot">Add to Overview</button>
+    </div><p id="media-tab-status" class="market-status" role="status">Sign in to select protected media files.</p><div id="media-preview" class="info-card"></div>
+  </section>
+
+  <section class="page-view" data-page="demo" hidden>
+    <h2>Demo Trading</h2><p class="view-description">USD / XAUUSD · Hedging · Simulated spread · Observed candle prices, not broker tick execution. No real-money orders.</p>
+    <p id="demo-status" class="market-status" role="status">Sign in to use Demo Trading.</p>
+    <div class="db-controls"><label>Account<select id="demo-account-select" aria-label="Demo account"></select></label></div>
+    <div id="demo-metrics"></div>
+    <details><summary>Create demo account</summary><form id="demo-create-form" class="db-controls">
+      <label>Name<input id="demo-account-name" required maxlength="80"></label><label>Initial USD<select id="demo-initial"><option>1000</option><option>3000</option><option>5000</option></select></label>
+      <label>Trade PIN<input id="demo-new-pin" type="password" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="new-password"></label><button id="demo-create" type="submit">Create account</button>
+    </form></details>
+    <details id="demo-settings-section" hidden><summary>Account settings</summary><p>Volume, leverage, spread, contract size, commission, swaps, stops and margin thresholds. Close positions and cancel pending orders before changing financial settings.</p>
+      <div id="demo-financial-fields" class="db-controls"></div><datalist id="demo-leverages"><option value="1"><option value="10"><option value="20"><option value="50"><option value="100"><option value="200"><option value="500"><option value="1000"></datalist>
+      <textarea id="demo-settings" class="module-note-input" rows="14" aria-label="Demo account settings"></textarea><button type="button" id="demo-save-settings">Save account settings</button>
+      <label>New trade PIN<input id="demo-rotate-pin" type="password" maxlength="4" inputmode="numeric" autocomplete="new-password"></label><button type="button" id="demo-set-pin">Update trade PIN</button>
+    </details>
+    <div class="demo-panels"><section class="info-card"><h3>Manual trade</h3><div id="demo-manual-root"></div></section><section class="info-card"><h3>Bot intent</h3><div id="demo-bot-root"></div></section></div>
+    <h3>Positions and orders</h3><div id="demo-positions-root"></div>
+    <details><summary>Submit a published Worker result</summary><p>The Worker must succeed and return price or ACTION, SL and TP. The PIN stays outside Worker code and output.</p><form id="demo-worker-form" class="db-controls"><label>Execution ID<input id="demo-execution-id" required></label><label>Trade PIN<input id="demo-worker-pin" type="password" inputmode="numeric" maxlength="4" required autocomplete="off"></label><button type="submit">Submit Worker intent</button></form></details>
+    <h3>Reports</h3><div class="db-controls"><label>From UTC<input id="demo-report-from" type="datetime-local"></label><label>Until UTC<input id="demo-report-to" type="datetime-local"></label><button type="button" id="demo-refresh-report" disabled>Refresh report</button><button type="button" id="demo-download-report" disabled>Download CSV</button></div><div id="demo-report-root"></div>
+  </section>
+
   <section class="page-view" data-page="workers" hidden><h2 class="view-heading">Workers</h2><p class="view-description">Manage and run registered Workers.</p><p class="workspace-note" data-auth-note>Sign in to manage Workers.</p></section>
   <section class="page-view" data-page="executions" hidden><h2 class="view-heading">Executions</h2><p class="view-description">Review execution history and results.</p><p class="workspace-note" data-auth-note>Sign in to view executions.</p></section>
   <section class="page-view" data-page="indicators" hidden>
@@ -600,6 +635,117 @@ document.getElementById('save-dashboard-form').addEventListener('submit',async e
 }catch(_){document.getElementById('dashboard-save-status').textContent='Could not save. Check the name and template limit; refresh before retrying.';}finally{button.disabled=false;}});
 document.addEventListener('dashboard-viewer',event=>{document.getElementById('viewer-identity').textContent=event.detail.username?`${event.detail.username} · ${event.detail.ip||'IP unavailable'}`:'';});
 
+let demoOverview=null,demoTabBusy=false,demoSettingsDirty=false;
+const DEMO_KINDS=['demo-account','demo-trade','demo-bot','demo-positions','demo-reports'];
+function demoMoney(value){return value==null?'—':new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(value);}
+function demoPaintPnl(node,value){node.textContent=demoMoney(value);node.style.color=value>0?'#22c55e':value<0?'#ef4444':'var(--muted)';}
+function demoStats(data){const root=makeElement('div','demo-metrics');const m=data.metrics||{};
+  [['Balance',m.balance],['Equity',m.equity],['Floating P/L',m.floating_pnl],['Used margin',m.used_margin],['Free margin',m.free_margin],['Margin level',m.margin_level==null?'—':m.margin_level.toFixed(1)+'%']].forEach(([name,value])=>{const tile=makeElement('div','demo-metric');tile.append(makeElement('small','',name));const amount=makeElement('strong','',typeof value==='string'?value:demoMoney(value));if(name==='Floating P/L')demoPaintPnl(amount,value);tile.append(amount);root.append(tile);});return root;
+}
+async function demoAction(trade,action,show){return window.dashboardModuleState.slotRequest(`demo/trades/${encodeURIComponent(trade.id)}/${action}`,action==='chart'?{show_on_chart:show}:{});}
+function demoOrderTable(data,includeHistory=false){const wrap=makeElement('div','db-scroll'),table=makeElement('table','db-table'),head=makeElement('tr','');['Side / ID','State','Entry','SL','TP','Lots','P/L','Actions'].forEach(name=>head.append(makeElement('th','',name)));table.append(head);
+  (data.orders||[]).filter(order=>includeHistory||['open','pending'].includes(order.status)).slice().reverse().forEach(order=>{const row=makeElement('tr','');row.append(makeElement('td','',`${order.side.toUpperCase()} · ${order.id.slice(-8)} · ${order.source}`),makeElement('td','',`${order.status}${order.close_reason?' · '+order.close_reason:''}`),makeElement('td','',String(order.entry_fill??order.entry_requested)),makeElement('td','',String(order.sl)),makeElement('td','',String(order.tp)),makeElement('td','',String(order.volume)));
+    const pnl=makeElement('td','');demoPaintPnl(pnl,order.status==='open'?order.floating_pnl:order.profit);row.append(pnl);const actions=makeElement('td','');
+    if(['open','pending'].includes(order.status)){const close=makeElement('button','',order.status==='open'?'Close':'Cancel');close.type='button';close.addEventListener('click',async()=>{close.disabled=true;try{await demoAction(order,order.status==='open'?'close':'cancel');document.dispatchEvent(new Event('demo-change'));}catch(error){close.title=error.message;close.disabled=false;}});actions.append(close);
+      const label=makeElement('label','','On chart'),show=makeElement('input','');show.type='checkbox';show.checked=Boolean(order.show_on_chart);show.addEventListener('change',async()=>{show.disabled=true;try{await demoAction(order,'chart',show.checked);document.dispatchEvent(new Event('demo-change'));}catch(_){show.checked=!show.checked;}finally{show.disabled=false;}});label.prepend(show);actions.append(label);}
+    row.append(actions);table.append(row);});wrap.append(table);return wrap;
+}
+function renderDemoTrade(body,slot=null,bot=false){
+  const container=body;body=makeElement('div','demo-trade-widget');container.append(body);
+  const info=makeElement('p','market-status'),position=makeElement('div',''),form=makeElement('form','demo-entry-form');
+  const sl=makeElement('input',''),tp=makeElement('input','');[sl,tp].forEach(input=>{input.type='number';input.step='any';input.required=true;input.min='.01';});sl.placeholder='Stop loss';tp.placeholder='Take profit';sl.setAttribute('aria-label','Stop loss');tp.setAttribute('aria-label','Take profit');
+  const entry=makeElement('div','demo-entry-price','Entry: waiting for quote');const buy=makeElement('button','demo-buy','Buy'),sell=makeElement('button','demo-sell','Sell');buy.type=sell.type='button';
+  const mode=makeElement('select',''),price=makeElement('input',''),pin=makeElement('input','');price.type='number';price.step='any';price.placeholder='Pending entry price';price.setAttribute('aria-label','Pending entry price');pin.type='password';pin.placeholder='4-digit trade PIN';pin.maxLength=4;pin.inputMode='numeric';pin.autocomplete='off';pin.setAttribute('aria-label','Trade PIN');
+  [['pending','Pending at price'],['BUY','Market Buy'],['SELL','Market Sell']].forEach(([value,title])=>{const option=makeElement('option','',title);option.value=value;mode.append(option);});mode.addEventListener('change',()=>{price.hidden=mode.value!=='pending';});
+  const chartLabel=makeElement('label','','Show on chart'),chart=makeElement('input','');chart.type='checkbox';chart.checked=true;chartLabel.prepend(chart);
+  const status=makeElement('p','market-status');status.setAttribute('role','status');const retry=makeElement('button','','Retry same request');retry.type='button';retry.hidden=true;
+  form.append(entry);if(bot)form.append(mode,price,pin);form.append(sl,tp,chartLabel);const buttons=makeElement('div','slot-section-actions');
+  const submit=makeElement('button','demo-buy','Submit bot intent');submit.type='button';buttons.append(...(bot?[submit]:[buy,sell]));form.append(buttons,retry,status);body.append(info,position,form);
+  let current=null,busy=false,pending=null,readBusy=false;
+  async function refresh(){const bridge=window.dashboardModuleState;if(body.closest('[data-page]')?.hidden||readBusy||!bridge?.ready())return;readBusy=true;try{
+    const data=slot?await bridge.read(slot.id,bot?'demo-bot':'demo-trade'):await bridge.slotRequest('demo/state');if(!body.isConnected||!bridge.ready())return;current=data;
+    if(pending&&(data.orders||[]).some(order=>order.request_id===pending.request_id)){pending=null;pin.value='';retry.hidden=true;status.textContent='Request confirmed in account history.';}
+    const cfg=data.account?.settings;info.textContent=data.account?`${data.account.name} · ${cfg.lots} lots · 1:${cfg.leverage} · ${data.model}${data.message?' · '+data.message:''}`:'Create a demo account in Demo Trading first.';
+    entry.textContent=data.quote?`Entry at execution · Buy Ask ${data.quote.ask} / Sell Bid ${data.quote.bid}${data.quote.stale?' · stale':''}`:'Fresh quote unavailable';
+    const active=slot?data.orders.find(order=>['open','pending'].includes(order.status)):null;position.replaceChildren();if(active)position.append(demoOrderTable({...data,orders:[active]}));
+    form.hidden=Boolean(active);[buy,sell,submit].forEach(button=>button.disabled=busy||!data.account||!data.metrics?.quote_available);
+  }catch(error){info.textContent=error.message||'Demo state unavailable.';}finally{readBusy=false;}}
+  async function send(){if(!pending||busy)return;busy=true;[buy,sell,submit].forEach(button=>button.disabled=true);retry.hidden=true;status.textContent='Submitting demo request…';
+    try{const result=await window.dashboardModuleState.slotRequest(bot?'demo/bot':'demo/trades',pending);if(!body.isConnected)return;pending=null;pin.value='';status.textContent=`${result.trade.status} · ${result.trade.id}`;document.dispatchEvent(new Event('demo-change'));await refresh();}
+    catch(error){if(!body.isConnected)return;if(error.status&&error.status<500){pending=null;pin.value='';status.textContent=error.message;}else{retry.hidden=false;status.textContent='No confirmed result. Check positions, then retry this same request.';}}finally{busy=false;await refresh();}}
+  function prepare(side){if(pending)return;const l=Number(sl.value),t=Number(tp.value);if(!sl.value||!tp.value||!Number.isFinite(l)||!Number.isFinite(t)||l<=0||t<=0){status.textContent='Enter valid SL and TP prices.';return;}
+    pending={account_id:current?.account?.id,sl:l,tp:t,request_id:crypto.randomUUID(),show_on_chart:chart.checked,...(slot?{slot_id:slot.id}:{})};
+    if(bot){if(!/^[0-9]{4}$/.test(pin.value)){pending=null;status.textContent='Enter a four-digit trade PIN.';return;}pending.tradePIN=pin.value;if(mode.value==='pending'){if(!price.value||!Number.isFinite(Number(price.value))){pending=null;status.textContent='Enter a pending price.';return;}pending.price=Number(price.value);}else pending.ACTION=mode.value;}else pending.side=side;
+    send();
+  }
+  buy.addEventListener('click',()=>prepare('buy'));sell.addEventListener('click',()=>prepare('sell'));submit.addEventListener('click',()=>prepare());retry.addEventListener('click',send);form.addEventListener('submit',event=>event.preventDefault());container.addEventListener('slot-refresh',refresh);container.addEventListener('demo-result',refresh);
+  const changed=()=>{if(!body.isConnected){document.removeEventListener('demo-change',changed);return;}refresh();};document.addEventListener('demo-change',changed);function tick(){if(!body.isConnected){pending=null;pin.value='';document.removeEventListener('demo-change',changed);container.removeEventListener('slot-refresh',refresh);container.removeEventListener('demo-result',refresh);return;}refresh();setTimeout(tick,2000);}setTimeout(tick,0);
+}
+function renderDemoMini(label,slot){
+  async function refresh(){if(!label.isConnected||!window.dashboardModuleState?.ready())return;try{const data=await window.dashboardModuleState.slotRequest('demo/state?slot_id='+encodeURIComponent(slot.id));if(!label.isConnected)return;const active=data.orders.find(order=>['open','pending'].includes(order.status));const value=active?.status==='open'?active.floating_pnl:active?null:data.orders.at(-1)?.profit;
+    label.replaceChildren(makeElement('span','',active?.status==='pending'?'Pending · ':active?'P/L · ':'Last P/L · '));const pnl=makeElement('strong','demo-mini-pnl');demoPaintPnl(pnl,value??0);label.append(pnl);
+  }catch(_){label.textContent='Demo P/L unavailable';}}
+  function tick(){if(!label.isConnected)return;refresh();setTimeout(tick,2000);}setTimeout(tick,0);
+}
+function renderDemoReports(root,report){
+  root.replaceChildren();const metrics=makeElement('div','demo-metrics');[['Closed trades',report.trades],['Win rate',report.win_rate.toFixed(1)+'%'],['Net profit',demoMoney(report.net_profit)],['Profit factor',report.profit_factor==null?'—':report.profit_factor.toFixed(2)],['Max drawdown',demoMoney(report.max_drawdown)],['Commission',demoMoney(report.commissions)],['Swap',demoMoney(report.swap)]].forEach(([key,value])=>{const item=makeElement('div','demo-metric');item.append(makeElement('small','',key),makeElement('strong','',String(value)));metrics.append(item);});root.append(metrics);
+  if(report.equity.length){const svg=technicalSvg('svg',{viewBox:'0 0 700 160',role:'img','aria-label':'Demo equity curve'}),values=report.equity.map(p=>p.equity),low=Math.min(...values),high=Math.max(...values),points=values.map((value,i)=>`${10+i/Math.max(1,values.length-1)*680},${145-(value-low)/Math.max(1,high-low)*130}`).join(' ');svg.append(technicalSvg('polyline',{points,fill:'none',stroke:'var(--accent)','stroke-width':2}));svg.style.width='100%';svg.style.maxHeight='180px';root.append(svg);}
+  const daily=makeElement('div','db-scroll');const table=makeElement('table','db-table');report.daily.forEach(day=>{const row=makeElement('tr','');row.append(makeElement('td','',day.date));const pnl=makeElement('td','');demoPaintPnl(pnl,day.profit);row.append(pnl);table.append(row);});daily.append(table);root.append(makeElement('p','market-status',report.drawdown_basis+(report.history_truncated?' · Narrow the date range to export the complete history.':'')),daily);
+}
+function renderDemoComponent(body,slot,module){
+  if(['demo-trade','demo-bot'].includes(module.id)){renderDemoTrade(body,slot,module.id==='demo-bot');return;}
+  const output=makeElement('div','');body.append(output);let busy=false;
+  async function refresh(){const bridge=window.dashboardModuleState;if(body.closest('[data-page]')?.hidden||busy||!bridge?.ready())return;busy=true;try{const data=await bridge.read(slot.id,module.id);if(!body.isConnected||!bridge.ready())return;
+    if(module.id==='demo-reports'){renderDemoReports(output,data);return;}output.replaceChildren();if(!data.account){output.append(makeElement('p','','Create a demo account in Demo Trading.'));return;}
+    output.append(makeElement('strong','',data.account.name),module.id==='demo-account'?demoStats(data):demoOrderTable(data));
+  }catch(_){output.textContent='Demo data unavailable. Create or select a demo account.';}finally{busy=false;}}
+  body.addEventListener('slot-refresh',refresh);function tick(){if(!body.isConnected)return;refresh();setTimeout(tick,3000);}setTimeout(tick,0);
+}
+async function refreshDemoTab(){
+  const bridge=window.dashboardModuleState,status=document.getElementById('demo-status');if(!bridge?.ready()){status.textContent='Sign in to use Demo Trading.';return;}if(demoTabBusy)return;demoTabBusy=true;
+  try{const data=await bridge.slotRequest('demo/state');if(!bridge.ready())return;demoOverview=data;
+    const select=document.getElementById('demo-account-select');select.replaceChildren();data.accounts.forEach(account=>{const option=makeElement('option','',account.name+' · '+demoMoney(account.balance));option.value=account.id;select.append(option);});select.value=data.account?.id||'';
+    document.getElementById('demo-metrics').replaceChildren(...(data.account?[demoStats(data)]:[]));document.getElementById('demo-settings-section').hidden=!data.account;
+    if(data.account&&!demoSettingsDirty){document.getElementById('demo-settings').value=JSON.stringify(data.account.settings,null,2);syncDemoFinancialFields(data.account.settings);}
+    document.getElementById('demo-positions-root').replaceChildren(demoOrderTable(data,true));status.textContent=data.account?`${data.model}${data.message?' · '+data.message:''}`:'Create an account with 1000, 3000 or 5000 USD.';
+    document.getElementById('demo-download-report').disabled=!data.account;document.getElementById('demo-refresh-report').disabled=!data.account;
+  }catch(error){status.textContent=error.message||'Demo Trading unavailable.';}finally{demoTabBusy=false;}
+}
+document.getElementById('demo-create-form').addEventListener('submit',async event=>{event.preventDefault();const button=document.getElementById('demo-create');button.disabled=true;try{
+  await window.dashboardModuleState.slotRequest('demo/accounts',{name:document.getElementById('demo-account-name').value,initial_balance:Number(document.getElementById('demo-initial').value),tradePIN:document.getElementById('demo-new-pin').value});document.getElementById('demo-new-pin').value='';demoSettingsDirty=false;document.dispatchEvent(new Event('demo-change'));await refreshDemoTab();
+}catch(error){document.getElementById('demo-status').textContent=error.message;}finally{button.disabled=false;}});
+document.getElementById('demo-account-select').addEventListener('change',async event=>{try{await window.dashboardModuleState.slotRequest('demo/accounts/'+encodeURIComponent(event.target.value)+'/select',{});demoSettingsDirty=false;document.dispatchEvent(new Event('demo-change'));await refreshDemoTab();}catch(error){document.getElementById('demo-status').textContent=error.message;}});
+const DEMO_FIELDS={leverage:'Leverage',lots:'Volume (lots)',spread_points:'Simulated spread (points)',stop_level_points:'Stop Level (points)',commission_per_lot:'Round-turn commission (USD / lot)',swap_long_per_lot:'Long swap (USD / lot / day)',swap_short_per_lot:'Short swap (USD / lot / day)',margin_call_percent:'Margin call (%)',stop_out_percent:'Stop-out (%)'};
+function syncDemoFinancialFields(cfg){Object.keys(DEMO_FIELDS).forEach(key=>document.getElementById('demo-setting-'+key).value=cfg[key]);}
+Object.entries(DEMO_FIELDS).forEach(([key,title])=>{const label=makeElement('label','',title),input=makeElement('input','');input.id='demo-setting-'+key;input.type='number';input.step=['leverage','spread_points','stop_level_points'].includes(key)?'1':key==='lots'?'.01':'any';if(key==='leverage')input.setAttribute('list','demo-leverages');input.addEventListener('input',()=>{demoSettingsDirty=true;try{const cfg=JSON.parse(document.getElementById('demo-settings').value);cfg[key]=Number(input.value);document.getElementById('demo-settings').value=JSON.stringify(cfg,null,2);}catch(_){}});label.append(input);document.getElementById('demo-financial-fields').append(label);});
+document.getElementById('demo-settings').addEventListener('input',()=>{demoSettingsDirty=true;try{syncDemoFinancialFields(JSON.parse(document.getElementById('demo-settings').value));}catch(_){}});
+document.getElementById('demo-save-settings').addEventListener('click',async()=>{try{await window.dashboardModuleState.slotRequest('demo/accounts/'+demoOverview.account.id+'/settings',{settings:JSON.parse(document.getElementById('demo-settings').value)},'PUT');demoSettingsDirty=false;document.dispatchEvent(new Event('demo-change'));await refreshDemoTab();}catch(error){document.getElementById('demo-status').textContent=error.message||'Invalid settings JSON.';}});
+document.getElementById('demo-set-pin').addEventListener('click',async()=>{try{await window.dashboardModuleState.slotRequest('demo/accounts/'+demoOverview.account.id+'/pin',{tradePIN:document.getElementById('demo-rotate-pin').value});document.getElementById('demo-rotate-pin').value='';document.getElementById('demo-status').textContent='Trade PIN updated.';}catch(error){document.getElementById('demo-status').textContent=error.message;}});
+function demoReportQuery(){const account=demoOverview?.account?.id;if(!account)throw Error('Select an account');let query='account_id='+encodeURIComponent(account);[['demo-report-from','since'],['demo-report-to','until']].forEach(([id,key])=>{const value=document.getElementById(id).value;if(value)query+='&'+key+'='+encodeURIComponent(Date.parse(value+'Z')/1000);});return query;}
+document.getElementById('demo-refresh-report').addEventListener('click',async()=>{try{const data=await window.dashboardModuleState.slotRequest('demo/reports?'+demoReportQuery());renderDemoReports(document.getElementById('demo-report-root'),data);}catch(error){document.getElementById('demo-status').textContent=error.message;}});
+document.getElementById('demo-download-report').addEventListener('click',async()=>{try{await window.dashboardModuleState.downloadDemoReport(demoReportQuery());}catch(error){document.getElementById('demo-status').textContent=error.message||'Report download unavailable.';}});
+document.getElementById('demo-worker-form').addEventListener('submit',async event=>{event.preventDefault();try{const result=await window.dashboardModuleState.slotRequest('demo/from-execution',{execution_id:document.getElementById('demo-execution-id').value,account_id:demoOverview?.account?.id,tradePIN:document.getElementById('demo-worker-pin').value});document.getElementById('demo-worker-pin').value='';document.getElementById('demo-status').textContent=`Worker intent ${result.trade.status}`;document.dispatchEvent(new Event('demo-change'));}catch(error){document.getElementById('demo-status').textContent=error.message;}});
+document.addEventListener('demo-change',()=>{if(document.body.dataset.view==='demo')refreshDemoTab();document.querySelectorAll('.market-chart').forEach(svg=>svg.closest('.module-body')?.dispatchEvent(new Event('slot-refresh')));});
+function demoTabTick(){if(document.body.dataset.view==='demo')refreshDemoTab();setTimeout(demoTabTick,3000);}setTimeout(demoTabTick,3000);
+
+let mediaLibrary=null;
+function mediaTabSettings(){const source=document.getElementById('media-tab-source').value,file=document.getElementById('media-tab-file').value;return {source,url:source==='external'?document.getElementById('media-tab-url').value:'',format:source==='external'?document.getElementById('media-tab-format').value:'auto',filename:source==='server'?file:'',file_id:source==='upload'?file:'',loop:document.getElementById('media-tab-loop').checked};}
+async function refreshMediaLibrary(){
+  const bridge=window.dashboardModuleState,status=document.getElementById('media-tab-status'),source=document.getElementById('media-tab-source').value,type=document.getElementById('media-component').value;
+  document.getElementById('media-url-label').hidden=source!=='external';document.getElementById('media-file-label').hidden=source==='external';
+  if(!bridge?.ready()){status.textContent='Sign in to use Media.';return;}
+  const preview=document.getElementById('media-preview');if(!preview.querySelector('.media-player-widget'))renderMediaPlayer(preview,null,'media-player',()=>bridge.slotRequest('media/describe',{settings:mediaTabSettings(),kind:document.getElementById('media-component').value==='auto'?null:document.getElementById('media-component').value}));
+  try{const owner=bridge.owner(),data=await bridge.slotRequest('media/library');if(!bridge.ready()||bridge.owner()!==owner)return;mediaLibrary=data;
+    const select=document.getElementById('media-tab-file'),selected=select.value;select.replaceChildren();(source==='upload'?data.uploads:data.server_files).filter(file=>type==='auto'||file.kind===type).forEach(file=>{const option=makeElement('option','',`${file.name||file.filename} · ${Math.ceil(file.size/1024)} KiB`);option.value=source==='upload'?file.id:file.filename;select.append(option);});if([...select.options].some(option=>option.value===selected))select.value=selected;
+    status.textContent=source==='server'?'Shared server media: /var/lib/30na/dashboard/media · maximum 32 MiB per file.':source==='upload'?'Upload Center permissions apply. Direct files remain private.':'Use a direct media URL. The external server and your browser must support playback.';
+  }catch(_){status.textContent='Media library unavailable.';}
+}
+['media-component','media-tab-source'].forEach(id=>document.getElementById(id).addEventListener('change',refreshMediaLibrary));document.getElementById('media-refresh-library').addEventListener('click',refreshMediaLibrary);
+document.getElementById('media-add-slot').addEventListener('click',async()=>{const bridge=window.dashboardModuleState,status=document.getElementById('media-tab-status'),button=document.getElementById('media-add-slot');if(!bridge?.ready()){status.textContent='Sign in first.';return;}button.disabled=true;let created=null;
+  try{const type=document.getElementById('media-component').value,settings=mediaTabSettings();await bridge.slotRequest('media/describe',{settings,kind:type==='auto'?null:type});created=await bridge.createSlot();await bridge.bind(created.slot,type==='auto'?'media-player':'media-'+type,{},false);await bridge.setSlotAppearance(created.slot,{media_settings:settings});await bridge.setOverview(created.slot,true);slotGeneration++;await refreshActiveSlots();openView('overview');}
+  catch(_){status.textContent=created?`Slot ${created.slot} was created; check Slots before retrying.`:'Invalid source, unsupported media or access denied.';}finally{button.disabled=false;}
+});
+
 function openView(name) {
   if (!document.querySelector(`[data-page="${name}"]`)) name = 'overview';
   document.body.dataset.view = name;
@@ -610,6 +756,9 @@ function openView(name) {
   });
   document.body.classList.remove('nav-open');
   document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
+  if(name==='media')refreshMediaLibrary();
+  document.querySelectorAll('[data-page]').forEach(page=>{if(page.hidden)page.querySelectorAll('audio,video').forEach(player=>player.pause());});
+  if(name==='demo')refreshDemoTab();
   if (name === 'uploads') refreshUploads();
   if (name === 'account') refreshAccountAdministration();
   if (name === 'database') refreshDatabase();
@@ -629,12 +778,15 @@ document.addEventListener('click', event => {
 });
 document.addEventListener('dashboard-account-state', event => {
   document.getElementById('account-shortcut').textContent = event.detail.ready ? 'Account' : 'Sign in';
+  if(event.detail.ready){renderDemoTrade(document.getElementById('demo-manual-root'));renderDemoTrade(document.getElementById('demo-bot-root'),null,true);}
   ['dashboard-save','dashboard-load'].forEach(id=>document.getElementById(id).disabled=!event.detail.ready);
   if(!event.detail.ready){saveDashboardDialog.close();loadDashboardDialog.close();document.getElementById('dashboard-catalog').replaceChildren();document.getElementById('dashboard-name').value='';document.getElementById('workspace-status').textContent='';}
   document.querySelectorAll('[data-auth-note]').forEach(note => { note.hidden = event.detail.ready; });
   if (event.detail.ready && (document.body.dataset.view === 'uploads' || new URLSearchParams(location.search).has('download'))) { openView('uploads'); }
   if (event.detail.ready && document.body.dataset.view === 'account') refreshAccountAdministration();
   if (!event.detail.ready) {
+    mediaLibrary=null;document.getElementById('media-preview').replaceChildren();document.getElementById('media-tab-file').replaceChildren();document.getElementById('media-tab-url').value='';
+    demoOverview=null;demoSettingsDirty=false;['demo-new-pin','demo-rotate-pin','demo-worker-pin','demo-execution-id','demo-settings'].forEach(id=>document.getElementById(id).value='');['demo-positions-root','demo-metrics','demo-report-root','demo-account-select','demo-manual-root','demo-bot-root'].forEach(id=>document.getElementById(id).replaceChildren());
     indicatorProfiles=[];document.getElementById('indicator-list').replaceChildren();document.getElementById('indicator-technical-list').replaceChildren();document.getElementById('indicator-status').textContent='Sign in to manage indicators.';
     document.getElementById('upload-list').replaceChildren();
     document.getElementById('upload-recipient').replaceChildren();
@@ -645,6 +797,8 @@ document.addEventListener('dashboard-account-state', event => {
     document.getElementById('runner-input').value = '{}';
     document.getElementById('db-output').replaceChildren();
     document.getElementById('db-status').textContent = 'Sign in to view market data.';
+  } else if(document.body.dataset.view==='media'){refreshMediaLibrary();
+  } else if(document.body.dataset.view==='demo'){refreshDemoTab();
   } else if (document.body.dataset.view === 'indicators') {
     refreshIndicatorProfiles();
   } else if (document.body.dataset.view === 'database') {
@@ -703,10 +857,10 @@ async function openTechnicalIndicator(slotId,configure=false){
   if(!configure)card.querySelector('.module-body')?.dispatchEvent(new Event('slot-refresh'));
   if(configure){card.querySelector('.slot-gear').click();[...card.querySelectorAll('[role="tab"]')].find(button=>button.textContent==='Module')?.click();}
 }
-async function addTechnicalIndicator(moduleId){
+async function addTechnicalIndicator(moduleId,configure=true){
   const bridge=window.dashboardModuleState;if(!bridge?.ready())throw Error('Sign in required');
   let created=null;
-  try{created=await bridge.createSlot();await bridge.bind(created.slot,moduleId,{},false);await bridge.setOverview(created.slot,true);slotGeneration++;await openTechnicalIndicator(created.slot,true);}
+  try{created=await bridge.createSlot();await bridge.bind(created.slot,moduleId,{},false);await bridge.setOverview(created.slot,true);slotGeneration++;await openTechnicalIndicator(created.slot,configure);}
   catch(error){error.createdSlot=created?.slot;throw error;}
 }
 function renderTechnicalIndicators(rows){
@@ -909,10 +1063,14 @@ function renderCatalog() {
   const catalog = document.getElementById('module-catalog');
   const query = document.getElementById('catalog-search').value.trim().toLowerCase();
   catalog.replaceChildren();
-  const modules = availableModules.filter(module => `${module.name} ${module.id}`.toLowerCase().includes(query));
+  const category=module=>DEMO_KINDS.includes(module.id)?'Demo Trading':['gold-chart','moving-average','market-indicator','price-levels','session-clock','session-windows','economic-calendar'].includes(module.type)?'Market and indicators':module.type==='host-monitor'?'Monitoring':'Utilities';
+  const groups=['Demo Trading','Market and indicators','Utilities','Monitoring'];
+  const modules = availableModules.filter(module => !module.archived&&`${module.name} ${module.id}`.toLowerCase().includes(query)).sort((a,b)=>groups.indexOf(category(a))-groups.indexOf(category(b))||a.name.localeCompare(b.name));
+  let previousGroup='';
   if (!modules.length) { catalog.append(makeElement('p', 'module-detail', 'No modules match your search.')); return; }
   modules.forEach(module => {
-    const card = makeElement('article', 'catalog-card');
+    if(category(module)!==previousGroup){previousGroup=category(module);const heading=makeElement('h3','',previousGroup);heading.style.gridColumn='1 / -1';catalog.append(heading);}
+    const card = makeElement('article', 'catalog-card');card.dataset.moduleId=module.id;
     const name = makeElement('h3', '', module.name);
     const id = makeElement('code', '', module.id);
     const description = makeElement('p', '', module.description);
@@ -926,7 +1084,7 @@ function renderCatalog() {
       document.getElementById('module-runner').hidden = false;
       document.getElementById('runner-input').focus();
     });
-    card.append(name, id, description, button); catalog.append(card);
+    card.append(name,id,description,button);const add=makeElement('button','dice-roll-button','Add to Overview');add.type='button';add.addEventListener('click',async()=>{add.disabled=true;try{await addTechnicalIndicator(module.id,false);}catch(_){document.getElementById('runner-status').textContent='Slot setup not confirmed. Check Slots before retrying.';}finally{add.disabled=false;}});card.append(add);catalog.append(card);
   });
 }
 document.getElementById('catalog-search').addEventListener('input', renderCatalog);
@@ -1351,6 +1509,9 @@ function renderMarketModule(body, slot, module) {
     graph.style.minHeight=clockHeight?`${clockHeight}px`:'';svg.style.height=clockHeight?`${clockHeight}px`:'';
     graph.replaceChildren(svg);
     drawTechnicalOverlays(data,svg,candles,y,low,high);
+    const demoLines=technicalSvg('g',{'pointer-events':'none','data-demo-trades':'true'});
+    (data.demo_trades||[]).forEach(order=>{[['Entry',order.entry_fill??order.entry_requested,order.side==='buy'?'#22c55e':'#ef4444'],['SL',order.sl,'#ef4444'],['TP',order.tp,'#22c55e']].forEach(([label,value,color])=>{if(value<low||value>high)return;demoLines.append(technicalSvg('line',{x1:8,x2:718,y1:y(value),y2:y(value),stroke:color,'stroke-dasharray':label==='Entry'?'7 3':'3 4','data-demo-trade':order.id}),technicalSvg('text',{x:14,y:y(value)-3,fill:color,'font-size':10},`${order.side.toUpperCase()} ${order.status} ${label} ${value}`));});});svg.append(demoLines);
+
     renderPanes(data, candles);
     showCandle(candles.find(item => item.time === selectedTime) || last, data);
     legend.textContent = `${interval} · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${(data.series || []).filter(item => item.type === 'sma').length ? ' · SMA: ' + (data.series || []).filter(item => item.type === 'sma').map((item,index) => item.name + ' (' + colors[index % colors.length] + ')').join(', ') : ''} · Live candle outlined`;
@@ -1642,6 +1803,42 @@ function renderMyIP(body,slot){
   body.addEventListener('slot-refresh',refresh);function tick(){if(!body.isConnected)return;refresh();setTimeout(tick,30000);}setTimeout(tick,0);
 }
 
+function renderMediaPlayer(body,slot,moduleId='media-player',descriptorSource=null){
+  const container=body;body=makeElement('div','media-player-widget');container.append(body);
+  const host=makeElement('div','media-player-host'),status=makeElement('p','market-status','Media is not loaded.'),load=makeElement('button','','Load media'),stop=makeElement('button','','Unload');load.type=stop.type='button';stop.disabled=true;
+  const actions=makeElement('div','slot-section-actions');actions.append(load,stop);body.append(actions,host,status);let player=null,url=null,controller=null;
+  function clear(){if(controller)controller.abort();controller=null;if(player){if(player.pause)player.pause();player.removeAttribute('src');if(player.load)player.load();}host.replaceChildren();player=null;if(url){URL.revokeObjectURL(url);url=null;}stop.disabled=true;}
+  stop.addEventListener('click',()=>{clear();status.textContent='Media unloaded.';});
+  load.addEventListener('click',async()=>{load.disabled=true;clear();try{
+    const bridge=window.dashboardModuleState,data=descriptorSource?await descriptorSource():await bridge.read(slot.id,moduleId);if(!body.isConnected||!bridge.ready())return;
+    if(data.status!=='ok'){status.textContent=data.message;return;}
+    status.textContent=data.source==='external'?`Source: ${new URL(data.url).hostname}`:'Loading authorized server media…';let src=data.url;
+    if(data.source!=='external'){controller=new AbortController();const blob=await bridge.mediaBlob(data.path,controller.signal);if(!body.isConnected||!bridge.ready())return;url=URL.createObjectURL(blob);src=url;}
+    player=document.createElement(data.kind==='image'?'img':data.kind);player.className='slot-media';player.referrerPolicy='no-referrer';
+    if(data.kind==='image'){player.alt='Media image';player.loading='lazy';}else{player.controls=true;player.autoplay=false;player.preload='none';player.loop=data.settings.loop;}
+    if(data.source==='external'&&data.kind!=='image')player.crossOrigin='anonymous';
+    if(data.kind==='image')player.addEventListener('load',()=>{status.textContent='Image loaded.';});
+    player.addEventListener('error',()=>{status.textContent='Media cannot be decoded or the external source blocks playback.';});player.src=src;host.append(player);stop.disabled=false;status.textContent=data.kind==='image'?'Loading image…':'Ready. Press Play to start.';
+  }catch(_){status.textContent='Media unavailable. Check file access, format and source.';}finally{load.disabled=false;}});
+  function tick(){if(!body.isConnected){clear();return;}setTimeout(tick,1000);}setTimeout(tick,1000);
+}
+function configureMediaPanel(panel,row,slot){
+  const expected={ 'media-image':'image','media-audio':'audio','media-video':'video'}[row.module_id];
+  const cfg=row.media_settings||{source:'external',url:'',file_id:'',filename:'',format:'auto',loop:false};
+  const source=makeElement('select','');source.setAttribute('aria-label','Media source');[['external','External HTTPS link'],['upload','Upload Center'],['server','Shared server media']].forEach(([value,title])=>{const option=makeElement('option','',title);option.value=value;source.append(option);});source.value=cfg.source;
+  const url=makeElement('input','');url.type='url';url.placeholder='https://example.com/video.mp4';url.value=cfg.url;url.setAttribute('aria-label','Media URL');
+  const file=makeElement('select','');file.setAttribute('aria-label','Media file');const format=makeElement('select','');format.setAttribute('aria-label','Media format');['auto','jpg','png','gif','webp','mp3','wav','ogg','m4a','mp4','webm'].forEach(value=>{const option=makeElement('option','',value);option.value=value;format.append(option);});format.value=cfg.format;
+  const loopLabel=makeElement('label','','Loop'),loop=makeElement('input','');loop.type='checkbox';loop.checked=cfg.loop;loopLabel.prepend(loop);
+  const save=makeElement('button','','Save media settings');save.type='button';const feedback=makeElement('p','market-status');let library=null;
+  async function refresh(){url.hidden=source.value!=='external';format.hidden=source.value!=='external';file.hidden=source.value==='external';if(file.hidden)return;
+    try{library=library||await window.dashboardModuleState.slotRequest('media/library');file.replaceChildren();(source.value==='upload'?library.uploads:library.server_files).filter(item=>!expected||item.kind===expected).forEach(item=>{const option=makeElement('option','',`${item.name||item.filename} · ${Math.ceil(item.size/1024)} KiB`);option.value=source.value==='upload'?item.id:item.filename;file.append(option);});file.value=source.value==='upload'?cfg.file_id:cfg.filename;
+      feedback.textContent=source.value==='server'?'Server media folder: /var/lib/30na/dashboard/media · maximum 32 MiB per file.':'Upload Center permissions apply to playback.';
+    }catch(_){feedback.textContent='Media library unavailable.';}
+  }
+  source.addEventListener('change',refresh);save.addEventListener('click',async()=>{save.disabled=true;try{await window.dashboardModuleState.setSlotAppearance(slot.id,{media_settings:{source:source.value,url:source.value==='external'?url.value:'',format:source.value==='external'?format.value:'auto',file_id:source.value==='upload'?file.value:'',filename:source.value==='server'?file.value:'',loop:loop.checked}});slotGeneration++;await refreshActiveSlots();}catch(_){feedback.textContent='Invalid source or save unavailable.';save.disabled=false;}});
+  panel.append(makeElement('p','','Direct media links only. Playback takes place in your browser; server files load on request.'),source,url,file,format,loopLabel,save,feedback);refresh();
+}
+
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
   const module = availableModules.find(item => item.id === moduleId);
@@ -1651,6 +1848,8 @@ function renderModuleContent(body, slot, moduleId) {
     return;
   }
 
+  if(module.type==='media-player'){renderMediaPlayer(body,slot,module.id);return;}
+  if(DEMO_KINDS.includes(module.id)){renderDemoComponent(body,slot,module);return;}
   if(module.type==='myip'){renderMyIP(body,slot);return;}
   if(module.type==='economic-calendar'){renderCalendar(body,slot);return;}
   if (module.type === 'gold-chart' || module.type === 'moving-average') {
@@ -2279,7 +2478,7 @@ function makeSlot(row, area) {
   const select = makeElement('select', 'module-select'); select.setAttribute('aria-label', `Module for ${slot.id}`);
   let selectedModule = row.module_id;
   function filterModules(selected) {
-    const matches = availableModules;
+    const matches = availableModules.filter(module=>!module.archived||module.id===row.module_id);
     const current = availableModules.find(module => module.id === selected);
     select.replaceChildren();
     if (current && !matches.some(module => module.id === current.id)) {
@@ -2384,8 +2583,9 @@ function makeSlot(row, area) {
       if (!card.isConnected || !bridge.ready()) return;
       notice.textContent = '';
       if (settingsDialog.open) settingsDialog.close();
-      if (['session-clock','session-windows','price-levels'].includes(moduleInfo?.type)) body.dispatchEvent(new CustomEvent('technical-result',{detail:result}));
-      else if (['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
+      if(DEMO_KINDS.includes(row.module_id)){body.dispatchEvent(new CustomEvent('demo-result',{detail:result}));document.dispatchEvent(new Event('demo-change'));}
+      else if (['session-clock','session-windows','price-levels'].includes(moduleInfo?.type)) body.dispatchEvent(new CustomEvent('technical-result',{detail:result}));
+      else if (['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar','media-player',...DEMO_KINDS].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
       else if (!['clock', 'counter', 'slot-note', 'empty', 'dashboard-health', 'theme-summary'].includes(row.module_id)) {
         let resultView = body.querySelector('.slot-quick-result');
         if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
@@ -2532,6 +2732,7 @@ function makeSlot(row, area) {
     config.setAttribute('aria-label',`Calendar settings for ${slot.id}`);const save=makeElement('button','','Save calendar settings');save.type='button';const status=makeElement('p','market-status');
     save.addEventListener('click',async()=>{save.disabled=true;try{await window.dashboardModuleState.setSlotAppearance(slot.id,{calendar_settings:JSON.parse(config.value)});slotGeneration++;await refreshActiveSlots();}catch(_){status.textContent='Invalid calendar settings or save unavailable.';save.disabled=false;}});modulePanel.append(config,save,status);
   }
+  if(['media-player','media-image','media-audio','media-video'].includes(row.module_id))configureMediaPanel(modulePanel,row,slot);
   const panels = [['Slot actions',actionsPanel],['Input',inputDrawer],['Commands',terminalDrawer],['Slot Worker',workerDrawer],['Output',outputDetails],['Module',modulePanel]];
   function selectSettingsTab(index) {
     panels.forEach(([,panel],i) => {panel.hidden=i!==index; tabs.children[i].setAttribute('aria-selected',String(i===index)); tabs.children[i].tabIndex=i===index?0:-1;});
@@ -2555,14 +2756,14 @@ function makeSlot(row, area) {
     card.append(listLabel, pin, menu, settingsDialog);
     return card;
   }
-  if (row.minimized) card.append(makeElement('div','slot-min-label', row.output_settings?.label || moduleInfo?.name || row.module_id));
+  if(row.minimized){const mini=makeElement('div','slot-min-label',row.output_settings?.label||moduleInfo?.name||row.module_id);card.append(mini);if(['demo-trade','demo-bot'].includes(row.module_id))renderDemoMini(mini,slot);}
   card.append(menu, moveHandle, settingsDialog, layoutNotice, body, resize);
   attachLayoutControls(card, moveHandle, resize, row, layoutNotice);
   applyOutputAppearance(card, body, row.output_settings);
   if (!row.minimized && row.output_settings?.mode === 'summary') renderSlotSummary(body, row, moduleInfo);
   else if (!row.minimized && isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
   else if (!row.minimized) renderModuleContent(body, slot, selectedModule);
-  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
+  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar','media-player',...DEMO_KINDS].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 
@@ -2818,18 +3019,22 @@ def create_app(*, credential_path=None, upstream_factory=None):
         scheduler = SlotWorkerScheduler()
         gold_collector = GoldCollector()
         signal_scheduler = SignalScheduler()
+        from modules.demo_trading import DemoScheduler
+        demo_scheduler=DemoScheduler()
 
         @instance.on_event('startup')
         def start_slot_workers():
             scheduler.start()
             gold_collector.start()
             signal_scheduler.start()
+            demo_scheduler.start()
 
         @instance.on_event('shutdown')
         def stop_slot_workers():
             scheduler.stop()
             gold_collector.stop()
             signal_scheduler.stop()
+            demo_scheduler.stop()
 
         instance.include_router(create_router(credential_path, upstream_factory))
 

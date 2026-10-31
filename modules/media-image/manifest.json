@@ -1,0 +1,8 @@
+{
+  "id": "media-image",
+  "name": "Image Viewer",
+  "description": "Browser-native image from HTTPS links or authorized server media.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "media-player"
+}

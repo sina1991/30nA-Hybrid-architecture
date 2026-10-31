@@ -1,0 +1,8 @@
+{
+  "id": "demo-positions",
+  "name": "Demo Positions",
+  "description": "Open positions, pending orders and trade management.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "demo-positions"
+}

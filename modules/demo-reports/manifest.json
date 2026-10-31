@@ -1,0 +1,8 @@
+{
+  "id": "demo-reports",
+  "name": "Demo Reports",
+  "description": "Realized performance, drawdown samples and daily results.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "demo-reports"
+}

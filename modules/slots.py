@@ -7,7 +7,7 @@ import sqlite3
 from uuid import uuid4
 from market_data.indicators import CHART_DEFAULTS
 from .module_state import change
-from . import chat_store, technical, economic_calendar, indicator_profiles
+from . import chat_store, technical, economic_calendar, indicator_profiles, demo_components, media
 from .execution import MODULE_FILES, HOST_MONITORS, MARKET_MODULES, run_module
 
 
@@ -86,7 +86,7 @@ def list_active(owner):
             result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
                            'layout': meta.get('layout'), 'minimized': bool(meta.get('minimized', False)), 'output_settings':meta.get('output_settings', {'mode':'full','label':'','field':''}), 'frame_color': meta.get('frame_color'),
                            'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker'),
-                           'calendar_settings':meta.get('calendar_settings',economic_calendar.settings()),'profile_visibility':meta.get('profile_visibility',{}),
+                           'media_settings':meta.get('media_settings',media.DEFAULTS),'calendar_settings':meta.get('calendar_settings',economic_calendar.settings()),'profile_visibility':meta.get('profile_visibility',{}),
                            'technical_settings':meta.get('technical_settings', {}), 'technical_defaults':technical.DEFAULTS.get(json.loads(value)['module_id']),
                            'slot_type': meta.get('slot_type', 'standard'), 'chat_room':meta.get('chat_room', 'public'),
                            'chart_period': meta.get('chart_period', 20), 'chart_interval': meta.get('chart_interval', '1m'), 'indicator_period': meta.get('indicator_period', 14), 'chart_overlay': meta.get('chart_overlay', True),
@@ -179,12 +179,13 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators', 'minimized', 'output_settings', 'chat_room', 'technical_settings', 'profile_visibility', 'calendar_settings'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators', 'minimized', 'output_settings', 'chat_room', 'technical_settings', 'profile_visibility', 'calendar_settings','media_settings'}:
         raise ValueError('invalid slot appearance')
     if 'profile_visibility' in updates:
         visibility=updates['profile_visibility']
         known={p['id'] for p in indicator_profiles.list_profiles(owner)}
         if not isinstance(visibility,dict) or len(visibility)>24 or set(visibility)-known or any(type(v) is not bool for v in visibility.values()):raise ValueError('Invalid indicator visibility')
+    if 'media_settings' in updates:updates=dict(updates,media_settings=media.settings(updates['media_settings']))
     if 'calendar_settings' in updates:
         updates=dict(updates,calendar_settings=economic_calendar.settings(updates['calendar_settings']))
     if 'technical_settings' in updates:
@@ -314,6 +315,10 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None, req
     defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
     if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
     payload = {**defaults, **config.get('context', {}), **data}
+    if module_id in media.KINDS:
+        meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}
+        payload={'settings':meta.get('media_settings',{}),'_state_owner':owner,**data}
+    if module_id in demo_components.KINDS:payload.update(_state_owner=owner,_state_slot=slot)
     if module_id=='myip':payload['_request_ip']=request_ip
     if module_id=='economic-calendar':
         meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}
@@ -326,7 +331,7 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None, req
         meta = change(owner, 'slot-meta', slot, None, lambda old:(old,False)) or {}
         payload.setdefault('room', meta.get('chat_room','public'))
     result = run_module(module_id, payload)
-    if module_id not in ('clock', 'counter', 'slot-note', 'chat-box','myip','economic-calendar'):
+    if module_id not in ('clock', 'counter', 'slot-note', 'chat-box','myip','economic-calendar',*media.KINDS) and module_id not in demo_components.KINDS:
         change(owner, 'slot-output', slot, None, lambda _: ({'module_id':module_id, 'binding_revision':config.get('revision'), 'result':result}, True))
     return {'slot':slot, 'module_id':module_id, 'result':result}
 
@@ -337,12 +342,16 @@ def read(owner, slot, request_ip=None):
         raise LookupError('slot is not configured')
     module_id = config['module_id']
     _authorize_host_monitor(owner, module_id)
-    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id in technical.KINDS or module_id in ('chat-box','myip','economic-calendar'):
+    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id in technical.KINDS or module_id in ('chat-box','myip','economic-calendar',*media.KINDS) or module_id in demo_components.KINDS:
         data = {'action':'get'} if module_id in ('counter','slot-note') else {}
         # Reads never change the saved output or execute arbitrary code.
         defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
         if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
         payload = {**defaults, **config.get('context', {}), **data}
+        if module_id in media.KINDS:
+            meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}
+            payload={'settings':meta.get('media_settings',{}),'_state_owner':owner}
+        if module_id in demo_components.KINDS:payload.update(_state_owner=owner,_state_slot=slot)
         if module_id=='myip':payload['_request_ip']=request_ip
         if module_id=='economic-calendar':
             meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}

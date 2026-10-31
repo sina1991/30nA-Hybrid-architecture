@@ -241,6 +241,7 @@ PANEL = r'''
         const error = new Error(({401:'Invalid account credentials; sign in again.',403:'You are not authorized for this operation.',
           404:'Worker or execution not found.',409:'Duplicate ID or operation conflicts with the current Worker state.',
           413:'Input exceeds the size limit.',422:'Invalid request data.'})[response.status] || 'The service is temporarily unavailable.');
+        if(path.startsWith('demo/')){try{const data=await response.json();const message=data.detail||data.error?.message;if(typeof message==='string')error.message=message.slice(0,300);}catch(_){}}
         error.status = response.status; throw error;
       }
       const data = await response.json();
@@ -264,6 +265,25 @@ PANEL = r'''
         if (current === generation && error.status === 401) disconnect(error.message);
         throw error;
       }
+    },
+    async mediaBlob(path,signal) {
+      if(!token||!authenticated||!/^media\/(server|upload)\//.test(path))throw Error('Invalid media request');
+      const current=generation,controller=new AbortController(),signals=[session.signal,...(signal?[signal]:[])],abort=()=>controller.abort();
+      signals.forEach(parent=>{if(parent.aborted)abort();else parent.addEventListener('abort',abort,{once:true});});
+      try{
+        const response=await fetch('/api/upstreams/'+path,{headers:{Authorization:'Bearer '+token},cache:'no-store',credentials:'omit',redirect:'error',signal:controller.signal});
+        if(!response.ok)throw Error('Media unavailable');
+        if(Number(response.headers.get('content-length')||0)>33554432){await response.body?.cancel();throw Error('Media exceeds 32 MiB');}
+        const reader=response.body.getReader(),chunks=[];let size=0;
+        while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>33554432){await reader.cancel();throw Error('Media exceeds 32 MiB');}chunks.push(value);}
+        if(current!==generation)throw Error('Session changed');return new Blob(chunks,{type:response.headers.get('content-type')||'application/octet-stream'});
+      }finally{signals.forEach(parent=>parent.removeEventListener('abort',abort));}
+    },
+    async downloadDemoReport(query) {
+      if(!token||!authenticated)throw Error('Sign in required');const current=generation;
+      const response=await fetch('/api/upstreams/demo/report.csv?'+query,{headers:{Authorization:'Bearer '+token},cache:'no-store',credentials:'omit',redirect:'error',signal:session.signal});
+      if(!response.ok){let message='Report unavailable';try{const body=await response.json();message=body.detail||body.error?.message||message;}catch(_){}throw Error(message);}const blob=await response.blob();if(current!==generation)throw Error('Session changed');
+      const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='demo-report.csv';document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
     },
     async downloadUpload(id, name) {
       if (!token || !authenticated) throw Error('Sign in required');
