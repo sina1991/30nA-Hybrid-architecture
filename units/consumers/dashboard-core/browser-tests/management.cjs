@@ -44,6 +44,7 @@ module.exports=async function checkManagement(page) {
   await page.locator('#worker-confirm-id').fill('browser-managed');await page.locator('#worker-confirm-submit').click();
   await page.locator('#worker-editor').waitFor({state:'hidden'});
   assert.equal(await row('browser-managed').count(),0);
+  await page.locator('[data-nav="executions"]').click();
   await page.locator('#history-worker').fill('no-matching-worker');
   assert((await page.locator('#account-executions').textContent()).includes('filter'));
   await page.locator('#history-worker').fill('demo-summary');
@@ -51,6 +52,7 @@ module.exports=async function checkManagement(page) {
   assert((await page.locator('#account-executions').textContent()).includes('Failed'));
   assert(!(await page.locator('#account-executions').textContent()).includes('· Succeeded ·'));
   await page.locator('#history-worker').fill('');await page.locator('#history-status').selectOption('');
+  await page.locator('[data-nav="workers"]').click();
   await row('demo-summary').click();
   await page.locator('#worker-editor-close').click();
 };

@@ -10,7 +10,7 @@ const el=(tag,text='')=>{const node=document.createElement(tag);node.textContent
 const dock=el('section');dock.className='music-dock';dock.setAttribute('aria-label','Now playing');dock.hidden=true;
 const title=el('p'),audio=document.createElement('audio'),note=el('p'),stop=el('button','Stop music');audio.id='persistent-music-audio';audio.controls=true;audio.preload='none';stop.type='button';dock.append(title,audio,note,stop);document.body.append(dock);
 let tracks=[],index=-1,blobURL=null,loading=null,ticket=0,owner='',library={uploads:[],server_files:[]};const views=new Set();
-function clear(){ticket++;loading?.abort();loading=null;audio.pause();audio.removeAttribute('src');audio.load();if(blobURL)URL.revokeObjectURL(blobURL);blobURL=null;dock.hidden=true;}
+function clear(){ticket++;loading?.abort();loading=null;audio.pause();audio.removeAttribute('src');audio.load();if(blobURL)URL.revokeObjectURL(blobURL);blobURL=null;dock.hidden=true;title.textContent='';}
 function message(value){note.textContent=value;update();}
 function update(){for(const view of views){if(!view.root.isConnected){views.delete(view);continue;}const value=String(index);view.select.replaceChildren(...tracks.map((track,i)=>{const option=el('option',track.title);option.value=String(i);return option;}));view.select.value=index<0?'0':value;view.status.textContent=note.textContent;view.play.textContent=audio.paused?'Play':'Pause';view.play.disabled=!tracks.length;view.prev.disabled=view.next.disabled=!tracks.length;}}
 async function play(i){

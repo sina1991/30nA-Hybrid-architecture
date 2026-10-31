@@ -274,7 +274,13 @@ def test_real_docker_memory_cgroup_kills_over_limit_process():
         "--cap-drop=ALL", "--security-opt=no-new-privileges:true",
         "--tmpfs", "/tmp:rw,noexec,nosuid,nodev,size=8m",
         image, "python", "-I", "-c",
-        "x=bytearray(256*1024*1024); x[::4096]=b'X'*(len(x)//4096); import time; time.sleep(1)",
+        "import json,pathlib,subprocess,sys; "
+        "events=pathlib.Path('/sys/fs/cgroup/memory.events'); "
+        "before=dict(line.split() for line in events.read_text().splitlines()); "
+        "child=subprocess.run([sys.executable,'-I','-c','x=bytearray(256*1024*1024); x[::4096]=bytes([88])*(len(x)//4096)'],capture_output=True,timeout=8); "
+        "after=dict(line.split() for line in events.read_text().splitlines()); "
+        "print(json.dumps({'oom_kills':int(after.get('oom_kill',0))-int(before.get('oom_kill',0)), 'child_exit':child.returncode, 'error':child.stderr.decode('utf8','replace')})); "
+        "sys.exit(0 if child.returncode==0 else 1)",
     ]
     try:
         run = subprocess.run(
@@ -291,9 +297,16 @@ def test_real_docker_memory_cgroup_kills_over_limit_process():
         oom_killed, memory_limit, container_exit = inspect.stdout.decode("ascii", "replace").strip().split()
         assert memory_limit == str(64 * 1024 * 1024), "Docker did not configure the requested memory cgroup limit"
         assert run.returncode != 0, "over-limit memory allocation unexpectedly succeeded"
-        assert oom_killed == "true" or (
-            container_exit == "1" and "MemoryError" in run.stderr.decode("utf-8", "replace")
-        ), "memory limit neither killed the process nor rejected its allocation"
+        # Some daemon versions do not set State.OOMKilled when only the child
+        # was killed. Require the kernel's cgroup counter as positive evidence;
+        # exit 137 alone is deliberately insufficient.
+        try: evidence = json.loads(run.stdout)
+        except (ValueError, UnicodeError): evidence = {}
+        kernel_kill = evidence.get('oom_kills', 0) > 0 and evidence.get('child_exit', 0) < 0
+        allocation_refused = evidence.get('child_exit') == 1 and 'MemoryError' in evidence.get('error', '')
+        assert oom_killed == "true" or kernel_kill or allocation_refused, (
+            "memory limit neither killed the process nor rejected its allocation"
+        )
     finally:
         subprocess.run(
             ["docker", "rm", "--force", name], stdin=subprocess.DEVNULL,

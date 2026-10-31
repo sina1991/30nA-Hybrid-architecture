@@ -2394,9 +2394,9 @@
       "sha256": "efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f"
     },
     {
-      "bytes": 11198,
+      "bytes": 11311,
       "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "9c804b0858ff720450a6b074a1ca39a5e6e9ca80ea344bbdecaa3444bf498b2e"
+      "sha256": "0d646b99ad05654e42fde6fa91cfd7223e14376287632d0099b4146ae1547a7b"
     },
     {
       "bytes": 19069,
@@ -2409,9 +2409,9 @@
       "sha256": "399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc"
     },
     {
-      "bytes": 3734,
+      "bytes": 3845,
       "path": "units/consumers/dashboard-core/browser-tests/management.cjs",
-      "sha256": "8a94dc16602fe8ed4b8da465c1eacea05c5f4d589db31977fd33a45658a821aa"
+      "sha256": "08eb1082f6c8537d0b9aca6ef4e6299732d1bb133c5cf369ddcb769a5a83d1d5"
     },
     {
       "bytes": 1765,
@@ -2469,9 +2469,9 @@
       "sha256": "b920ecb3337de92010152921ce7891951d132b65330c992e015682887f3fb631"
     },
     {
-      "bytes": 9483,
+      "bytes": 9504,
       "path": "units/consumers/dashboard-core/dashboard/music_panel.py",
-      "sha256": "de7cfbf704ccac5bc385af1e9677fc0bc46bc770df79d57250a605624c0e0561"
+      "sha256": "37be45889f829fad6a977c492ffeba9757194f8f858105800561042c3a798388"
     },
     {
       "bytes": 696,
@@ -2744,9 +2744,9 @@
       "sha256": "a53b4b0b24568cdd05d31f5b35a0de684133e8d2342eea3110aab890a217ab2d"
     },
     {
-      "bytes": 15478,
+      "bytes": 16519,
       "path": "units/worker-runtime/tests/test_docker_sandbox_integration.py",
-      "sha256": "8610d2d69f7989867576d54e24962bd44eb1544c7c2b9141ba878686fc7825cb"
+      "sha256": "719411bb8755464f2a714dc5c8fe2a55490f38584432180c45decf0a9c5e2c46"
     },
     {
       "bytes": 3782,

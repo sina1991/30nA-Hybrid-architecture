@@ -272,10 +272,10 @@
 | [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | 5199 | `f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496` |
 | [units/consumers/dashboard-core/browser-tests/accounts_chat.cjs](../../units/consumers/dashboard-core/browser-tests/accounts_chat.cjs) | 6982 | `fbef0ce3d952e56fb5afb39bdc19effca7fd40be58f9b7e0c9e5edaef81687f0` |
 | [units/consumers/dashboard-core/browser-tests/chart_overlays.cjs](../../units/consumers/dashboard-core/browser-tests/chart_overlays.cjs) | 5028 | `efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f` |
-| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11198 | `9c804b0858ff720450a6b074a1ca39a5e6e9ca80ea344bbdecaa3444bf498b2e` |
+| [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11311 | `0d646b99ad05654e42fde6fa91cfd7223e14376287632d0099b4146ae1547a7b` |
 | [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19069 | `29dd2b4fdf7aa9d15d090eb51186d9f756473d27520d0c6f4e04106116ac4076` |
 | [units/consumers/dashboard-core/browser-tests/layout.cjs](../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1242 | `399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc` |
-| [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3734 | `8a94dc16602fe8ed4b8da465c1eacea05c5f4d589db31977fd33a45658a821aa` |
+| [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3845 | `08eb1082f6c8537d0b9aca6ef4e6299732d1bb133c5cf369ddcb769a5a83d1d5` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
 | [units/consumers/dashboard-core/browser-tests/technical.cjs](../../units/consumers/dashboard-core/browser-tests/technical.cjs) | 5082 | `7f9b0eb8e333fb7f2c1c21867c653e04d9ab5a8322b40b82eef9c4224b2fd441` |
@@ -287,7 +287,7 @@
 | [units/consumers/dashboard-core/dashboard/modules/module_state.py](../../units/consumers/dashboard-core/dashboard/modules/module_state.py) | 172 | `3a347ce78439f00e178fc4e49961b77ed8a56941085fdf77df7b389919a4afa8` |
 | [units/consumers/dashboard-core/dashboard/modules/module_support.py](../../units/consumers/dashboard-core/dashboard/modules/module_support.py) | 174 | `9d78e2dafa971a209de113786d8d0e138526c1121143a7cc2d4d8f38471e2266` |
 | [units/consumers/dashboard-core/dashboard/modules/registry.py](../../units/consumers/dashboard-core/dashboard/modules/registry.py) | 173 | `b920ecb3337de92010152921ce7891951d132b65330c992e015682887f3fb631` |
-| [units/consumers/dashboard-core/dashboard/music_panel.py](../../units/consumers/dashboard-core/dashboard/music_panel.py) | 9483 | `de7cfbf704ccac5bc385af1e9677fc0bc46bc770df79d57250a605624c0e0561` |
+| [units/consumers/dashboard-core/dashboard/music_panel.py](../../units/consumers/dashboard-core/dashboard/music_panel.py) | 9504 | `37be45889f829fad6a977c492ffeba9757194f8f858105800561042c3a798388` |
 | [units/consumers/dashboard-core/dashboard/production.py](../../units/consumers/dashboard-core/dashboard/production.py) | 696 | `3cb7072b852490b9539315bc26d695448049bd26e946226a4655d4b0d98b44fd` |
 | [units/consumers/dashboard-core/dashboard/static/login-airless.png](../../units/consumers/dashboard-core/dashboard/static/login-airless.png) | 3282622 | `7d67839c7df7371083a3b28c3052396e25bc90265b31d4e9bd462ea6f099d4f5` |
 | [units/consumers/dashboard-core/dashboard/static/login-galaxy.png](../../units/consumers/dashboard-core/dashboard/static/login-galaxy.png) | 2659793 | `b3fbd8a0b7086d9dc7667dbde7b84b415442173e4afa6e297718f9d82cedf64b` |
@@ -342,7 +342,7 @@
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../../units/worker-runtime/tests/test_code_manager_adapter.py) | 5099 | `8e20c3253a49c0019554b458d47c30a4ebd15690ed1b0e3829b85b25cdbb42c9` |
 | [units/worker-runtime/tests/test_code_manager_runtime_e2e.py](../../units/worker-runtime/tests/test_code_manager_runtime_e2e.py) | 12190 | `cbb100bd8fb3af8c3442a4df2574975307ebc48536621b5bbcf67d5d8b5bcc9b` |
 | [units/worker-runtime/tests/test_docker_sandbox.py](../../units/worker-runtime/tests/test_docker_sandbox.py) | 13362 | `a53b4b0b24568cdd05d31f5b35a0de684133e8d2342eea3110aab890a217ab2d` |
-| [units/worker-runtime/tests/test_docker_sandbox_integration.py](../../units/worker-runtime/tests/test_docker_sandbox_integration.py) | 15478 | `8610d2d69f7989867576d54e24962bd44eb1544c7c2b9141ba878686fc7825cb` |
+| [units/worker-runtime/tests/test_docker_sandbox_integration.py](../../units/worker-runtime/tests/test_docker_sandbox_integration.py) | 16519 | `719411bb8755464f2a714dc5c8fe2a55490f38584432180c45decf0a9c5e2c46` |
 | [units/worker-runtime/tests/test_history_reuse.py](../../units/worker-runtime/tests/test_history_reuse.py) | 3782 | `cc52d66f93947d28a484ba9550cd475e7b639bc06b5f616327e46a2e78125e3c` |
 | [units/worker-runtime/tests/test_http_api.py](../../units/worker-runtime/tests/test_http_api.py) | 2527 | `107876a44299cce2863f63bdc5eba72b12c920f3da948156c11693744980e1e0` |
 | [units/worker-runtime/tests/test_integration.py](../../units/worker-runtime/tests/test_integration.py) | 2647 | `dac3941ef2dc7a9456c81740fe213c132f1fce363beae27de01eb5966dbe50c6` |

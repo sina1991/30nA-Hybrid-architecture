@@ -125,7 +125,9 @@ async function main() {
       await page.locator('#worker-run').click();
       await page.waitForFunction(()=>document.getElementById('execution-status').textContent==='Failed',null,{timeout:45000});
       assert.equal(JSON.parse(await page.locator('#execution-output').textContent()).code,'EXECUTION_ERROR');
+      await page.locator('#account-shortcut').click();
       await page.locator('#account-refresh').click();
+      await page.locator('[data-nav="workers"]').click();
       await page.waitForFunction(()=>document.getElementById('account-executions').textContent.includes('Failed'));
     }
     if(!isReal) {
