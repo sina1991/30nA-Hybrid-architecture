@@ -273,7 +273,7 @@
 | [units/consumers/dashboard-core/browser-tests/accounts_chat.cjs](../../units/consumers/dashboard-core/browser-tests/accounts_chat.cjs) | 6982 | `fbef0ce3d952e56fb5afb39bdc19effca7fd40be58f9b7e0c9e5edaef81687f0` |
 | [units/consumers/dashboard-core/browser-tests/chart_overlays.cjs](../../units/consumers/dashboard-core/browser-tests/chart_overlays.cjs) | 5028 | `efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f` |
 | [units/consumers/dashboard-core/browser-tests/check.cjs](../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11311 | `0d646b99ad05654e42fde6fa91cfd7223e14376287632d0099b4146ae1547a7b` |
-| [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19069 | `29dd2b4fdf7aa9d15d090eb51186d9f756473d27520d0c6f4e04106116ac4076` |
+| [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19213 | `3816b954f1b8383a172b5f3e3cd0d1cdc6893d2ce9da8f2c09afdb14a3662a2f` |
 | [units/consumers/dashboard-core/browser-tests/layout.cjs](../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1242 | `399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc` |
 | [units/consumers/dashboard-core/browser-tests/management.cjs](../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3845 | `08eb1082f6c8537d0b9aca6ef4e6299732d1bb133c5cf369ddcb769a5a83d1d5` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
@@ -281,7 +281,7 @@
 | [units/consumers/dashboard-core/browser-tests/technical.cjs](../../units/consumers/dashboard-core/browser-tests/technical.cjs) | 5082 | `7f9b0eb8e333fb7f2c1c21867c653e04d9ab5a8322b40b82eef9c4224b2fd441` |
 | [units/consumers/dashboard-core/browser-tests/workspaces.cjs](../../units/consumers/dashboard-core/browser-tests/workspaces.cjs) | 6474 | `96a9fe151a972e6fd4a1e611f1fb705997aafa0b5dc519b6f4aaf55d9d537f43` |
 | [units/consumers/dashboard-core/dashboard/__init__.py](../../units/consumers/dashboard-core/dashboard/__init__.py) | 34 | `df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048` |
-| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 271932 | `8eb40500a261861fcf8c2de5f7e6633243ecf3b704db3ddd02043ed5a391698f` |
+| [units/consumers/dashboard-core/dashboard/app.py](../../units/consumers/dashboard-core/dashboard/app.py) | 271974 | `a77883c714e5daef7275e9e46a83f896b7be009d5cb5651214dd9d5479725991` |
 | [units/consumers/dashboard-core/dashboard/modules/__init__.py](../../units/consumers/dashboard-core/dashboard/modules/__init__.py) | 41 | `35ef8ebac64753121ad6a4d2e62c7c2c90b29160f0c22dbadb2faf113226622f` |
 | [units/consumers/dashboard-core/dashboard/modules/execution.py](../../units/consumers/dashboard-core/dashboard/modules/execution.py) | 169 | `5bef73ad14e3c2595302b184e0cae257303cea569d45fefa6f3b7127eb3123a2` |
 | [units/consumers/dashboard-core/dashboard/modules/module_state.py](../../units/consumers/dashboard-core/dashboard/modules/module_state.py) | 172 | `3a347ce78439f00e178fc4e49961b77ed8a56941085fdf77df7b389919a4afa8` |

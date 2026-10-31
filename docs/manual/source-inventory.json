@@ -2399,9 +2399,9 @@
       "sha256": "0d646b99ad05654e42fde6fa91cfd7223e14376287632d0099b4146ae1547a7b"
     },
     {
-      "bytes": 19069,
+      "bytes": 19213,
       "path": "units/consumers/dashboard-core/browser-tests/demo_media.cjs",
-      "sha256": "29dd2b4fdf7aa9d15d090eb51186d9f756473d27520d0c6f4e04106116ac4076"
+      "sha256": "3816b954f1b8383a172b5f3e3cd0d1cdc6893d2ce9da8f2c09afdb14a3662a2f"
     },
     {
       "bytes": 1242,
@@ -2439,9 +2439,9 @@
       "sha256": "df94febda29d5b0c1889a53ca6f62e4a33f96097b09c7c2e1f879ad96a05b048"
     },
     {
-      "bytes": 271932,
+      "bytes": 271974,
       "path": "units/consumers/dashboard-core/dashboard/app.py",
-      "sha256": "8eb40500a261861fcf8c2de5f7e6633243ecf3b704db3ddd02043ed5a391698f"
+      "sha256": "a77883c714e5daef7275e9e46a83f896b7be009d5cb5651214dd9d5479725991"
     },
     {
       "bytes": 41,

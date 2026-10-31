@@ -2919,44 +2919,44 @@ document.addEventListener('dashboard-account-state', event => {
   if (event.detail.ready) refreshActiveSlots();
 });
 document.getElementById('add-slot').addEventListener('click', async event => {
-  event.currentTarget.disabled = true;
+  const button=event.currentTarget;button.disabled = true;
   try {
     await window.dashboardModuleState.createSlot();
     slotGeneration++; await refreshActiveSlots();
   } catch (_) { document.getElementById('slots-message').textContent = 'Could not add slot. Refresh and check its state.'; }
-  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+  finally { button.disabled = !window.dashboardModuleState?.ready(); }
 });
 document.getElementById('add-minimal-slot').addEventListener('click', async event => {
-  event.currentTarget.disabled = true;
+  const button=event.currentTarget;button.disabled = true;
   try { await window.dashboardModuleState.createSlot('minimal'); slotGeneration++; await refreshActiveSlots(); }
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add minimal slot.'; }
-  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+  finally { button.disabled = !window.dashboardModuleState?.ready(); }
 });
 document.getElementById('add-note-slot').addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{await window.dashboardModuleState.createSlot('note');slotGeneration++;await refreshActiveSlots();}catch(_){document.getElementById('slots-message').textContent='Could not add note.';}finally{button.disabled=!window.dashboardModuleState?.ready();}});
 document.getElementById('add-linear-slot').addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{await window.dashboardModuleState.createSlot('linear');slotGeneration++;await refreshActiveSlots();}catch(_){document.getElementById('slots-message').textContent='Could not add linear slot.';}finally{button.disabled=!window.dashboardModuleState?.ready();}});
 document.getElementById('add-small-slot').addEventListener('click', async event => {
-  event.currentTarget.disabled = true;
+  const button=event.currentTarget;button.disabled = true;
   try { await window.dashboardModuleState.createSlot('small'); slotGeneration++; await refreshActiveSlots(); }
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add small slot.'; }
-  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+  finally { button.disabled = !window.dashboardModuleState?.ready(); }
 });
 document.getElementById('add-chat-slot').addEventListener('click', async event => {
-  event.currentTarget.disabled = true;
+  const button=event.currentTarget;button.disabled = true;
   try { await window.dashboardModuleState.createSlot('chat'); slotGeneration++; await refreshActiveSlots(); }
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add chat slot.'; }
-  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+  finally { button.disabled = !window.dashboardModuleState?.ready(); }
 });
 document.getElementById('add-chart-slot').addEventListener('click', async event => {
-  event.currentTarget.disabled = true;
+  const button=event.currentTarget;button.disabled = true;
   try { await window.dashboardModuleState.createSlot('chart'); slotGeneration++; await refreshActiveSlots(); }
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add chart slot. Refresh and check its state.'; }
-  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+  finally { button.disabled = !window.dashboardModuleState?.ready(); }
 });
 document.getElementById('add-fixed-chart-slot').addEventListener('click', async event => {
-  event.currentTarget.disabled = true;
+  const button=event.currentTarget;button.disabled = true;
   try { await window.dashboardModuleState.createSlot('fix-chart'); slotGeneration++; await refreshActiveSlots(); }
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add fixed chart slot.'; }
-  finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
+  finally { button.disabled = !window.dashboardModuleState?.ready(); }
 });
 async function pollSlots() {
   if (window.dashboardModuleState?.ready() && !slotRequestPending) {
