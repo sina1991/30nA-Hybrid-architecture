@@ -264,6 +264,15 @@ PANEL = r'''
         throw error;
       }
     },
+    async downloadUpload(id, name) {
+      if (!token || !authenticated) throw Error('Sign in required');
+      const current=generation;
+      const response=await fetch('/api/upstreams/uploads/'+encodeURIComponent(id)+'/content',{
+        headers:{Authorization:'Bearer '+token},cache:'no-store',credentials:'omit',redirect:'error',signal:session.signal});
+      if (!response.ok) throw Error('Download unavailable');
+      const blob=await response.blob(); if(current!==generation) throw Error('Session changed');
+      const url=URL.createObjectURL(blob), link=document.createElement('a');link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    },
     async listIndicatorProfiles() { return (await this.slotRequest('indicator-profiles')).profiles; },
     async createIndicatorProfile(profile) { return this.slotRequest('indicator-profiles', profile); },
     async saveIndicatorProfile(id, profile) { return this.slotRequest('indicator-profiles/' + encodeURIComponent(id), profile, 'PUT'); },
@@ -509,7 +518,7 @@ PANEL = r'''
       workerAccess = Boolean(account.worker_access);
       const [workers,history] = account.worker_access ? await Promise.all([request('workers'),request('executions')]) : [{workers:[]},{executions:[]}];
       if (current !== generation || ticket !== refreshTicket) return;
-      authenticated = true; allWorkers = workers.workers; renderWorkers();
+      slotOwner = account.user.id; authenticated = true; allWorkers = workers.workers; renderWorkers();
       const previous = el('account-worker').value;
       enabledWorkers = workers.workers.filter(row => row.lifecycle === 'enabled');
       el('account-worker').replaceChildren();

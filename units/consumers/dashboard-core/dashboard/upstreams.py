@@ -3,13 +3,13 @@ from uuid import UUID
 import sqlite3
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field
 from worker_manager.api import RegisterBody, ConfigureBody
 from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, owner_dependency
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
-from modules import slots
+from modules import slots, uploads
 from modules import slot_workers, indicator_profiles, signal_rules, accounts, chat_store
 from market_data.data import chart as gold_chart
 from market_data.data import indicator as market_indicator, database_table
@@ -145,6 +145,39 @@ def create_router(credential_path, upstream_factory):
         except LookupError: raise HTTPException(404, 'Account not found') from None
         except ValueError: raise HTTPException(422, 'Account cannot be disabled') from None
         response=JSONResponse(envelope({'enabled':body['enabled']})); response.headers['Cache-Control']='no-store'; return response
+
+    def upload_error(exc):
+        status = 404 if isinstance(exc, LookupError) else 403 if isinstance(exc, PermissionError) else 413 if isinstance(exc, OverflowError) else 422 if isinstance(exc, ValueError) else 503
+        raise HTTPException(status, {404:'File not found',403:'Account setup required',413:'File exceeds 512 KiB',422:'Invalid upload',503:'Upload storage unavailable'}[status]) from None
+
+    @router.get('/uploads')
+    def upload_list(identity=Depends(owner)):
+        try: items = uploads.list_files(identity)
+        except (PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
+        return JSONResponse(envelope({'files':items,'max_bytes':uploads.MAX_BYTES}), headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+    @router.post('/uploads')
+    def upload_create(body: dict, identity=Depends(owner)):
+        if set(body) != {'name','visibility','recipient','content'}: raise HTTPException(422, 'Invalid upload')
+        try: item = uploads.create(identity, **body)
+        except (ValueError, OverflowError, PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
+        return JSONResponse(envelope({'file':item}), headers={'Cache-Control':'no-store'})
+
+    @router.get('/uploads/{file_id}/content')
+    def upload_download(file_id: str, identity=Depends(owner)):
+        from urllib.parse import quote
+        try: item = uploads.access(identity, file_id)
+        except (LookupError, PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
+        return Response(item['content'], media_type='application/octet-stream', headers={
+            'Content-Disposition': "attachment; filename=download; filename*=UTF-8''" + quote(item['name'], safe=''),
+            'X-Content-Type-Options':'nosniff', 'Content-Security-Policy':"sandbox; default-src 'none'",
+            'Cache-Control':'no-store', 'Vary':'Authorization'})
+
+    @router.delete('/uploads/{file_id}')
+    def upload_delete(file_id: str, identity=Depends(owner)):
+        try: uploads.access(identity, file_id, delete=True)
+        except (LookupError, PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
+        return JSONResponse(envelope({'deleted':True}), headers={'Cache-Control':'no-store'})
 
     @router.get('/chat/users')
     def chat_users(identity=Depends(owner)):

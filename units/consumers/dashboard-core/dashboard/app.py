@@ -294,8 +294,6 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 .slot[data-slot-type="minimal"] {min-height:0;padding:5px;gap:3px}.slot[data-slot-type="minimal"] .module-body {gap:3px;font-size:12px}
 .slot-gear {position:absolute;z-index:3;top:5px;right:5px;display:grid;place-items:center;width:27px;height:27px;padding:0;border:1px solid var(--border);border-radius:7px;background:var(--field);color:var(--muted);font-size:17px;line-height:1;cursor:pointer}
 .slot-gear:hover,.slot-gear:focus-visible {color:var(--accent);border-color:var(--accent)}
-.slot-gear.worker-active::after,.slot-gear.worker-inactive::after {content:'';position:absolute;right:-2px;bottom:-2px;width:7px;height:7px;border:1px solid var(--field);border-radius:50%;background:#dc2626}
-.slot-gear.worker-active::after {background:#16a34a}
 .slot-options-dialog {width:min(560px,calc(100vw - 28px));max-height:min(85vh,800px);overflow:auto;border:1px solid var(--border);border-radius:12px;padding:14px;background:var(--panel);color:var(--text);box-shadow:0 15px 55px #0008}
 .slot-options-dialog::backdrop {background:#0009}.slot-options-dialog .slot-head-actions {justify-content:flex-start;flex-wrap:wrap;overflow:visible;padding:0}
 .slot-options-dialog .slot-head-actions::before,.slot-options-dialog .slot-head-actions::after {display:none}
@@ -415,6 +413,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   #overview-grid .slot-resize {display:none!important}
   #overview-grid .slot-name {cursor:default!important;touch-action:auto!important}
 }
+.slot-settings-tabs {display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}.slot-settings-tabs [aria-selected="true"] {background:var(--accent);color:white}.slot-options-dialog [hidden] {display:none!important}
 </style>
 </head>
 <body data-view="overview">
@@ -423,6 +422,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <nav aria-label="Dashboard sections">
     <button class="nav-button" type="button" data-nav="overview" aria-current="page">Overview</button>
     <button class="nav-button" type="button" data-nav="slots">Slots</button>
+    <button class="nav-button" type="button" data-nav="uploads">Upload Center</button>
     <button class="nav-button" type="button" data-nav="modules">Modules</button>
     <button class="nav-button" type="button" data-nav="workers">Workers</button>
     <button class="nav-button" type="button" data-nav="executions">Executions</button>
@@ -442,6 +442,14 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <button type="button" class="dice-roll-button" id="account-shortcut">Sign in</button>
 </header>
 <main>
+  <section class="page-view" data-page="uploads" hidden>
+    <h2>Upload Center</h2><p>Public files are shared with signed-in users. Direct files are restricted to sender and recipient. Maximum file size: 512 KiB.</p>
+    <input type="file" id="upload-file" aria-label="File">
+    <select id="upload-visibility" aria-label="Access"><option value="public">Public</option><option value="direct">Direct</option></select>
+    <select id="upload-recipient" aria-label="Recipient" hidden></select>
+    <button type="button" id="upload-send">Upload</button><button type="button" id="upload-refresh">Refresh</button>
+    <p id="upload-status" role="status"></p><div id="upload-list"></div>
+  </section>
   <section class="page-view" data-page="overview">
     <p class="slots-message" id="overview-empty">Sign in to view pinned slots.</p>
     <div id="overview-grid" aria-label="Pinned slots"></div>
@@ -515,6 +523,47 @@ const serverSlotContext = {};
 let slotSettings = readSettings();
 let runnerModule = null;
 
+async function refreshUploads() {
+  const bridge=window.dashboardModuleState, list=document.getElementById('upload-list'), status=document.getElementById('upload-status');
+  list.replaceChildren();
+  if (!bridge?.ready()) {status.textContent='Sign in to view and download files.';return;}
+  const owner=bridge.owner();
+  try {
+    const [data,users]=await Promise.all([bridge.slotRequest('uploads'),bridge.slotRequest('chat/users')]);
+    if (!bridge.ready() || bridge.owner()!==owner) return;
+    const names=new Map(users.users.map(user=>[user.id,user.username])); names.set(owner,'You');
+    const recipient=document.getElementById('upload-recipient');recipient.replaceChildren();
+    users.users.forEach(user=>{const option=makeElement('option','',user.username);option.value=user.id;recipient.append(option);});
+    const target=new URLSearchParams(location.search).get('download');
+    data.files.forEach(file=>{
+      const item=makeElement('div','worker-section-card');
+      item.append(makeElement('strong','',file.name),makeElement('p','',`${file.size.toLocaleString('en-US')} bytes · From: ${names.get(file.sender)||file.sender} · ${file.recipient?'To: '+(names.get(file.recipient)||file.recipient):'Public'} · ${new Date(file.created_at*1000).toLocaleString('en-US')}`));
+      const download=makeElement('button','','Download');download.type='button';
+      download.addEventListener('click',async()=>{try{await bridge.downloadUpload(file.id,file.name);}catch(_){status.textContent='Download unavailable. Check your account and file access.';}});
+      const copy=makeElement('button','','Copy download link');copy.type='button';copy.addEventListener('click',async()=>{try{const url=new URL(location.origin+location.pathname);url.searchParams.set('download',file.id);await navigator.clipboard.writeText(url.href);status.textContent='Download link copied. Sign-in and file access are required.';}catch(_){status.textContent='Could not copy link.';}});
+      item.append(download,copy);
+      if(file.sender===owner){const remove=makeElement('button','','Delete');remove.type='button';remove.addEventListener('click',async()=>{if(!confirm('Delete this file?'))return;try{await bridge.slotRequest('uploads/'+file.id,undefined,'DELETE');await refreshUploads();}catch(_){status.textContent='Could not delete file.';}});item.append(remove);}
+      if(file.id===target){item.style.border='2px solid var(--accent)';item.prepend(makeElement('p','','Linked file — select Download'));}
+      list.append(item);
+    });
+    status.textContent=target&&!data.files.some(file=>file.id===target)?'Linked file is unavailable to this account.':`${data.files.length} files`;
+  }catch(_){status.textContent='Upload Center unavailable. Account setup may be required.';}
+}
+document.getElementById('upload-visibility').addEventListener('change',event=>{document.getElementById('upload-recipient').hidden=event.target.value!=='direct';});
+document.getElementById('upload-refresh').addEventListener('click',refreshUploads);
+document.getElementById('upload-send').addEventListener('click',async()=>{
+  const file=document.getElementById('upload-file').files[0],status=document.getElementById('upload-status'),button=document.getElementById('upload-send'),bridge=window.dashboardModuleState;
+  if(!bridge?.ready()){status.textContent='Sign in to upload files.';return;}
+  if(!file||file.size>524288){status.textContent='Choose a file no larger than 512 KiB.';return;}
+  button.disabled=true;const owner=bridge.owner();
+  try{const bytes=new Uint8Array(await file.arrayBuffer());let raw='';for(let i=0;i<bytes.length;i+=8192)raw+=String.fromCharCode(...bytes.subarray(i,i+8192));
+    if(!bridge.ready()||bridge.owner()!==owner)throw Error();
+    const visibility=document.getElementById('upload-visibility').value;
+    await bridge.slotRequest('uploads',{name:file.name,visibility,recipient:visibility==='direct'?document.getElementById('upload-recipient').value:null,content:btoa(raw)});
+    document.getElementById('upload-file').value='';await refreshUploads();
+  }catch(_){status.textContent='Upload failed. Refresh the list before retrying.';}finally{button.disabled=false;}
+});
+
 function openView(name) {
   if (!document.querySelector(`[data-page="${name}"]`)) name = 'overview';
   document.body.dataset.view = name;
@@ -525,6 +574,7 @@ function openView(name) {
   });
   document.body.classList.remove('nav-open');
   document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
+  if (name === 'uploads') refreshUploads();
   if (name === 'account') refreshAccountAdministration();
   if (name === 'database') refreshDatabase();
   if (name === 'indicators') refreshIndicatorProfiles();
@@ -544,8 +594,12 @@ document.addEventListener('click', event => {
 document.addEventListener('dashboard-account-state', event => {
   document.getElementById('account-shortcut').textContent = event.detail.ready ? 'Account' : 'Sign in';
   document.querySelectorAll('[data-auth-note]').forEach(note => { note.hidden = event.detail.ready; });
+  if (event.detail.ready && (document.body.dataset.view === 'uploads' || new URLSearchParams(location.search).has('download'))) { openView('uploads'); }
   if (event.detail.ready && document.body.dataset.view === 'account') refreshAccountAdministration();
   if (!event.detail.ready) {
+    document.getElementById('upload-list').replaceChildren();
+    document.getElementById('upload-recipient').replaceChildren();
+    document.getElementById('upload-file').value='';
     document.getElementById('account-administration').replaceChildren();
     document.getElementById('runner-output').textContent = '';
     document.getElementById('runner-status').textContent = '';
@@ -1667,11 +1721,11 @@ function attachSavedResult(body, slot, moduleId) {
   setTimeout(tick, 0);
 }
 
-function numericFields(value) {
+function summaryFieldsFromResult(value) {
   const fields = [];
   function visit(item, path, depth) {
     if (fields.length >= 120 || depth > 8) return;
-    if (typeof item === 'number' && Number.isFinite(item)) { if (path) fields.push(path); return; }
+    if ((typeof item === 'number' && Number.isFinite(item)) || typeof item === 'string' || typeof item === 'boolean') { if (path) fields.push(path); return; }
     if (Array.isArray(item)) { if (item.length) visit(item[item.length - 1], path ? path + '.-1' : '-1', depth + 1); return; }
     if (!item || typeof item !== 'object') return;
     Object.entries(item).forEach(([key, child]) => {
@@ -1681,13 +1735,13 @@ function numericFields(value) {
   visit(value, '', 0); return fields;
 }
 
-function numericValue(value, path) {
+function summaryValue(value, path) {
   for (const key of path.split('.')) {
     if (Array.isArray(value) && key === '-1') value = value.length ? value[value.length - 1] : undefined;
     else if (value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value, key)) value = value[key];
     else return null;
   }
-  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+  return (typeof value === 'number' && Number.isFinite(value)) || typeof value === 'string' || typeof value === 'boolean' ? value : null;
 }
 
 const OUTPUT_FONTS = {system:'system-ui, sans-serif', mono:'ui-monospace, monospace', serif:'Georgia, serif'};
@@ -1724,10 +1778,10 @@ function renderSlotSummary(body, row, moduleInfo) {
     try {
       const result = await bridge.read(row.slot, row.module_id);
       if (!body.isConnected || !bridge.ready()) return;
-      const number = numericValue(result, settings.field);
+      const number = summaryValue(result, settings.field);
       const digits = Number.isInteger(settings.decimals) ? {minimumFractionDigits:settings.decimals, maximumFractionDigits:settings.decimals} : {maximumFractionDigits:8};
-      value.textContent = number === null ? '—' : new Intl.NumberFormat('en-US', digits).format(number);
-      value.title = number === null ? `Field ${settings.field} has no numeric value` : `Field: ${settings.field}`;
+      value.textContent = number === null ? '—' : typeof number === 'number' ? new Intl.NumberFormat('en-US', digits).format(number) : String(number);
+      value.title = number === null ? `Field ${settings.field} has no scalar value` : `Field: ${settings.field}`;
     } catch (_) { if (body.isConnected) { value.textContent = '—'; value.title = 'Could not read this slot'; } }
     finally { busy = false; }
   }
@@ -1781,7 +1835,7 @@ function makeSlot(row, area) {
     syncLayoutControls();
   });
   const menu = makeElement('button', 'slot-gear', '⚙'); menu.type = 'button';
-  menu.classList.add(row.worker?.enabled ? 'worker-active' : 'worker-inactive');
+
   const settingsDialog = makeElement('dialog', 'slot-options-dialog');
   settingsDialog.setAttribute('aria-label', `Slot options for ${slot.id}`);
   const closeSettings = makeElement('button', 'slot-dialog-close', 'Close'); closeSettings.type = 'button';
@@ -1881,17 +1935,11 @@ function makeSlot(row, area) {
   const appearanceGroup = makeElement('div', 'slot-appearance-controls'); appearanceGroup.append(typeLabel, displayLabel, colorLabel, resetColor);
   actions.append(makeElement('strong', '', 'Slot actions'), slotActionGroup, makeElement('strong', '', 'Slot appearance'), appearanceGroup);
   const controls = makeElement('div', 'slot-controls');
-  const searchLabel = makeElement('label', '', 'Find module');
-  const search = makeElement('input', 'module-search');
-  search.type = 'search'; search.placeholder = 'Search name or ID'; search.autocomplete = 'off';
-  search.setAttribute('aria-label', `Find module for ${slot.id}`);
-  const searchHint = makeElement('div', 'module-search-hint'); searchHint.setAttribute('aria-live', 'polite');
   const label = makeElement('label', '', 'Module');
   const select = makeElement('select', 'module-select'); select.setAttribute('aria-label', `Module for ${slot.id}`);
   let selectedModule = row.module_id;
   function filterModules(selected) {
-    const query = search.value.trim().toLowerCase();
-    const matches = availableModules.filter(module => module.name.toLowerCase().includes(query) || module.id.toLowerCase().includes(query));
+    const matches = availableModules;
     const current = availableModules.find(module => module.id === selected);
     select.replaceChildren();
     if (current && !matches.some(module => module.id === current.id)) {
@@ -1899,10 +1947,8 @@ function makeSlot(row, area) {
     }
     matches.forEach(module => { const option = makeElement('option', '', module.name); option.value = module.id; select.append(option); });
     select.value = selected;
-    searchHint.textContent = query ? (matches.length ? `${matches.length} matching modules` : 'No matching modules') : '';
   }
   filterModules(selectedModule);
-  search.addEventListener('input', () => filterModules(selectedModule));
   const body = makeElement('div', 'module-body');
   const inputDrawer = makeElement('div', 'slot-drawer'); inputDrawer.hidden = true;
   const input = makeElement('textarea', 'module-note-input'); input.value = '{}'; input.spellcheck = false;
@@ -1914,7 +1960,7 @@ function makeSlot(row, area) {
     'gold-chart':'{"period":20}', 'moving-average':'{"period":20,"latest":true}',
     'rsi':'{"period":14,"latest":true}', 'macd':'{"fast":12,"slow":26,"signal":9,"latest":true}'};
   input.placeholder = 'Example: ' + (examples[row.module_id] || '{}');
-  inputDrawer.append(makeElement('h4', '', 'Input settings (JSON)'), input);
+  inputDrawer.append(makeElement('h4', '', 'Input (JSON)'), input);
   const terminalDrawer = makeElement('div', 'slot-drawer'); terminalDrawer.hidden = true;
   const terminalContent = makeElement('div', '');
   terminalDrawer.append(makeElement('h4', '', 'Terminal commands'), makeElement('p', '', 'Run these commands as root on the installed server.'), terminalContent);
@@ -1925,15 +1971,6 @@ function makeSlot(row, area) {
     commands.forEach(([label, command]) => { terminalContent.append(makeElement('p', '', label), makeElement('pre', '', command)); });
   }
   input.addEventListener('input', refreshTerminalCommands);
-  function drawerButton(label, icon, drawer) {
-    const button = makeElement('button', 'slot-icon', label); button.type = 'button';
-    button.title = label; button.setAttribute('aria-label', `${label} for ${slot.id}`); button.setAttribute('aria-expanded', 'false');
-    button.addEventListener('click', () => { drawer.hidden = !drawer.hidden; button.setAttribute('aria-expanded', String(!drawer.hidden));
-      if (drawer === terminalDrawer && !drawer.hidden) refreshTerminalCommands(); });
-    return button;
-  }
-  const inputButton = drawerButton('Input settings', '{}', inputDrawer);
-  const terminalButton = drawerButton('Terminal commands', '>_', terminalDrawer);
   const workerDrawer = makeElement('div', 'slot-drawer'); workerDrawer.hidden = true;
   const workerTitle = makeElement('h4', '', 'Slot worker');
   const workerHelp = makeElement('p', '', 'Runs this slot module on the server while Dashboard is running. Stopping prevents new runs; an active run may finish.');
@@ -1991,16 +2028,12 @@ function makeSlot(row, area) {
   workerButtons.append(workerSave, workerStop);
   workerForm.append(kindLabel, intervalLabel, workerInputDetails, workerState, workerButtons);
   workerDrawer.append(workerTitle, workerHelp, workerForm);
-  const workerButton = drawerButton('Slot worker settings', '⚒', workerDrawer);
-  workerButton.dataset.slotWorker = slot.id;
-  workerButton.classList.add(row.worker?.enabled ? 'worker-active' : 'worker-inactive');
-  workerButton.title = row.worker?.enabled ? 'Slot worker active' : 'Slot worker inactive';
   const run = makeElement('button', 'slot-icon slot-run', 'Run module'); run.type = 'button';
   run.title = 'Run module'; run.setAttribute('aria-label', `Run ${row.module_id} in ${slot.id}`);
   run.addEventListener('click', async () => {
     let data;
     try { data = JSON.parse(input.value); if (!data || Array.isArray(data) || typeof data !== 'object') throw Error(); }
-    catch (_) { notice.textContent = 'Enter a valid JSON object in Input settings.'; inputDrawer.hidden = false; inputButton.setAttribute('aria-expanded', 'true'); return; }
+    catch (_) { notice.textContent = 'Enter a valid JSON object in Input.'; selectSettingsTab(1); return; }
     const bridge = window.dashboardModuleState;
     if (!bridge?.ready()) { notice.textContent = 'Sign in to run this module.'; return; }
     run.disabled = true; notice.textContent = 'Running…';
@@ -2021,32 +2054,32 @@ function makeSlot(row, area) {
   serverSlotContext[slot.id] = row.context || {};
   select.addEventListener('change', async () => {
     const chosen = select.value, previous = selectedModule;
-    select.disabled = true; search.disabled = true;
+    select.disabled = true;
     try {
       await window.dashboardModuleState.bind(slot.id, chosen, contextFor(chosen), false);
       slotGeneration++; await refreshActiveSlots();
     } catch (_) {
       filterModules(previous); notice.textContent = 'Slot save failed or has an unknown outcome; check server state.';
-    } finally { select.disabled = false; search.disabled = false; }
+    } finally { select.disabled = false; }
   });
-  searchLabel.textContent = 'Find module'; searchLabel.append(search); label.append(select); controls.append(searchLabel, searchHint, label);
-  const outputDetails = makeElement('details', 'output-form');
-  outputDetails.append(makeElement('summary', '', 'Output settings'));
+  label.append(select); controls.append(label);
+  const outputDetails = makeElement('div', 'output-form');
+  outputDetails.append(makeElement('h4', '', 'Output'));
   const outputSettings = row.output_settings || {mode:'full', label:'', field:''};
   const outputModeLabel = makeElement('label', '', 'Display'); const outputMode = makeElement('select', '');
-  [['full','Full output'], ['summary','Name and key number']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value=value; outputMode.append(option); });
+  [['full','Full output'], ['summary','Name and key value']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value=value; outputMode.append(option); });
   outputMode.value = outputSettings.mode; outputModeLabel.append(outputMode);
   const outputNameLabel = makeElement('label', '', 'Short name'); const outputName = makeElement('input', ''); outputName.maxLength=32; outputName.placeholder='Example: CPU'; outputName.value=outputSettings.label; outputNameLabel.append(outputName);
-  const fieldLabel = makeElement('label', '', 'Available numeric fields'); const fieldSelect=makeElement('select',''); fieldLabel.append(fieldSelect);
+  const fieldLabel = makeElement('label', '', 'Available fields'); const fieldSelect=makeElement('select',''); fieldLabel.append(fieldSelect);
   const pathLabel=makeElement('label','','Field path'); const fieldPath=makeElement('input',''); fieldPath.placeholder='Example: memory.used_percent'; fieldPath.maxLength=160; fieldPath.value=outputSettings.field; pathLabel.append(fieldPath);
   const outputStatus=makeElement('p','market-status'); const refreshFields=makeElement('button','chart-options-button','Refresh fields'); refreshFields.type='button';
   const saveOutput=makeElement('button','chart-options-button','Save output settings'); saveOutput.type='button';
   fieldSelect.addEventListener('change', () => { if (fieldSelect.value) fieldPath.value=fieldSelect.value; });
   async function loadNumericFields() {
-    fieldSelect.replaceChildren(); const placeholder=makeElement('option','','Select a numeric field'); placeholder.value=''; fieldSelect.append(placeholder);
+    fieldSelect.replaceChildren(); const placeholder=makeElement('option','','Select a field'); placeholder.value=''; fieldSelect.append(placeholder);
     try {
       const result=await window.dashboardModuleState.read(slot.id,row.module_id);
-      const fields=numericFields(result);
+      const fields=summaryFieldsFromResult(result);
       fields.forEach(path => { const option=makeElement('option','',path); option.value=path; fieldSelect.append(option); });
       if (fields.includes(fieldPath.value)) fieldSelect.value=fieldPath.value;
       outputStatus.textContent=fields.length ? 'Choose a field, or enter its path.' : 'No numeric fields available yet. Run the module or enter a path.';
@@ -2101,7 +2134,6 @@ function makeSlot(row, area) {
   const summaryFields=makeElement('div','slot-section'); summaryFields.append(outputNameLabel,fieldLabel,pathLabel,refreshFields);
   function updateOutputMode() { const isSummary=outputMode.value === 'summary'; summaryFields.hidden=!isSummary; preview.hidden=!isSummary; previewLabel.hidden=!isSummary; }
   outputMode.addEventListener('change', () => { updateOutputMode(); if (outputMode.value === 'summary') loadNumericFields(); });
-  outputDetails.addEventListener('toggle', () => { if (outputDetails.open && outputMode.value === 'summary') loadNumericFields(); });
   refreshFields.addEventListener('click', loadNumericFields);
   [fontSize,labelSize,decimals,weight,family,alignment,outputName,textColor.color,labelColor.color,backgroundColor.color].forEach(input => { input.addEventListener('input', updatePreview); input.addEventListener('change', updatePreview); });
   const resetStyle=makeElement('button','chart-options-button','Reset appearance'); resetStyle.type='button';
@@ -2116,19 +2148,36 @@ function makeSlot(row, area) {
     try {
       await window.dashboardModuleState.setSlotAppearance(slot.id,{output_settings:{mode:outputMode.value,label:outputName.value.trim(),field:fieldPath.value.trim(),...styleValues()}});
       slotGeneration++; await refreshActiveSlots();
-    } catch (_) { outputStatus.textContent='Check the numeric field path and appearance values before saving.'; saveOutput.disabled=false; }
+    } catch (_) { outputStatus.textContent='Check the field path and appearance values before saving.'; saveOutput.disabled=false; }
   });
   outputDetails.append(outputModeLabel,summaryFields,makeElement('strong','','Output appearance'),styleGrid,previewLabel,preview,resetStyle,saveOutput,outputStatus);
   updateOutputMode(); updatePreview();
-  const moduleSection = makeElement('div', 'slot-section'); moduleSection.append(makeElement('h4', '', 'Module selection'), controls);
-  const runtimeSection = makeElement('div', 'slot-section'); runtimeSection.append(makeElement('h4', '', 'Run, input and Worker'));
   lock.classList.add('slot-icon');
-  headActions.append(run, inputButton, terminalButton, workerButton, lock); head.append(headActions); runtimeSection.append(head, inputDrawer, terminalDrawer, workerDrawer);
   const resize = makeElement('button', 'slot-resize', '↘'); resize.type = 'button';
   resize.setAttribute('aria-label', `Resize ${slot.id}`); resize.title = 'Drag to resize';
   const moveHandle = makeElement('div', 'chart-move-handle', 'Drag to move');
   const layoutNotice = makeElement('div', 'market-status'); layoutNotice.setAttribute('role', 'status');
-  settingsDialog.append(closeSettings, name, actions, moduleSection, outputDetails, runtimeSection, notice);
+  const tabs = makeElement('div', 'slot-settings-tabs'); tabs.setAttribute('role','tablist');
+  const actionsPanel = makeElement('div','slot-settings-panel');
+  actionsPanel.append(actions, label, run, lock);
+  const modulePanel = makeElement('div','slot-settings-panel');
+  modulePanel.append(makeElement('h4','','Module'), makeElement('p','',moduleInfo?.description || moduleInfo?.name || row.module_id));
+  const panels = [['Slot actions',actionsPanel],['Input',inputDrawer],['Commands',terminalDrawer],['Slot Worker',workerDrawer],['Output',outputDetails],['Module',modulePanel]];
+  function selectSettingsTab(index) {
+    panels.forEach(([,panel],i) => {panel.hidden=i!==index; tabs.children[i].setAttribute('aria-selected',String(i===index)); tabs.children[i].tabIndex=i===index?0:-1;});
+    if (index===2) refreshTerminalCommands();
+    if (index===4) loadNumericFields();
+  }
+  panels.forEach(([title,panel],index) => {
+    const button=makeElement('button','',title); button.type='button'; button.setAttribute('role','tab');
+    button.id=`${area}-${slot.id}-tab-${index}`; panel.id=`${area}-${slot.id}-panel-${index}`;
+    button.setAttribute('aria-controls',panel.id); panel.setAttribute('role','tabpanel'); panel.setAttribute('aria-labelledby',button.id);
+    button.addEventListener('click',()=>selectSettingsTab(index));
+    button.addEventListener('keydown',event=>{if(['ArrowRight','ArrowLeft','Home','End'].includes(event.key)){event.preventDefault(); const next=event.key==='Home'?0:event.key==='End'?5:(index+(event.key==='ArrowRight'?1:5))%6; selectSettingsTab(next);tabs.children[next].focus();}});
+    tabs.append(button);
+  });
+  settingsDialog.append(closeSettings,name,tabs,...panels.map(([,panel])=>panel),notice);
+  selectSettingsTab(0);
   if (area === 'slots') {
     const listLabel = makeElement('div', 'slot-list-label', moduleInfo?.name || row.module_id);
     listLabel.append(makeElement('span', '', slot.id));
