@@ -1,0 +1,8 @@
+{
+  "id": "session-clock",
+  "name": "Session Clock",
+  "description": "Configurable broker-time 24-hour clock and countdown.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "session-clock"
+}

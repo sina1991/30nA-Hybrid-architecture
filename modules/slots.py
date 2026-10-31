@@ -7,7 +7,7 @@ import sqlite3
 from uuid import uuid4
 from market_data.indicators import CHART_DEFAULTS
 from .module_state import change
-from . import chat_store
+from . import chat_store, technical
 from .execution import MODULE_FILES, HOST_MONITORS, MARKET_MODULES, run_module
 
 
@@ -86,6 +86,7 @@ def list_active(owner):
             result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
                            'layout': meta.get('layout'), 'minimized': bool(meta.get('minimized', False)), 'output_settings':meta.get('output_settings', {'mode':'full','label':'','field':''}), 'frame_color': meta.get('frame_color'),
                            'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker'),
+                           'technical_settings':meta.get('technical_settings', {}), 'technical_defaults':technical.DEFAULTS.get(json.loads(value)['module_id']),
                            'slot_type': meta.get('slot_type', 'standard'), 'chat_room':meta.get('chat_room', 'public'),
                            'chart_period': meta.get('chart_period', 20), 'chart_interval': meta.get('chart_interval', '1m'), 'indicator_period': meta.get('indicator_period', 14), 'chart_overlay': meta.get('chart_overlay', True),
                            'chart_live': meta.get('chart_live', True), 'chart_indicators': meta.get('chart_indicators', [])})
@@ -177,8 +178,12 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators', 'minimized', 'output_settings', 'chat_room'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators', 'minimized', 'output_settings', 'chat_room', 'technical_settings'}:
         raise ValueError('invalid slot appearance')
+    if 'technical_settings' in updates:
+        configs=updates['technical_settings']
+        if not isinstance(configs,dict) or not configs or set(configs)-set(technical.KINDS): raise ValueError('invalid technical settings')
+        updates=dict(updates,technical_settings={kind:technical.settings(kind,value) for kind,value in configs.items()})
     if 'minimized' in updates and type(updates['minimized']) is not bool:
         raise ValueError('invalid minimized state')
     if 'output_settings' in updates:
@@ -252,6 +257,8 @@ def update_appearance(owner, slot, updates):
             raise ValueError('fixed chart dimensions cannot be changed')
         if resulting_type != meta.get('slot_type', 'standard') and (resulting_type in ('fix-chart', 'small', 'minimal') or meta.get('slot_type') in ('small', 'minimal')):
             meta.pop('layout', None)
+        if 'technical_settings' in updates:
+            updates=dict(updates,technical_settings={**meta.get('technical_settings',{}),**updates['technical_settings']})
         meta.update(updates)
         db.execute("UPDATE module_state SET value=? WHERE owner=? AND module='slot-meta' AND slot=?", (json.dumps(meta), owner, slot))
         db.commit()
@@ -265,7 +272,7 @@ def delete(owner, slot):
     try:
         exists = db.execute("SELECT 1 FROM module_state WHERE owner=? AND module='slot-meta' AND slot=?", (owner, slot)).fetchone()
         if not exists: raise LookupError('slot is not active')
-        db.execute("DELETE FROM module_state WHERE owner=? AND slot=? AND module IN ('slot-binding','slot-meta','slot-output','counter','slot-note')", (owner, slot))
+        db.execute("DELETE FROM module_state WHERE owner=? AND slot=? AND module IN ('slot-binding','slot-meta','slot-output','counter','slot-note','round-spacing')", (owner, slot))
         db.commit()
     finally:
         db.close()
@@ -278,6 +285,11 @@ def _market_preferences(owner, slot, module_id):
     if module_id == 'gold-chart': result['interval'] = meta.get('chart_interval', '1m')
     if module_id == 'rsi': result['period'] = meta.get('indicator_period', 14)
     return result
+
+
+def _technical_preferences(owner, slot, module_id):
+    meta = change(owner, 'slot-meta', slot, None, lambda old:(old,False)) or {}
+    return {'settings':meta.get('technical_settings',{}).get(module_id,{}), '_state_owner':owner, '_state_slot':slot}
 
 
 def execute(owner, slot, data, expected_module=None, expected_revision=None):
@@ -293,7 +305,10 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None):
     if not isinstance(data, dict) or any(str(key).startswith('_') or key in ('owner', 'slot') for key in data):
         raise ValueError('invalid module input')
     defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
+    if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
     payload = {**defaults, **config.get('context', {}), **data}
+    if module_id in technical.KINDS and isinstance(data.get('settings'), dict):
+        payload['settings'] = {**defaults.get('settings', {}), **data['settings']}
     if module_id in ('counter', 'slot-note', 'chat-box'):
         payload.update(_state_owner=owner, _state_slot=slot)
     if module_id == 'chat-box':
@@ -311,10 +326,11 @@ def read(owner, slot):
         raise LookupError('slot is not configured')
     module_id = config['module_id']
     _authorize_host_monitor(owner, module_id)
-    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id == 'chat-box':
+    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id in technical.KINDS or module_id == 'chat-box':
         data = {'action':'get'} if module_id in ('counter','slot-note') else {}
         # Reads never change the saved output or execute arbitrary code.
         defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
+        if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
         payload = {**defaults, **config.get('context', {}), **data}
         if module_id in ('counter','slot-note','chat-box'):
             payload.update(_state_owner=owner, _state_slot=slot)

@@ -1,0 +1,8 @@
+{
+  "id": "previous-day-session-levels",
+  "name": "Previous Day Session Levels",
+  "description": "Previous trading day session OHLC with configurable scan timeframe.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "price-levels"
+}

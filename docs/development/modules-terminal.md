@@ -128,3 +128,22 @@ python3 /opt/30na/dashboard-current/modules/chat-box/module.py --owner USER_ID -
 ```
 
 این مسیر محلی به دسترسی سیستم‌عامل به state متکی است؛ برای استفاده کاربران از Terminal، دستورات `30na account` و `30na chat` از API احراز هویت‌شده استفاده می‌کنند. Chat خصوصی فقط پس از پذیرش درخواست و برای اعضای همان اتاق قابل خواندن است. پیام‌ها در سرور ذخیره می‌شوند و End-to-End Encryption ندارند.
+
+## اندیکاتورهای زمان و سطوح قیمت
+
+پنج Module مستقل زیر از منطق server-side مشترک با Dashboard استفاده می‌کنند. تنظیمات پایدار هر اسلات در `Settings → Module` و در state همان owner ذخیره می‌شوند؛ برای استفاده از همان تنظیمات در CLI از `30na slots --owner OWNER run SLOT --input '{}'` استفاده کنید.
+
+```bash
+30na modules run round-levels --input '{"price":4000,"visible_low":3980,"visible_high":4040}'
+30na modules run previous-day-levels --input '{"settings":{"winter_utc_minutes":120,"clock_change":"Europe","days":10}}'
+30na modules run previous-day-session-levels --input '{"settings":{"winter_utc_minutes":120,"clock_change":"Europe","session_start":"16:30","session_end":"23:00","scan_minutes":15}}'
+30na modules run session-windows --input '{}'
+30na modules run session-clock --input '{}'
+python3 /opt/30na/dashboard-current/modules/session-windows/module.py --input '{}'
+```
+
+دو فرمان آخر مربوط به سشن بدون تنظیم بروکر و زمان‌بندی، `needs_configuration` برمی‌گردانند. ساعت دقیق ۱۱ پنجره و Time Pointهای نسخه اصلی در مستندات دریافتی نیست؛ این مقادیر جعل نشده‌اند. `windows` شامل objectهای `name/start/end/grade/views/color` و `points` شامل `time/views` است؛ ساعت‌ها قالب `HH:MM` دارند. `reference_timezone` منطقه زمانی مرجع IANA را مشخص می‌کند؛ اگر `null` باشد ساعت‌های واردشده مستقیماً ساعت بروکر هستند. `schedule_shift_minutes` فقط برنامه را جابه‌جا می‌کند و ساعت جاری بروکر را تغییر نمی‌دهد. `Teaching view` با `views` تعریف‌شده برای همان پنجره و نقطه فیلتر می‌شود. تنظیمات زمان‌بندی Session Windows را می‌توان از تب Module در Session Clock کپی کرد.
+
+دادهٔ پیش‌فرض قیمت، history موجود `XAUUSD` است. برای نماد دیگر باید `price` در Round Levels یا `candles` در سایر Moduleها بدهید؛ مسیر فایل یا URL دلخواه پذیرفته نمی‌شود. هر candle شامل `time` به UTC epoch seconds و `open/high/low/close` است؛ فهرست باید مرتب، بدون timestamp تکراری و حداکثر ۱۰۰۰۰ مورد باشد. دادهٔ ناقص، تضمین سقف و کف واقعی بروکر نیست؛ پاسخ با `coverage: available_history_only` این محدودیت را اعلام می‌کند. روز بدون candle ساخته نمی‌شود و سشن خالی با سشن قدیمی‌تر جایگزین نمی‌شود.
+
+Round Levels در اسلات و CLI دارای `--owner/--slot`، anchor فاصلهٔ خودکار را جداگانه نگه می‌دارد. در اجرای مستقل بدون owner، برای حفظ فاصله بین فراخوانی‌ها `spacing_state` پاسخ قبلی را به ورودی بعدی بدهید. جدول قیمت حداکثر ۵۰ روز و نمودار تعداد محدودی candle را برای نمایش نگه می‌دارد؛ برای مرور گذشته از `Show history (UTC)` استفاده کنید. پارامتر `days` محاسبات تا ۱۰۰۰ روز را می‌پذیرد، مشروط به history موجود. بدون اتصال به بروکر، زمان محاسبه‌شده با عنوان `not broker-verified` نمایش داده می‌شود.

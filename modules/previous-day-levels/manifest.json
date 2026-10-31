@@ -1,0 +1,8 @@
+{
+  "id": "previous-day-levels",
+  "name": "Previous Day Levels",
+  "description": "Previous trading day High, Low, Mid, Open and Close.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "price-levels"
+}

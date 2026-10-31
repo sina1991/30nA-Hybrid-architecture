@@ -232,8 +232,8 @@ def main():
                 if bool(args.owner) != bool(args.slot):
                     raise ValueError('--owner and --slot must be supplied together')
                 data = dict(args.input)
-                if args.owner and args.module_id not in ('counter','slot-note','chat-box'):
-                    raise ValueError('Shared state is supported for counter, slot-note and chat-box')
+                if args.owner and args.module_id not in ('counter','slot-note','chat-box','session-windows','session-clock','round-levels','previous-day-levels','previous-day-session-levels'):
+                    raise ValueError('Shared state is supported for stateful trusted modules and technical indicators')
                 if args.owner:
                     data.update(_state_owner=args.owner, _state_slot=args.slot)
                 result = run_module(args.module_id, data)

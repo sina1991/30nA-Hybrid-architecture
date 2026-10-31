@@ -1,0 +1,5 @@
+{
+  "id":"session-windows", "name":"Session Windows",
+  "description":"Broker-aware session windows, grades and time points using the shared Session Clock engine.",
+  "version":"1.0.0", "api_version":"1", "type":"session-windows"
+}

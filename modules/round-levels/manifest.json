@@ -1,0 +1,8 @@
+{
+  "id": "round-levels",
+  "name": "Round Levels",
+  "description": "Zero-anchored automatic or manual psychological price levels.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "price-levels"
+}

@@ -11,6 +11,9 @@ from pathlib import Path
 PACKAGES_DIR = Path(__file__).resolve().parent
 MODULE_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 SUPPORTED_TYPES = {
+    "session-windows",
+    "session-clock",
+    "price-levels",
     "empty",
     "health",
     "theme-summary",

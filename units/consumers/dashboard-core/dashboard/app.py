@@ -126,7 +126,8 @@ def clock_time(timezone: str | None = None) -> dict:
 def execute_module(module_id: str, data: dict) -> dict:
     try:
         from modules.execution import HOST_MONITORS, MARKET_MODULES
-        if module_id in HOST_MONITORS or module_id in MARKET_MODULES:
+        from modules.technical import KINDS
+        if module_id in HOST_MONITORS or module_id in MARKET_MODULES or module_id in KINDS:
             raise HTTPException(status_code=403, detail="Sign in to use this module")
         if any(str(key).startswith('_') for key in data):
             raise ValueError('reserved input field')
@@ -414,6 +415,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   #overview-grid .slot-name {cursor:default!important;touch-action:auto!important}
 }
 .slot-settings-tabs {display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}.slot-settings-tabs [aria-selected="true"] {background:var(--accent);color:white}.slot-options-dialog [hidden] {display:none!important}
+.slot[data-technical] .module-body {min-height:0;overflow:auto}.slot-settings-panel > .slot-icon {width:auto;padding:6px 10px;font-size:12px}.technical-view {overflow:auto;flex-shrink:0;touch-action:pan-y}.technical-details {overflow:auto;max-height:260px}.technical-details td,.technical-details th {padding:5px;white-space:nowrap;font-size:11px}.technical-view svg {display:block}
 </style>
 </head>
 <body data-view="overview">
@@ -1307,6 +1309,136 @@ function renderChat(body, slot) {
   function tick(){if(!body.isConnected)return;refresh();setTimeout(tick,5000);}setTimeout(tick,0);
 }
 
+function technicalSvg(tag, attrs={}, text=null) {
+  const node=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  Object.entries(attrs).forEach(([key,value])=>node.setAttribute(key,String(value)));
+  if(text!==null) node.textContent=String(text);
+  return node;
+}
+function renderTechnicalModule(body,slot,module) {
+  const status=makeElement('p','market-status','Loading indicator…'), view=makeElement('div','technical-view'), details=makeElement('div','technical-details');
+  view.dataset.moduleId=module.id;
+  body.append(status,view,details);
+  let busy=false,last=null,received=0,dragging=false,manual=false;
+  const isSession=['session-clock','session-windows'].includes(module.id);
+  const tools=makeElement('div','slot-section-actions'),reload=makeElement('button','','Live / refresh');reload.type='button';
+  reload.addEventListener('click',()=>{manual=false;refresh();});tools.append(reload);body.prepend(tools);
+  if(module.id==='round-levels'){
+    const low=makeElement('input',''),high=makeElement('input','');low.type=high.type='number';low.step=high.step='any';low.placeholder='Visible low';high.placeholder='Visible high';low.setAttribute('aria-label','Visible low');high.setAttribute('aria-label','Visible high');
+    const apply=makeElement('button','','Apply visible range');apply.type='button';apply.addEventListener('click',async()=>{if(!low.value||!high.value)return;try{const data=await window.dashboardModuleState.execute(slot.id,module.id,{visible_low:Number(low.value),visible_high:Number(high.value)});if(body.isConnected)body.dispatchEvent(new CustomEvent('technical-result',{detail:data}));}catch(_){status.textContent='Invalid range or market price unavailable.';}});tools.append(low,high,apply);
+  }else{
+    const date=makeElement('input','');date.type='datetime-local';date.setAttribute('aria-label','As of UTC');
+    const past=makeElement('button','','Show history (UTC)');past.type='button';past.addEventListener('click',async()=>{if(!date.value)return;try{const data=await window.dashboardModuleState.execute(slot.id,module.id,{now:Date.parse(date.value+'Z')/1000});if(body.isConnected)body.dispatchEvent(new CustomEvent('technical-result',{detail:data}));}catch(_){status.textContent='Historical data unavailable.';}});tools.append(date,past);
+  }
+  const point=(minute,radius=135)=>{const angle=minute/1440*Math.PI*2-Math.PI/2;return [180+radius*Math.cos(angle),180+radius*Math.sin(angle)];};
+  function paintClock(data) {
+    if(dragging)return;
+    view.replaceChildren();details.replaceChildren();
+    if (!data.wall_time) {status.textContent=data.message;return;}
+    const cfg=data.settings, elapsed=(performance.now()-received)/1000,seconds=(data.seconds_of_day+elapsed)%86400;
+    const svg=technicalSvg('svg',{viewBox:'0 0 360 430',role:'img','aria-label':'24-hour broker session clock'});
+    svg.style.width=`${cfg.clock_size}px`;svg.style.maxWidth='100%';svg.style.background=cfg.background_color;svg.style.color=cfg.text_color;
+    svg.style.fontFamily=OUTPUT_FONTS[cfg.font] || 'system-ui';
+    svg.append(technicalSvg('circle',{cx:180,cy:180,r:135,fill:'none',stroke:'#334155','stroke-width':18}));
+    data.windows.forEach(window=>{
+      const minuteOf=text=>Number(text.slice(0,2))*60+Number(text.slice(3));
+      const start=minuteOf(window.start),end=minuteOf(window.end),length=(end-start+1440)%1440 || 1440;
+      const from=point(start),to=point(end===start?end-0.0001:end),active=data.active_windows.some(item=>item.name===window.name && item.start===window.start);
+      svg.append(technicalSvg('path',{d:`M ${from} A 135 135 0 ${length>720?1:0} 1 ${to}`,fill:'none',stroke:window.color||'#60a5fa','stroke-width':18,opacity:active?1:0.25}));
+    });
+    for(let hour=0;hour<24;hour++){
+      const start=point(hour*60,148),end=point(hour*60,153),label=point(hour*60,167);
+      svg.append(technicalSvg('line',{x1:start[0],y1:start[1],x2:end[0],y2:end[1],stroke:cfg.text_color}));
+      svg.append(technicalSvg('text',{x:label[0],y:label[1]+4,'text-anchor':'middle',fill:cfg.text_color,'font-size':11},String(hour).padStart(2,'0')));
+    }
+    if(cfg.points_on_clock) data.points.forEach(time=>{const m=Number(time.slice(0,2))*60+Number(time.slice(3)),a=point(m,121),b=point(m,148);svg.append(technicalSvg('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:cfg.point_color,'stroke-width':2}));});
+    const nowPoint=point(seconds/60);svg.append(technicalSvg('circle',{cx:nowPoint[0],cy:nowPoint[1],r:5,fill:'#ffffff'}));
+    const hhmmss=new Date(Math.floor(seconds)*1000).toISOString().slice(11,cfg.show_seconds?19:16);
+    svg.append(technicalSvg('text',{x:180,y:165,'text-anchor':'middle',fill:cfg.text_color,'font-size':30},hhmmss));
+    const lines=data.active_windows.map(w=>`${w.start}–${w.end} · ${w.grade} · ${w.name}`);
+    (lines.length?lines:['No active window']).forEach((line,i)=>svg.append(technicalSvg('text',{x:180,y:195+i*16,'text-anchor':'middle',fill:cfg.text_color,'font-size':11},line)));
+    const remaining=data.remaining_seconds===null?null:Math.max(0,Math.ceil(data.remaining_seconds-elapsed));
+    const countdown=remaining===null?'Not configured':`${String(Math.floor(remaining/3600)).padStart(2,'0')}:${String(Math.floor(remaining%3600/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
+    svg.append(technicalSvg('text',{x:180,y:365,'text-anchor':'middle',fill:cfg.text_color,'font-size':13},'NEXT POINT '+(data.next_point?.time||'—')),
+      technicalSvg('text',{x:180,y:397,'text-anchor':'middle',fill:remaining!==null&&remaining<=cfg.highlight_minutes*60?cfg.point_color:cfg.text_color,'font-size':26},countdown));
+    if(module.id==='session-clock'){
+      const stage=makeElement('div','session-clock-stage');stage.style.position='relative';stage.style.height='550px';stage.style.width='100%';
+      svg.style.position='absolute';svg.style.cursor='grab';svg.style.touchAction='none';stage.append(svg);view.append(stage);
+      requestAnimationFrame(()=>{if(!svg.isConnected)return;svg.style.left=`${Math.max(0,stage.clientWidth-svg.getBoundingClientRect().width)*cfg.position.x}px`;svg.style.top=`${Math.max(0,stage.clientHeight-svg.getBoundingClientRect().height)*cfg.position.y}px`;});
+      svg.addEventListener('pointerdown',event=>{
+        if(event.button!==0)return;event.preventDefault();dragging=true;svg.setPointerCapture(event.pointerId);
+        const startX=event.clientX,startY=event.clientY,left=parseFloat(svg.style.left)||0,top=parseFloat(svg.style.top)||0;
+        const width=Math.max(0,stage.clientWidth-svg.getBoundingClientRect().width),height=Math.max(0,stage.clientHeight-svg.getBoundingClientRect().height);
+        const position={...cfg.position};
+        const move=e=>{const x=Math.max(0,Math.min(width,left+e.clientX-startX)),y=Math.max(0,Math.min(height,top+e.clientY-startY));svg.style.left=`${x}px`;svg.style.top=`${y}px`;position.x=width?x/width:0;position.y=height?y/height:0;};
+        const finish=async e=>{svg.removeEventListener('pointermove',move);svg.removeEventListener('pointerup',finish);svg.removeEventListener('pointercancel',finish);dragging=false;if(e.type==='pointercancel')return;
+          try{await window.dashboardModuleState.setSlotAppearance(slot.id,{technical_settings:{[module.id]:{...cfg,position}}});cfg.position=position;}catch(_){status.textContent='Could not save clock position.';}};
+        svg.addEventListener('pointermove',move);svg.addEventListener('pointerup',finish);svg.addEventListener('pointercancel',finish);
+      });
+    }
+    if(module.id==='session-windows' && cfg.countdown_panel!==false){const panel=makeElement('p','session-live-panel',`${hhmmss} · ${lines.join(' / ')||'No active window'} · NEXT POINT ${data.next_point?.time||'—'} · ${countdown}`);panel.style.color=remaining!==null&&remaining<=cfg.highlight_minutes*60?cfg.point_color:cfg.text_color;view.append(panel);}
+    if(module.id==='session-windows'||cfg.chart_point_lines)paintSessionChart(data);
+    status.textContent=data.status==='ok'?'Calculated broker time · not broker-verified':data.message;
+
+  }
+  function paintSessionChart(data){
+    const cfg=data.settings,candles=data.candles||[];
+    if(!candles.length){details.append(makeElement('p','','No market history for session chart.'));return;}
+    const start=candles[0].time,finish=candles.at(-1).time,low=Math.min(...candles.map(c=>c.low)),high=Math.max(...candles.map(c=>c.high));
+    const svg=technicalSvg('svg',{viewBox:'0 0 800 330',role:'img','aria-label':'Session windows on market chart'});svg.style.width='100%';svg.style.minHeight='220px';
+    const x=t=>10+(t-start)/Math.max(1,finish-start)*770,y=p=>25+(high-p)/Math.max(0.01,high-low)*245;
+    (module.id==='session-windows'?data.chart_windows||[]:[]).forEach(w=>{
+      if(w.end_timestamp<start||w.start_timestamp>finish)return;
+      const left=Math.max(10,x(w.start_timestamp)),right=Math.min(780,x(w.end_timestamp)),opacity={A:0.3,B:0.18,C:0.08}[w.grade];
+      svg.append(technicalSvg('rect',{x:left,y:20,width:Math.max(1,right-left),height:260,fill:cfg.window_shape==='border'?'none':w.color||'#60a5fa','fill-opacity':opacity,stroke:cfg.window_shape==='filled'?'none':w.color||'#60a5fa'}));
+      if(cfg.window_labels)svg.append(technicalSvg('text',{x:left+3,y:34+(w.grade==='B'?12:w.grade==='C'?24:0),fill:cfg.text_color,'font-size':10},`${w.start}–${w.end} ${w.grade} ${w.name}`));
+    });
+    candles.forEach(c=>{const color=c.close>=c.open?'#22c55e':'#ef4444';svg.append(technicalSvg('line',{x1:x(c.time),x2:x(c.time),y1:y(c.high),y2:y(c.low),stroke:color}));svg.append(technicalSvg('rect',{x:x(c.time)-1,y:Math.min(y(c.open),y(c.close)),width:2,height:Math.max(1,Math.abs(y(c.open)-y(c.close))),fill:color}));});
+    if(module.id!=='session-windows'||cfg.time_points)(data.chart_lines||[]).filter(p=>p.time>=start&&p.time<=finish).forEach(p=>{svg.append(technicalSvg('line',{x1:x(p.time),x2:x(p.time),y1:20,y2:280,stroke:cfg.point_color,'stroke-dasharray':'2 4'}),technicalSvg('text',{x:x(p.time)+2,y:295,fill:cfg.point_color,'font-size':10},p.label));});
+    if(module.id==='session-windows'&&cfg.day_start_lines)(data.day_lines||[]).filter(t=>t>=start&&t<=finish).forEach(t=>svg.append(technicalSvg('line',{x1:x(t),x2:x(t),y1:15,y2:280,stroke:cfg.text_color,'stroke-dasharray':'7 4'})));
+    svg.append(technicalSvg('text',{x:10,y:321,fill:cfg.text_color,'font-size':10},`${new Date(start*1000).toISOString()} — ${new Date(finish*1000).toISOString()} · UTC`));details.append(svg);
+  }
+  function paintLevels(data) {
+    view.replaceChildren();details.replaceChildren();
+    const cfg=data.settings, candles=data.candles||[], days=data.days||[];
+    const prices=module.id==='round-levels'?data.levels:days.flatMap(day=>Object.values(day.levels));
+    if (!prices?.length) {status.textContent='Insufficient market history. Supply candles in Input or wait for the collector.';return;}
+    let low=Math.min(...prices,...candles.map(c=>c.low)),high=Math.max(...prices,...candles.map(c=>c.high));
+    const pad=(high-low)*0.06||1;low-=pad;high+=pad;
+    const svg=technicalSvg('svg',{viewBox:'0 0 800 330',role:'img','aria-label':module.name+' price chart'});
+    svg.style.width='100%';svg.style.minHeight='220px';
+    const start=candles[0]?.time || days[0]?.start || 0, finish=candles.at(-1)?.time || days.at(-1)?.end || 1;
+    const x=stamp=>12+(stamp-start)/Math.max(1,finish-start)*640,y=price=>15+(high-price)/(high-low)*265;
+    const dash={solid:'',dotted:'2 4',dashed:'7 4','dash-dot':'7 3 2 3'};
+    candles.forEach(c=>{const color=c.close>=c.open?'#22c55e':'#ef4444';svg.append(technicalSvg('line',{x1:x(c.time),x2:x(c.time),y1:y(c.high),y2:y(c.low),stroke:color}));svg.append(technicalSvg('rect',{x:x(c.time)-1,y:Math.min(y(c.open),y(c.close)),width:2,height:Math.max(1,Math.abs(y(c.open)-y(c.close))),fill:color}));});
+    const draw=(value,label,style,from=12,to=652)=>{
+      if(to<12||from>652)return;
+      svg.append(technicalSvg('line',{x1:Math.max(12,from),x2:Math.min(652,to),y1:y(value),y2:y(value),stroke:style.color,'stroke-width':style.width,'stroke-dasharray':dash[style.style]}));
+      if(cfg.show_labels!==false)svg.append(technicalSvg('text',{x:Math.min(660,Math.max(14,to)),y:y(value)-3,fill:cfg.label_color||style.color,'font-size':cfg.font_size||10},`${label} ${value}`));
+    };
+    if(module.id==='round-levels')data.levels.forEach(value=>draw(value,'',cfg));
+    else days.forEach(day=>Object.entries(day.levels).forEach(([key,value])=>draw(value,key.toUpperCase(),data.styles[key],x(day.start),x(day.end))));
+    svg.append(technicalSvg('text',{x:12,y:316,fill:'var(--muted)','font-size':10},candles.length?`${new Date(start*1000).toISOString()} — ${new Date(finish*1000).toISOString()} · UTC`:'Price levels'));
+    view.append(svg);
+    status.textContent=module.id==='round-levels'?`Step: ${data.step}${data.capped?' · line cap applied':''}`:`${days.length} trading days · ${data.source} · available history only${days.some(d=>d.provisional)?' · provisional session':''}`;
+    if(days.length){const table=makeElement('table','');const head=makeElement('tr','');['Day','Source day','High','Low','Mid','Open','Close','State'].forEach(text=>head.append(makeElement('th','',text)));table.append(head);
+      days.slice(-50).forEach(day=>{const tr=makeElement('tr','');[day.date,day.source_date,...['high','low','mid','open','close'].map(k=>day.levels[k]??'—'),day.provisional?'Provisional':'Closed'].forEach(text=>tr.append(makeElement('td','',String(text))));table.append(tr);});details.append(table);}
+  }
+  async function refresh(){
+    const bridge=window.dashboardModuleState;if(busy||manual||!bridge?.ready())return;busy=true;
+    try{const data=await bridge.read(slot.id,module.id);if(!body.isConnected||!bridge.ready()||manual)return;last=data;received=performance.now();if(isSession)paintClock(data);else paintLevels(data);}
+    catch(_){if(body.isConnected)status.textContent='Indicator unavailable. Check Module settings and market data.';}finally{busy=false;}
+  }
+  body.addEventListener('slot-refresh',()=>{manual=false;refresh();});
+  body.addEventListener('technical-result',event=>{manual=true;last=event.detail;received=performance.now();if(isSession)paintClock(last);else paintLevels(last);});
+  function tick(){if(!body.isConnected)return;
+    if(isSession&&last){paintClock(last);const elapsed=(performance.now()-received)/1000;if(!manual&&(elapsed>=15||(last.next_transition!==null&&last.now+elapsed>=last.next_transition)))refresh();}
+    setTimeout(tick,1000);
+  }
+  function poll(){if(!body.isConnected)return;refresh();setTimeout(poll,isSession?15000:10000);}
+  setTimeout(poll,0);setTimeout(tick,1000);
+}
+
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
   const module = availableModules.find(item => item.id === moduleId);
@@ -1321,6 +1453,7 @@ function renderModuleContent(body, slot, moduleId) {
     return;
   }
   if (module.type === 'market-indicator') { renderIndicator(body, slot, module); return; }
+  if (['session-clock','session-windows','price-levels'].includes(module.type)) {renderTechnicalModule(body,slot,module);return;}
   if (module.type === 'chat') { renderChat(body, slot); return; }
 
   if (module.type === "host-monitor") {
@@ -1809,6 +1942,7 @@ function makeSlot(row, area) {
     chat_room:row.chat_room, chart_period:row.chart_period, chart_interval:row.chart_interval, chart_indicators:row.chart_indicators, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
   const card = makeElement('article', isChartSlot ? 'slot chart-slot' : 'slot');
   card.dataset.slotId = slot.id;
+  if(row.technical_defaults)card.dataset.technical='true';
   card.dataset.area = area;
   card.dataset.slotType = row.slot_type || 'standard';
   card.dataset.displayTheme = slot.display_theme;
@@ -1966,7 +2100,9 @@ function makeSlot(row, area) {
   terminalDrawer.append(makeElement('h4', '', 'Terminal commands'), makeElement('p', '', 'Run these commands as root on the installed server.'), terminalContent);
   function refreshTerminalCommands() {
     terminalContent.replaceChildren();
-    const commands = terminalCommands(slot.id, row.module_id, row.context, input.value);
+    let commandInput=input.value;
+    if(row.technical_defaults){try{commandInput=JSON.stringify({settings:row.technical_settings?.[row.module_id]||row.technical_defaults,...JSON.parse(input.value)});}catch(_){}}
+    const commands = terminalCommands(slot.id, row.module_id, row.context, commandInput);
     if (typeof commands === 'string') { terminalContent.append(makeElement('p', '', commands)); return; }
     commands.forEach(([label, command]) => { terminalContent.append(makeElement('p', '', label), makeElement('pre', '', command)); });
   }
@@ -1977,7 +2113,7 @@ function makeSlot(row, area) {
   const workerForm = makeElement('div', 'slot-worker-form');
   const kindLabel = makeElement('label', '', 'Worker type');
   const kind = makeElement('select', ''); kind.setAttribute('aria-label', `Worker type for ${slot.id}`);
-  const monitorModules = ['clock','dashboard-health','system-monitor','service-monitor','disk-usage','network-monitor','process-monitor','log-viewer','docker-monitor','alerts','gold-chart','moving-average','rsi','macd'];
+  const monitorModules = ['clock','dashboard-health','system-monitor','service-monitor','disk-usage','network-monitor','process-monitor','log-viewer','docker-monitor','alerts','gold-chart','moving-average','rsi','macd','session-clock','session-windows','round-levels','previous-day-levels','previous-day-session-levels'];
   [['monitor', 'Monitor · read-only modules'], ['task', 'Task · run module']].forEach(([value, title]) => {
     const option = makeElement('option', '', title); option.value = value;
     if (value === 'monitor' && !monitorModules.includes(row.module_id)) option.disabled = true;
@@ -2042,7 +2178,8 @@ function makeSlot(row, area) {
       if (!card.isConnected || !bridge.ready()) return;
       notice.textContent = '';
       if (settingsDialog.open) settingsDialog.close();
-      if (['host-monitor','gold-chart','moving-average','market-indicator','chat'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
+      if (['session-clock','session-windows','price-levels'].includes(moduleInfo?.type)) body.dispatchEvent(new CustomEvent('technical-result',{detail:result}));
+      else if (['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
       else if (!['clock', 'counter', 'slot-note', 'empty', 'dashboard-health', 'theme-summary'].includes(row.module_id)) {
         let resultView = body.querySelector('.slot-quick-result');
         if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
@@ -2162,6 +2299,27 @@ function makeSlot(row, area) {
   actionsPanel.append(actions, label, run, lock);
   const modulePanel = makeElement('div','slot-settings-panel');
   modulePanel.append(makeElement('h4','','Module'), makeElement('p','',moduleInfo?.description || moduleInfo?.name || row.module_id));
+  if(row.technical_defaults){
+    const config=makeElement('textarea','module-note-input');config.spellcheck=false;config.rows=18;
+    config.setAttribute('aria-label',`Indicator settings for ${slot.id}`);
+    config.value=JSON.stringify(row.technical_settings?.[row.module_id]||row.technical_defaults,null,2);
+    const help=makeElement('p','','winter_utc_minutes is the broker winter offset from UTC; clock_change accepts none, Europe or USA. Schedule times use reference_timezone when set, otherwise broker wall time. Session Clock and Session Windows need the original windows and points.');
+    const save=makeElement('button','','Save indicator settings');save.type='button';
+    const feedback=makeElement('p','market-status');
+    save.addEventListener('click',async()=>{save.disabled=true;try{const value=JSON.parse(config.value);await window.dashboardModuleState.setSlotAppearance(slot.id,{technical_settings:{[row.module_id]:value}});slotGeneration++;await refreshActiveSlots();}catch(_){feedback.textContent='Invalid settings or save unavailable. Check field names, ranges and HH:MM times.';save.disabled=false;}});
+    if(['session-clock','session-windows'].includes(row.module_id)){
+      const viewLabel=makeElement('label','','Teaching view '),viewSelect=makeElement('select','');
+      ['Full map','Main sessions','New York start','New York middle','New York end','London start','Points only'].forEach(title=>{const option=makeElement('option','',title);option.value=title;viewSelect.append(option);});
+      const value=JSON.parse(config.value).teaching_view;viewSelect.value=value==='all'?'Full map':value;
+      viewSelect.addEventListener('change',()=>{try{config.value=JSON.stringify({...JSON.parse(config.value),teaching_view:viewSelect.value},null,2);}catch(_){feedback.textContent='Fix settings JSON first.';}});viewLabel.append(viewSelect);modulePanel.append(viewLabel);
+      if(row.module_id==='session-clock'){
+        const source=makeElement('select','');source.setAttribute('aria-label','Copy schedule from Session Windows slot');const empty=makeElement('option','','Copy schedule from Session Windows…');empty.value='';source.append(empty);
+        activeSlots.filter(item=>item.module_id==='session-windows').forEach(item=>{const option=makeElement('option','',item.slot);option.value=item.slot;source.append(option);});
+        source.addEventListener('change',()=>{const item=activeSlots.find(item=>item.slot===source.value);if(!item)return;try{const current=JSON.parse(config.value),cfg=item.technical_settings?.['session-windows']||item.technical_defaults;['winter_utc_minutes','clock_change','reference_timezone','schedule_shift_minutes','windows','points','teaching_view'].forEach(key=>current[key]=cfg[key]);config.value=JSON.stringify(current,null,2);feedback.textContent='Schedule copied. Save to apply.';}catch(_){feedback.textContent='Could not copy schedule.';}});modulePanel.append(source);
+      }
+    }
+    modulePanel.append(help,config,save,feedback);
+  }
   const panels = [['Slot actions',actionsPanel],['Input',inputDrawer],['Commands',terminalDrawer],['Slot Worker',workerDrawer],['Output',outputDetails],['Module',modulePanel]];
   function selectSettingsTab(index) {
     panels.forEach(([,panel],i) => {panel.hidden=i!==index; tabs.children[i].setAttribute('aria-selected',String(i===index)); tabs.children[i].tabIndex=i===index?0:-1;});
@@ -2170,6 +2328,7 @@ function makeSlot(row, area) {
   }
   panels.forEach(([title,panel],index) => {
     const button=makeElement('button','',title); button.type='button'; button.setAttribute('role','tab');
+    if(index===3){button.dataset.slotWorker=slot.id;button.title=row.worker?.enabled?'Slot worker active':'Slot worker inactive';}
     button.id=`${area}-${slot.id}-tab-${index}`; panel.id=`${area}-${slot.id}-panel-${index}`;
     button.setAttribute('aria-controls',panel.id); panel.setAttribute('role','tabpanel'); panel.setAttribute('aria-labelledby',button.id);
     button.addEventListener('click',()=>selectSettingsTab(index));
@@ -2191,7 +2350,7 @@ function makeSlot(row, area) {
   if (!row.minimized && row.output_settings?.mode === 'summary') renderSlotSummary(body, row, moduleInfo);
   else if (!row.minimized && isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
   else if (!row.minimized) renderModuleContent(body, slot, selectedModule);
-  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
+  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 

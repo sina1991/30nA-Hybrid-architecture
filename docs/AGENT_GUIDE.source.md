@@ -170,3 +170,9 @@ DATA direct envelope، provisioning children در HTTP و propagation سرتاس
 ## چیدمان v0.1.1
 
 `upstream_panel.py`، `ACCESS` برای header و `PANEL` برای Workspace پایین اسلات‌ها دارد؛ factory در `app.py` آن‌ها را مستقل تزریق می‌کند. `authenticated` پس از refresh موفق، Workspace را باز می‌کند؛ logout آن را پنهان می‌کند. پیام `account-status` میان ناحیه ورود و Workspace جابه‌جا می‌شود. تست `browser-tests/layout.cjs` اندازه کنترل ورود و موقعیت اسلات/Workspace را در desktop و mobile و سه حالت ورود بررسی می‌کند. fixture browser از theme/module واقعی پروژه استفاده می‌کند.
+
+## اندیکاتورهای زمان و قیمت
+
+- موتور trusted در `modules/technical.py` و پنج entrypoint مستقل `session-windows`، `session-clock`، `round-levels`، `previous-day-levels` و `previous-day-session-levels` قرار دارد. wrapperها executable ارسالی MT5 را اجرا نمی‌کنند. دستورها و محدودیت داده در `docs/development/modules-terminal.md` آمده‌اند.
+- `technical_settings` در meta هر owner/slot نگهداری می‌شود؛ اعتبارسنجی با `technical.settings` انجام می‌شود. ساعت مرجع سشن با ساعت بروکر یکی فرض نمی‌شود. دو ابزار سشن موتور مشترک دارند؛ تا دریافت مقادیر واقعی Inputs، برنامه اختصاصی ۱۱ پنجره و Time Pointها مقدار پیش‌فرض ساختگی ندارد.
+- تست هدفمند: `tests/test_technical_indicators.py` و `tests/test_technical_browser.py`؛ بررسی DST، نیمه‌شب، داده ناقص، owner isolation و اجرای مستقل CLI. پذیرش VPS و برابری با executable اصلی انجام نشده است.

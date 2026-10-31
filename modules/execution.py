@@ -5,6 +5,7 @@ from pathlib import Path
 
 PACKAGES = Path(__file__).resolve().parent
 MODULE_FILES = {
+    **{name: name + '/module.py' for name in ('session-windows','session-clock','round-levels','previous-day-levels','previous-day-session-levels')},
     'clock': 'clock/clock.py', 'calculator': 'calculator/module.py',
     'counter': 'counter/module.py', 'dice-roller': 'dice-roller/module.py',
     'slot-note': 'slot-note/module.py', 'theme-summary': 'theme-summary/module.py',
