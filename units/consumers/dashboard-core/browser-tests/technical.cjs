@@ -3,7 +3,7 @@ const fs=require('node:fs');
 const http=require('node:http');
 const {chromium}=require('playwright');
 const input=JSON.parse(fs.readFileSync(0,'utf8'));
-let kind='session-windows';const saved={};const writes=[];
+let kind='session-windows',slotId='slot-technical';const saved={};const writes=[];
 const server=http.createServer((req,res)=>{
  res.setHeader('content-type',req.url==='/'?'text/html; charset=utf-8':'application/json');
  if(req.url==='/')return res.end(input.html);
@@ -21,11 +21,14 @@ const server=http.createServer((req,res)=>{
  await page.route('**/api/upstreams/**',async route=>{
   const path=new URL(route.request().url()).pathname,send=payload=>route.fulfill({json:{contract_version:'1.0.0',payload}});
   if(path.endsWith('/account/login'))return send({token:'s_'+'a'.repeat(43)});
+  if(path==='/api/upstreams/slots'&&route.request().method()==='POST'){slotId='slot-from-indicators';return send({slot:{slot:slotId,module_id:'empty'}});}
+  if(path.endsWith('/slots/'+slotId+'/overview'))return send({slot:slotId,overview:true});
+  if(path.endsWith('/indicator-profiles'))return send({profiles:[]});
   if(path.endsWith('/account/me'))return send({user:{id:'user-a',username:'alice',role:'user'},legacy:false,worker_access:false});
-  if(path.endsWith('/slots/active'))return send({owner:'user-a',slots:[{slot:'slot-technical',module_id:kind,context:{},revision:'rev-'+kind,overview:true,slot_type:'standard',technical_defaults:input.defaults[kind],technical_settings:saved}]});
-  if(path.endsWith('/slots/slot-technical/read'))return send({result:{...input.results[kind],settings:saved[kind]||input.results[kind].settings}});
-  if(path.endsWith('/slots/slot-technical/binding')){kind=route.request().postDataJSON().module_id;return send({binding:{module_id:kind}});}
-  if(path.endsWith('/slots/slot-technical/appearance')){const body=route.request().postDataJSON();writes.push(body);Object.assign(saved,body.technical_settings||{});return send({appearance:body});}
+  if(path.endsWith('/slots/active'))return send({owner:'user-a',slots:[{slot:slotId,module_id:kind,context:{},revision:'rev-'+kind,overview:true,slot_type:'standard',technical_defaults:input.defaults[kind],technical_settings:saved}]});
+  if(path.endsWith('/slots/'+slotId+'/read'))return send({result:{...input.results[kind],settings:saved[kind]||input.results[kind].settings}});
+  if(path.endsWith('/slots/'+slotId+'/binding')){kind=route.request().postDataJSON().module_id;return send({binding:{module_id:kind}});}
+  if(path.endsWith('/slots/'+slotId+'/appearance')){const body=route.request().postDataJSON();writes.push(body);Object.assign(saved,body.technical_settings||{});return send({appearance:body});}
   return send({rooms:[],requests:[],users:[]});
  });
  await page.goto(`http://127.0.0.1:${server.address().port}`);
@@ -49,6 +52,21 @@ const server=http.createServer((req,res)=>{
   await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
  }
  assert.equal(writes.filter(item=>item.technical_settings).length,4);
+ await page.locator('[data-nav="indicators"]').click();
+ await page.locator('[data-indicator-module="session-windows"]').waitFor();
+ assert.equal(await page.locator('#indicator-technical-list > article').count(),5);
+ for(const id of Object.keys(input.defaults))assert.equal(await page.locator(`#indicator-new-type option[value="${id}"]`).count(),1);
+ await page.locator('[data-indicator-module="previous-day-session-levels"]').getByRole('button',{name:'Configure',exact:true}).click();
+ await page.getByRole('textbox',{name:'Indicator settings for slot-technical'}).waitFor();
+ await page.locator('dialog[open]').getByRole('button',{name:'Close',exact:true}).click();
+ await page.locator('[data-nav="indicators"]').click();
+ await page.locator('#indicator-new-type').selectOption('round-levels');await page.locator('#indicator-add').click();
+ await page.getByRole('textbox',{name:'Indicator settings for slot-from-indicators'}).waitFor();
+ assert.equal(kind,'round-levels');assert.equal(await page.locator('dialog[open] [role="tab"][aria-selected="true"]').textContent(),'Module');
+ await page.locator('dialog[open]').getByRole('button',{name:'Close',exact:true}).click();
+ await page.locator('[data-nav="indicators"]').click();
+ await page.locator('[data-indicator-module="round-levels"]').getByRole('button',{name:'View',exact:true}).click();
+ await page.waitForFunction(()=>document.body.dataset.view==='overview');
  assert.deepEqual(errors,[]);console.log('PASS: five independent indicators, live clock and persistent module settings');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

@@ -488,7 +488,10 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <section class="page-view" data-page="indicators" hidden>
     <h2 class="view-heading">Indicators</h2><p class="view-description">Configure independent indicator instances for your charts and signals.</p>
     <div class="db-controls"><label>Indicator<select id="indicator-new-type"><option value="sma">SMA</option><option value="rsi">RSI</option><option value="macd">MACD</option></select></label><button type="button" id="indicator-add">Add indicator</button><button type="button" id="indicator-refresh">Refresh</button></div>
-    <p id="indicator-status" class="market-status">Sign in to manage indicators.</p><div id="indicator-list" class="indicator-grid"></div>
+    <p id="indicator-status" class="market-status">Sign in to manage indicators.</p>
+    <h3>Session and price indicators</h3><p>Open an independent indicator on Overview, then configure its Module settings. Session tools require the original schedule.</p>
+    <div id="indicator-technical-list" class="indicator-grid"></div>
+    <h3>Chart and signal indicators</h3><div id="indicator-list" class="indicator-grid"></div>
   </section>
   <section class="page-view" data-page="signals" hidden>
     <h2 class="view-heading">Signal Scripts</h2><p class="view-description">Build rules or run a published Python Worker with indicator inputs.</p>
@@ -599,6 +602,7 @@ document.addEventListener('dashboard-account-state', event => {
   if (event.detail.ready && (document.body.dataset.view === 'uploads' || new URLSearchParams(location.search).has('download'))) { openView('uploads'); }
   if (event.detail.ready && document.body.dataset.view === 'account') refreshAccountAdministration();
   if (!event.detail.ready) {
+    indicatorProfiles=[];document.getElementById('indicator-list').replaceChildren();document.getElementById('indicator-technical-list').replaceChildren();document.getElementById('indicator-status').textContent='Sign in to manage indicators.';
     document.getElementById('upload-list').replaceChildren();
     document.getElementById('upload-recipient').replaceChildren();
     document.getElementById('upload-file').value='';
@@ -608,6 +612,8 @@ document.addEventListener('dashboard-account-state', event => {
     document.getElementById('runner-input').value = '{}';
     document.getElementById('db-output').replaceChildren();
     document.getElementById('db-status').textContent = 'Sign in to view market data.';
+  } else if (document.body.dataset.view === 'indicators') {
+    refreshIndicatorProfiles();
   } else if (document.body.dataset.view === 'database') {
     refreshDatabase();
   }
@@ -649,11 +655,52 @@ document.getElementById('db-prev').addEventListener('click', () => { databaseOff
 document.getElementById('db-next').addEventListener('click', () => { databaseOffset += Number(document.getElementById('db-limit').value); refreshDatabase(); });
 const indicatorDefaults = {sma:{period:20}, rsi:{period:14}, macd:{fast:12,slow:26,signal:9}};
 let indicatorProfiles = [];
+function technicalIndicators() {return availableModules.filter(module=>['session-windows','session-clock','price-levels'].includes(module.type));}
+function populateIndicatorTypes(){
+  const select=document.getElementById('indicator-new-type');
+  technicalIndicators().forEach(module=>{if([...select.options].some(option=>option.value===module.id))return;const option=makeElement('option','',module.name);option.value=module.id;select.append(option);});
+}
+async function openTechnicalIndicator(slotId,configure=false){
+  await refreshActiveSlots();const row=activeSlots.find(item=>item.slot===slotId);if(!row)throw Error('Slot unavailable');
+  if(!configure&&!row.overview){await window.dashboardModuleState.setOverview(slotId,true);slotGeneration++;await refreshActiveSlots();}
+  const overview=!configure||row.overview;openView(overview?'overview':'slots');
+  const container=overview?document.getElementById('overview-grid'):grid;
+  const card=[...(container||document).querySelectorAll('.slot')].find(item=>item.dataset.slotId===slotId&&item.dataset.area===(overview?'overview':'slots'));
+  if(!card)throw Error('Slot unavailable');card.scrollIntoView({behavior:'smooth',block:'center'});
+  if(configure){card.querySelector('.slot-gear').click();[...card.querySelectorAll('[role="tab"]')].find(button=>button.textContent==='Module')?.click();}
+}
+async function addTechnicalIndicator(moduleId){
+  const bridge=window.dashboardModuleState;if(!bridge?.ready())throw Error('Sign in required');
+  let created=null;
+  try{created=await bridge.createSlot();await bridge.bind(created.slot,moduleId,{},false);await bridge.setOverview(created.slot,true);slotGeneration++;await openTechnicalIndicator(created.slot,true);}
+  catch(error){error.createdSlot=created?.slot;throw error;}
+}
+function renderTechnicalIndicators(rows){
+  const root=document.getElementById('indicator-technical-list');root.replaceChildren();
+  technicalIndicators().forEach(module=>{
+    const card=makeElement('article','indicator-card');card.dataset.indicatorModule=module.id;
+    card.append(makeElement('strong','',module.name),makeElement('p','market-status',module.description));
+    const add=makeElement('button','','Add to Overview');add.type='button';add.disabled=!window.dashboardModuleState?.ready();
+    const message=makeElement('p','market-status');
+    add.addEventListener('click',async()=>{add.disabled=true;try{await addTechnicalIndicator(module.id);}catch(error){message.textContent=error.createdSlot?`Slot ${error.createdSlot} was created; setup was not confirmed. Refresh and check Slots before retrying.`:'Could not create indicator. Sign in and check the slot limit.';}finally{add.disabled=!window.dashboardModuleState?.ready();}});
+    card.append(add);
+    rows.filter(row=>row.module_id===module.id).forEach(row=>{
+      const item=makeElement('div','slot-section-actions'),cfg=row.technical_settings?.[module.id]||row.technical_defaults;
+      const needs=['session-clock','session-windows'].includes(module.id)&&(!cfg||cfg.winter_utc_minutes===null||!cfg.windows?.length||!cfg.points?.length);
+      item.append(makeElement('span','',`${row.slot} · ${needs?'Needs configuration':row.technical_settings?.[module.id]?'Settings saved':'Default settings'}`));
+      [['View',false],['Configure',true]].forEach(([title,configure])=>{const button=makeElement('button','',title);button.type='button';button.addEventListener('click',async()=>{button.disabled=true;try{await openTechnicalIndicator(row.slot,configure);}catch(_){message.textContent='Could not open this indicator. Refresh and check Slots.';}finally{button.disabled=false;}});item.append(button);});card.append(item);
+    });card.append(message);root.append(card);
+  });
+}
 async function refreshIndicatorProfiles() {
-  const bridge = window.dashboardModuleState, status = document.getElementById('indicator-status');
-  if (!bridge?.ready()) { indicatorProfiles = []; document.getElementById('indicator-list').replaceChildren(); status.textContent = 'Sign in to manage indicators.'; return; }
-  try { indicatorProfiles = await bridge.listIndicatorProfiles(); if (!bridge.ready()) return; renderIndicatorProfiles(); status.textContent = `${indicatorProfiles.length} indicator instances`; }
-  catch (_) { status.textContent = 'Could not load indicator settings.'; }
+  const bridge = window.dashboardModuleState, status = document.getElementById('indicator-status');populateIndicatorTypes();
+  if (!bridge?.ready()) { indicatorProfiles = []; document.getElementById('indicator-list').replaceChildren();renderTechnicalIndicators([]); status.textContent = 'Sign in to manage indicators.'; return; }
+  const identity=bridge.owner();
+  const [profiles,slots]=await Promise.allSettled([bridge.listIndicatorProfiles(),bridge.listSlots()]);
+  if(!bridge.ready()||bridge.owner()!==identity)return;
+  if(profiles.status==='fulfilled'){indicatorProfiles=profiles.value;renderIndicatorProfiles();}else document.getElementById('indicator-list').replaceChildren();
+  renderTechnicalIndicators(slots.status==='fulfilled'?slots.value:[]);
+  status.textContent=profiles.status==='fulfilled'&&slots.status==='fulfilled'?`${indicatorProfiles.length} chart / signal instances · ${slots.value.filter(row=>technicalIndicators().some(module=>module.id===row.module_id)).length} session / price instances`:'Some indicator settings could not be loaded. Refresh before creating another instance.';
 }
 function renderIndicatorProfiles() {
   const list = document.getElementById('indicator-list'); list.replaceChildren();
@@ -676,6 +723,7 @@ function renderIndicatorProfiles() {
 }
 document.getElementById('indicator-add').addEventListener('click', async () => {
   const kind = document.getElementById('indicator-new-type').value;
+  if(technicalIndicators().some(module=>module.id===kind)){const button=document.getElementById('indicator-add');button.disabled=true;try{await addTechnicalIndicator(kind);}catch(error){document.getElementById('indicator-status').textContent=error.createdSlot?`Slot ${error.createdSlot} was created; setup was not confirmed. Refresh and check Slots before retrying.`:'Could not add indicator. Sign in and check the slot limit.';}finally{button.disabled=false;}return;}
   try { await window.dashboardModuleState.createIndicatorProfile({name:kind.toUpperCase(),type:kind,parameters:{...indicatorDefaults[kind]},enabled:false}); await refreshIndicatorProfiles(); }
   catch (_) { document.getElementById('indicator-status').textContent = 'Could not add indicator. Check account and instance limit.'; }
 });
@@ -2536,7 +2584,8 @@ async function start() {
 
     const themeData = await themeResponse.json();
     const moduleData = await moduleResponse.json();
-    availableModules = moduleData.modules;
+    availableModules = moduleData.modules;populateIndicatorTypes();
+    if(document.body.dataset.view==='indicators')refreshIndicatorProfiles();
     renderCatalog();
     renderSlots();
 
