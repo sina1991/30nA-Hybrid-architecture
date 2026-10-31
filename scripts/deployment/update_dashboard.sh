@@ -4,6 +4,17 @@ set -Eeuo pipefail
 umask 077
 REF=${1:-main}
 [[ $REF =~ ^[a-zA-Z0-9][a-zA-Z0-9._/-]*$ && $REF != *..* ]] || { echo 'Invalid Git ref' >&2; exit 1; }
+resolve_dashboard_ref() {
+    local checkout=$1 requested=$2
+    if [[ $requested =~ ^[[:xdigit:]]{7,39}$ ]]; then
+        # A clone contains reachable history; abbreviated object IDs are local
+        # revisions, not remote ref names accepted by git fetch.
+        git -C "$checkout" rev-parse --verify --end-of-options "${requested}^{commit}"
+    else
+        git -C "$checkout" fetch --quiet origin "$requested" || return
+        git -C "$checkout" rev-parse --verify 'FETCH_HEAD^{commit}'
+    fi
+}
 [[ $EUID == 0 && -f /etc/30na/installed-release ]] || { echo 'Run as root on an installer-owned VPS.' >&2; exit 1; }
 exec 9>/run/lock/30na-install.lock
 flock -n 9 || { echo 'Another install/update is active.' >&2; exit 1; }
@@ -57,8 +68,7 @@ rollback() {
 trap rollback ERR INT TERM
 TEMPORARY=$(mktemp -d "$BASE/releases/dashboard.XXXXXXXX")
 (umask 022; git clone --quiet --no-checkout https://github.com/sina1991/30nA-Hybrid-architecture.git "$TEMPORARY")
-git -C "$TEMPORARY" fetch --quiet origin "$REF"
-SHA=$(git -C "$TEMPORARY" rev-parse 'FETCH_HEAD^{commit}')
+SHA=$(resolve_dashboard_ref "$TEMPORARY" "$REF")
 git -C "$TEMPORARY" checkout --quiet --detach "$SHA"
 chmod -R a+rX "$TEMPORARY"
 # Use a separate release directory even if a backend checkout has the same SHA.
