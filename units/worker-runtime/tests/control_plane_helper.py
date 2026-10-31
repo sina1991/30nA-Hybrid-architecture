@@ -1,5 +1,6 @@
 """Real HTTPS Manager -> Runtime -> CODE and Dashboard read integration."""
 from contextlib import contextmanager
+from unittest.mock import patch
 import socket
 import json
 import os
@@ -36,6 +37,10 @@ def https_server(app, cert, key):
         assert not thread.is_alive(),'HTTPS test server did not stop'
 
 
+@patch('market_data.collector.GoldCollector.start', lambda self: None)
+@patch('modules.slot_workers.SlotWorkerScheduler.start', lambda self: None)
+@patch('modules.signal_rules.SignalScheduler.start', lambda self: None)
+@patch('modules.demo_trading.DemoScheduler.start', lambda self: None)
 def exercise_control_plane(root,cert,key,credentials,code_url,image,artifact_hash):
     from worker_runtime import CodeManagerArtifactProvider,DockerSandboxBackend,SQLiteExecutionStore,WorkerRuntime
     from worker_runtime.api import create_app as runtime_app
@@ -65,6 +70,9 @@ def exercise_control_plane(root,cert,key,credentials,code_url,image,artifact_has
             with https_server(dashboard_app(credential_path=credentials,upstream_factory=upstream),cert,key) as dashboard_url:
                 with httpx.Client(verify=ssl.create_default_context(cafile=str(cert)),trust_env=False) as client:
                     auth={'Authorization':'Bearer alice-integration-token'}
+                    identity=client.get(dashboard_url+'/api/upstreams/account/me',headers=auth)
+                    assert identity.status_code==200,identity.text
+                    assert identity.json()['payload']['user']['id']=='alice'
                     other={'Authorization':'Bearer bob-integration-token'}
                     body={'worker_id':'managed-worker','artifact_id':'sample-worker@1.0.0','artifact_hash':artifact_hash,
                           'entrypoint':'worker:run','configuration':{'increment':2}}

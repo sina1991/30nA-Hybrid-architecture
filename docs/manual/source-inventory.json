@@ -348,7 +348,7 @@
     [
       "DASHBOARD_SCREENSHOT",
       "units/worker-runtime/tests/control_plane_helper.py",
-      114,
+      122,
       "optional lookup"
     ],
     [
@@ -360,7 +360,7 @@
     [
       "DASHBOARD_SKIP_BROWSER",
       "units/worker-runtime/tests/control_plane_helper.py",
-      110,
+      118,
       "optional lookup"
     ],
     [
@@ -2394,9 +2394,9 @@
       "sha256": "efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f"
     },
     {
-      "bytes": 11143,
+      "bytes": 11198,
       "path": "units/consumers/dashboard-core/browser-tests/check.cjs",
-      "sha256": "2d8310840435e4f53625c7221a238b4d5122d8c5cde7c6846680a2693df279e7"
+      "sha256": "9c804b0858ff720450a6b074a1ca39a5e6e9ca80ea344bbdecaa3444bf498b2e"
     },
     {
       "bytes": 19069,
@@ -2409,9 +2409,9 @@
       "sha256": "399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc"
     },
     {
-      "bytes": 3475,
+      "bytes": 3539,
       "path": "units/consumers/dashboard-core/browser-tests/management.cjs",
-      "sha256": "e50b81b1e00341e3a27623dacc5bf851bbaac7783412f1e68d6450713eba25de"
+      "sha256": "cf2d3f38708c55323217624cbcafec8fac4a27e370c1247a892d464919d3aa98"
     },
     {
       "bytes": 1765,
@@ -2719,9 +2719,9 @@
       "sha256": "927188b494450962688cb4422c855902fb480ecb0fb7502665b3f544c74ca064"
     },
     {
-      "bytes": 7778,
+      "bytes": 8339,
       "path": "units/worker-runtime/tests/control_plane_helper.py",
-      "sha256": "1065dd26993984d47e8c2c62902ee38fd4a69eefb0c4548971adf050998900d9"
+      "sha256": "f50affabece89fc8f5a201a0924f9f32406595f55e2924ce45b432bc15b7093a"
     },
     {
       "bytes": 237,
@@ -2734,9 +2734,9 @@
       "sha256": "8e20c3253a49c0019554b458d47c30a4ebd15690ed1b0e3829b85b25cdbb42c9"
     },
     {
-      "bytes": 12129,
+      "bytes": 12190,
       "path": "units/worker-runtime/tests/test_code_manager_runtime_e2e.py",
-      "sha256": "e027d0eb99d592297351cddd6c01e587fef6a7c3e64359439ad11ef16a4b99bf"
+      "sha256": "cbb100bd8fb3af8c3442a4df2574975307ebc48536621b5bbcf67d5d8b5bcc9b"
     },
     {
       "bytes": 13362,
@@ -10573,31 +10573,31 @@
     ],
     [
       "units/worker-runtime/tests/control_plane_helper.py",
-      18,
+      19,
       "https_server",
       "(app, cert, key)"
     ],
     [
       "units/worker-runtime/tests/control_plane_helper.py",
-      39,
+      44,
       "exercise_control_plane",
       "(root, cert, key, credentials, code_url, image, artifact_hash)"
     ],
     [
       "units/worker-runtime/tests/control_plane_helper.py",
-      48,
+      53,
       "exercise_control_plane.factory",
       "(owner)"
     ],
     [
       "units/worker-runtime/tests/control_plane_helper.py",
-      60,
+      65,
       "exercise_control_plane.gateway",
       "(owner)"
     ],
     [
       "units/worker-runtime/tests/control_plane_helper.py",
-      64,
+      69,
       "exercise_control_plane.upstream",
       "(owner, token)"
     ],

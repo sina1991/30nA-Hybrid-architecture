@@ -134,7 +134,7 @@ class CodeManagerRuntimeE2ETests(unittest.TestCase):
                 base_url = f"https://localhost:{server.server_port}"
                 # Trust only the ephemeral test certificate; normal TLS verification
                 # remains enabled and production adapter defaults are unchanged.
-                with patch.dict(os.environ, {"SSL_CERT_FILE": str(cert_path)}):
+                with patch.dict(os.environ, {"SSL_CERT_FILE": str(cert_path), "DASHBOARD_MODULE_STATE_DIR": str(root / "dashboard-state")}):
                     source = make_worker_artifact()
                     with httpx.Client(verify=ssl.create_default_context(cafile=str(cert_path)),
                                       trust_env=False, timeout=60) as client:

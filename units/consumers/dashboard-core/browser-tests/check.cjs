@@ -85,6 +85,7 @@ async function main() {
     await page.waitForFunction(()=>!document.getElementById('worker-run-fields').disabled);
     await require('./layout.cjs')(page,true);
     await page.locator('[data-nav="slots"]').click();
+    if(isReal)await page.locator('#add-slot').click();
     await page.locator('#grid .slot').first().click({button:'right',position:{x:5,y:5}});
     const dialog=page.locator('.slot-options-dialog[open]');
     assert.equal(await dialog.getByRole('tab').count(),6);

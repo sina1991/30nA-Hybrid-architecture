@@ -1671,10 +1671,10 @@ http_contracts:
 | [units/consumers/dashboard-core/README.md](../units/consumers/dashboard-core/README.md) | 5199 | `f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496` |
 | [units/consumers/dashboard-core/browser-tests/accounts_chat.cjs](../units/consumers/dashboard-core/browser-tests/accounts_chat.cjs) | 6982 | `fbef0ce3d952e56fb5afb39bdc19effca7fd40be58f9b7e0c9e5edaef81687f0` |
 | [units/consumers/dashboard-core/browser-tests/chart_overlays.cjs](../units/consumers/dashboard-core/browser-tests/chart_overlays.cjs) | 5028 | `efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f` |
-| [units/consumers/dashboard-core/browser-tests/check.cjs](../units/consumers/dashboard-core/browser-tests/check.cjs) | 11143 | `2d8310840435e4f53625c7221a238b4d5122d8c5cde7c6846680a2693df279e7` |
+| [units/consumers/dashboard-core/browser-tests/check.cjs](../units/consumers/dashboard-core/browser-tests/check.cjs) | 11198 | `9c804b0858ff720450a6b074a1ca39a5e6e9ca80ea344bbdecaa3444bf498b2e` |
 | [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19069 | `29dd2b4fdf7aa9d15d090eb51186d9f756473d27520d0c6f4e04106116ac4076` |
 | [units/consumers/dashboard-core/browser-tests/layout.cjs](../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1242 | `399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc` |
-| [units/consumers/dashboard-core/browser-tests/management.cjs](../units/consumers/dashboard-core/browser-tests/management.cjs) | 3475 | `e50b81b1e00341e3a27623dacc5bf851bbaac7783412f1e68d6450713eba25de` |
+| [units/consumers/dashboard-core/browser-tests/management.cjs](../units/consumers/dashboard-core/browser-tests/management.cjs) | 3539 | `cf2d3f38708c55323217624cbcafec8fac4a27e370c1247a892d464919d3aa98` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
 | [units/consumers/dashboard-core/browser-tests/package.json](../units/consumers/dashboard-core/browser-tests/package.json) | 215 | `fe2c94def5f9630a2fb872250ab6b1f68a628c2924105a499445d01d363da11f` |
 | [units/consumers/dashboard-core/browser-tests/technical.cjs](../units/consumers/dashboard-core/browser-tests/technical.cjs) | 5082 | `7f9b0eb8e333fb7f2c1c21867c653e04d9ab5a8322b40b82eef9c4224b2fd441` |
@@ -1736,10 +1736,10 @@ http_contracts:
 | [units/worker-manager/worker_manager/service.py](../units/worker-manager/worker_manager/service.py) | 7286 | `69a4d54daf645b3b02b96e2c1cc2490ec3769914064b960acf146fd344af4c17` |
 | [units/worker-manager/worker_manager/sqlite_store.py](../units/worker-manager/worker_manager/sqlite_store.py) | 7587 | `1ab946a64e2844b8a81b231a8d57428f0e6f34d2d6f2078bbdad2b6badc172fe` |
 | [units/worker-runtime/README.md](../units/worker-runtime/README.md) | 7799 | `927188b494450962688cb4422c855902fb480ecb0fb7502665b3f544c74ca064` |
-| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py) | 7778 | `1065dd26993984d47e8c2c62902ee38fd4a69eefb0c4548971adf050998900d9` |
+| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py) | 8339 | `f50affabece89fc8f5a201a0924f9f32406595f55e2924ce45b432bc15b7093a` |
 | [units/worker-runtime/tests/sandbox-image/Dockerfile](../units/worker-runtime/tests/sandbox-image/Dockerfile) | 237 | `ca42b03b1ccc46fb2610353c923ed43b4ad34042c159dd183d282935dd1ef360` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../units/worker-runtime/tests/test_code_manager_adapter.py) | 5099 | `8e20c3253a49c0019554b458d47c30a4ebd15690ed1b0e3829b85b25cdbb42c9` |
-| [units/worker-runtime/tests/test_code_manager_runtime_e2e.py](../units/worker-runtime/tests/test_code_manager_runtime_e2e.py) | 12129 | `e027d0eb99d592297351cddd6c01e587fef6a7c3e64359439ad11ef16a4b99bf` |
+| [units/worker-runtime/tests/test_code_manager_runtime_e2e.py](../units/worker-runtime/tests/test_code_manager_runtime_e2e.py) | 12190 | `cbb100bd8fb3af8c3442a4df2574975307ebc48536621b5bbcf67d5d8b5bcc9b` |
 | [units/worker-runtime/tests/test_docker_sandbox.py](../units/worker-runtime/tests/test_docker_sandbox.py) | 13362 | `a53b4b0b24568cdd05d31f5b35a0de684133e8d2342eea3110aab890a217ab2d` |
 | [units/worker-runtime/tests/test_docker_sandbox_integration.py](../units/worker-runtime/tests/test_docker_sandbox_integration.py) | 15478 | `8610d2d69f7989867576d54e24962bd44eb1544c7c2b9141ba878686fc7825cb` |
 | [units/worker-runtime/tests/test_history_reuse.py](../units/worker-runtime/tests/test_history_reuse.py) | 3782 | `cc52d66f93947d28a484ba9550cd475e7b639bc06b5f616327e46a2e78125e3c` |
@@ -1802,9 +1802,9 @@ http_contracts:
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/slots.py](../modules/slots.py#L61) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [modules/uploads.py](../modules/uploads.py#L19) | optional lookup |
 | `DASHBOARD_MODULE_STATE_DIR` | [units/consumers/dashboard-core/dashboard/upstreams.py](../units/consumers/dashboard-core/dashboard/upstreams.py#L49) | optional lookup |
-| `DASHBOARD_SCREENSHOT` | [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L114) | optional lookup |
+| `DASHBOARD_SCREENSHOT` | [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L122) | optional lookup |
 | `DASHBOARD_SKIP_BROWSER` | [units/consumers/dashboard-core/tests/test_browser.py](../units/consumers/dashboard-core/tests/test_browser.py#L12) | optional lookup |
-| `DASHBOARD_SKIP_BROWSER` | [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L110) | optional lookup |
+| `DASHBOARD_SKIP_BROWSER` | [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L118) | optional lookup |
 | `DASHBOARD_TRUST_LOCAL_PROXY` | [modules/client_ip.py](../modules/client_ip.py#L10) | optional lookup |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [scripts/development/data_manager_server.py](../scripts/development/data_manager_server.py#L16) | tooling assignment |
 | `DATA_MANAGER_ALLOW_INSECURE_HEADER` | [units/code-manager/code_manager/api.py](../units/code-manager/code_manager/api.py#L748) | optional lookup |
@@ -3607,11 +3607,11 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [units/worker-manager/worker_manager/sqlite_store.py](../units/worker-manager/worker_manager/sqlite_store.py#L132) | `SQLiteWorkerStore.save_new` | `(self, record: WorkerRecord)` |
 | [units/worker-manager/worker_manager/sqlite_store.py](../units/worker-manager/worker_manager/sqlite_store.py#L143) | `SQLiteWorkerStore.save` | `(self, record: WorkerRecord)` |
 | [units/worker-manager/worker_manager/sqlite_store.py](../units/worker-manager/worker_manager/sqlite_store.py#L155) | `SQLiteWorkerStore.delete` | `(self, worker_id: str)` |
-| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L18) | `https_server` | `(app, cert, key)` |
-| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L39) | `exercise_control_plane` | `(root, cert, key, credentials, code_url, image, artifact_hash)` |
-| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L48) | `exercise_control_plane.factory` | `(owner)` |
-| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L60) | `exercise_control_plane.gateway` | `(owner)` |
-| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L64) | `exercise_control_plane.upstream` | `(owner, token)` |
+| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L19) | `https_server` | `(app, cert, key)` |
+| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L44) | `exercise_control_plane` | `(root, cert, key, credentials, code_url, image, artifact_hash)` |
+| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L53) | `exercise_control_plane.factory` | `(owner)` |
+| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L65) | `exercise_control_plane.gateway` | `(owner)` |
+| [units/worker-runtime/tests/control_plane_helper.py](../units/worker-runtime/tests/control_plane_helper.py#L69) | `exercise_control_plane.upstream` | `(owner, token)` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../units/worker-runtime/tests/test_code_manager_adapter.py#L18) | `FakeResponse` | `class` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../units/worker-runtime/tests/test_code_manager_adapter.py#L19) | `FakeResponse.__init__` | `(self, body, *, status=200, content_type='application/octet-stream')` |
 | [units/worker-runtime/tests/test_code_manager_adapter.py](../units/worker-runtime/tests/test_code_manager_adapter.py#L25) | `FakeResponse.__enter__` | `(self)` |

@@ -11,6 +11,7 @@ module.exports=async function checkManagement(page) {
   await page.locator('#worker-create').click();
   await page.locator('#edit-worker-id').fill('browser-managed');
   for(const [id,value] of Object.entries(fields))await page.locator('#'+id).fill(value);
+  await page.locator('#edit-config-mode').selectOption('json');
   await page.locator('#edit-configuration').fill('[]');
   await page.locator('#worker-save').click();
   await page.waitForFunction(()=>document.getElementById('worker-edit-status').textContent.includes('JSON object'));
