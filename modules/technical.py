@@ -11,6 +11,7 @@ import re
 import time
 from zoneinfo import ZoneInfo
 from .module_state import change
+from .session_presets import PRESET
 
 KINDS = ('session-windows', 'session-clock', 'round-levels', 'previous-day-levels', 'previous-day-session-levels')
 DEFAULTS = {
@@ -26,7 +27,8 @@ DEFAULTS = {
                                     'show_high':True,'show_low':True,'show_mid':True,'show_open':True,'show_close':True,'styles':{},
                                     'session_start':'16:30','session_end':'23:00','scan_minutes':15,'allow_wrap':True},
 }
-DEFAULTS['session-windows'] = {**DEFAULTS['session-clock'], 'window_labels':True,'time_points':True,'countdown_panel':True,'day_start_lines':True,'window_shape':'both'}
+DEFAULTS['session-clock'].update(PRESET)
+DEFAULTS['session-windows'] = {**DEFAULTS['session-clock'], 'window_labels':True,'time_points':True,'countdown_panel':True,'day_start_lines':True,'window_shape':'filled'}
 
 LEVEL_STYLES = {
     'high':{'color':'#c4b5fd','style':'solid','width':1}, 'low':{'color':'#c4b5fd','style':'solid','width':1},
@@ -60,7 +62,7 @@ def color(value):
 def line_style(value):
     if not isinstance(value,dict) or set(value)-{'color','style','width'}: raise ValueError('invalid line style')
     if 'color' in value: color(value['color'])
-    if value.get('style','solid') not in ('solid','dashed','dotted','dash-dot'): raise ValueError('invalid line style')
+    if value.get('style','solid') not in ('solid','dashed','dotted','dash-dot','dash-dot-dot'): raise ValueError('invalid line style')
     integer(value.get('width',1),1,5,'line width')
 
 
@@ -86,6 +88,17 @@ def settings(kind, raw=None):
         integer(cfg['chart_minutes'],1,1440,'chart timeframe')
         if 1440 % cfg['chart_minutes']: raise ValueError('chart minutes must divide 1440')
         if kind=='session-windows' and cfg['window_shape'] not in ('filled','border','both'): raise ValueError('invalid window shape')
+        integer(cfg['label_size'],6,32,'label size');integer(cfg['panel_font_size'],6,32,'panel font size')
+        for key in ('label_font','panel_font'):
+            if not isinstance(cfg[key],str) or not re.fullmatch(r'[A-Za-z0-9 ,_-]{1,80}',cfg[key]): raise ValueError('invalid font')
+        for key in ('point_width','day_line_width','border_width'): integer(cfg[key],1,5,key)
+        for key in ('point_style','day_line_style'):
+            if cfg[key] not in ('solid','dashed','dotted','dash-dot','dash-dot-dot'): raise ValueError('invalid style')
+        for key in ('label_color','day_line_color'): color(cfg[key])
+        if not isinstance(cfg['grade_opacity'],dict) or set(cfg['grade_opacity'])!={'A','B','C'}: raise ValueError('invalid grade opacity')
+        for value in cfg['grade_opacity'].values(): number(value,0,1,'grade opacity')
+        if not isinstance(cfg['panel_position'],dict) or set(cfg['panel_position'])!={'x','y'}: raise ValueError('invalid panel position')
+        for value in cfg['panel_position'].values(): number(value,0,1,'panel position')
         integer(cfg['clock_size'],120,420,'clock size'); integer(cfg['highlight_minutes'],0,120,'highlight minutes')
         if cfg['font'] not in ('system','mono','serif'): raise ValueError('invalid font')
         for key in ('text_color','point_color','background_color'): color(cfg[key])
@@ -207,7 +220,9 @@ def clock_result(cfg,now):
             transitions=sorted([*transitions,right]);break
 
     ready=bool(cfg['windows'] and cfg['points'])
-    return {'status':'ok' if ready else 'needs_configuration','message':'' if ready else 'Configure the original windows and time points; no proprietary schedule is assumed.',
+    view_ready=cfg['teaching_view'] in ('all','Full map','Points only') or bool(windows or points)
+    ready=ready and view_ready
+    return {'status':'ok' if ready else 'needs_configuration','message':'' if ready else ('Configure windows and time points.' if view_ready else 'This Teaching view has no grouping. Use Full map or configure views for each window and point.'),
             'now':now,'wall_time':local.isoformat(),'seconds_of_day':local.hour*3600+local.minute*60+local.second,
             'utc_offset_minutes':cfg['winter_utc_minutes']+dst_seconds(now,cfg['clock_change'])//60,
             'active_windows':active,'windows':[] if cfg['teaching_view']=='Points only' else windows,'points':sorted({p['time'] for p in points}),

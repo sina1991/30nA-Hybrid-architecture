@@ -9,7 +9,7 @@ from worker_manager.api import RegisterBody, ConfigureBody
 from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, owner_dependency
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
-from modules import slots, uploads
+from modules import slots, uploads, technical, chart_overlays
 from modules import slot_workers, indicator_profiles, signal_rules, accounts, chat_store
 from market_data.data import chart as gold_chart
 from market_data.data import indicator as market_indicator, database_table
@@ -236,13 +236,18 @@ def create_router(credential_path, upstream_factory):
                        interval: str = '1m', include_indicators: bool = False, identity=Depends(owner)):
         try:
             profiles = [profile for profile in indicator_profiles.list_profiles(identity) if profile['enabled']]
-            result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time, interval=interval, include_indicators=include_indicators, profiles=profiles if include_indicators else None)
+            result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time, interval=interval, include_indicators=include_indicators, profiles=[profile for profile in profiles if profile['type'] not in technical.KINDS] if include_indicators else None)
+            if include_indicators: result['technical_overlays']=chart_overlays.calculate(identity,profiles,result,end_time)
         except (ValueError, OSError, sqlite3.Error):
             raise HTTPException(503, 'Market data is unavailable') from None
         response = JSONResponse(envelope(result))
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
         return response
+
+    @router.get('/indicator-presets')
+    def indicator_presets(identity=Depends(owner)):
+        return envelope({'presets':{kind:technical.settings(kind) for kind in ('session-clock','session-windows')}})
 
     @router.get('/indicator-profiles')
     def profile_list(identity=Depends(owner)):

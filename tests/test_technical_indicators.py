@@ -10,6 +10,11 @@ from modules.execution import run_module
 from test_account_chat_api import client, create_accounts, auth
 
 
+@pytest.fixture(autouse=True)
+def isolated_state(tmp_path,monkeypatch):
+    monkeypatch.setenv('DASHBOARD_MODULE_STATE_DIR',str(tmp_path/'technical-state'))
+
+
 def ts(value): return int(datetime.fromisoformat(value.replace('Z','+00:00')).timestamp())
 
 
@@ -113,10 +118,20 @@ def test_windows_and_clock_share_the_same_schedule_and_only_traded_dates():
     assert not windows['chart_windows'] and windows['chart_lines']
 
 
-def test_missing_original_schedule_is_explicit():
-    assert run_module('session-clock',{})['status']=='needs_configuration'
-    assert run_module('session-windows',{})['status']=='needs_configuration'
-    assert run_module('session-clock',{'settings':{'winter_utc_minutes':120}})['status']=='needs_configuration'
+def test_supplied_schedule_is_default_and_explicit_empty_configuration_is_honored():
+    from modules.session_presets import mt5_color
+    for kind in ('session-clock','session-windows'):
+        result=run_module(kind,{})
+        assert result['status']=='ok' and len(result['settings']['windows'])==11 and len(result['settings']['points'])==15
+        assert result['settings']['windows'][0]['start']=='01:00'
+        assert result['settings']['windows'][1]['grade']=='A'
+        assert result['settings']['windows'][-1]['end']=='00:00'
+        assert result['settings']['windows'][0]['color']==mt5_color(6903890)
+        assert result['settings']['point_color']==mt5_color(7260392)
+        assert result['settings']['grade_opacity']=={'A':0.28,'B':0.16,'C':0.08}
+        assert result['settings']['winter_utc_minutes']==120 and result['settings']['clock_change']=='Europe'
+        assert run_module(kind,{'settings':{'windows':[],'points':[]}})['status']=='needs_configuration'
+    assert run_module('session-clock',{'settings':{'winter_utc_minutes':None}})['status']=='needs_configuration'
 
 
 def test_nonexistent_dst_wall_time_is_not_invented():

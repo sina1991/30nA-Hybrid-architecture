@@ -211,7 +211,7 @@ body:not([data-view="overview"]) #edit-layout {display:none}
 #grid .slot[data-slot-type="fix-chart"],#grid .slot[data-slot-type="chart"] {grid-column:1 / -1}
 .slot[data-slot-type="chart"] .market-chart {height:clamp(240px,45vh,520px)}
 .slot[data-slot-type="fix-chart"] .module-body {min-height:0;gap:4px}
-.slot[data-slot-type="fix-chart"] .market-graph {flex:1;min-height:200px}
+.slot[data-slot-type="fix-chart"] .market-graph {position:relative;flex:1;min-height:200px}
 .slot[data-slot-type="fix-chart"] .market-chart {height:100%;min-height:200px}
 .slot[data-slot-type="fix-chart"] .market-price {font-size:15px}
 .slot[data-slot-type="fix-chart"] .market-legend {display:block;font-size:10px}
@@ -489,9 +489,8 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <h2 class="view-heading">Indicators</h2><p class="view-description">Configure independent indicator instances for your charts and signals.</p>
     <div class="db-controls"><label>Indicator<select id="indicator-new-type"><option value="sma">SMA</option><option value="rsi">RSI</option><option value="macd">MACD</option></select></label><button type="button" id="indicator-add">Add indicator</button><button type="button" id="indicator-refresh">Refresh</button></div>
     <p id="indicator-status" class="market-status">Sign in to manage indicators.</p>
-    <h3>Session and price indicators</h3><p>Open an independent indicator on Overview, then configure its Module settings. Session tools require the original schedule.</p>
-    <div id="indicator-technical-list" class="indicator-grid"></div>
-    <h3>Chart and signal indicators</h3><div id="indicator-list" class="indicator-grid"></div>
+    <div id="indicator-list" class="indicator-grid"></div>
+    <details><summary>Independent panels (optional)</summary><div id="indicator-technical-list" class="indicator-grid"></div></details>
   </section>
   <section class="page-view" data-page="signals" hidden>
     <h2 class="view-heading">Signal Scripts</h2><p class="view-description">Build rules or run a published Python Worker with indicator inputs.</p>
@@ -654,7 +653,7 @@ document.getElementById('db-refresh').addEventListener('click', refreshDatabase)
 document.getElementById('db-prev').addEventListener('click', () => { databaseOffset = Math.max(0, databaseOffset - Number(document.getElementById('db-limit').value)); refreshDatabase(); });
 document.getElementById('db-next').addEventListener('click', () => { databaseOffset += Number(document.getElementById('db-limit').value); refreshDatabase(); });
 const indicatorDefaults = {sma:{period:20}, rsi:{period:14}, macd:{fast:12,slow:26,signal:9}};
-let indicatorProfiles = [];
+let indicatorProfiles = [],indicatorPresets={};
 function technicalIndicators() {return availableModules.filter(module=>['session-windows','session-clock','price-levels'].includes(module.type));}
 function populateIndicatorTypes(){
   const select=document.getElementById('indicator-new-type');
@@ -667,6 +666,7 @@ async function openTechnicalIndicator(slotId,configure=false){
   const container=overview?document.getElementById('overview-grid'):grid;
   const card=[...(container||document).querySelectorAll('.slot')].find(item=>item.dataset.slotId===slotId&&item.dataset.area===(overview?'overview':'slots'));
   if(!card)throw Error('Slot unavailable');card.scrollIntoView({behavior:'smooth',block:'center'});
+  if(!configure)card.querySelector('.module-body')?.dispatchEvent(new Event('slot-refresh'));
   if(configure){card.querySelector('.slot-gear').click();[...card.querySelectorAll('[role="tab"]')].find(button=>button.textContent==='Module')?.click();}
 }
 async function addTechnicalIndicator(moduleId){
@@ -696,35 +696,66 @@ async function refreshIndicatorProfiles() {
   const bridge = window.dashboardModuleState, status = document.getElementById('indicator-status');populateIndicatorTypes();
   if (!bridge?.ready()) { indicatorProfiles = []; document.getElementById('indicator-list').replaceChildren();renderTechnicalIndicators([]); status.textContent = 'Sign in to manage indicators.'; return; }
   const identity=bridge.owner();
-  const [profiles,slots]=await Promise.allSettled([bridge.listIndicatorProfiles(),bridge.listSlots()]);
+  const [profiles,slots,presets]=await Promise.allSettled([bridge.listIndicatorProfiles(),bridge.listSlots(),bridge.slotRequest('indicator-presets')]);
   if(!bridge.ready()||bridge.owner()!==identity)return;
+  indicatorPresets=presets.status==='fulfilled'?(presets.value.presets||{}):{};
   if(profiles.status==='fulfilled'){indicatorProfiles=profiles.value;renderIndicatorProfiles();}else document.getElementById('indicator-list').replaceChildren();
   renderTechnicalIndicators(slots.status==='fulfilled'?slots.value:[]);
   status.textContent=profiles.status==='fulfilled'&&slots.status==='fulfilled'?`${indicatorProfiles.length} chart / signal instances · ${slots.value.filter(row=>technicalIndicators().some(module=>module.id===row.module_id)).length} session / price instances`:'Some indicator settings could not be loaded. Refresh before creating another instance.';
 }
+function technicalParameterEditor(parameters,card){
+  const fields=[];
+  Object.entries(parameters).forEach(([key,value])=>{
+    const label=makeElement('label','',key.split('_').map(word=>word.charAt(0).toUpperCase()+word.slice(1)).join(' '));
+    let input,read;
+    const choices={clock_change:['none','Europe','USA'],window_shape:['filled','border','both'],style:['solid','dashed','dotted','dash-dot'],font:['system','mono','serif'],teaching_view:['all','Full map','Main sessions','New York start','New York middle','New York end','London start','Points only']}[key];
+    if(choices){input=makeElement('select','');[...new Set([...choices,value])].forEach(option=>{const node=makeElement('option','',option);node.value=option;input.append(node);});input.value=value;read=()=>input.value;}
+    else if(typeof value==='boolean'){input=makeElement('input','');input.type='checkbox';input.checked=value;read=()=>input.checked;}
+    else if(value!==null&&typeof value==='object'){input=makeElement('textarea','module-note-input');input.rows=key==='windows'?8:4;input.value=JSON.stringify(value,null,2);input.spellcheck=false;read=()=>JSON.parse(input.value);}
+    else {input=makeElement('input','');const numeric=typeof value==='number'||key==='winter_utc_minutes';input.type=numeric?'number':key.endsWith('_color')||key==='color'?'color':'text';if(numeric)input.step='any';input.value=value===null?'':String(value);read=()=>input.value===''&&value===null?null:numeric?Number(input.value):input.value;}
+    input.setAttribute('aria-label',label.textContent);label.append(input);card.append(label);fields.push([key,read]);
+  });
+  return ()=>Object.fromEntries(fields.map(([key,read])=>[key,read()]));
+}
+async function openIndicatorChart(){
+  const bridge=window.dashboardModuleState;const rows=await bridge.listSlots();
+  let chart=rows.find(row=>row.module_id==='gold-chart'&&row.overview)||rows.find(row=>row.module_id==='gold-chart');
+  if(!chart)chart=await bridge.createSlot('chart');
+  await openTechnicalIndicator(chart.slot,false);
+}
 function renderIndicatorProfiles() {
   const list = document.getElementById('indicator-list'); list.replaceChildren();
   indicatorProfiles.forEach(profile => {
-    const card = makeElement('article','indicator-card');
-    card.append(makeElement('strong','',profile.type.toUpperCase()));
+    const technical=technicalIndicators().some(module=>module.id===profile.type);
+    const card = makeElement('article','indicator-card');card.dataset.profileId=profile.id;card.dataset.profileType=profile.type;
+    card.append(makeElement('strong','',availableModules.find(module=>module.id===profile.type)?.name||profile.type.toUpperCase()));
     const nameLabel = makeElement('label','','Name'); const name = makeElement('input',''); name.value = profile.name; name.maxLength = 80; nameLabel.append(name); card.append(nameLabel);
-    const inputs = {};
-    Object.entries(profile.parameters).forEach(([key,value]) => { const label = makeElement('label','',key.charAt(0).toUpperCase() + key.slice(1)); const input = makeElement('input',''); input.type = 'number'; input.min = '1'; input.max = '500'; input.step = '1'; input.value = String(value); label.append(input); card.append(label); inputs[key] = input; });
-    const enabledLabel = makeElement('label','','Enabled for charts and signals'); const enabled = makeElement('input',''); enabled.type = 'checkbox'; enabled.checked = profile.enabled; enabledLabel.prepend(enabled); card.append(enabledLabel);
-    const message = makeElement('div','market-status'); const actions = makeElement('div','indicator-card-actions');
-    const save = makeElement('button','','Save'); const duplicate = makeElement('button','','Duplicate'); const remove = makeElement('button','','Delete');
-    [save,duplicate,remove].forEach(button => { button.type = 'button'; actions.append(button); });
-    const values = () => ({name:name.value, type:profile.type, parameters:Object.fromEntries(Object.entries(inputs).map(([key,input]) => [key, Number(input.value)])), enabled:enabled.checked});
-    save.addEventListener('click', async () => { save.disabled = true; try { await window.dashboardModuleState.saveIndicatorProfile(profile.id, values()); await refreshIndicatorProfiles(); } catch (_) { message.textContent = 'Could not save. Check name and parameter values.'; } finally { save.disabled = false; } });
-    duplicate.addEventListener('click', async () => { duplicate.disabled = true; try { const config = values(); config.name += ' copy'; config.enabled = false; await window.dashboardModuleState.createIndicatorProfile(config); await refreshIndicatorProfiles(); } catch (_) { message.textContent = 'Could not duplicate indicator.'; } finally { duplicate.disabled = false; } });
-    remove.addEventListener('click', async () => { if (!window.confirm(`Delete ${profile.name}?`)) return; remove.disabled = true; try { await window.dashboardModuleState.deleteIndicatorProfile(profile.id); await refreshIndicatorProfiles(); } catch (_) { message.textContent = 'Could not delete indicator.'; } finally { remove.disabled = false; } });
-    card.append(actions,message); list.append(card);
+    let parameters;
+    if(technical){
+      const settings=makeElement('details','');settings.append(makeElement('summary','','Settings'));parameters=technicalParameterEditor(profile.parameters,settings);card.append(settings);
+      if(indicatorPresets[profile.type]){const preset=makeElement('button','','Load supplied MT5 preset');preset.type='button';preset.addEventListener('click',async()=>{preset.disabled=true;try{await window.dashboardModuleState.saveIndicatorProfile(profile.id,{name:profile.name,type:profile.type,enabled:profile.enabled,parameters:indicatorPresets[profile.type]});await refreshIndicatorProfiles();}catch(_){preset.disabled=false;}});card.append(preset);}
+      if(['session-clock','session-windows'].includes(profile.type))card.append(makeElement('p','market-status','Set Winter UTC Minutes and Clock Change for your broker. Imported schedule uses broker wall time. Broker auto-detection is unavailable.'));
+      if(['session-clock','session-windows'].includes(profile.type)&&(!profile.parameters.windows.length||!profile.parameters.points.length||profile.parameters.winter_utc_minutes===null))card.append(makeElement('p','market-status','Needs configuration: broker winter UTC offset, clock change rule, original windows and time points.'));
+    }else{
+      const inputs={};Object.entries(profile.parameters).forEach(([key,value])=>{const label=makeElement('label','',key.charAt(0).toUpperCase()+key.slice(1)),input=makeElement('input','');input.type='number';input.min='1';input.max='500';input.step='1';input.value=String(value);label.append(input);card.append(label);inputs[key]=input;});parameters=()=>Object.fromEntries(Object.entries(inputs).map(([key,input])=>[key,Number(input.value)]));
+    }
+    const enabledLabel = makeElement('label','','Show on chart');const enabled=makeElement('input','');enabled.type='checkbox';enabled.checked=profile.enabled;enabledLabel.prepend(enabled);card.append(enabledLabel);
+    const message=makeElement('div','market-status'),actions=makeElement('div','indicator-card-actions');
+    const save=makeElement('button','','Save'),duplicate=makeElement('button','','Duplicate'),remove=makeElement('button','','Delete'),view=makeElement('button','','Open chart');
+    [save,duplicate,remove,view].forEach(button=>{button.type='button';actions.append(button);});
+    const values=()=>({name:name.value,type:profile.type,parameters:parameters(),enabled:enabled.checked});
+    async function persist(){save.disabled=true;enabled.disabled=true;try{await window.dashboardModuleState.saveIndicatorProfile(profile.id,values());await refreshIndicatorProfiles();}catch(_){enabled.checked=profile.enabled;message.textContent='Could not save. Check settings and account access.';}finally{save.disabled=false;enabled.disabled=false;}}
+    save.addEventListener('click',persist);enabled.addEventListener('change',persist);
+    duplicate.addEventListener('click',async()=>{duplicate.disabled=true;try{const config=values();config.name+=' copy';config.enabled=false;await window.dashboardModuleState.createIndicatorProfile(config);await refreshIndicatorProfiles();}catch(_){message.textContent='Could not duplicate indicator.';}finally{duplicate.disabled=false;}});
+    remove.addEventListener('click',async()=>{if(!confirm(`Delete ${profile.name}?`))return;remove.disabled=true;try{await window.dashboardModuleState.deleteIndicatorProfile(profile.id);await refreshIndicatorProfiles();}catch(_){message.textContent='Could not delete indicator.';}finally{remove.disabled=false;}});
+    view.addEventListener('click',async()=>{view.disabled=true;try{await openIndicatorChart();}catch(_){message.textContent='Could not open chart. Check Slots before retrying.';}finally{view.disabled=false;}});
+    card.append(actions,message);list.append(card);
   });
 }
 document.getElementById('indicator-add').addEventListener('click', async () => {
   const kind = document.getElementById('indicator-new-type').value;
-  if(technicalIndicators().some(module=>module.id===kind)){const button=document.getElementById('indicator-add');button.disabled=true;try{await addTechnicalIndicator(kind);}catch(error){document.getElementById('indicator-status').textContent=error.createdSlot?`Slot ${error.createdSlot} was created; setup was not confirmed. Refresh and check Slots before retrying.`:'Could not add indicator. Sign in and check the slot limit.';}finally{button.disabled=false;}return;}
-  try { await window.dashboardModuleState.createIndicatorProfile({name:kind.toUpperCase(),type:kind,parameters:{...indicatorDefaults[kind]},enabled:false}); await refreshIndicatorProfiles(); }
+
+  try { await window.dashboardModuleState.createIndicatorProfile({name:availableModules.find(module=>module.id===kind)?.name||kind.toUpperCase(),type:kind,parameters:{...(indicatorDefaults[kind]||{})},enabled:false}); await refreshIndicatorProfiles(); }
   catch (_) { document.getElementById('indicator-status').textContent = 'Could not add indicator. Check account and instance limit.'; }
 });
 document.getElementById('indicator-refresh').addEventListener('click', refreshIndicatorProfiles);
@@ -736,7 +767,7 @@ async function refreshSignals() {
   try {
     const [profiles, rules, workers] = await Promise.all([bridge.listIndicatorProfiles(), bridge.listSignalRules(), bridge.signalWorkers().catch(() => ({workers:[]}))]);
     if (!bridge.ready()) return;
-    indicatorProfiles = profiles; signalRules = rules; renderSignals(workers.workers || []);
+    indicatorProfiles = profiles.filter(profile=>['sma','rsi','macd'].includes(profile.type)); signalRules = rules; renderSignals(workers.workers || []);
   } catch (_) { root.textContent = 'Could not load signal scripts or Workers.'; }
 }
 function renderSignals(workers) {
@@ -1012,16 +1043,22 @@ function renderMarketModule(body, slot, module) {
   let shownIndicators = new Set(slot.chart_indicators || []), selectedTime = null, requestVersion = 0, pendingRefresh = false;
   let overlay = slot.chart_overlay !== false, includeOpen = slot.chart_live !== false, busy = false;
   let viewCount = 80, endOffset = 0, cachedData = null, olderCandles = [], olderPoints = [], olderBusy = false, noOlder = false;
-  let olderIndicators = {rsi:[], macd:[]}, olderSeries = {}, seriesSignature = null;
+  let olderIndicators = {rsi:[], macd:[]}, olderSeries = {}, seriesSignature = null, overlayHistory={};
   function mergeHistory(data) {
-    const signature = JSON.stringify((data.series || []).map(item => [item.id,item.type,item.parameters]));
+    const signature = JSON.stringify([...(data.series || []),...(data.technical_overlays||[])].map(item => [item.id,item.type,item.parameters]));
     if (seriesSignature !== null && seriesSignature !== signature) { olderCandles = []; olderPoints = []; olderSeries = {}; olderIndicators = {rsi:[],macd:[]}; endOffset = 0; }
+    if(seriesSignature!==signature)overlayHistory={};
     seriesSignature = signature;
     const merge = (older, newer) => {
       const byTime = new Map(); older.forEach(item => byTime.set(item.time, item)); newer.forEach(item => byTime.set(item.time, item));
       return [...byTime.values()].sort((a,b) => a.time - b.time);
     };
-    return {...data, candles:merge(olderCandles, data.candles),
+    const mergedOverlays=(data.technical_overlays||[]).map(profile=>{
+      const old=overlayHistory[profile.id]||{},result=profile.result;
+      const combine=(key,identity)=>[...new Map([...(old[key]||[]),...(result[key]||[])].map(item=>[identity(item),item])).values()];
+      const joined={...result,days:combine('days',item=>item.date),chart_windows:combine('chart_windows',item=>item.name+':'+item.start_timestamp),chart_lines:combine('chart_lines',item=>item.time),day_lines:[...new Set([...(old.day_lines||[]),...(result.day_lines||[])])]};overlayHistory[profile.id]=joined;return {...profile,result:joined};
+    });
+    return {...data,technical_overlays:mergedOverlays,candles:merge(olderCandles, data.candles),
       indicators:Object.fromEntries(['rsi','macd'].map(name => [name, {...data.indicators?.[name], points:merge(olderIndicators[name], data.indicators?.[name]?.points || [])}])),
       series:(data.series || []).map(item => ({...item, points:merge(olderSeries[item.id] || [], item.points)})),
       moving_average:{...data.moving_average, points:merge(olderPoints, data.moving_average?.points || [])}};
@@ -1038,6 +1075,7 @@ function renderMarketModule(body, slot, module) {
       olderCandles = [...newCandles, ...olderCandles]; olderPoints = [...(data.moving_average?.points || []), ...olderPoints];
       ['rsi','macd'].forEach(name => { olderIndicators[name] = [...(data.indicators?.[name]?.points || []), ...olderIndicators[name]]; });
       (data.series || []).forEach(item => { olderSeries[item.id] = [...item.points, ...(olderSeries[item.id] || [])]; });
+      mergeHistory(data);
       endOffset += Math.max(1, Math.floor(viewCount / 3)); plot(mergeHistory(cachedData));
     } catch (_) { status.textContent = 'Could not load older candles.'; }
     finally { olderBusy = false; }
@@ -1118,7 +1156,7 @@ function renderMarketModule(body, slot, module) {
     const selector = toolbar.querySelector('[aria-label="Chart timeframe"]'); if (selector) selector.value = interval;
     Object.keys(indicatorChecks).forEach(name => { indicatorChecks[name].checked = shownIndicators.has(name); });
     if (changed) {
-      requestVersion++; olderCandles = []; olderPoints = []; olderIndicators = {rsi:[], macd:[]}; olderSeries = {}; noOlder = false; endOffset = 0;
+      requestVersion++; overlayHistory={}; olderCandles = []; olderPoints = []; olderIndicators = {rsi:[], macd:[]}; olderSeries = {}; noOlder = false; endOffset = 0;
       status.textContent = cachedData ? 'Updating chart · showing previous data' : 'Loading market data…';
       refresh();
     } else if (overlayChanged && cachedData) plot(cachedData);
@@ -1126,8 +1164,66 @@ function renderMarketModule(body, slot, module) {
   periodSelect.addEventListener('change', () => saveOptions({chart_period:Number(periodSelect.value)}));
   overlayInput.addEventListener('change', () => saveOptions({chart_overlay:overlayInput.checked}));
   liveInput.addEventListener('change', () => saveOptions({chart_live:liveInput.checked}));
+  const chartClocks=[];let chartClockDragging=false;
+  function clockOverlayTick(){if(!body.isConnected)return;
+    if(!chartClockDragging)chartClocks.forEach(item=>{
+      if(!item.box.isConnected)return;const elapsed=(performance.now()-item.received)/1000;
+      const graphic=sessionClockGraphic(item.result,elapsed);if(item.panel){item.box.textContent=`${item.name} · ${graphic.hhmmss} · ${graphic.lines.join(' / ')||'No active window'} · NEXT POINT ${item.result.next_point?.time||'—'} · ${graphic.countdown} · not broker-verified`;item.box.style.color=graphic.remaining!==null&&graphic.remaining<=graphic.cfg.highlight_minutes*60?graphic.cfg.point_color:graphic.cfg.text_color;}else{graphic.svg.style.width='100%';graphic.svg.style.maxWidth='100%';item.box.replaceChildren(graphic.svg);}
+    });setTimeout(clockOverlayTick,1000);
+  }
+  setTimeout(clockOverlayTick,1000);
+  function drawTechnicalOverlays(data,svg,candles,y,low,high){
+    chartClocks.length=0;
+    const entries=data.technical_overlays||[],start=candles[0].time,finish=candles.at(-1).time+Number(interval.slice(0,-1))*60;
+    const timeX=stamp=>{if(stamp<=start)return 8;if(stamp>=finish)return 718;let i=candles.findIndex(c=>c.time>stamp);if(i<0)i=candles.length;const before=candles[Math.max(0,i-1)].time,after=candles[i]?.time||finish;return 8+((i-1)+(stamp-before)/Math.max(1,after-before)+.5)*710/candles.length;};
+    const backgrounds=technicalSvg('g',{'pointer-events':'none'}),lines=technicalSvg('g',{'pointer-events':'none'}),dash={solid:'',dotted:'2 4',dashed:'7 4','dash-dot':'7 3 2 3'};
+    svg.prepend(backgrounds);svg.append(lines);
+    entries.forEach(profile=>{
+      const result=profile.result,cfg=result?.settings||profile.parameters;if(result?.status!=='ok')return;
+      const group=technicalSvg('g',{'data-chart-indicator':profile.id,'data-indicator-type':profile.type});lines.append(group);
+      const line=(value,label,style,left=8,right=718)=>{if(value<low||value>high||right<8||left>718)return;
+        group.append(technicalSvg('line',{x1:Math.max(8,left),x2:Math.min(718,right),y1:y(value),y2:y(value),stroke:style.color,'stroke-width':style.width,'stroke-dasharray':dash[style.style]}));
+        if(cfg.show_labels!==false)group.append(technicalSvg('text',{x:Math.min(720,Math.max(8,right)),y:y(value)-3,fill:cfg.label_color||style.color,'font-size':cfg.font_size||9},`${label} ${Number(value.toPrecision(12))}`));};
+      if(profile.type==='round-levels'){
+        const step=result.step;let left=Math.ceil(low/step),right=Math.floor(high/step);const total=right-left+1,count=Math.max(0,Math.min(total,cfg.max_lines));left+=Math.max(0,Math.floor((total-count)/2));
+        for(let index=left;index<left+count;index++)line(index*step,profile.name,cfg);
+      }
+      if(['previous-day-levels','previous-day-session-levels'].includes(profile.type))
+        (result.days||[]).filter(day=>day.end>start&&day.start<finish).forEach(day=>Object.entries(day.levels).forEach(([key,value])=>line(value,`${profile.name} ${key.toUpperCase()}`,result.styles[key],timeX(day.start),timeX(day.end))));
+      if(profile.type==='session-windows'){
+        (result.chart_windows||[]).filter(w=>w.end_timestamp>start&&w.start_timestamp<finish&&candles.some(c=>c.time>=w.start_timestamp&&c.time<w.end_timestamp)).forEach(w=>{
+          const left=timeX(w.start_timestamp),right=timeX(w.end_timestamp),color=w.color||'#60a5fa';
+          const rect=technicalSvg('rect',{x:left,y:8,width:Math.max(1,right-left),height:215,fill:cfg.window_shape==='border'?'none':color,'fill-opacity':cfg.grade_opacity[w.grade],stroke:cfg.window_shape==='filled'?'none':color,'stroke-width':cfg.border_width,'data-session-window':w.name});backgrounds.append(rect);
+          if(cfg.window_labels)group.append(technicalSvg('text',{x:left+2,y:18+(w.grade==='B'?11:w.grade==='C'?22:0),fill:cfg.label_color,'font-size':cfg.label_size,'font-family':cfg.label_font},`${w.start}–${w.end} ${cfg.grade_in_label?w.grade:''} ${w.name}`));
+        });
+        if(cfg.day_start_lines)(result.day_lines||[]).filter(t=>t>=start&&t<finish).forEach(t=>group.append(technicalSvg('line',{x1:timeX(t),x2:timeX(t),y1:8,y2:223,stroke:cfg.day_line_color,'stroke-width':cfg.day_line_width,'stroke-dasharray':dash[cfg.day_line_style]})));
+      }
+      if((profile.type==='session-windows'&&cfg.time_points)||(profile.type==='session-clock'&&cfg.chart_point_lines))
+        (result.chart_lines||[]).filter(p=>p.time>=start&&p.time<finish).forEach(p=>group.append(technicalSvg('line',{x1:timeX(p.time),x2:timeX(p.time),y1:8,y2:223,stroke:cfg.point_color,'stroke-width':cfg.point_width,'stroke-dasharray':dash[cfg.point_style]}),...(cfg.point_labels?[technicalSvg('text',{x:timeX(p.time)+2,y:218,fill:cfg.point_color,'font-size':cfg.label_size},p.label)]:[])));
+      if(profile.type==='session-windows'&&cfg.countdown_panel){
+        const box=makeElement('div','chart-session-panel',profile.name);box.dataset.chartSessionPanel=profile.id;
+        box.style.cssText=`position:absolute;left:8px;top:${22+entries.indexOf(profile)*22}px;right:12px;left:auto;z-index:2;background:${cfg.background_color};padding:4px;font-size:${cfg.panel_font_size}px;font-family:${cfg.panel_font};pointer-events:none`;
+        graph.append(box);chartClocks.push({box,result,received:performance.now(),panel:true,name:profile.name});
+      }
+      if(profile.type==='session-clock'){
+        const box=makeElement('div','chart-session-clock');box.dataset.chartClock=profile.id;
+        box.style.cssText=`position:absolute;width:${cfg.clock_size}px;max-width:85%;z-index:3;cursor:grab;touch-action:none`;
+        const graphic=sessionClockGraphic(result);graphic.svg.style.width='100%';box.append(graphic.svg);graph.append(box);
+        const place=()=>{box.style.left=`${Math.max(0,graph.clientWidth-box.offsetWidth)*cfg.position.x}px`;box.style.top=`${Math.max(0,graph.clientHeight-box.offsetHeight)*cfg.position.y}px`;};requestAnimationFrame(place);
+        chartClocks.push({box,result,received:performance.now()});
+        box.addEventListener('pointerdown',event=>{if(event.button!==0)return;event.preventDefault();event.stopPropagation();chartClockDragging=true;box.setPointerCapture(event.pointerId);
+          const sx=event.clientX,sy=event.clientY,left=parseFloat(box.style.left)||0,top=parseFloat(box.style.top)||0,pos={...cfg.position},width=Math.max(0,graph.clientWidth-box.offsetWidth),height=Math.max(0,graph.clientHeight-box.offsetHeight);
+          const move=e=>{const x=Math.max(0,Math.min(width,left+e.clientX-sx)),y=Math.max(0,Math.min(height,top+e.clientY-sy));box.style.left=`${x}px`;box.style.top=`${y}px`;pos.x=width?x/width:0;pos.y=height?y/height:0;};
+          const finish=async e=>{box.removeEventListener('pointermove',move);box.removeEventListener('pointerup',finish);box.removeEventListener('pointercancel',finish);try{if(e.type!=='pointercancel'){await window.dashboardModuleState.saveIndicatorProfile(profile.id,{name:profile.name,type:profile.type,enabled:profile.enabled,parameters:{...profile.parameters,position:pos}});cfg.position=pos;}}catch(_){status.textContent='Could not save clock position.';}finally{chartClockDragging=false;}};
+          box.addEventListener('pointermove',move);box.addEventListener('pointerup',finish);box.addEventListener('pointercancel',finish);
+        });
+      }
+    });
+  }
+
   function plot(data) {
     cachedData = data;
+    if(chartClockDragging)return;
     const available = data.candles.filter(item => ['time','open','high','low','close'].every(key => typeof item[key] === 'number' && Number.isFinite(item[key])));
     endOffset = Math.min(endOffset, Math.max(0, available.length - 1));
     const end = Math.max(0, available.length - endOffset);
@@ -1214,10 +1310,14 @@ function renderMarketModule(body, slot, module) {
       endOffset = Math.max(0, endOffset + Math.round(delta / width * viewCount)); plot(cachedData);
     });
     svg.addEventListener('pointercancel', () => { dragStart = null; });
+    const clockHeight=Math.max(0,...(data.technical_overlays||[]).filter(item=>item.type==='session-clock'&&item.result?.status==='ok').map(item=>item.result.settings.clock_size*430/360));
+    graph.style.minHeight=clockHeight?`${clockHeight}px`:'';svg.style.height=clockHeight?`${clockHeight}px`:'';
     graph.replaceChildren(svg);
+    drawTechnicalOverlays(data,svg,candles,y,low,high);
     renderPanes(data, candles);
     showCandle(candles.find(item => item.time === selectedTime) || last, data);
     legend.textContent = `${interval} · ${candles.length} / ${available.length} candles · UTC · High ${actualHigh.toFixed(2)} / Low ${actualLow.toFixed(2)}${(data.series || []).filter(item => item.type === 'sma').length ? ' · SMA: ' + (data.series || []).filter(item => item.type === 'sma').map((item,index) => item.name + ' (' + colors[index % colors.length] + ')').join(', ') : ''} · Live candle outlined`;
+    legend.textContent+=(data.technical_overlays||[]).map(item=>' · '+item.name+': '+(item.result?.status==='ok'?'On chart':item.result?.message||item.result?.status||'Unavailable')).join('');
   }
   function showCandle(candle, data) {
     const stamp = new Date(candle.time * 1000).toISOString().replace('T', ' ').replace('.000Z', ' UTC');
@@ -1363,27 +1463,9 @@ function technicalSvg(tag, attrs={}, text=null) {
   if(text!==null) node.textContent=String(text);
   return node;
 }
-function renderTechnicalModule(body,slot,module) {
-  const status=makeElement('p','market-status','Loading indicator…'), view=makeElement('div','technical-view'), details=makeElement('div','technical-details');
-  view.dataset.moduleId=module.id;
-  body.append(status,view,details);
-  let busy=false,last=null,received=0,dragging=false,manual=false;
-  const isSession=['session-clock','session-windows'].includes(module.id);
-  const tools=makeElement('div','slot-section-actions'),reload=makeElement('button','','Live / refresh');reload.type='button';
-  reload.addEventListener('click',()=>{manual=false;refresh();});tools.append(reload);body.prepend(tools);
-  if(module.id==='round-levels'){
-    const low=makeElement('input',''),high=makeElement('input','');low.type=high.type='number';low.step=high.step='any';low.placeholder='Visible low';high.placeholder='Visible high';low.setAttribute('aria-label','Visible low');high.setAttribute('aria-label','Visible high');
-    const apply=makeElement('button','','Apply visible range');apply.type='button';apply.addEventListener('click',async()=>{if(!low.value||!high.value)return;try{const data=await window.dashboardModuleState.execute(slot.id,module.id,{visible_low:Number(low.value),visible_high:Number(high.value)});if(body.isConnected)body.dispatchEvent(new CustomEvent('technical-result',{detail:data}));}catch(_){status.textContent='Invalid range or market price unavailable.';}});tools.append(low,high,apply);
-  }else{
-    const date=makeElement('input','');date.type='datetime-local';date.setAttribute('aria-label','As of UTC');
-    const past=makeElement('button','','Show history (UTC)');past.type='button';past.addEventListener('click',async()=>{if(!date.value)return;try{const data=await window.dashboardModuleState.execute(slot.id,module.id,{now:Date.parse(date.value+'Z')/1000});if(body.isConnected)body.dispatchEvent(new CustomEvent('technical-result',{detail:data}));}catch(_){status.textContent='Historical data unavailable.';}});tools.append(date,past);
-  }
+function sessionClockGraphic(data,elapsed=0){
   const point=(minute,radius=135)=>{const angle=minute/1440*Math.PI*2-Math.PI/2;return [180+radius*Math.cos(angle),180+radius*Math.sin(angle)];};
-  function paintClock(data) {
-    if(dragging)return;
-    view.replaceChildren();details.replaceChildren();
-    if (!data.wall_time) {status.textContent=data.message;return;}
-    const cfg=data.settings, elapsed=(performance.now()-received)/1000,seconds=(data.seconds_of_day+elapsed)%86400;
+    const cfg=data.settings, seconds=(data.seconds_of_day+elapsed)%86400;
     const svg=technicalSvg('svg',{viewBox:'0 0 360 430',role:'img','aria-label':'24-hour broker session clock'});
     svg.style.width=`${cfg.clock_size}px`;svg.style.maxWidth='100%';svg.style.background=cfg.background_color;svg.style.color=cfg.text_color;
     svg.style.fontFamily=OUTPUT_FONTS[cfg.font] || 'system-ui';
@@ -1409,6 +1491,28 @@ function renderTechnicalModule(body,slot,module) {
     const countdown=remaining===null?'Not configured':`${String(Math.floor(remaining/3600)).padStart(2,'0')}:${String(Math.floor(remaining%3600/60)).padStart(2,'0')}:${String(remaining%60).padStart(2,'0')}`;
     svg.append(technicalSvg('text',{x:180,y:365,'text-anchor':'middle',fill:cfg.text_color,'font-size':13},'NEXT POINT '+(data.next_point?.time||'—')),
       technicalSvg('text',{x:180,y:397,'text-anchor':'middle',fill:remaining!==null&&remaining<=cfg.highlight_minutes*60?cfg.point_color:cfg.text_color,'font-size':26},countdown));
+  return {svg,cfg,lines,remaining,countdown,hhmmss};
+}
+function renderTechnicalModule(body,slot,module) {
+  const status=makeElement('p','market-status','Loading indicator…'), view=makeElement('div','technical-view'), details=makeElement('div','technical-details');
+  view.dataset.moduleId=module.id;
+  body.append(status,view,details);
+  let busy=false,last=null,received=0,dragging=false,manual=false;
+  const isSession=['session-clock','session-windows'].includes(module.id);
+  const tools=makeElement('div','slot-section-actions'),reload=makeElement('button','','Live / refresh');reload.type='button';
+  reload.addEventListener('click',()=>{manual=false;refresh();});tools.append(reload);body.prepend(tools);
+  if(module.id==='round-levels'){
+    const low=makeElement('input',''),high=makeElement('input','');low.type=high.type='number';low.step=high.step='any';low.placeholder='Visible low';high.placeholder='Visible high';low.setAttribute('aria-label','Visible low');high.setAttribute('aria-label','Visible high');
+    const apply=makeElement('button','','Apply visible range');apply.type='button';apply.addEventListener('click',async()=>{if(!low.value||!high.value)return;try{const data=await window.dashboardModuleState.execute(slot.id,module.id,{visible_low:Number(low.value),visible_high:Number(high.value)});if(body.isConnected)body.dispatchEvent(new CustomEvent('technical-result',{detail:data}));}catch(_){status.textContent='Invalid range or market price unavailable.';}});tools.append(low,high,apply);
+  }else{
+    const date=makeElement('input','');date.type='datetime-local';date.setAttribute('aria-label','As of UTC');
+    const past=makeElement('button','','Show history (UTC)');past.type='button';past.addEventListener('click',async()=>{if(!date.value)return;try{const data=await window.dashboardModuleState.execute(slot.id,module.id,{now:Date.parse(date.value+'Z')/1000});if(body.isConnected)body.dispatchEvent(new CustomEvent('technical-result',{detail:data}));}catch(_){status.textContent='Historical data unavailable.';}});tools.append(date,past);
+  }
+  function paintClock(data) {
+    if(dragging)return;
+    view.replaceChildren();details.replaceChildren();
+    if (!data.wall_time) {status.textContent=data.message;return;}
+    const {svg,cfg,lines,remaining,countdown,hhmmss}=sessionClockGraphic(data,(performance.now()-received)/1000);
     if(module.id==='session-clock'){
       const stage=makeElement('div','session-clock-stage');stage.style.position='relative';stage.style.height='550px';stage.style.width='100%';
       svg.style.position='absolute';svg.style.cursor='grab';svg.style.touchAction='none';stage.append(svg);view.append(stage);
@@ -1437,7 +1541,7 @@ function renderTechnicalModule(body,slot,module) {
     const x=t=>10+(t-start)/Math.max(1,finish-start)*770,y=p=>25+(high-p)/Math.max(0.01,high-low)*245;
     (module.id==='session-windows'?data.chart_windows||[]:[]).forEach(w=>{
       if(w.end_timestamp<start||w.start_timestamp>finish)return;
-      const left=Math.max(10,x(w.start_timestamp)),right=Math.min(780,x(w.end_timestamp)),opacity={A:0.3,B:0.18,C:0.08}[w.grade];
+      const left=Math.max(10,x(w.start_timestamp)),right=Math.min(780,x(w.end_timestamp)),opacity=cfg.grade_opacity[w.grade];
       svg.append(technicalSvg('rect',{x:left,y:20,width:Math.max(1,right-left),height:260,fill:cfg.window_shape==='border'?'none':w.color||'#60a5fa','fill-opacity':opacity,stroke:cfg.window_shape==='filled'?'none':w.color||'#60a5fa'}));
       if(cfg.window_labels)svg.append(technicalSvg('text',{x:left+3,y:34+(w.grade==='B'?12:w.grade==='C'?24:0),fill:cfg.text_color,'font-size':10},`${w.start}–${w.end} ${w.grade} ${w.name}`));
     });
@@ -2366,6 +2470,7 @@ function makeSlot(row, area) {
         source.addEventListener('change',()=>{const item=activeSlots.find(item=>item.slot===source.value);if(!item)return;try{const current=JSON.parse(config.value),cfg=item.technical_settings?.['session-windows']||item.technical_defaults;['winter_utc_minutes','clock_change','reference_timezone','schedule_shift_minutes','windows','points','teaching_view'].forEach(key=>current[key]=cfg[key]);config.value=JSON.stringify(current,null,2);feedback.textContent='Schedule copied. Save to apply.';}catch(_){feedback.textContent='Could not copy schedule.';}});modulePanel.append(source);
       }
     }
+    if(['session-clock','session-windows'].includes(row.module_id)){const preset=makeElement('button','','Load supplied MT5 preset');preset.type='button';preset.addEventListener('click',()=>{config.value=JSON.stringify(row.technical_defaults,null,2);feedback.textContent='Preset loaded. Save indicator settings to apply.';});modulePanel.append(preset);}
     modulePanel.append(help,config,save,feedback);
   }
   const panels = [['Slot actions',actionsPanel],['Input',inputDrawer],['Commands',terminalDrawer],['Slot Worker',workerDrawer],['Output',outputDetails],['Module',modulePanel]];

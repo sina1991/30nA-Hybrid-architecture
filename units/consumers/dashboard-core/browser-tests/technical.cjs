@@ -52,21 +52,6 @@ const server=http.createServer((req,res)=>{
   await page.waitForFunction(()=>!document.querySelector('dialog[open]'));
  }
  assert.equal(writes.filter(item=>item.technical_settings).length,4);
- await page.locator('[data-nav="indicators"]').click();
- await page.locator('[data-indicator-module="session-windows"]').waitFor();
- assert.equal(await page.locator('#indicator-technical-list > article').count(),5);
- for(const id of Object.keys(input.defaults))assert.equal(await page.locator(`#indicator-new-type option[value="${id}"]`).count(),1);
- await page.locator('[data-indicator-module="previous-day-session-levels"]').getByRole('button',{name:'Configure',exact:true}).click();
- await page.getByRole('textbox',{name:'Indicator settings for slot-technical'}).waitFor();
- await page.locator('dialog[open]').getByRole('button',{name:'Close',exact:true}).click();
- await page.locator('[data-nav="indicators"]').click();
- await page.locator('#indicator-new-type').selectOption('round-levels');await page.locator('#indicator-add').click();
- await page.getByRole('textbox',{name:'Indicator settings for slot-from-indicators'}).waitFor();
- assert.equal(kind,'round-levels');assert.equal(await page.locator('dialog[open] [role="tab"][aria-selected="true"]').textContent(),'Module');
- await page.locator('dialog[open]').getByRole('button',{name:'Close',exact:true}).click();
- await page.locator('[data-nav="indicators"]').click();
- await page.locator('[data-indicator-module="round-levels"]').getByRole('button',{name:'View',exact:true}).click();
- await page.waitForFunction(()=>document.body.dataset.view==='overview');
  assert.deepEqual(errors,[]);console.log('PASS: five independent indicators, live clock and persistent module settings');
  }finally{await browser.close();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1;});

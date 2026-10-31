@@ -2,6 +2,7 @@
 from uuid import uuid4
 from market_data import indicators
 from .module_state import change
+from . import technical
 
 DEFAULTS = [
     {'id':'sma-default', 'name':'SMA 20', 'type':'sma', 'parameters':{'period':20}, 'enabled':True},
@@ -21,7 +22,7 @@ def save(owner, data, profile_id=None):
     if not isinstance(name, str) or not name.strip() or len(name) > 80 or type(enabled) is not bool:
         raise ValueError('invalid indicator name or status')
     if not isinstance(kind, str): raise ValueError('invalid indicator type')
-    parameters = indicators.normalize(kind, data['parameters'])
+    parameters = technical.settings(kind, data['parameters']) if kind in technical.KINDS else indicators.normalize(kind, data['parameters'])
     ident = profile_id or 'ind-' + uuid4().hex[:12]
     profile = {'id':ident, 'name':name.strip(), 'type':kind, 'parameters':parameters, 'enabled':enabled}
     def update(old):

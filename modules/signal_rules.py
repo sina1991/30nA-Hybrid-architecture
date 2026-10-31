@@ -20,7 +20,7 @@ def save(owner, data, rule_id=None):
     if not isinstance(data['name'], str) or not data['name'].strip() or len(data['name']) > 80: raise ValueError('invalid rule name')
     if data['interval'] not in ('1m','5m','15m') or type(data['enabled']) is not bool or data['signal'] not in ('BUY','SELL'):
         raise ValueError('invalid rule options')
-    profiles = {item['id']:item for item in indicator_profiles.list_profiles(owner)}
+    profiles = {item['id']:item for item in indicator_profiles.list_profiles(owner) if item['type'] in FIELDS}
     conditions = data['conditions']
     if not isinstance(conditions, list) or not 1 <= len(conditions) <= 8: raise ValueError('one to eight conditions required')
     for item in conditions:
@@ -54,7 +54,7 @@ def delete(owner, rule_id):
 
 
 def market_input(owner, interval='1m'):
-    profiles = [item for item in indicator_profiles.list_profiles(owner) if item['enabled']]
+    profiles = [item for item in indicator_profiles.list_profiles(owner) if item['enabled'] and item['type'] in FIELDS]
     if not profiles: raise ValueError('no enabled indicators')
     data = chart(limit=2, include_open=False, interval=interval, profiles=profiles)
     if not data['last_success'] or time.time() - data['last_success'] > 90 or data['collector_error']:
