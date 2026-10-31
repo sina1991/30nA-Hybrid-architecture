@@ -1,0 +1,120 @@
+# همهٔ راهنماها و مستندات
+
+این پوشه یک کپی قابل مرور از مستندات پروژه است. ساختار مسیرها در files حفظ شده؛ لینک‌های Markdown به کپی‌ها یا کد اصلی تنظیم شده‌اند. محتوای آموزشی منبع اصلی همچنان در مسیر اولیه نگهداری می‌شود؛ برای اصلاح، منبع اصلی را تغییر دهید و کپی‌ها را دوباره بسازید.
+
+شروع سریع: [راهنمای کاربر Dashboard](files/docs/dashboard/USER_GUIDE.md) · [Demo Trading](files/docs/dashboard/demo-trading.md) · [Signal Scripts](files/docs/dashboard/signal-scripts.md) · [دفترچهٔ کم‌توکن Agent](files/docs/DASHBOARD_AGENT.md) · [دفترچهٔ PDF](files/docs/manual/PROJECT_MANUAL.pdf).
+
+بازتولید: `python scripts/documentation/copy_guides.py` از ریشهٔ مخزن. ابتدا منابع تولیدشدهٔ دفترچه را با build_manual.py و render_pdf.cjs به‌روز کنید. `--check` همسانی کپی‌ها و SHA-256ها را بدون تغییر فایل کنترل می‌کند. کد، credential، env و DB عملیاتی به این مجموعه اضافه نمی‌شوند.
+
+تعداد فایل‌های کپی‌شده: **108**. JSON و تصاویر مستندات نیز همراه آن‌ها هستند.
+
+| منبع اصلی | کپی |
+|---|---|
+| [AGENTS.md](../../AGENTS.md) | [Open](files/AGENTS.md) |
+| [CHANGELOG.md](../../CHANGELOG.md) | [Open](files/CHANGELOG.md) |
+| [CONTRIBUTING.md](../../CONTRIBUTING.md) | [Open](files/CONTRIBUTING.md) |
+| [README.md](../../README.md) | [Open](files/README.md) |
+| [SECURITY.md](../../SECURITY.md) | [Open](files/SECURITY.md) |
+| [agents/README.md](../../agents/README.md) | [Open](files/agents/README.md) |
+| [agents/base-prompt.md](../../agents/base-prompt.md) | [Open](files/agents/base-prompt.md) |
+| [agents/tasks/01-core.md](../../agents/tasks/01-core.md) | [Open](files/agents/tasks/01-core.md) |
+| [contracts/code/README.md](../../contracts/code/README.md) | [Open](files/contracts/code/README.md) |
+| [contracts/core/README.md](../../contracts/core/README.md) | [Open](files/contracts/core/README.md) |
+| [contracts/core/config/README.md](../../contracts/core/config/README.md) | [Open](files/contracts/core/config/README.md) |
+| [contracts/core/envelope/README.md](../../contracts/core/envelope/README.md) | [Open](files/contracts/core/envelope/README.md) |
+| [contracts/core/errors/README.md](../../contracts/core/errors/README.md) | [Open](files/contracts/core/errors/README.md) |
+| [contracts/core/identifiers/README.md](../../contracts/core/identifiers/README.md) | [Open](files/contracts/core/identifiers/README.md) |
+| [contracts/core/status/README.md](../../contracts/core/status/README.md) | [Open](files/contracts/core/status/README.md) |
+| [contracts/core/versioning/README.md](../../contracts/core/versioning/README.md) | [Open](files/contracts/core/versioning/README.md) |
+| [contracts/data/README.md](../../contracts/data/README.md) | [Open](files/contracts/data/README.md) |
+| [contracts/worker/README.md](../../contracts/worker/README.md) | [Open](files/contracts/worker/README.md) |
+| [docs/AGENT_GUIDE.md](../AGENT_GUIDE.md) | [Open](files/docs/AGENT_GUIDE.md) |
+| [docs/AGENT_GUIDE.source.md](../AGENT_GUIDE.source.md) | [Open](files/docs/AGENT_GUIDE.source.md) |
+| [docs/DASHBOARD_AGENT.md](../DASHBOARD_AGENT.md) | [Open](files/docs/DASHBOARD_AGENT.md) |
+| [docs/DOCUMENTATION_REVIEW.md](../DOCUMENTATION_REVIEW.md) | [Open](files/docs/DOCUMENTATION_REVIEW.md) |
+| [docs/PROJECT_FINALIZATION_STATUS.md](../PROJECT_FINALIZATION_STATUS.md) | [Open](files/docs/PROJECT_FINALIZATION_STATUS.md) |
+| [docs/README.md](../README.md) | [Open](files/docs/README.md) |
+| [docs/architecture/components.md](../architecture/components.md) | [Open](files/docs/architecture/components.md) |
+| [docs/architecture/data-flow.md](../architecture/data-flow.md) | [Open](files/docs/architecture/data-flow.md) |
+| [docs/architecture/dependencies.md](../architecture/dependencies.md) | [Open](files/docs/architecture/dependencies.md) |
+| [docs/architecture/overview.md](../architecture/overview.md) | [Open](files/docs/architecture/overview.md) |
+| [docs/architecture/worker-lifecycle.md](../architecture/worker-lifecycle.md) | [Open](files/docs/architecture/worker-lifecycle.md) |
+| [docs/assets/architecture.dot](../assets/architecture.dot) | [Open](files/docs/assets/architecture.dot) |
+| [docs/assets/architecture.svg](../assets/architecture.svg) | [Open](files/docs/assets/architecture.svg) |
+| [docs/assets/dashboard-execution.png](../assets/dashboard-execution.png) | [Open](files/docs/assets/dashboard-execution.png) |
+| [docs/assets/dashboard-layout-v011.png](../assets/dashboard-layout-v011.png) | [Open](files/docs/assets/dashboard-layout-v011.png) |
+| [docs/audit/ci-and-branch-state.md](../audit/ci-and-branch-state.md) | [Open](files/docs/audit/ci-and-branch-state.md) |
+| [docs/audit/feature-capability-matrix.md](../audit/feature-capability-matrix.md) | [Open](files/docs/audit/feature-capability-matrix.md) |
+| [docs/audit/remediation-plan.md](../audit/remediation-plan.md) | [Open](files/docs/audit/remediation-plan.md) |
+| [docs/audit/unit-api-findings.md](../audit/unit-api-findings.md) | [Open](files/docs/audit/unit-api-findings.md) |
+| [docs/dashboard/USER_GUIDE.md](../dashboard/USER_GUIDE.md) | [Open](files/docs/dashboard/USER_GUIDE.md) |
+| [docs/dashboard/demo-trading.md](../dashboard/demo-trading.md) | [Open](files/docs/dashboard/demo-trading.md) |
+| [docs/dashboard/signal-scripts.md](../dashboard/signal-scripts.md) | [Open](files/docs/dashboard/signal-scripts.md) |
+| [docs/deployment/dashboard-update.md](../deployment/dashboard-update.md) | [Open](files/docs/deployment/dashboard-update.md) |
+| [docs/deployment/first-delivery.md](../deployment/first-delivery.md) | [Open](files/docs/deployment/first-delivery.md) |
+| [docs/deployment/installer.md](../deployment/installer.md) | [Open](files/docs/deployment/installer.md) |
+| [docs/deployment/multiuser-chat.md](../deployment/multiuser-chat.md) | [Open](files/docs/deployment/multiuser-chat.md) |
+| [docs/deployment/ubuntu.md](../deployment/ubuntu.md) | [Open](files/docs/deployment/ubuntu.md) |
+| [docs/development/dashboard-v0.1.1.md](../development/dashboard-v0.1.1.md) | [Open](files/docs/development/dashboard-v0.1.1.md) |
+| [docs/development/modules-terminal.md](../development/modules-terminal.md) | [Open](files/docs/development/modules-terminal.md) |
+| [docs/handbook/00-audit-baseline.md](../handbook/00-audit-baseline.md) | [Open](files/docs/handbook/00-audit-baseline.md) |
+| [docs/handbook/01-documentation-governance.md](../handbook/01-documentation-governance.md) | [Open](files/docs/handbook/01-documentation-governance.md) |
+| [docs/handbook/02-completion-roadmap.md](../handbook/02-completion-roadmap.md) | [Open](files/docs/handbook/02-completion-roadmap.md) |
+| [docs/handbook/03-code-contract-findings.md](../handbook/03-code-contract-findings.md) | [Open](files/docs/handbook/03-code-contract-findings.md) |
+| [docs/handbook/README.md](../handbook/README.md) | [Open](files/docs/handbook/README.md) |
+| [docs/handbook/decisions/0001-owner-scoped-control-plane.md](../handbook/decisions/0001-owner-scoped-control-plane.md) | [Open](files/docs/handbook/decisions/0001-owner-scoped-control-plane.md) |
+| [docs/handbook/decisions/README.md](../handbook/decisions/README.md) | [Open](files/docs/handbook/decisions/README.md) |
+| [docs/handbook/testing-and-ci.md](../handbook/testing-and-ci.md) | [Open](files/docs/handbook/testing-and-ci.md) |
+| [docs/handbook/units/00-core-contracts.md](../handbook/units/00-core-contracts.md) | [Open](files/docs/handbook/units/00-core-contracts.md) |
+| [docs/handbook/units/01-data-manager.md](../handbook/units/01-data-manager.md) | [Open](files/docs/handbook/units/01-data-manager.md) |
+| [docs/handbook/units/02-code-manager.md](../handbook/units/02-code-manager.md) | [Open](files/docs/handbook/units/02-code-manager.md) |
+| [docs/handbook/units/03-worker-manager.md](../handbook/units/03-worker-manager.md) | [Open](files/docs/handbook/units/03-worker-manager.md) |
+| [docs/handbook/units/04-worker-runtime.md](../handbook/units/04-worker-runtime.md) | [Open](files/docs/handbook/units/04-worker-runtime.md) |
+| [docs/handbook/units/05-dashboard-core.md](../handbook/units/05-dashboard-core.md) | [Open](files/docs/handbook/units/05-dashboard-core.md) |
+| [docs/handbook/units/06-integration-agent08.md](../handbook/units/06-integration-agent08.md) | [Open](files/docs/handbook/units/06-integration-agent08.md) |
+| [docs/manual/00-reading-and-status.md](../manual/00-reading-and-status.md) | [Open](files/docs/manual/00-reading-and-status.md) |
+| [docs/manual/01-architecture.md](../manual/01-architecture.md) | [Open](files/docs/manual/01-architecture.md) |
+| [docs/manual/02-development.md](../manual/02-development.md) | [Open](files/docs/manual/02-development.md) |
+| [docs/manual/03-core-contracts.md](../manual/03-core-contracts.md) | [Open](files/docs/manual/03-core-contracts.md) |
+| [docs/manual/04-data-manager.md](../manual/04-data-manager.md) | [Open](files/docs/manual/04-data-manager.md) |
+| [docs/manual/05-code-manager.md](../manual/05-code-manager.md) | [Open](files/docs/manual/05-code-manager.md) |
+| [docs/manual/06-worker-manager.md](../manual/06-worker-manager.md) | [Open](files/docs/manual/06-worker-manager.md) |
+| [docs/manual/07-worker-runtime.md](../manual/07-worker-runtime.md) | [Open](files/docs/manual/07-worker-runtime.md) |
+| [docs/manual/08-dashboard.md](../manual/08-dashboard.md) | [Open](files/docs/manual/08-dashboard.md) |
+| [docs/manual/09-agent08.md](../manual/09-agent08.md) | [Open](files/docs/manual/09-agent08.md) |
+| [docs/manual/10-configuration.md](../manual/10-configuration.md) | [Open](files/docs/manual/10-configuration.md) |
+| [docs/manual/11-storage-and-migrations.md](../manual/11-storage-and-migrations.md) | [Open](files/docs/manual/11-storage-and-migrations.md) |
+| [docs/manual/12-security.md](../manual/12-security.md) | [Open](files/docs/manual/12-security.md) |
+| [docs/manual/13-ubuntu-deployment.md](../manual/13-ubuntu-deployment.md) | [Open](files/docs/manual/13-ubuntu-deployment.md) |
+| [docs/manual/14-operations-and-observability.md](../manual/14-operations-and-observability.md) | [Open](files/docs/manual/14-operations-and-observability.md) |
+| [docs/manual/15-backup-and-recovery.md](../manual/15-backup-and-recovery.md) | [Open](files/docs/manual/15-backup-and-recovery.md) |
+| [docs/manual/16-testing-and-ci.md](../manual/16-testing-and-ci.md) | [Open](files/docs/manual/16-testing-and-ci.md) |
+| [docs/manual/17-customer-delivery.md](../manual/17-customer-delivery.md) | [Open](files/docs/manual/17-customer-delivery.md) |
+| [docs/manual/18-extension-and-governance.md](../manual/18-extension-and-governance.md) | [Open](files/docs/manual/18-extension-and-governance.md) |
+| [docs/manual/19-troubleshooting-and-gaps.md](../manual/19-troubleshooting-and-gaps.md) | [Open](files/docs/manual/19-troubleshooting-and-gaps.md) |
+| [docs/manual/20-generated-reference.md](../manual/20-generated-reference.md) | [Open](files/docs/manual/20-generated-reference.md) |
+| [docs/manual/BOOK.md](../manual/BOOK.md) | [Open](files/docs/manual/BOOK.md) |
+| [docs/manual/PROJECT_MANUAL.html](../manual/PROJECT_MANUAL.html) | [Open](files/docs/manual/PROJECT_MANUAL.html) |
+| [docs/manual/PROJECT_MANUAL.pdf](../manual/PROJECT_MANUAL.pdf) | [Open](files/docs/manual/PROJECT_MANUAL.pdf) |
+| [docs/manual/README.md](../manual/README.md) | [Open](files/docs/manual/README.md) |
+| [docs/manual/manifest.json](../manual/manifest.json) | [Open](files/docs/manual/manifest.json) |
+| [docs/manual/pdf-manifest.json](../manual/pdf-manifest.json) | [Open](files/docs/manual/pdf-manifest.json) |
+| [docs/manual/source-inventory.json](../manual/source-inventory.json) | [Open](files/docs/manual/source-inventory.json) |
+| [docs/migration/migration-plan.md](../migration/migration-plan.md) | [Open](files/docs/migration/migration-plan.md) |
+| [docs/migration/repository-inventory.md](../migration/repository-inventory.md) | [Open](files/docs/migration/repository-inventory.md) |
+| [docs/releases/v0.1.0.md](../releases/v0.1.0.md) | [Open](files/docs/releases/v0.1.0.md) |
+| [docs/releases/v0.1.2.md](../releases/v0.1.2.md) | [Open](files/docs/releases/v0.1.2.md) |
+| [docs/releases/v1.1.0.md](../releases/v1.1.0.md) | [Open](files/docs/releases/v1.1.0.md) |
+| [docs/releases/v1.1.1.md](../releases/v1.1.1.md) | [Open](files/docs/releases/v1.1.1.md) |
+| [docs/security/production-host-sandbox-acceptance.md](../security/production-host-sandbox-acceptance.md) | [Open](files/docs/security/production-host-sandbox-acceptance.md) |
+| [docs/security/rootless-docker-stage-acceptance.md](../security/rootless-docker-stage-acceptance.md) | [Open](files/docs/security/rootless-docker-stage-acceptance.md) |
+| [docs/security/sandbox-cleanup-recovery.md](../security/sandbox-cleanup-recovery.md) | [Open](files/docs/security/sandbox-cleanup-recovery.md) |
+| [docs/security/worker-runtime-sandbox-threat-model.md](../security/worker-runtime-sandbox-threat-model.md) | [Open](files/docs/security/worker-runtime-sandbox-threat-model.md) |
+| [docs/standards/development.md](../standards/development.md) | [Open](files/docs/standards/development.md) |
+| [docs/standards/versioning.md](../standards/versioning.md) | [Open](files/docs/standards/versioning.md) |
+| [units/code-manager/README.md](../../units/code-manager/README.md) | [Open](files/units/code-manager/README.md) |
+| [units/code-manager/deployment/README-stage-b.md](../../units/code-manager/deployment/README-stage-b.md) | [Open](files/units/code-manager/deployment/README-stage-b.md) |
+| [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | [Open](files/units/consumers/dashboard-core/README.md) |
+| [units/data-manager/README.md](../../units/data-manager/README.md) | [Open](files/units/data-manager/README.md) |
+| [units/worker-manager/README.md](../../units/worker-manager/README.md) | [Open](files/units/worker-manager/README.md) |
+| [units/worker-runtime/README.md](../../units/worker-runtime/README.md) | [Open](files/units/worker-runtime/README.md) |

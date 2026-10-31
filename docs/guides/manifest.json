@@ -1,0 +1,653 @@
+{
+  "format": 1,
+  "files": [
+    {
+      "source": "AGENTS.md",
+      "copy": "files/AGENTS.md",
+      "source_sha256": "8a436c29913fe45dee2d6ebb4de73ee58e30fae33f1df9773988a401e4208b05",
+      "copy_sha256": "8a436c29913fe45dee2d6ebb4de73ee58e30fae33f1df9773988a401e4208b05"
+    },
+    {
+      "source": "CHANGELOG.md",
+      "copy": "files/CHANGELOG.md",
+      "source_sha256": "78eeea764662138e0cb7299f6aa5aa9c748852c3ddb9a52e74f3f42293196dd5",
+      "copy_sha256": "78eeea764662138e0cb7299f6aa5aa9c748852c3ddb9a52e74f3f42293196dd5"
+    },
+    {
+      "source": "CONTRIBUTING.md",
+      "copy": "files/CONTRIBUTING.md",
+      "source_sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f",
+      "copy_sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
+    },
+    {
+      "source": "README.md",
+      "copy": "files/README.md",
+      "source_sha256": "5b9ef04aac44fbda4a09a2357e45941632a93de792d69c3708e050f18bba0bc1",
+      "copy_sha256": "8ee81eb4f46c322e21dc39292064688842e274fd2037d8644cf4f06cee22e180"
+    },
+    {
+      "source": "SECURITY.md",
+      "copy": "files/SECURITY.md",
+      "source_sha256": "341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655",
+      "copy_sha256": "341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655"
+    },
+    {
+      "source": "agents/README.md",
+      "copy": "files/agents/README.md",
+      "source_sha256": "636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f",
+      "copy_sha256": "636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f"
+    },
+    {
+      "source": "agents/base-prompt.md",
+      "copy": "files/agents/base-prompt.md",
+      "source_sha256": "967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a",
+      "copy_sha256": "967841528d746150c0d8a714430f00295db6bc1214fc64ce8c91b865d6a6974a"
+    },
+    {
+      "source": "agents/tasks/01-core.md",
+      "copy": "files/agents/tasks/01-core.md",
+      "source_sha256": "246f884a492333b17d4cbcebb0435776f0eb4546f6e887cbafd57a294438692e",
+      "copy_sha256": "246f884a492333b17d4cbcebb0435776f0eb4546f6e887cbafd57a294438692e"
+    },
+    {
+      "source": "contracts/code/README.md",
+      "copy": "files/contracts/code/README.md",
+      "source_sha256": "668f3c984f15966f242731b8eed9dcdb19519cd01a1267c0b6a9475eba2f3c6e",
+      "copy_sha256": "668f3c984f15966f242731b8eed9dcdb19519cd01a1267c0b6a9475eba2f3c6e"
+    },
+    {
+      "source": "contracts/core/README.md",
+      "copy": "files/contracts/core/README.md",
+      "source_sha256": "9b22e91cc348388988fbc6490f963f36625e649597533755371f64731a464a72",
+      "copy_sha256": "9b22e91cc348388988fbc6490f963f36625e649597533755371f64731a464a72"
+    },
+    {
+      "source": "contracts/core/config/README.md",
+      "copy": "files/contracts/core/config/README.md",
+      "source_sha256": "ebb8adc0c2d9cc5d2ca5dea9ac98d5308dba92306ccf8c0adefeb877c3474dde",
+      "copy_sha256": "ebb8adc0c2d9cc5d2ca5dea9ac98d5308dba92306ccf8c0adefeb877c3474dde"
+    },
+    {
+      "source": "contracts/core/envelope/README.md",
+      "copy": "files/contracts/core/envelope/README.md",
+      "source_sha256": "179302671c247ec3bea1b57236b2237dc647ca53db7c42c1f89ac68bcb7b6eb2",
+      "copy_sha256": "179302671c247ec3bea1b57236b2237dc647ca53db7c42c1f89ac68bcb7b6eb2"
+    },
+    {
+      "source": "contracts/core/errors/README.md",
+      "copy": "files/contracts/core/errors/README.md",
+      "source_sha256": "bb9468f788cae923b0265c474406bc5cd98f57e8d10839bcd4047d445f852fff",
+      "copy_sha256": "bb9468f788cae923b0265c474406bc5cd98f57e8d10839bcd4047d445f852fff"
+    },
+    {
+      "source": "contracts/core/identifiers/README.md",
+      "copy": "files/contracts/core/identifiers/README.md",
+      "source_sha256": "b8fc4811b236d97e2c798c0cc52221153f7ff19b52464dc702eea135403aee27",
+      "copy_sha256": "b8fc4811b236d97e2c798c0cc52221153f7ff19b52464dc702eea135403aee27"
+    },
+    {
+      "source": "contracts/core/status/README.md",
+      "copy": "files/contracts/core/status/README.md",
+      "source_sha256": "b90daa97a77816807837840e40f9ab4e7575ce64db89aa3c8dbf1f15070802cf",
+      "copy_sha256": "b90daa97a77816807837840e40f9ab4e7575ce64db89aa3c8dbf1f15070802cf"
+    },
+    {
+      "source": "contracts/core/versioning/README.md",
+      "copy": "files/contracts/core/versioning/README.md",
+      "source_sha256": "beb95aafadef9d863f9b65c34848686eaec2d630e17eaf80fbd94c4bb5b18cf5",
+      "copy_sha256": "beb95aafadef9d863f9b65c34848686eaec2d630e17eaf80fbd94c4bb5b18cf5"
+    },
+    {
+      "source": "contracts/data/README.md",
+      "copy": "files/contracts/data/README.md",
+      "source_sha256": "6e3be41bfeaccd9fc7ef80a15eeedc64de35f42edfb6dcf789f46be2e52e5920",
+      "copy_sha256": "6e3be41bfeaccd9fc7ef80a15eeedc64de35f42edfb6dcf789f46be2e52e5920"
+    },
+    {
+      "source": "contracts/worker/README.md",
+      "copy": "files/contracts/worker/README.md",
+      "source_sha256": "4d330cd753ad143a1af46237f79305b122623a4828997ada4f717c1417984201",
+      "copy_sha256": "f9b963f8e78b1c476252b34894a0da2b238b33920c9279ff85e006b569d74418"
+    },
+    {
+      "source": "docs/AGENT_GUIDE.md",
+      "copy": "files/docs/AGENT_GUIDE.md",
+      "source_sha256": "14e74c61a993fe98af00b26066c84e320dbd5b5d3e62998520d46a899de70dfb",
+      "copy_sha256": "7e31bb64dbb35b2f7c5b45eaf0aa230cdd9fac0de613a272d2b48cd9f9ac4246"
+    },
+    {
+      "source": "docs/AGENT_GUIDE.source.md",
+      "copy": "files/docs/AGENT_GUIDE.source.md",
+      "source_sha256": "55e76450a11b9101e56589c8d218c27f8f784837faa1e80b6216cb5dbd0eb953",
+      "copy_sha256": "55e76450a11b9101e56589c8d218c27f8f784837faa1e80b6216cb5dbd0eb953"
+    },
+    {
+      "source": "docs/DASHBOARD_AGENT.md",
+      "copy": "files/docs/DASHBOARD_AGENT.md",
+      "source_sha256": "c1edcc606dda2e1ccc3ba33d47a885fe593cf93a36fb57dcfbbe4b20001823ef",
+      "copy_sha256": "c1edcc606dda2e1ccc3ba33d47a885fe593cf93a36fb57dcfbbe4b20001823ef"
+    },
+    {
+      "source": "docs/DOCUMENTATION_REVIEW.md",
+      "copy": "files/docs/DOCUMENTATION_REVIEW.md",
+      "source_sha256": "9fbaacae3b6cd93f55d786014a5a501c384e8672bcf54603d97165c083dc0f94",
+      "copy_sha256": "9fbaacae3b6cd93f55d786014a5a501c384e8672bcf54603d97165c083dc0f94"
+    },
+    {
+      "source": "docs/PROJECT_FINALIZATION_STATUS.md",
+      "copy": "files/docs/PROJECT_FINALIZATION_STATUS.md",
+      "source_sha256": "c9be9f7292ab329b96ef33f958c619bb9351bfdd2977e2351ffc6c9b84befcfa",
+      "copy_sha256": "c9be9f7292ab329b96ef33f958c619bb9351bfdd2977e2351ffc6c9b84befcfa"
+    },
+    {
+      "source": "docs/README.md",
+      "copy": "files/docs/README.md",
+      "source_sha256": "5af2b001975106490f25904c1abd252bd284eb1839a794986e35a11c214f2488",
+      "copy_sha256": "5af2b001975106490f25904c1abd252bd284eb1839a794986e35a11c214f2488"
+    },
+    {
+      "source": "docs/architecture/components.md",
+      "copy": "files/docs/architecture/components.md",
+      "source_sha256": "3f48744bef407dde66bac6d7d5c404dc610402954d0e2cbc8bc502e41ef129b7",
+      "copy_sha256": "3f48744bef407dde66bac6d7d5c404dc610402954d0e2cbc8bc502e41ef129b7"
+    },
+    {
+      "source": "docs/architecture/data-flow.md",
+      "copy": "files/docs/architecture/data-flow.md",
+      "source_sha256": "9039c3a609a5525a83fafc00f2016bd7f81e2a1b862da08f54f088ab877caac1",
+      "copy_sha256": "9039c3a609a5525a83fafc00f2016bd7f81e2a1b862da08f54f088ab877caac1"
+    },
+    {
+      "source": "docs/architecture/dependencies.md",
+      "copy": "files/docs/architecture/dependencies.md",
+      "source_sha256": "f685a8fa6915d2c25f46f4fa23f6bce69144e79171631aed8288efb10e727d97",
+      "copy_sha256": "f685a8fa6915d2c25f46f4fa23f6bce69144e79171631aed8288efb10e727d97"
+    },
+    {
+      "source": "docs/architecture/overview.md",
+      "copy": "files/docs/architecture/overview.md",
+      "source_sha256": "4b6eb5119741dfbbaa80e881b64a27659d8afdb803457b429f5ce440601cc630",
+      "copy_sha256": "4b6eb5119741dfbbaa80e881b64a27659d8afdb803457b429f5ce440601cc630"
+    },
+    {
+      "source": "docs/architecture/worker-lifecycle.md",
+      "copy": "files/docs/architecture/worker-lifecycle.md",
+      "source_sha256": "0da42d0c686465c689ace200458541efc6ad4811ac16216ce733d8bc1555533b",
+      "copy_sha256": "0da42d0c686465c689ace200458541efc6ad4811ac16216ce733d8bc1555533b"
+    },
+    {
+      "source": "docs/assets/architecture.dot",
+      "copy": "files/docs/assets/architecture.dot",
+      "source_sha256": "3837435bdf582fd9b819d2c7087a85dadba66609725f009711d6a0ff8e975cb0",
+      "copy_sha256": "3837435bdf582fd9b819d2c7087a85dadba66609725f009711d6a0ff8e975cb0"
+    },
+    {
+      "source": "docs/assets/architecture.svg",
+      "copy": "files/docs/assets/architecture.svg",
+      "source_sha256": "5f6efe8706f6908fdaa0c4aee85a5b1e0f533c8e98efe5ee0d1306fa9ac66fb8",
+      "copy_sha256": "5f6efe8706f6908fdaa0c4aee85a5b1e0f533c8e98efe5ee0d1306fa9ac66fb8"
+    },
+    {
+      "source": "docs/assets/dashboard-execution.png",
+      "copy": "files/docs/assets/dashboard-execution.png",
+      "source_sha256": "da4b4745920912efc6b3ea4024045032fd29130ee5d0ac0982eae2aeb62cf105",
+      "copy_sha256": "da4b4745920912efc6b3ea4024045032fd29130ee5d0ac0982eae2aeb62cf105"
+    },
+    {
+      "source": "docs/assets/dashboard-layout-v011.png",
+      "copy": "files/docs/assets/dashboard-layout-v011.png",
+      "source_sha256": "78c349905fdf2fe5db3784a718068a9399341be008e760bcadd3d5473117c4a6",
+      "copy_sha256": "78c349905fdf2fe5db3784a718068a9399341be008e760bcadd3d5473117c4a6"
+    },
+    {
+      "source": "docs/audit/ci-and-branch-state.md",
+      "copy": "files/docs/audit/ci-and-branch-state.md",
+      "source_sha256": "6f5cda0b18e01aa65e57930024307a41c4e883bd34acc36534b45dcc8e6f8178",
+      "copy_sha256": "6f5cda0b18e01aa65e57930024307a41c4e883bd34acc36534b45dcc8e6f8178"
+    },
+    {
+      "source": "docs/audit/feature-capability-matrix.md",
+      "copy": "files/docs/audit/feature-capability-matrix.md",
+      "source_sha256": "e683c02d53dbfad35985cfe384def926aa6aaae8ca3f99882f4bfca71f20fcf6",
+      "copy_sha256": "e683c02d53dbfad35985cfe384def926aa6aaae8ca3f99882f4bfca71f20fcf6"
+    },
+    {
+      "source": "docs/audit/remediation-plan.md",
+      "copy": "files/docs/audit/remediation-plan.md",
+      "source_sha256": "10266bcb061d845ac8e559b251c24e95afa11601887a52144ce33f9c848b625d",
+      "copy_sha256": "10266bcb061d845ac8e559b251c24e95afa11601887a52144ce33f9c848b625d"
+    },
+    {
+      "source": "docs/audit/unit-api-findings.md",
+      "copy": "files/docs/audit/unit-api-findings.md",
+      "source_sha256": "0b66aa2f9ed53e686682a12c4c27fa1e09c4173ce49820b98a2fe167eb5bc1c9",
+      "copy_sha256": "0b66aa2f9ed53e686682a12c4c27fa1e09c4173ce49820b98a2fe167eb5bc1c9"
+    },
+    {
+      "source": "docs/dashboard/USER_GUIDE.md",
+      "copy": "files/docs/dashboard/USER_GUIDE.md",
+      "source_sha256": "0a3fc05b4bb1b0aca49469cf9c36838b32f402b8561a102fc15740d9d376afcb",
+      "copy_sha256": "0a3fc05b4bb1b0aca49469cf9c36838b32f402b8561a102fc15740d9d376afcb"
+    },
+    {
+      "source": "docs/dashboard/demo-trading.md",
+      "copy": "files/docs/dashboard/demo-trading.md",
+      "source_sha256": "b0ea5833955b9a5666217319e7a95952d4b3174a9a6b21876f5937cc74b6312f",
+      "copy_sha256": "b0ea5833955b9a5666217319e7a95952d4b3174a9a6b21876f5937cc74b6312f"
+    },
+    {
+      "source": "docs/dashboard/signal-scripts.md",
+      "copy": "files/docs/dashboard/signal-scripts.md",
+      "source_sha256": "8ce89a230d5c5ec4153ed4dfa6bcf3eba6412ee476ddc49c7c4647c04f952e59",
+      "copy_sha256": "8ce89a230d5c5ec4153ed4dfa6bcf3eba6412ee476ddc49c7c4647c04f952e59"
+    },
+    {
+      "source": "docs/deployment/dashboard-update.md",
+      "copy": "files/docs/deployment/dashboard-update.md",
+      "source_sha256": "732b362655182f0e94d3432302988439350ba419d156f8aaa0629dfee8cd6e64",
+      "copy_sha256": "732b362655182f0e94d3432302988439350ba419d156f8aaa0629dfee8cd6e64"
+    },
+    {
+      "source": "docs/deployment/first-delivery.md",
+      "copy": "files/docs/deployment/first-delivery.md",
+      "source_sha256": "a88fec6b63208b2f150d21f7f1b7954a6ff03382c0d042d7423547dabc4e26a8",
+      "copy_sha256": "a88fec6b63208b2f150d21f7f1b7954a6ff03382c0d042d7423547dabc4e26a8"
+    },
+    {
+      "source": "docs/deployment/installer.md",
+      "copy": "files/docs/deployment/installer.md",
+      "source_sha256": "10d6167e9fc02276d986ea4ca3dc262b82b6c44d1e33076776fb0fc795ea6de6",
+      "copy_sha256": "10d6167e9fc02276d986ea4ca3dc262b82b6c44d1e33076776fb0fc795ea6de6"
+    },
+    {
+      "source": "docs/deployment/multiuser-chat.md",
+      "copy": "files/docs/deployment/multiuser-chat.md",
+      "source_sha256": "cc2b24ce3823e5d4d7646b98bb0418629e1984fd76018240383cf9ed16b42b3a",
+      "copy_sha256": "cc2b24ce3823e5d4d7646b98bb0418629e1984fd76018240383cf9ed16b42b3a"
+    },
+    {
+      "source": "docs/deployment/ubuntu.md",
+      "copy": "files/docs/deployment/ubuntu.md",
+      "source_sha256": "7c6eb0146f19b79fdd49a4bcf8c25a4a2b76b0ea8bd1e96ebdb247a669c3af48",
+      "copy_sha256": "7c6eb0146f19b79fdd49a4bcf8c25a4a2b76b0ea8bd1e96ebdb247a669c3af48"
+    },
+    {
+      "source": "docs/development/dashboard-v0.1.1.md",
+      "copy": "files/docs/development/dashboard-v0.1.1.md",
+      "source_sha256": "86be6f63c52ab7644df455f113532071855b073cbc998a08593f9a9157355a40",
+      "copy_sha256": "86be6f63c52ab7644df455f113532071855b073cbc998a08593f9a9157355a40"
+    },
+    {
+      "source": "docs/development/modules-terminal.md",
+      "copy": "files/docs/development/modules-terminal.md",
+      "source_sha256": "54242a58d8b1a7f8d223421e9595f426edf20525a99a2344c09db007f84b7a4b",
+      "copy_sha256": "54242a58d8b1a7f8d223421e9595f426edf20525a99a2344c09db007f84b7a4b"
+    },
+    {
+      "source": "docs/handbook/00-audit-baseline.md",
+      "copy": "files/docs/handbook/00-audit-baseline.md",
+      "source_sha256": "71db78d6625d79788cb4afa97a1f625b450b08c9cb6bb5b657f2e99a2af77f83",
+      "copy_sha256": "71db78d6625d79788cb4afa97a1f625b450b08c9cb6bb5b657f2e99a2af77f83"
+    },
+    {
+      "source": "docs/handbook/01-documentation-governance.md",
+      "copy": "files/docs/handbook/01-documentation-governance.md",
+      "source_sha256": "440f14442b4df8a86fd8f8c105143604cd93974aa27a38595be2f5fb6d4fd7ff",
+      "copy_sha256": "440f14442b4df8a86fd8f8c105143604cd93974aa27a38595be2f5fb6d4fd7ff"
+    },
+    {
+      "source": "docs/handbook/02-completion-roadmap.md",
+      "copy": "files/docs/handbook/02-completion-roadmap.md",
+      "source_sha256": "af3ee534aa6ba1cff70190cc7efc336d79cfcfbb437c4a925e456a1df9b1f7d3",
+      "copy_sha256": "af3ee534aa6ba1cff70190cc7efc336d79cfcfbb437c4a925e456a1df9b1f7d3"
+    },
+    {
+      "source": "docs/handbook/03-code-contract-findings.md",
+      "copy": "files/docs/handbook/03-code-contract-findings.md",
+      "source_sha256": "7681610dbb8207befb22eb3efbdb636f78eadfea82100e6c41f6719a2e368922",
+      "copy_sha256": "7681610dbb8207befb22eb3efbdb636f78eadfea82100e6c41f6719a2e368922"
+    },
+    {
+      "source": "docs/handbook/README.md",
+      "copy": "files/docs/handbook/README.md",
+      "source_sha256": "b88a2e78fdca64908887383d0772c162fc8385dc86f65e486a28ecfe7ea92f5e",
+      "copy_sha256": "b88a2e78fdca64908887383d0772c162fc8385dc86f65e486a28ecfe7ea92f5e"
+    },
+    {
+      "source": "docs/handbook/decisions/0001-owner-scoped-control-plane.md",
+      "copy": "files/docs/handbook/decisions/0001-owner-scoped-control-plane.md",
+      "source_sha256": "1cf3ce7d1b0fd27879532b436e87eb6bc3190780dee5507ba6d943cdfd8c2d31",
+      "copy_sha256": "1cf3ce7d1b0fd27879532b436e87eb6bc3190780dee5507ba6d943cdfd8c2d31"
+    },
+    {
+      "source": "docs/handbook/decisions/README.md",
+      "copy": "files/docs/handbook/decisions/README.md",
+      "source_sha256": "3a84e53bb1f4d980bd442823adcd25673c7816d189fd4e68db3a3d76a1af569f",
+      "copy_sha256": "3a84e53bb1f4d980bd442823adcd25673c7816d189fd4e68db3a3d76a1af569f"
+    },
+    {
+      "source": "docs/handbook/testing-and-ci.md",
+      "copy": "files/docs/handbook/testing-and-ci.md",
+      "source_sha256": "cdd6799320b52334d64a4ecdf92fddd32ee80720adf9ccb58e0e7a684c6486e6",
+      "copy_sha256": "cdd6799320b52334d64a4ecdf92fddd32ee80720adf9ccb58e0e7a684c6486e6"
+    },
+    {
+      "source": "docs/handbook/units/00-core-contracts.md",
+      "copy": "files/docs/handbook/units/00-core-contracts.md",
+      "source_sha256": "34473fc79ef01d91a0b18a4ef0fe2145b27f88cf4970e5bd43dbdedc3c3d6e38",
+      "copy_sha256": "34473fc79ef01d91a0b18a4ef0fe2145b27f88cf4970e5bd43dbdedc3c3d6e38"
+    },
+    {
+      "source": "docs/handbook/units/01-data-manager.md",
+      "copy": "files/docs/handbook/units/01-data-manager.md",
+      "source_sha256": "2fb6f7605e7858da9b081ac800d4608926ab77523880793c650128237fd5630c",
+      "copy_sha256": "2fb6f7605e7858da9b081ac800d4608926ab77523880793c650128237fd5630c"
+    },
+    {
+      "source": "docs/handbook/units/02-code-manager.md",
+      "copy": "files/docs/handbook/units/02-code-manager.md",
+      "source_sha256": "0c9b19ba51f3e51bcdd017478cf126f6911f9d3891720b14533fe945321ce950",
+      "copy_sha256": "0c9b19ba51f3e51bcdd017478cf126f6911f9d3891720b14533fe945321ce950"
+    },
+    {
+      "source": "docs/handbook/units/03-worker-manager.md",
+      "copy": "files/docs/handbook/units/03-worker-manager.md",
+      "source_sha256": "cc01f367115bb853ca5e08f8f872e393e2e78caa7279eb3553821ac42e111be9",
+      "copy_sha256": "cc01f367115bb853ca5e08f8f872e393e2e78caa7279eb3553821ac42e111be9"
+    },
+    {
+      "source": "docs/handbook/units/04-worker-runtime.md",
+      "copy": "files/docs/handbook/units/04-worker-runtime.md",
+      "source_sha256": "d2be1018b0977facafcb8df6da298bbcd3621fe81683750f604822d69e39e0ac",
+      "copy_sha256": "d2be1018b0977facafcb8df6da298bbcd3621fe81683750f604822d69e39e0ac"
+    },
+    {
+      "source": "docs/handbook/units/05-dashboard-core.md",
+      "copy": "files/docs/handbook/units/05-dashboard-core.md",
+      "source_sha256": "b168cf25aa7c55e1a8af48757fe80449be1562fc1fd87ff7432b4f4da234cca7",
+      "copy_sha256": "b168cf25aa7c55e1a8af48757fe80449be1562fc1fd87ff7432b4f4da234cca7"
+    },
+    {
+      "source": "docs/handbook/units/06-integration-agent08.md",
+      "copy": "files/docs/handbook/units/06-integration-agent08.md",
+      "source_sha256": "2764c2d97e1e4a981af588a74b6669f9a6578c2eb243cb07e7b3cf1d9910606e",
+      "copy_sha256": "2764c2d97e1e4a981af588a74b6669f9a6578c2eb243cb07e7b3cf1d9910606e"
+    },
+    {
+      "source": "docs/manual/00-reading-and-status.md",
+      "copy": "files/docs/manual/00-reading-and-status.md",
+      "source_sha256": "1b42716396d7be9c53e36bf3dcdd9a26165d1561dd8f72d828b3b02922e3a1ac",
+      "copy_sha256": "1b42716396d7be9c53e36bf3dcdd9a26165d1561dd8f72d828b3b02922e3a1ac"
+    },
+    {
+      "source": "docs/manual/01-architecture.md",
+      "copy": "files/docs/manual/01-architecture.md",
+      "source_sha256": "84bf1ff6da195b40af49c577124410f8f3f203e95a6973b25d9170a61effcad7",
+      "copy_sha256": "84bf1ff6da195b40af49c577124410f8f3f203e95a6973b25d9170a61effcad7"
+    },
+    {
+      "source": "docs/manual/02-development.md",
+      "copy": "files/docs/manual/02-development.md",
+      "source_sha256": "4a88f5f57ca02c616395fbd548dc01f04accdaaced2251d4a26a4bb1b77e0b94",
+      "copy_sha256": "4a88f5f57ca02c616395fbd548dc01f04accdaaced2251d4a26a4bb1b77e0b94"
+    },
+    {
+      "source": "docs/manual/03-core-contracts.md",
+      "copy": "files/docs/manual/03-core-contracts.md",
+      "source_sha256": "d4cfb615d0a7987886925971dadcfeaf9a610b0e3c979ed0254e07d093c1f48a",
+      "copy_sha256": "d4cfb615d0a7987886925971dadcfeaf9a610b0e3c979ed0254e07d093c1f48a"
+    },
+    {
+      "source": "docs/manual/04-data-manager.md",
+      "copy": "files/docs/manual/04-data-manager.md",
+      "source_sha256": "0946f2c7fe6d185df310ca6e77b079d009a744ee26d682a05a90f019b46cb57d",
+      "copy_sha256": "574b45e3c5593fc3e8c0fdd4c6e11f9746c58ec5580761f960346169eca92b46"
+    },
+    {
+      "source": "docs/manual/05-code-manager.md",
+      "copy": "files/docs/manual/05-code-manager.md",
+      "source_sha256": "c5c6f70e2773784d7cdce47f4a549d19d17497a944b27e4d2f685414adfe677b",
+      "copy_sha256": "79a055c34c0abdb232ed55325edd2ce923db9dc49d90468686763a800ce9dbac"
+    },
+    {
+      "source": "docs/manual/06-worker-manager.md",
+      "copy": "files/docs/manual/06-worker-manager.md",
+      "source_sha256": "e5872db1c344f91475e774c58e2783d78ea2ea3f82c01837872575d160fd9b4a",
+      "copy_sha256": "2d81db123d7ca92ad52ea521a3ad524b75fc45e3deac4063cd5ddc01b58664b2"
+    },
+    {
+      "source": "docs/manual/07-worker-runtime.md",
+      "copy": "files/docs/manual/07-worker-runtime.md",
+      "source_sha256": "fe7a09c5e3f84519f63ef8ade7d431f877e1b096c9960c7e811453400600e7c1",
+      "copy_sha256": "ffbe5c372dddda46d0dcde3a8f5ab47e04f165f0e9052d40cc878a69f4f8b199"
+    },
+    {
+      "source": "docs/manual/08-dashboard.md",
+      "copy": "files/docs/manual/08-dashboard.md",
+      "source_sha256": "4b4779f17bdfb6f0e61f6f6cf70c3930222f35921730486d81471d0f90d6b542",
+      "copy_sha256": "dd75da292f8008999685cbd458b93881e8a6a7e3eb6abe77af8ebd1be659668c"
+    },
+    {
+      "source": "docs/manual/09-agent08.md",
+      "copy": "files/docs/manual/09-agent08.md",
+      "source_sha256": "47821608a5254496d2da58c475e797cc629cabec7e24814c22f6a8ae830c4f6a",
+      "copy_sha256": "b6fe868139402d0024de96d2c3f7735cad43a243701e9d2a84c62e2f8b09404e"
+    },
+    {
+      "source": "docs/manual/10-configuration.md",
+      "copy": "files/docs/manual/10-configuration.md",
+      "source_sha256": "e2d474ffbff0e4be4004738242aa6fa464039af17159a7589228fc8f203d6537",
+      "copy_sha256": "e2d474ffbff0e4be4004738242aa6fa464039af17159a7589228fc8f203d6537"
+    },
+    {
+      "source": "docs/manual/11-storage-and-migrations.md",
+      "copy": "files/docs/manual/11-storage-and-migrations.md",
+      "source_sha256": "d3cbf0549427cd06d045fe19113d7a5f9c203b5033466f479b53765b4c7c9867",
+      "copy_sha256": "d3cbf0549427cd06d045fe19113d7a5f9c203b5033466f479b53765b4c7c9867"
+    },
+    {
+      "source": "docs/manual/12-security.md",
+      "copy": "files/docs/manual/12-security.md",
+      "source_sha256": "0b7e35a9447a06949458f62e633c1d6487ec917001a56c9f56973f7313ce30cd",
+      "copy_sha256": "0b7e35a9447a06949458f62e633c1d6487ec917001a56c9f56973f7313ce30cd"
+    },
+    {
+      "source": "docs/manual/13-ubuntu-deployment.md",
+      "copy": "files/docs/manual/13-ubuntu-deployment.md",
+      "source_sha256": "8dfc16e05c63b9e1210682daa45f739a5116f89814017da9b54798a5a9d531e2",
+      "copy_sha256": "8dfc16e05c63b9e1210682daa45f739a5116f89814017da9b54798a5a9d531e2"
+    },
+    {
+      "source": "docs/manual/14-operations-and-observability.md",
+      "copy": "files/docs/manual/14-operations-and-observability.md",
+      "source_sha256": "e6c878e8cec0a08867e08f752a50193792c78592a8c2131040d434e1c3bf71a9",
+      "copy_sha256": "e6c878e8cec0a08867e08f752a50193792c78592a8c2131040d434e1c3bf71a9"
+    },
+    {
+      "source": "docs/manual/15-backup-and-recovery.md",
+      "copy": "files/docs/manual/15-backup-and-recovery.md",
+      "source_sha256": "3afdd0df0c2dcef874e5970f5bc90b5c46164c3f59a220dd78b0f659af7a5a03",
+      "copy_sha256": "3afdd0df0c2dcef874e5970f5bc90b5c46164c3f59a220dd78b0f659af7a5a03"
+    },
+    {
+      "source": "docs/manual/16-testing-and-ci.md",
+      "copy": "files/docs/manual/16-testing-and-ci.md",
+      "source_sha256": "a6876495e6c25256d0870b94b52e3655cb50c345b7fb1d4c4d958c84b6306d3f",
+      "copy_sha256": "a6876495e6c25256d0870b94b52e3655cb50c345b7fb1d4c4d958c84b6306d3f"
+    },
+    {
+      "source": "docs/manual/17-customer-delivery.md",
+      "copy": "files/docs/manual/17-customer-delivery.md",
+      "source_sha256": "3eab80483a66f9e9bc173534853a7f9d8f03d0a9da2dfcf316311233340b029c",
+      "copy_sha256": "3eab80483a66f9e9bc173534853a7f9d8f03d0a9da2dfcf316311233340b029c"
+    },
+    {
+      "source": "docs/manual/18-extension-and-governance.md",
+      "copy": "files/docs/manual/18-extension-and-governance.md",
+      "source_sha256": "2dce3f5dc7b242fc49426602e4a479b32dfbae1218e63ebcc57f527a8a3adf83",
+      "copy_sha256": "2dce3f5dc7b242fc49426602e4a479b32dfbae1218e63ebcc57f527a8a3adf83"
+    },
+    {
+      "source": "docs/manual/19-troubleshooting-and-gaps.md",
+      "copy": "files/docs/manual/19-troubleshooting-and-gaps.md",
+      "source_sha256": "d08c5754ff0451553647fb5c222edb7044c7bd8b5665a5e798de71807a81bf79",
+      "copy_sha256": "d08c5754ff0451553647fb5c222edb7044c7bd8b5665a5e798de71807a81bf79"
+    },
+    {
+      "source": "docs/manual/20-generated-reference.md",
+      "copy": "files/docs/manual/20-generated-reference.md",
+      "source_sha256": "183b38762633c8e8a351ed41cf9c79ccdfc714ba9002a10e31bc1c7a45b1d723",
+      "copy_sha256": "e6cf50744cb89945aad14e4ab03878ff0d59fde4bcdf15bf675e69770c0b5461"
+    },
+    {
+      "source": "docs/manual/BOOK.md",
+      "copy": "files/docs/manual/BOOK.md",
+      "source_sha256": "338a21e52f04f2f41fc559f77a5ecd1c6377fa64b67283bfb28ed4ab01c62516",
+      "copy_sha256": "9ced9f20776728f8258ad14faf123fab623cd16c3ed523cb3fb3b87192594abd"
+    },
+    {
+      "source": "docs/manual/PROJECT_MANUAL.html",
+      "copy": "files/docs/manual/PROJECT_MANUAL.html",
+      "source_sha256": "74ee5977519e6fcf4cb7791c09001719cd88ea83b9c04864d4369f55907764a6",
+      "copy_sha256": "74ee5977519e6fcf4cb7791c09001719cd88ea83b9c04864d4369f55907764a6"
+    },
+    {
+      "source": "docs/manual/PROJECT_MANUAL.pdf",
+      "copy": "files/docs/manual/PROJECT_MANUAL.pdf",
+      "source_sha256": "e75653ede2ab745b948e1ce404bf2b5bca01c5cf5ffe08bd9c750af8e230b162",
+      "copy_sha256": "e75653ede2ab745b948e1ce404bf2b5bca01c5cf5ffe08bd9c750af8e230b162"
+    },
+    {
+      "source": "docs/manual/README.md",
+      "copy": "files/docs/manual/README.md",
+      "source_sha256": "f1d46215db62ecd34354b790072f15148de0aca97566c0e946967a8ed0a098e6",
+      "copy_sha256": "f1d46215db62ecd34354b790072f15148de0aca97566c0e946967a8ed0a098e6"
+    },
+    {
+      "source": "docs/manual/manifest.json",
+      "copy": "files/docs/manual/manifest.json",
+      "source_sha256": "402aca1fa5eaaf52b1ddc5d20a3a49e906c56f4e17fd7f3769abe03849c71c44",
+      "copy_sha256": "402aca1fa5eaaf52b1ddc5d20a3a49e906c56f4e17fd7f3769abe03849c71c44"
+    },
+    {
+      "source": "docs/manual/pdf-manifest.json",
+      "copy": "files/docs/manual/pdf-manifest.json",
+      "source_sha256": "1174bae54bf9915b306dfe974d37b57c858fbb5c9eff2dd6dcf1314fa28a8afe",
+      "copy_sha256": "1174bae54bf9915b306dfe974d37b57c858fbb5c9eff2dd6dcf1314fa28a8afe"
+    },
+    {
+      "source": "docs/manual/source-inventory.json",
+      "copy": "files/docs/manual/source-inventory.json",
+      "source_sha256": "5c650e2918fe490bf68a33d213af71f09950207faea12da29169653ea49b82b6",
+      "copy_sha256": "5c650e2918fe490bf68a33d213af71f09950207faea12da29169653ea49b82b6"
+    },
+    {
+      "source": "docs/migration/migration-plan.md",
+      "copy": "files/docs/migration/migration-plan.md",
+      "source_sha256": "3aa5aa18efdc9c3d399e1b4aca5c7e98fb7e0042ccb0f559063c875bcaa9e987",
+      "copy_sha256": "3aa5aa18efdc9c3d399e1b4aca5c7e98fb7e0042ccb0f559063c875bcaa9e987"
+    },
+    {
+      "source": "docs/migration/repository-inventory.md",
+      "copy": "files/docs/migration/repository-inventory.md",
+      "source_sha256": "45a9c588e4f326d478566901caeb3810de81ab20dfcbbbc9a1cfe8a0b1d7c9d3",
+      "copy_sha256": "45a9c588e4f326d478566901caeb3810de81ab20dfcbbbc9a1cfe8a0b1d7c9d3"
+    },
+    {
+      "source": "docs/releases/v0.1.0.md",
+      "copy": "files/docs/releases/v0.1.0.md",
+      "source_sha256": "fb792f28f91937410601d982e6cf1a07b2f29570a6cbae50ff0d8d7037083eda",
+      "copy_sha256": "fb792f28f91937410601d982e6cf1a07b2f29570a6cbae50ff0d8d7037083eda"
+    },
+    {
+      "source": "docs/releases/v0.1.2.md",
+      "copy": "files/docs/releases/v0.1.2.md",
+      "source_sha256": "06164838109023710d2b240988e12a817c4594829b73283323865981d8b173ea",
+      "copy_sha256": "06164838109023710d2b240988e12a817c4594829b73283323865981d8b173ea"
+    },
+    {
+      "source": "docs/releases/v1.1.0.md",
+      "copy": "files/docs/releases/v1.1.0.md",
+      "source_sha256": "32c156379fa83d4a9b6d3f99f3eaed847cb114708cfd53fc2c1587016fc915ec",
+      "copy_sha256": "32c156379fa83d4a9b6d3f99f3eaed847cb114708cfd53fc2c1587016fc915ec"
+    },
+    {
+      "source": "docs/releases/v1.1.1.md",
+      "copy": "files/docs/releases/v1.1.1.md",
+      "source_sha256": "45b64cd29a22a9bb746be4d790c4d53faf3e8b534fa963cceef50e364da8e847",
+      "copy_sha256": "45b64cd29a22a9bb746be4d790c4d53faf3e8b534fa963cceef50e364da8e847"
+    },
+    {
+      "source": "docs/security/production-host-sandbox-acceptance.md",
+      "copy": "files/docs/security/production-host-sandbox-acceptance.md",
+      "source_sha256": "7ef1fe23783cc378e209dbedf71ecc65ec5efaf90990027467cc86e401cc41e3",
+      "copy_sha256": "7ef1fe23783cc378e209dbedf71ecc65ec5efaf90990027467cc86e401cc41e3"
+    },
+    {
+      "source": "docs/security/rootless-docker-stage-acceptance.md",
+      "copy": "files/docs/security/rootless-docker-stage-acceptance.md",
+      "source_sha256": "f78a5058a423ecda1075db2c06ed38ed8622987974315550e66d37237bb06d12",
+      "copy_sha256": "f78a5058a423ecda1075db2c06ed38ed8622987974315550e66d37237bb06d12"
+    },
+    {
+      "source": "docs/security/sandbox-cleanup-recovery.md",
+      "copy": "files/docs/security/sandbox-cleanup-recovery.md",
+      "source_sha256": "8904e95e091a632d8f5662a8372bfb0f070a3b4b3f67e145d6da522db1af82a5",
+      "copy_sha256": "8904e95e091a632d8f5662a8372bfb0f070a3b4b3f67e145d6da522db1af82a5"
+    },
+    {
+      "source": "docs/security/worker-runtime-sandbox-threat-model.md",
+      "copy": "files/docs/security/worker-runtime-sandbox-threat-model.md",
+      "source_sha256": "7f8963f1935c6fe3d7c9a3dc0631d3b22165f8a29b4e96417643165a9eebb893",
+      "copy_sha256": "7f8963f1935c6fe3d7c9a3dc0631d3b22165f8a29b4e96417643165a9eebb893"
+    },
+    {
+      "source": "docs/standards/development.md",
+      "copy": "files/docs/standards/development.md",
+      "source_sha256": "1cfebdae8379cc45a1cd75656c293c2f5bcc6c7be21b12c67b6b9f7e7accfb05",
+      "copy_sha256": "1cfebdae8379cc45a1cd75656c293c2f5bcc6c7be21b12c67b6b9f7e7accfb05"
+    },
+    {
+      "source": "docs/standards/versioning.md",
+      "copy": "files/docs/standards/versioning.md",
+      "source_sha256": "02572c1aec68051c347db6471310be7adbd36095e2e3450784b62c3633d830b2",
+      "copy_sha256": "02572c1aec68051c347db6471310be7adbd36095e2e3450784b62c3633d830b2"
+    },
+    {
+      "source": "units/code-manager/README.md",
+      "copy": "files/units/code-manager/README.md",
+      "source_sha256": "a6188e8e5994c3db15537556d8968cc42ee90bb0aadaed5bfa33396d6d2cb14e",
+      "copy_sha256": "a6188e8e5994c3db15537556d8968cc42ee90bb0aadaed5bfa33396d6d2cb14e"
+    },
+    {
+      "source": "units/code-manager/deployment/README-stage-b.md",
+      "copy": "files/units/code-manager/deployment/README-stage-b.md",
+      "source_sha256": "43e5ed9d926b904685a5cf439d53788d8e90a437c01f0a45f617bdec9b370f5a",
+      "copy_sha256": "43e5ed9d926b904685a5cf439d53788d8e90a437c01f0a45f617bdec9b370f5a"
+    },
+    {
+      "source": "units/consumers/dashboard-core/README.md",
+      "copy": "files/units/consumers/dashboard-core/README.md",
+      "source_sha256": "f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496",
+      "copy_sha256": "f5d447d1206793b15c3a7c84294df829d7f9ad294c004968470504a59062b496"
+    },
+    {
+      "source": "units/data-manager/README.md",
+      "copy": "files/units/data-manager/README.md",
+      "source_sha256": "68a95bf1737bb4f9fdbda0710cf1870e0029e3620761598fcee16d19daa3dd6f",
+      "copy_sha256": "68a95bf1737bb4f9fdbda0710cf1870e0029e3620761598fcee16d19daa3dd6f"
+    },
+    {
+      "source": "units/worker-manager/README.md",
+      "copy": "files/units/worker-manager/README.md",
+      "source_sha256": "60c21b2fff146cfeaa412680b34d8b07f5180fdaffc5801a54cf25be0fe5cb0f",
+      "copy_sha256": "68b0a7061022955856e2f62701c9418abcfda4531c628e74e29e607c503ab176"
+    },
+    {
+      "source": "units/worker-runtime/README.md",
+      "copy": "files/units/worker-runtime/README.md",
+      "source_sha256": "927188b494450962688cb4422c855902fb480ecb0fb7502665b3f544c74ca064",
+      "copy_sha256": "927188b494450962688cb4422c855902fb480ecb0fb7502665b3f544c74ca064"
+    }
+  ]
+}

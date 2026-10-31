@@ -93,3 +93,5 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-archite
 [اجرای ماژول‌ها در ترمینال و قرارداد ماژول جدید](docs/development/modules-terminal.md)
 
 راهنماهای Dashboard: [استفادهٔ کاربر](docs/dashboard/USER_GUIDE.md) · [Demo Trading](docs/dashboard/demo-trading.md) · [Signal Scripts](docs/dashboard/signal-scripts.md) · [دفترچهٔ کم‌توکن Agent](docs/DASHBOARD_AGENT.md).
+
+[پوشهٔ یکپارچهٔ کپی همهٔ راهنماها و مستندات](docs/guides/README.md)؛ نسخه‌های قابل مرور همراه فهرست و SHA-256.

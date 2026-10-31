@@ -91,6 +91,11 @@
       "--check"
     ],
     [
+      "scripts/documentation/copy_guides.py",
+      54,
+      "--check"
+    ],
+    [
       "scripts/security/install_gitleaks.py",
       12,
       "--output"
@@ -1129,9 +1134,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 7771,
+      "bytes": 7948,
       "path": "README.md",
-      "sha256": "c7221479d9173c15d9a763bbb8f3024efd5fd3b97e01b17e519c07658dd1e78a"
+      "sha256": "5b9ef04aac44fbda4a09a2357e45941632a93de792d69c3708e050f18bba0bc1"
     },
     {
       "bytes": 1866,
@@ -2102,6 +2107,11 @@
       "bytes": 4521,
       "path": "scripts/documentation/check_docs.py",
       "sha256": "7684f7ac6e65f30b1da9afc05cfedcf71158294265cbfb3adf6b85320a568929"
+    },
+    {
+      "bytes": 5567,
+      "path": "scripts/documentation/copy_guides.py",
+      "sha256": "ef2a2373101b79cdbd4d3dc7bc919dc5ca5eab213e6f857378286cb66a925236"
     },
     {
       "bytes": 2173,
@@ -4904,6 +4914,30 @@
     [
       "scripts/documentation/check_docs.py",
       48,
+      "main",
+      "()"
+    ],
+    [
+      "scripts/documentation/copy_guides.py",
+      16,
+      "source_files",
+      "()"
+    ],
+    [
+      "scripts/documentation/copy_guides.py",
+      23,
+      "markdown_copy",
+      "(text, source, destination, selected)"
+    ],
+    [
+      "scripts/documentation/copy_guides.py",
+      24,
+      "markdown_copy.target",
+      "(raw)"
+    ],
+    [
+      "scripts/documentation/copy_guides.py",
+      53,
       "main",
       "()"
     ],

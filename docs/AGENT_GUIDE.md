@@ -1402,7 +1402,7 @@ http_contracts:
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **349**؛ تعداد نمادهای Python: **1445**.
+تعداد فایل‌های فنی و پشتیبان: **350**؛ تعداد نمادهای Python: **1449**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -1418,7 +1418,7 @@ http_contracts:
 | [AGENTS.md](../AGENTS.md) | 2381 | `8a436c29913fe45dee2d6ebb4de73ee58e30fae33f1df9773988a401e4208b05` |
 | [CHANGELOG.md](../CHANGELOG.md) | 6155 | `78eeea764662138e0cb7299f6aa5aa9c748852c3ddb9a52e74f3f42293196dd5` |
 | [CONTRIBUTING.md](../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
-| [README.md](../README.md) | 7771 | `c7221479d9173c15d9a763bbb8f3024efd5fd3b97e01b17e519c07658dd1e78a` |
+| [README.md](../README.md) | 7948 | `5b9ef04aac44fbda4a09a2357e45941632a93de792d69c3708e050f18bba0bc1` |
 | [SECURITY.md](../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
 | [VERSION](../VERSION) | 6 | `cc52f678848b814373757b460383bf61960e4943c203735adde0a350b3e50989` |
 | [agents/README.md](../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
@@ -1613,6 +1613,7 @@ http_contracts:
 | [scripts/development/export_openapi.py](../scripts/development/export_openapi.py) | 1373 | `3443bd17d389f8cd8e500ce70138239f9037a00418237d0851a25aa3145000a6` |
 | [scripts/documentation/build_manual.py](../scripts/documentation/build_manual.py) | 13014 | `b35c24b03ef7c20564d3b0c3123cba19d0f53f46fa3c56d263173019d91c7ae9` |
 | [scripts/documentation/check_docs.py](../scripts/documentation/check_docs.py) | 4521 | `7684f7ac6e65f30b1da9afc05cfedcf71158294265cbfb3adf6b85320a568929` |
+| [scripts/documentation/copy_guides.py](../scripts/documentation/copy_guides.py) | 5567 | `ef2a2373101b79cdbd4d3dc7bc919dc5ca5eab213e6f857378286cb66a925236` |
 | [scripts/documentation/render_pdf.cjs](../scripts/documentation/render_pdf.cjs) | 2173 | `56c52e9e3a70c1db86e10acda8c5e1f9f22c8533533175ccfa75519ce9335791` |
 | [scripts/security/install_gitleaks.py](../scripts/security/install_gitleaks.py) | 1405 | `4c2307bccfbfde650a5c1c74acb3022877138d42d8442139657dfbc5a4e85150` |
 | [scripts/security/run_sandbox_acceptance.sh](../scripts/security/run_sandbox_acceptance.sh) | 1628 | `29e42f1387cba4a6408e47a778bef1c72ce2b7d260b1c928aab7c56c8b9d4caf` |
@@ -1869,6 +1870,7 @@ http_contracts:
 | [scripts/development/data_manager_server.py](../scripts/development/data_manager_server.py#L13) | `--database` |
 | [scripts/development/data_manager_server.py](../scripts/development/data_manager_server.py#L14) | `--ready-file` |
 | [scripts/documentation/build_manual.py](../scripts/documentation/build_manual.py#L173) | `--check` |
+| [scripts/documentation/copy_guides.py](../scripts/documentation/copy_guides.py#L54) | `--check` |
 | [scripts/security/install_gitleaks.py](../scripts/security/install_gitleaks.py#L12) | `--output` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../scripts/security/run_sandbox_daemon_fault_injection.py#L212) | `image` |
 | [scripts/testing/run_ci.py](../scripts/testing/run_ci.py#L25) | `--image` |
@@ -2663,6 +2665,10 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [scripts/documentation/check_docs.py](../scripts/documentation/check_docs.py#L22) | `prose` | `(text)` |
 | [scripts/documentation/check_docs.py](../scripts/documentation/check_docs.py#L35) | `anchors` | `(path)` |
 | [scripts/documentation/check_docs.py](../scripts/documentation/check_docs.py#L48) | `main` | `()` |
+| [scripts/documentation/copy_guides.py](../scripts/documentation/copy_guides.py#L16) | `source_files` | `()` |
+| [scripts/documentation/copy_guides.py](../scripts/documentation/copy_guides.py#L23) | `markdown_copy` | `(text, source, destination, selected)` |
+| [scripts/documentation/copy_guides.py](../scripts/documentation/copy_guides.py#L24) | `markdown_copy.target` | `(raw)` |
+| [scripts/documentation/copy_guides.py](../scripts/documentation/copy_guides.py#L53) | `main` | `()` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../scripts/security/run_sandbox_daemon_fault_injection.py#L27) | `_run` | `(command, *, timeout=5)` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../scripts/security/run_sandbox_daemon_fault_injection.py#L39) | `_preflight` | `(image)` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../scripts/security/run_sandbox_daemon_fault_injection.py#L69) | `_wait_for_docker` | `()` |
