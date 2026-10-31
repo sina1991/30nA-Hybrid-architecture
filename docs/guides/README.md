@@ -6,7 +6,7 @@
 
 بازتولید: `python scripts/documentation/copy_guides.py` از ریشهٔ مخزن. ابتدا منابع تولیدشدهٔ دفترچه را با build_manual.py و render_pdf.cjs به‌روز کنید. `--check` همسانی کپی‌ها و SHA-256ها را بدون تغییر فایل کنترل می‌کند. کد، credential، env و DB عملیاتی به این مجموعه اضافه نمی‌شوند.
 
-تعداد فایل‌های کپی‌شده: **108**. JSON و تصاویر مستندات نیز همراه آن‌ها هستند.
+تعداد فایل‌های کپی‌شده: **109**. JSON و تصاویر مستندات نیز همراه آن‌ها هستند.
 
 | منبع اصلی | کپی |
 |---|---|
@@ -112,6 +112,7 @@
 | [docs/security/worker-runtime-sandbox-threat-model.md](../security/worker-runtime-sandbox-threat-model.md) | [Open](files/docs/security/worker-runtime-sandbox-threat-model.md) |
 | [docs/standards/development.md](../standards/development.md) | [Open](files/docs/standards/development.md) |
 | [docs/standards/versioning.md](../standards/versioning.md) | [Open](files/docs/standards/versioning.md) |
+| [standalone/remote-browser/README.md](../../standalone/remote-browser/README.md) | [Open](files/standalone/remote-browser/README.md) |
 | [units/code-manager/README.md](../../units/code-manager/README.md) | [Open](files/units/code-manager/README.md) |
 | [units/code-manager/deployment/README-stage-b.md](../../units/code-manager/deployment/README-stage-b.md) | [Open](files/units/code-manager/deployment/README-stage-b.md) |
 | [units/consumers/dashboard-core/README.md](../../units/consumers/dashboard-core/README.md) | [Open](files/units/consumers/dashboard-core/README.md) |

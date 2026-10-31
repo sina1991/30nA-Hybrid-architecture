@@ -1,7 +1,7 @@
 {
   "title": "دفترچه جامع پروژه 30nA Hybrid Architecture",
   "date": "2026-11-01",
-  "application_commit": "v1.1.1",
+  "application_commit": "main",
   "ci_url": "https://github.com/sina1991/30nA-Hybrid-architecture/actions/workflows/ci.yml",
   "chapters": [
     "00-reading-and-status.md",
@@ -26,5 +26,5 @@
     "19-troubleshooting-and-gaps.md",
     "20-generated-reference.md"
   ],
-  "repository_ref": "v1.1.1"
+  "repository_ref": "main"
 }

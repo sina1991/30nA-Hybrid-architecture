@@ -12,6 +12,7 @@
 | auth، کاربران، نقش | `modules/accounts.py`؛ owner dependency در BFF | `test_accounts_chat.py`، `test_account_chat_api.py` |
 | state اسلات و قواعد Pin/Lock | `modules/slots.py`: create، bind_active، execute، read، update_appearance | Dashboard `tests/test_monitor_modules.py` و تست‌های workspace |
 | Module تازه | `modules/<id>/manifest.json` و module.py، `registry.py`، `execution.py`، slots.read/execute، renderer در app.py | تست CLI + owner isolation + UI مرتبط |
+| دکمهٔ مرورگر مستقل | فقط لینک زیر login-ip در upstream_panel.py؛ سرویس در standalone/remote-browser، بدون Project import/account/state | test_remote_browser.py؛ README مستقل |
 | Note مینیمال | `slots.py`: type=note با binding=slot-note؛ app.py: plain-note و editor Module | `test_music_player.py`، `test_demo_media_browser.py` |
 | Playlist و پخش ممتد | `modules/music.py`: playlist/run؛ `dashboard/music_panel.py`: MUSIC و audio مشترک | `test_music_player.py`، `test_demo_media_browser.py` |
 | Media/YouTube | `modules/media.py`: settings/describe/youtube_video/server_file؛ renderMediaPlayer | `test_media_modules.py`، `test_demo_media_browser.py` |

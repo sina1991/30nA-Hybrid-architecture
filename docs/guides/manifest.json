@@ -22,8 +22,8 @@
     {
       "source": "README.md",
       "copy": "files/README.md",
-      "source_sha256": "5b9ef04aac44fbda4a09a2357e45941632a93de792d69c3708e050f18bba0bc1",
-      "copy_sha256": "8ee81eb4f46c322e21dc39292064688842e274fd2037d8644cf4f06cee22e180"
+      "source_sha256": "7b35f5c82667e76f46165a1416cb01de9025b739648c5e309ae1c0cd05a6d792",
+      "copy_sha256": "df4782ea9539da969dc399fececd87f8dcd4c71f18d52ceeb2c5e1fdadd5322e"
     },
     {
       "source": "SECURITY.md",
@@ -112,20 +112,20 @@
     {
       "source": "docs/AGENT_GUIDE.md",
       "copy": "files/docs/AGENT_GUIDE.md",
-      "source_sha256": "14e74c61a993fe98af00b26066c84e320dbd5b5d3e62998520d46a899de70dfb",
-      "copy_sha256": "7e31bb64dbb35b2f7c5b45eaf0aa230cdd9fac0de613a272d2b48cd9f9ac4246"
+      "source_sha256": "375f295a5aba07ba463f6197f49cd1ae851c4e072e39cb979d09b603a7e269ca",
+      "copy_sha256": "a17018674633d2ca8754ed73d39fb85748aa6c6efaa4d5037415dd6e9c6cfff7"
     },
     {
       "source": "docs/AGENT_GUIDE.source.md",
       "copy": "files/docs/AGENT_GUIDE.source.md",
-      "source_sha256": "55e76450a11b9101e56589c8d218c27f8f784837faa1e80b6216cb5dbd0eb953",
-      "copy_sha256": "55e76450a11b9101e56589c8d218c27f8f784837faa1e80b6216cb5dbd0eb953"
+      "source_sha256": "ab7135e6e4d95285900e7984f90141ad786a31c2d981429643756be259300127",
+      "copy_sha256": "ab7135e6e4d95285900e7984f90141ad786a31c2d981429643756be259300127"
     },
     {
       "source": "docs/DASHBOARD_AGENT.md",
       "copy": "files/docs/DASHBOARD_AGENT.md",
-      "source_sha256": "c1edcc606dda2e1ccc3ba33d47a885fe593cf93a36fb57dcfbbe4b20001823ef",
-      "copy_sha256": "c1edcc606dda2e1ccc3ba33d47a885fe593cf93a36fb57dcfbbe4b20001823ef"
+      "source_sha256": "3ffaeac252a784153ab2d1cb7526755b9e19220e6bbfc95d408d32ca90011501",
+      "copy_sha256": "3ffaeac252a784153ab2d1cb7526755b9e19220e6bbfc95d408d32ca90011501"
     },
     {
       "source": "docs/DOCUMENTATION_REVIEW.md",
@@ -226,8 +226,8 @@
     {
       "source": "docs/dashboard/USER_GUIDE.md",
       "copy": "files/docs/dashboard/USER_GUIDE.md",
-      "source_sha256": "0a3fc05b4bb1b0aca49469cf9c36838b32f402b8561a102fc15740d9d376afcb",
-      "copy_sha256": "0a3fc05b4bb1b0aca49469cf9c36838b32f402b8561a102fc15740d9d376afcb"
+      "source_sha256": "7f079345d2b5224254c2fec01c8ea54e49eee75b586c672d5f87b67fd43617bc",
+      "copy_sha256": "7f079345d2b5224254c2fec01c8ea54e49eee75b586c672d5f87b67fd43617bc"
     },
     {
       "source": "docs/dashboard/demo-trading.md",
@@ -496,26 +496,26 @@
     {
       "source": "docs/manual/20-generated-reference.md",
       "copy": "files/docs/manual/20-generated-reference.md",
-      "source_sha256": "183b38762633c8e8a351ed41cf9c79ccdfc714ba9002a10e31bc1c7a45b1d723",
-      "copy_sha256": "e6cf50744cb89945aad14e4ab03878ff0d59fde4bcdf15bf675e69770c0b5461"
+      "source_sha256": "4621276ebf38e1a345552e38bec2bbb1a19740002e483df0654460add1b4cea6",
+      "copy_sha256": "b76209680dcea94f86250afe4ed3b0b7c61c3a0b6434f19c86b36390ff9bbc54"
     },
     {
       "source": "docs/manual/BOOK.md",
       "copy": "files/docs/manual/BOOK.md",
-      "source_sha256": "338a21e52f04f2f41fc559f77a5ecd1c6377fa64b67283bfb28ed4ab01c62516",
-      "copy_sha256": "9ced9f20776728f8258ad14faf123fab623cd16c3ed523cb3fb3b87192594abd"
+      "source_sha256": "f2d2a87d9a08532dbc71264ce8979fb6136f47fa0913de51168418837996c023",
+      "copy_sha256": "6c36ff5f4af4d1f6a49e365fba6964ae584a800061b6e8077e95928bf5466f47"
     },
     {
       "source": "docs/manual/PROJECT_MANUAL.html",
       "copy": "files/docs/manual/PROJECT_MANUAL.html",
-      "source_sha256": "74ee5977519e6fcf4cb7791c09001719cd88ea83b9c04864d4369f55907764a6",
-      "copy_sha256": "74ee5977519e6fcf4cb7791c09001719cd88ea83b9c04864d4369f55907764a6"
+      "source_sha256": "b3cbe87e9949cc355e9056f8019dee16ff6b2dade91567f6ee419e5326284e25",
+      "copy_sha256": "b3cbe87e9949cc355e9056f8019dee16ff6b2dade91567f6ee419e5326284e25"
     },
     {
       "source": "docs/manual/PROJECT_MANUAL.pdf",
       "copy": "files/docs/manual/PROJECT_MANUAL.pdf",
-      "source_sha256": "e75653ede2ab745b948e1ce404bf2b5bca01c5cf5ffe08bd9c750af8e230b162",
-      "copy_sha256": "e75653ede2ab745b948e1ce404bf2b5bca01c5cf5ffe08bd9c750af8e230b162"
+      "source_sha256": "a56e11d00366db9cf964edd953a558efec7cafc46158fec151ebe7e6d95eb68a",
+      "copy_sha256": "a56e11d00366db9cf964edd953a558efec7cafc46158fec151ebe7e6d95eb68a"
     },
     {
       "source": "docs/manual/README.md",
@@ -526,20 +526,20 @@
     {
       "source": "docs/manual/manifest.json",
       "copy": "files/docs/manual/manifest.json",
-      "source_sha256": "402aca1fa5eaaf52b1ddc5d20a3a49e906c56f4e17fd7f3769abe03849c71c44",
-      "copy_sha256": "402aca1fa5eaaf52b1ddc5d20a3a49e906c56f4e17fd7f3769abe03849c71c44"
+      "source_sha256": "604ed92a3802d7084bb3d5a4e82a89ecde64e229215ccf1b4339b542381a0671",
+      "copy_sha256": "604ed92a3802d7084bb3d5a4e82a89ecde64e229215ccf1b4339b542381a0671"
     },
     {
       "source": "docs/manual/pdf-manifest.json",
       "copy": "files/docs/manual/pdf-manifest.json",
-      "source_sha256": "1174bae54bf9915b306dfe974d37b57c858fbb5c9eff2dd6dcf1314fa28a8afe",
-      "copy_sha256": "1174bae54bf9915b306dfe974d37b57c858fbb5c9eff2dd6dcf1314fa28a8afe"
+      "source_sha256": "1c5e2d0eb1dd207394e775a43c179316bb0b2d1910bca7494a1e153a80ac1f36",
+      "copy_sha256": "1c5e2d0eb1dd207394e775a43c179316bb0b2d1910bca7494a1e153a80ac1f36"
     },
     {
       "source": "docs/manual/source-inventory.json",
       "copy": "files/docs/manual/source-inventory.json",
-      "source_sha256": "5c650e2918fe490bf68a33d213af71f09950207faea12da29169653ea49b82b6",
-      "copy_sha256": "5c650e2918fe490bf68a33d213af71f09950207faea12da29169653ea49b82b6"
+      "source_sha256": "5c2bc79404f5eb1481733c9e4fece14dccf0f00d569ee26ff7f6d052f2d8c3e8",
+      "copy_sha256": "5c2bc79404f5eb1481733c9e4fece14dccf0f00d569ee26ff7f6d052f2d8c3e8"
     },
     {
       "source": "docs/migration/migration-plan.md",
@@ -612,6 +612,12 @@
       "copy": "files/docs/standards/versioning.md",
       "source_sha256": "02572c1aec68051c347db6471310be7adbd36095e2e3450784b62c3633d830b2",
       "copy_sha256": "02572c1aec68051c347db6471310be7adbd36095e2e3450784b62c3633d830b2"
+    },
+    {
+      "source": "standalone/remote-browser/README.md",
+      "copy": "files/standalone/remote-browser/README.md",
+      "source_sha256": "76328e352463a54a6008edde81825e0f134ddd9e705297c3e67f06912fedef9c",
+      "copy_sha256": "76328e352463a54a6008edde81825e0f134ddd9e705297c3e67f06912fedef9c"
     },
     {
       "source": "units/code-manager/README.md",

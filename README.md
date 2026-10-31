@@ -95,3 +95,5 @@ bash <(curl -fsSL https://raw.githubusercontent.com/sina1991/30nA-Hybrid-archite
 راهنماهای Dashboard: [استفادهٔ کاربر](docs/dashboard/USER_GUIDE.md) · [Demo Trading](docs/dashboard/demo-trading.md) · [Signal Scripts](docs/dashboard/signal-scripts.md) · [دفترچهٔ کم‌توکن Agent](docs/DASHBOARD_AGENT.md).
 
 [پوشهٔ یکپارچهٔ کپی همهٔ راهنماها و مستندات](docs/guides/README.md)؛ نسخه‌های قابل مرور همراه فهرست و SHA-256.
+
+[مرورگر مستقل اختیاری](standalone/remote-browser/README.md): Login جدا، حساب‌های 1 تا 9 و Chromium موقت روی پورت 9443؛ نصب جداگانه و بدون اتصال به حساب‌ها یا Workerهای پروژه.

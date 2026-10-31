@@ -1,0 +1,4 @@
+{
+  "browser_image": "ghcr.io/linuxserver/chromium@sha256:40e40dfc46bd628fb5f3e0900dbf1f9db3074e4819c377c1941b7b7032ac533d",
+  "python_image": "python@sha256:1148dbb014615300fa7e713b2f94f550c0d1c69780c0805f84f093ceee34dd0b"
+}

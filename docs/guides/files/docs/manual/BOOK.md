@@ -1,6 +1,6 @@
 # دفترچه جامع پروژه 30nA Hybrid Architecture
 
-تاریخ بررسی: `2026-11-01`؛ مبنای رفتار برنامه: `v1.1.1`.
+تاریخ بررسی: `2026-11-01`؛ مبنای رفتار برنامه: `main`.
 
 این کتاب نسخه یک‌جلدی فصل‌های همین پوشه است. فصل‌ها و مرجع ماشینی منبع نگهداری هستند؛ BOOK.md و HTML را دستی ویرایش نکنید.
 
@@ -1108,7 +1108,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **350**؛ تعداد نمادهای Python: **1449**.
+تعداد فایل‌های فنی و پشتیبان: **364**؛ تعداد نمادهای Python: **1514**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -1124,7 +1124,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [AGENTS.md](../../AGENTS.md) | 2381 | `8a436c29913fe45dee2d6ebb4de73ee58e30fae33f1df9773988a401e4208b05` |
 | [CHANGELOG.md](../../CHANGELOG.md) | 6155 | `78eeea764662138e0cb7299f6aa5aa9c748852c3ddb9a52e74f3f42293196dd5` |
 | [CONTRIBUTING.md](../../CONTRIBUTING.md) | 2817 | `1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f` |
-| [README.md](../../README.md) | 7948 | `5b9ef04aac44fbda4a09a2357e45941632a93de792d69c3708e050f18bba0bc1` |
+| [README.md](../../README.md) | 8210 | `7b35f5c82667e76f46165a1416cb01de9025b739648c5e309ae1c0cd05a6d792` |
 | [SECURITY.md](../../SECURITY.md) | 1866 | `341562d8d0a89930d1a1e0ec6b6d186464f51226f723dab14e14b07ec1158655` |
 | [VERSION](../../../../../VERSION) | 6 | `cc52f678848b814373757b460383bf61960e4943c203735adde0a350b3e50989` |
 | [agents/README.md](../../agents/README.md) | 4234 | `636e63de6bf3b27e7e6aa58082e01ceccbe3111c5cdc817c12f4271cae35394f` |
@@ -1325,6 +1325,19 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [scripts/security/run_sandbox_acceptance.sh](../../../../../scripts/security/run_sandbox_acceptance.sh) | 1628 | `29e42f1387cba4a6408e47a778bef1c72ce2b7d260b1c928aab7c56c8b9d4caf` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../../../../../scripts/security/run_sandbox_daemon_fault_injection.py) | 9281 | `2b69f43549441d92624c1e4c16f5b59a06a15dec23926b18f4c5391399f581df` |
 | [scripts/testing/run_ci.py](../../../../../scripts/testing/run_ci.py) | 5751 | `e456246359b97e4c27138eba8ebace0b81a838d30600ef0b4e867173eab2afa2` |
+| [standalone/remote-browser/.dockerignore](../../../../../standalone/remote-browser/.dockerignore) | 58 | `4a7231b8cbe463810efc1fc58837f0f6ac48fd0c64c6091fe1b106cdd84e5dea` |
+| [standalone/remote-browser/Dockerfile](../../../../../standalone/remote-browser/Dockerfile) | 456 | `a1c3324b0e87c04a7a8514fcc635bc91ac13bd970207c9b836f0f997cf09c6cf` |
+| [standalone/remote-browser/README.md](../../standalone/remote-browser/README.md) | 9140 | `76328e352463a54a6008edde81825e0f134ddd9e705297c3e67f06912fedef9c` |
+| [standalone/remote-browser/configure.py](../../../../../standalone/remote-browser/configure.py) | 2019 | `2507f6dedc065547a577335678f1607168121125eeed7e34e4a4d8ca390bedd8` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py) | 4684 | `fcb3553dd1205eac489d59c8f0deba8f197dfdae1f0fd53511ef3b52076ce18e` |
+| [standalone/remote-browser/images.json](../../../../../standalone/remote-browser/images.json) | 226 | `c33e7ca55b049d4827c027e33fcf9ae8691ec0632c5f2df5207cb915db035e36` |
+| [standalone/remote-browser/install.sh](../../../../../standalone/remote-browser/install.sh) | 5117 | `c571735ad765f618e8c7bdaacafe23112055f69d42282d5c8f3018b756a49d12` |
+| [standalone/remote-browser/requirements.in](../../../../../standalone/remote-browser/requirements.in) | 16 | `9ff2177e763edd4e9724ffbd5a78794aa24e8492245e2f9e2b3f521fdf956b74` |
+| [standalone/remote-browser/requirements.lock](../../../../../standalone/remote-browser/requirements.lock) | 62649 | `31dbc0d650689e4c603f2a0fecadeda3e176530f36381a7177f0ff97bcf7e287` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py) | 5512 | `b6c5b1138a136d7e23b5905e265f17dbae616e114db85d2ee60a65d21636e3ff` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py) | 9235 | `12d9255d93536d7f99ecce58e1f655da5c5c922c797bc0fa22922d59b8e5b194` |
+| [standalone/remote-browser/transport.py](../../../../../standalone/remote-browser/transport.py) | 2614 | `58e793416dbc6623fa0041a6cdb78299c0e5d47fd4546f87ccdd0e53291d6bab` |
+| [standalone/remote-browser/ui.py](../../../../../standalone/remote-browser/ui.py) | 2965 | `edd65e66081441fb483a9ff452a9e287a0186f19f593dab66997830fab8c467e` |
 | [terminal_ui.py](../../../../../terminal_ui.py) | 22223 | `80e21fb985fdf4e8a622ff6384182dc9a81d0d9118e15ddb9d1bff00c61f4db3` |
 | [tests/test_account_chat_api.py](../../../../../tests/test_account_chat_api.py) | 8755 | `34f36c514334a35b1438b1f33e8a696a9f86f279741911bed02c6ecffc4616aa` |
 | [tests/test_account_chat_browser.py](../../../../../tests/test_account_chat_browser.py) | 923 | `eeaf3a954269fcbcf57000dc645362090f30fb6cadf7fbbf2e8e161a8a3b79c6` |
@@ -1338,6 +1351,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [tests/test_demo_trading.py](../../../../../tests/test_demo_trading.py) | 15857 | `fbb44987bff21b037025bafd55a203b4a3a19b9a207c64beecdd7f05dacc54dd` |
 | [tests/test_media_modules.py](../../../../../tests/test_media_modules.py) | 4853 | `c0bbebc0b8738f5977ae97e8508adf0e722ce67d9ce42f6d2c80c578b8e37a3a` |
 | [tests/test_music_player.py](../../../../../tests/test_music_player.py) | 4874 | `1431ea99cad7a8d561cd5430d0a9e6f80715e0258e312bb794903c79f489df6f` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py) | 10266 | `567e2d1efb1fed1a947d4f3c4382d911d9190e489a17b554e7871581cc47e495` |
 | [tests/test_shared_dashboards.py](../../../../../tests/test_shared_dashboards.py) | 5561 | `5276012acd538bf3ca04503220e77c9741cc8261648b7803ec405975dabd505d` |
 | [tests/test_technical_browser.py](../../../../../tests/test_technical_browser.py) | 1692 | `ab5ec16655b559d6a851e0c23a3af60689052ffb92e3f761ad515cd1ffb8e387` |
 | [tests/test_technical_indicators.py](../../../../../tests/test_technical_indicators.py) | 12736 | `39242133dc7559ef9938572177968128fd01fd3316e7dad0072ecfd6a421742a` |
@@ -1379,7 +1393,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/consumers/dashboard-core/browser-tests/accounts_chat.cjs](../../../../../units/consumers/dashboard-core/browser-tests/accounts_chat.cjs) | 6982 | `fbef0ce3d952e56fb5afb39bdc19effca7fd40be58f9b7e0c9e5edaef81687f0` |
 | [units/consumers/dashboard-core/browser-tests/chart_overlays.cjs](../../../../../units/consumers/dashboard-core/browser-tests/chart_overlays.cjs) | 5028 | `efa09b16a3b02aa2ede3554e7f8c073425b0df455088808f137df6c37b4ed77f` |
 | [units/consumers/dashboard-core/browser-tests/check.cjs](../../../../../units/consumers/dashboard-core/browser-tests/check.cjs) | 11311 | `0d646b99ad05654e42fde6fa91cfd7223e14376287632d0099b4146ae1547a7b` |
-| [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../../../../../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19213 | `3816b954f1b8383a172b5f3e3cd0d1cdc6893d2ce9da8f2c09afdb14a3662a2f` |
+| [units/consumers/dashboard-core/browser-tests/demo_media.cjs](../../../../../units/consumers/dashboard-core/browser-tests/demo_media.cjs) | 19842 | `c67c65ef631251ad5abceb62ab3bfd8f7a7bed7ccf9f2e200e0e484b6c760a3e` |
 | [units/consumers/dashboard-core/browser-tests/layout.cjs](../../../../../units/consumers/dashboard-core/browser-tests/layout.cjs) | 1242 | `399d079dce99e66aed86f3c03fe7f944427d8dad920bc86586ffb385275eb9bc` |
 | [units/consumers/dashboard-core/browser-tests/management.cjs](../../../../../units/consumers/dashboard-core/browser-tests/management.cjs) | 3845 | `08eb1082f6c8537d0b9aca6ef4e6299732d1bb133c5cf369ddcb769a5a83d1d5` |
 | [units/consumers/dashboard-core/browser-tests/package-lock.json](../../../../../units/consumers/dashboard-core/browser-tests/package-lock.json) | 1765 | `c45d16df23cd096cfd5b4a40bc709a1af5802d91eab340ba74d7c80459b19751` |
@@ -1397,7 +1411,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [units/consumers/dashboard-core/dashboard/production.py](../../../../../units/consumers/dashboard-core/dashboard/production.py) | 696 | `3cb7072b852490b9539315bc26d695448049bd26e946226a4655d4b0d98b44fd` |
 | [units/consumers/dashboard-core/dashboard/static/login-airless.png](../../../../../units/consumers/dashboard-core/dashboard/static/login-airless.png) | 3282622 | `7d67839c7df7371083a3b28c3052396e25bc90265b31d4e9bd462ea6f099d4f5` |
 | [units/consumers/dashboard-core/dashboard/static/login-galaxy.png](../../../../../units/consumers/dashboard-core/dashboard/static/login-galaxy.png) | 2659793 | `b3fbd8a0b7086d9dc7667dbde7b84b415442173e4afa6e297718f9d82cedf64b` |
-| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../../../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 65218 | `59ffda66b5406b3649ba4e7b7caf88e4c755c93c66f053f1eee6ef2068e436e2` |
+| [units/consumers/dashboard-core/dashboard/upstream_panel.py](../../../../../units/consumers/dashboard-core/dashboard/upstream_panel.py) | 65863 | `dbf3ac744c500f80846a69f157c86c39b4070f4974e362d7cdf8f5237c37cdf8` |
 | [units/consumers/dashboard-core/dashboard/upstreams.py](../../../../../units/consumers/dashboard-core/dashboard/upstreams.py) | 50083 | `22c9657242af7143787f0273a6cbffb31cf6d10a019daf6bcfccba7a0c19a782` |
 | [units/consumers/dashboard-core/legacy-tests/test_dashboard.py](../../../../../units/consumers/dashboard-core/legacy-tests/test_dashboard.py) | 2142 | `a2f3ff7914c9cc00a36293a12d74d66180967543225c0691fdf16d270eaf3ce6` |
 | [units/consumers/dashboard-core/legacy-tests/test_registry.py](../../../../../units/consumers/dashboard-core/legacy-tests/test_registry.py) | 3954 | `aaa8da8a33038f063560bd693de4722924f8ec35121f506933ff53fc3d196d22` |
@@ -1474,6 +1488,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | `AGENT08_ARTIFACT_MODE` | [units/integration/agent08/agent08.py](../../../../../units/integration/agent08/agent08.py#L157) | optional lookup |
 | `AGENT08_CODE_MANAGER_AUTHORIZATION` | [units/integration/agent08/agent08.py](../../../../../units/integration/agent08/agent08.py#L66) | optional lookup |
 | `AGENT08_CODE_MANAGER_URL` | [units/integration/agent08/agent08.py](../../../../../units/integration/agent08/agent08.py#L65) | required lookup |
+| `BROWSER_HOST` | [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L93) | required lookup |
 | `CI` | [units/worker-runtime/tests/test_code_manager_runtime_e2e.py](../../../../../units/worker-runtime/tests/test_code_manager_runtime_e2e.py#L62) | optional lookup |
 | `CI` | [units/worker-runtime/tests/test_code_manager_runtime_e2e.py](../../../../../units/worker-runtime/tests/test_code_manager_runtime_e2e.py#L66) | optional lookup |
 | `CI` | [units/worker-runtime/tests/test_code_manager_runtime_e2e.py](../../../../../units/worker-runtime/tests/test_code_manager_runtime_e2e.py#L78) | optional lookup |
@@ -1521,8 +1536,12 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | `DATA_MANAGER_DB` | [units/data-manager/api/app.py](../../../../../units/data-manager/api/app.py#L11) | optional lookup |
 | `DATA_MANAGER_HOST` | [units/data-manager/run.py](../../../../../units/data-manager/run.py#L22) | optional lookup |
 | `DATA_MANAGER_PORT` | [units/data-manager/run.py](../../../../../units/data-manager/run.py#L23) | optional lookup |
+| `DENY_ALL_EGRESS` | [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L48) | optional lookup |
+| `DENY_HOST` | [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L51) | optional lookup |
 | `DOCKER_HOST` | [scripts/security/run_sandbox_daemon_fault_injection.py](../../../../../scripts/security/run_sandbox_daemon_fault_injection.py#L48) | optional lookup |
 | `GITHUB_ACTIONS` | [scripts/testing/run_ci.py](../../../../../scripts/testing/run_ci.py#L72) | optional lookup |
+| `LISTEN_FDS` | [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L145) | optional lookup |
+| `LISTEN_PID` | [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L145) | optional lookup |
 | `SANDBOX_FAULT_INJECTION_ACK` | [scripts/security/run_sandbox_daemon_fault_injection.py](../../../../../scripts/security/run_sandbox_daemon_fault_injection.py#L42) | optional lookup |
 | `TERM` | [terminal_ui.py](../../../../../terminal_ui.py#L26) | optional lookup |
 | `TERM` | [terminal_ui.py](../../../../../terminal_ui.py#L108) | optional lookup |
@@ -1582,6 +1601,7 @@ RBAC/OIDC/MFA و expiry، pagination کامل history، retention/GC، per-owner
 | [scripts/testing/run_ci.py](../../../../../scripts/testing/run_ci.py#L25) | `--image` |
 | [scripts/testing/run_ci.py](../../../../../scripts/testing/run_ci.py#L26) | `--unit-only` |
 | [scripts/testing/run_ci.py](../../../../../scripts/testing/run_ci.py#L27) | `--evidence-dir` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L143) | `--config` |
 
 ## error codeهای literal در Python
 
@@ -2382,6 +2402,41 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../../../../../scripts/security/run_sandbox_daemon_fault_injection.py#L92) | `run_fault_injection` | `(image)` |
 | [scripts/security/run_sandbox_daemon_fault_injection.py](../../../../../scripts/security/run_sandbox_daemon_fault_injection.py#L210) | `main` | `()` |
 | [scripts/testing/run_ci.py](../../../../../scripts/testing/run_ci.py#L23) | `main` | `()` |
+| [standalone/remote-browser/configure.py](../../../../../standalone/remote-browser/configure.py#L13) | `configure` | `(path, hostname, browser_image, egress_image, cert, key, password=None)` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L15) | `public_addresses` | `(host)` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L25) | `tunnel` | `(reader, writer)` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L61) | `tunnel.pipe` | `(source, dest)` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L82) | `start` | `(app)` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L86) | `stop` | `(app)` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L90) | `create_app` | `()` |
+| [standalone/remote-browser/egress.py](../../../../../standalone/remote-browser/egress.py#L92) | `create_app.gui` | `(request)` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py#L10) | `CapacityError` | `class` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py#L13) | `Runtime` | `class` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py#L14) | `Runtime.__init__` | `(self, config)` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py#L20) | `Runtime.command` | `(self, *args, check=True)` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py#L28) | `Runtime.recover` | `(self)` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py#L35) | `Runtime.launch` | `(self, user)` |
+| [standalone/remote-browser/runtime.py](../../../../../standalone/remote-browser/runtime.py#L69) | `Runtime.stop` | `(self, session)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L21) | `password_hash` | `(password, salt)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L25) | `username` | `(value)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L29) | `create_app` | `(config, runtime=None, recover=True, idle_callback=None)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L33) | `create_app.check_origin` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L35) | `create_app.authorized` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L39) | `create_app.close` | `(key)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L53) | `create_app.index` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L57) | `create_app.login` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L94) | `create_app.view` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L98) | `create_app.lease` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L110) | `create_app.desktop` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L117) | `create_app.reap` | `()` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L123) | `create_app.start` | `(app)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L126) | `create_app.stop` | `(app)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L129) | `create_app.root` | `(request)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L130) | `create_app.private_headers` | `(request, response)` |
+| [standalone/remote-browser/server.py](../../../../../standalone/remote-browser/server.py#L147) | `serve` | `()` |
+| [standalone/remote-browser/transport.py](../../../../../standalone/remote-browser/transport.py#L8) | `forward` | `(request, target)` |
+| [standalone/remote-browser/transport.py](../../../../../standalone/remote-browser/transport.py#L18) | `forward.relay` | `(source, destination)` |
+| [standalone/remote-browser/ui.py](../../../../../standalone/remote-browser/ui.py#L4) | `viewer` | `(nonce)` |
 | [terminal_ui.py](../../../../../terminal_ui.py#L11) | `Terminal` | `class` |
 | [terminal_ui.py](../../../../../terminal_ui.py#L12) | `Terminal.__init__` | `(self, owner='customer', manager_url='https://localhost:18444', token_file='/etc/30na/customer-token', ca_file='/etc/30na/ca/trust.pem')` |
 | [terminal_ui.py](../../../../../terminal_ui.py#L28) | `Terminal.style` | `(self, text, *codes)` |
@@ -2495,6 +2550,36 @@ CREATE TABLE IF NOT EXISTS idempotency_keys (
 | [tests/test_music_player.py](../../../../../tests/test_music_player.py#L46) | `test_login_routes_and_backgrounds_are_public_without_exposing_credentials` | `(client)` |
 | [tests/test_music_player.py](../../../../../tests/test_music_player.py#L56) | `test_login_ip_uses_trusted_request_without_authentication` | `(client, monkeypatch)` |
 | [tests/test_music_player.py](../../../../../tests/test_music_player.py#L68) | `test_note_slot_keeps_plain_text_owner_and_shared_copy` | `(client)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L16) | `load` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L26) | `config` | `(limit=1)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L32) | `Runtime` | `class` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L33) | `Runtime.__init__` | `(self, port=1)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L34) | `Runtime.recover` | `(self)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L35) | `Runtime.launch` | `(self, user)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L36) | `Runtime.stop` | `(self, item)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L39) | `login` | `(client, user='1', password='fixture-password ')` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L43) | `test_separate_login_exact_password_limit_and_explicit_origin` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L44) | `test_separate_login_exact_password_limit_and_explicit_origin.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L63) | `test_nine_usernames_and_rate_limit_without_executing_browser` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L65) | `test_nine_usernames_and_rate_limit_without_executing_browser.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L75) | `test_websocket_disconnect_stops_only_its_browser_and_nonce_is_account_bound` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L76) | `test_websocket_disconnect_stops_only_its_browser_and_nonce_is_account_bound.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L95) | `test_gui_proxy_strips_credentials_and_streams_websocket` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L96) | `test_gui_proxy_strips_credentials_and_streams_websocket.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L98) | `test_gui_proxy_strips_credentials_and_streams_websocket.run.gui` | `(request)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L117) | `test_pinned_proxy_rejects_private_and_mixed_dns_results` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L121) | `test_pinned_proxy_rejects_private_and_mixed_dns_results.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L130) | `test_configure_uses_private_file_and_all_nine_accounts` | `(tmp_path)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L141) | `test_connect_proxy_streams_only_after_validating_and_pinning_target` | `(monkeypatch)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L145) | `test_connect_proxy_streams_only_after_validating_and_pinning_target.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L146) | `test_connect_proxy_streams_only_after_validating_and_pinning_target.run.echo` | `(reader, writer)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L151) | `test_connect_proxy_streams_only_after_validating_and_pinning_target.run.connect` | `(host, value)` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L164) | `test_idle_controller_requests_shutdown_without_starting_chrome` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L165) | `test_idle_controller_requests_shutdown_without_starting_chrome.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L177) | `test_shutdown_cancels_inflight_browser_launch_and_clears_reservation` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L178) | `test_shutdown_cancels_inflight_browser_launch_and_clears_reservation.run` | `()` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L180) | `test_shutdown_cancels_inflight_browser_launch_and_clears_reservation.run.Slow` | `class` |
+| [tests/test_remote_browser.py](../../../../../tests/test_remote_browser.py#L181) | `test_shutdown_cancels_inflight_browser_launch_and_clears_reservation.run.Slow.launch` | `(self, user)` |
 | [tests/test_shared_dashboards.py](../../../../../tests/test_shared_dashboards.py#L7) | `test_named_shared_dashboard_copies_layout_notes_and_profiles` | `(client)` |
 | [tests/test_shared_dashboards.py](../../../../../tests/test_shared_dashboards.py#L45) | `test_restricted_modules_and_private_chat_do_not_grant_access_on_load` | `(client)` |
 | [tests/test_shared_dashboards.py](../../../../../tests/test_shared_dashboards.py#L60) | `test_failed_load_is_atomic_and_same_name_only_updates_own_template` | `(client)` |

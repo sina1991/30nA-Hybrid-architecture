@@ -9,7 +9,7 @@ ACCESS = r'''
         <button id="login-submit" type="submit">Sign in</button>
       </form>
       <details id="login-advanced"><summary>Use an access token</summary><form id="account-form"><label for="account-token">Account access token</label><input id="account-token" type="password" autocomplete="off" placeholder="Access token" required><button id="account-connect" type="submit">Sign in</button></form></details>
-      <div id="account-notices"><p id="account-status" role="status" aria-live="polite"></p></div><p id="login-ip" class="login-subtitle" aria-live="polite">Your IP · …</p>
+      <div id="account-notices"><p id="account-status" role="status" aria-live="polite"></p></div><p id="login-ip" class="login-subtitle" aria-live="polite">Your IP · …</p><button id="remote-browser-launch" type="button" aria-label="Open remote browser"></button>
     </div><p class="login-footer">30nA · v1.1.1</p>
   </section>
   <div id="account-actions" class="account-actions" hidden><a id="worker-workspace-link" href="#workers">Manage Workers</a><button id="account-refresh" type="button">Refresh</button><button id="account-disconnect" type="button">Sign out</button></div>
@@ -24,6 +24,7 @@ PANEL = r'''
 .login-mark {font-size:40px;text-align:center;color:#b2dbff}.login-brand {text-align:center;font-weight:700;letter-spacing:.18em;margin:0 0 18px}.login-card h1 {font-size:25px;text-align:center;margin:0}.login-subtitle,.login-footer {text-align:center;color:#bed0e2;font-size:13px}.login-subtitle {margin:8px 0 24px}
 #login-screen form {display:grid;gap:9px}#login-screen label {font-size:13px;color:#d5e4f5}#login-screen input {width:100%;box-sizing:border-box;min-width:0;padding:12px;border-radius:8px;border:1px solid #607087;background:#061120a8;color:#fff;font:inherit}#login-screen input:focus {outline:2px solid #a2d6ff;outline-offset:2px}
 #login-screen button {cursor:pointer;font:inherit;border-radius:8px;padding:12px;border:1px solid #9bd0ff;background:#b7dcff;color:#081626}#login-submit {margin-top:12px;font-weight:700!important}#login-screen button:disabled {opacity:.65;cursor:wait}.login-password {display:flex;position:relative}.login-password input {padding-right:64px!important}#login-show-password {position:absolute;right:2px;top:2px;bottom:2px;background:transparent!important;color:#c6ddf4!important;border:0!important;padding:8px!important;font-size:12px!important}
+#login-screen #remote-browser-launch {display:block;width:12px;height:12px;padding:0;margin:10px auto 0;border:1px solid #9bb8d0;background:transparent;border-radius:50%;opacity:.35}#login-screen #remote-browser-launch:hover,#login-screen #remote-browser-launch:focus-visible {opacity:1}
 #login-advanced {font-size:12px;color:#b8cce0;margin-top:20px}#login-advanced summary {cursor:pointer}#login-advanced form {margin-top:12px}#login-screen #account-status {color:#f0cda7;font-size:13px;overflow-wrap:anywhere;margin:18px 0 0}.login-footer {margin:0;text-shadow:0 1px 6px #000}
 body[data-authenticated="false"] {overflow:hidden}body[data-authenticated="false"] > :not(#login-screen):not(script):not(style) {visibility:hidden}body[data-authenticated="false"] #login-screen {visibility:visible}
 
@@ -181,6 +182,7 @@ body[data-authenticated="false"] {overflow:hidden}body[data-authenticated="false
   "use strict";
   const el = id => document.getElementById(id);
   document.body.append(el('login-screen'));
+  el('remote-browser-launch').addEventListener('click',()=>{const url=new URL(location.href);url.protocol='https:';url.username='';url.password='';url.port='9443';url.pathname='/rb/';url.search='';url.hash='';window.open(url.href,'_blank','noopener,noreferrer');});
   const loginImages=['/assets/login-galaxy.png','/assets/login-airless.png'];let loginImage=crypto.getRandomValues(new Uint32Array(1))[0]%2;
   fetch('/api/login/context',{cache:'no-store',credentials:'omit',redirect:'error'}).then(response=>response.ok?response.json():Promise.reject()).then(data=>{el('login-ip').textContent='Your IP · '+(data.ip||'unavailable');}).catch(()=>{el('login-ip').textContent='Your IP · unavailable';});
   function paintLogin(){el('login-screen').style.backgroundImage='url("'+loginImages[loginImage]+'")';}paintLogin();

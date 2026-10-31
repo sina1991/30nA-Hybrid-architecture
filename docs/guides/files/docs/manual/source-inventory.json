@@ -119,6 +119,11 @@
       "scripts/testing/run_ci.py",
       27,
       "--evidence-dir"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      143,
+      "--config"
     ]
   ],
   "environment": [
@@ -138,6 +143,12 @@
       "AGENT08_CODE_MANAGER_URL",
       "units/integration/agent08/agent08.py",
       65,
+      "required lookup"
+    ],
+    [
+      "BROWSER_HOST",
+      "standalone/remote-browser/egress.py",
+      93,
       "required lookup"
     ],
     [
@@ -423,6 +434,18 @@
       "optional lookup"
     ],
     [
+      "DENY_ALL_EGRESS",
+      "standalone/remote-browser/egress.py",
+      48,
+      "optional lookup"
+    ],
+    [
+      "DENY_HOST",
+      "standalone/remote-browser/egress.py",
+      51,
+      "optional lookup"
+    ],
+    [
       "DOCKER_HOST",
       "scripts/security/run_sandbox_daemon_fault_injection.py",
       48,
@@ -432,6 +455,18 @@
       "GITHUB_ACTIONS",
       "scripts/testing/run_ci.py",
       72,
+      "optional lookup"
+    ],
+    [
+      "LISTEN_FDS",
+      "standalone/remote-browser/server.py",
+      145,
+      "optional lookup"
+    ],
+    [
+      "LISTEN_PID",
+      "standalone/remote-browser/server.py",
+      145,
       "optional lookup"
     ],
     [
@@ -1134,9 +1169,9 @@
       "sha256": "1c684d3a59a02307e293f9ad64f8683839a01883349c7dd7dc2692c088e9e52f"
     },
     {
-      "bytes": 7948,
+      "bytes": 8210,
       "path": "README.md",
-      "sha256": "5b9ef04aac44fbda4a09a2357e45941632a93de792d69c3708e050f18bba0bc1"
+      "sha256": "7b35f5c82667e76f46165a1416cb01de9025b739648c5e309ae1c0cd05a6d792"
     },
     {
       "bytes": 1866,
@@ -2139,6 +2174,71 @@
       "sha256": "e456246359b97e4c27138eba8ebace0b81a838d30600ef0b4e867173eab2afa2"
     },
     {
+      "bytes": 58,
+      "path": "standalone/remote-browser/.dockerignore",
+      "sha256": "4a7231b8cbe463810efc1fc58837f0f6ac48fd0c64c6091fe1b106cdd84e5dea"
+    },
+    {
+      "bytes": 456,
+      "path": "standalone/remote-browser/Dockerfile",
+      "sha256": "a1c3324b0e87c04a7a8514fcc635bc91ac13bd970207c9b836f0f997cf09c6cf"
+    },
+    {
+      "bytes": 9140,
+      "path": "standalone/remote-browser/README.md",
+      "sha256": "76328e352463a54a6008edde81825e0f134ddd9e705297c3e67f06912fedef9c"
+    },
+    {
+      "bytes": 2019,
+      "path": "standalone/remote-browser/configure.py",
+      "sha256": "2507f6dedc065547a577335678f1607168121125eeed7e34e4a4d8ca390bedd8"
+    },
+    {
+      "bytes": 4684,
+      "path": "standalone/remote-browser/egress.py",
+      "sha256": "fcb3553dd1205eac489d59c8f0deba8f197dfdae1f0fd53511ef3b52076ce18e"
+    },
+    {
+      "bytes": 226,
+      "path": "standalone/remote-browser/images.json",
+      "sha256": "c33e7ca55b049d4827c027e33fcf9ae8691ec0632c5f2df5207cb915db035e36"
+    },
+    {
+      "bytes": 5117,
+      "path": "standalone/remote-browser/install.sh",
+      "sha256": "c571735ad765f618e8c7bdaacafe23112055f69d42282d5c8f3018b756a49d12"
+    },
+    {
+      "bytes": 16,
+      "path": "standalone/remote-browser/requirements.in",
+      "sha256": "9ff2177e763edd4e9724ffbd5a78794aa24e8492245e2f9e2b3f521fdf956b74"
+    },
+    {
+      "bytes": 62649,
+      "path": "standalone/remote-browser/requirements.lock",
+      "sha256": "31dbc0d650689e4c603f2a0fecadeda3e176530f36381a7177f0ff97bcf7e287"
+    },
+    {
+      "bytes": 5512,
+      "path": "standalone/remote-browser/runtime.py",
+      "sha256": "b6c5b1138a136d7e23b5905e265f17dbae616e114db85d2ee60a65d21636e3ff"
+    },
+    {
+      "bytes": 9235,
+      "path": "standalone/remote-browser/server.py",
+      "sha256": "12d9255d93536d7f99ecce58e1f655da5c5c922c797bc0fa22922d59b8e5b194"
+    },
+    {
+      "bytes": 2614,
+      "path": "standalone/remote-browser/transport.py",
+      "sha256": "58e793416dbc6623fa0041a6cdb78299c0e5d47fd4546f87ccdd0e53291d6bab"
+    },
+    {
+      "bytes": 2965,
+      "path": "standalone/remote-browser/ui.py",
+      "sha256": "edd65e66081441fb483a9ff452a9e287a0186f19f593dab66997830fab8c467e"
+    },
+    {
       "bytes": 22223,
       "path": "terminal_ui.py",
       "sha256": "80e21fb985fdf4e8a622ff6384182dc9a81d0d9118e15ddb9d1bff00c61f4db3"
@@ -2202,6 +2302,11 @@
       "bytes": 4874,
       "path": "tests/test_music_player.py",
       "sha256": "1431ea99cad7a8d561cd5430d0a9e6f80715e0258e312bb794903c79f489df6f"
+    },
+    {
+      "bytes": 10266,
+      "path": "tests/test_remote_browser.py",
+      "sha256": "567e2d1efb1fed1a947d4f3c4382d911d9190e489a17b554e7871581cc47e495"
     },
     {
       "bytes": 5561,
@@ -2409,9 +2514,9 @@
       "sha256": "0d646b99ad05654e42fde6fa91cfd7223e14376287632d0099b4146ae1547a7b"
     },
     {
-      "bytes": 19213,
+      "bytes": 19842,
       "path": "units/consumers/dashboard-core/browser-tests/demo_media.cjs",
-      "sha256": "3816b954f1b8383a172b5f3e3cd0d1cdc6893d2ce9da8f2c09afdb14a3662a2f"
+      "sha256": "c67c65ef631251ad5abceb62ab3bfd8f7a7bed7ccf9f2e200e0e484b6c760a3e"
     },
     {
       "bytes": 1242,
@@ -2499,9 +2604,9 @@
       "sha256": "b3fbd8a0b7086d9dc7667dbde7b84b415442173e4afa6e297718f9d82cedf64b"
     },
     {
-      "bytes": 65218,
+      "bytes": 65863,
       "path": "units/consumers/dashboard-core/dashboard/upstream_panel.py",
-      "sha256": "59ffda66b5406b3649ba4e7b7caf88e4c755c93c66f053f1eee6ef2068e436e2"
+      "sha256": "dbf3ac744c500f80846a69f157c86c39b4070f4974e362d7cdf8f5237c37cdf8"
     },
     {
       "bytes": 50083,
@@ -4984,6 +5089,216 @@
       "()"
     ],
     [
+      "standalone/remote-browser/configure.py",
+      13,
+      "configure",
+      "(path, hostname, browser_image, egress_image, cert, key, password=None)"
+    ],
+    [
+      "standalone/remote-browser/egress.py",
+      15,
+      "public_addresses",
+      "(host)"
+    ],
+    [
+      "standalone/remote-browser/egress.py",
+      25,
+      "tunnel",
+      "(reader, writer)"
+    ],
+    [
+      "standalone/remote-browser/egress.py",
+      61,
+      "tunnel.pipe",
+      "(source, dest)"
+    ],
+    [
+      "standalone/remote-browser/egress.py",
+      82,
+      "start",
+      "(app)"
+    ],
+    [
+      "standalone/remote-browser/egress.py",
+      86,
+      "stop",
+      "(app)"
+    ],
+    [
+      "standalone/remote-browser/egress.py",
+      90,
+      "create_app",
+      "()"
+    ],
+    [
+      "standalone/remote-browser/egress.py",
+      92,
+      "create_app.gui",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/runtime.py",
+      10,
+      "CapacityError",
+      "class"
+    ],
+    [
+      "standalone/remote-browser/runtime.py",
+      13,
+      "Runtime",
+      "class"
+    ],
+    [
+      "standalone/remote-browser/runtime.py",
+      14,
+      "Runtime.__init__",
+      "(self, config)"
+    ],
+    [
+      "standalone/remote-browser/runtime.py",
+      20,
+      "Runtime.command",
+      "(self, *args, check=True)"
+    ],
+    [
+      "standalone/remote-browser/runtime.py",
+      28,
+      "Runtime.recover",
+      "(self)"
+    ],
+    [
+      "standalone/remote-browser/runtime.py",
+      35,
+      "Runtime.launch",
+      "(self, user)"
+    ],
+    [
+      "standalone/remote-browser/runtime.py",
+      69,
+      "Runtime.stop",
+      "(self, session)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      21,
+      "password_hash",
+      "(password, salt)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      25,
+      "username",
+      "(value)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      29,
+      "create_app",
+      "(config, runtime=None, recover=True, idle_callback=None)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      33,
+      "create_app.check_origin",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      35,
+      "create_app.authorized",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      39,
+      "create_app.close",
+      "(key)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      53,
+      "create_app.index",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      57,
+      "create_app.login",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      94,
+      "create_app.view",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      98,
+      "create_app.lease",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      110,
+      "create_app.desktop",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      117,
+      "create_app.reap",
+      "()"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      123,
+      "create_app.start",
+      "(app)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      126,
+      "create_app.stop",
+      "(app)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      129,
+      "create_app.root",
+      "(request)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      130,
+      "create_app.private_headers",
+      "(request, response)"
+    ],
+    [
+      "standalone/remote-browser/server.py",
+      147,
+      "serve",
+      "()"
+    ],
+    [
+      "standalone/remote-browser/transport.py",
+      8,
+      "forward",
+      "(request, target)"
+    ],
+    [
+      "standalone/remote-browser/transport.py",
+      18,
+      "forward.relay",
+      "(source, destination)"
+    ],
+    [
+      "standalone/remote-browser/ui.py",
+      4,
+      "viewer",
+      "(nonce)"
+    ],
+    [
       "terminal_ui.py",
       11,
       "Terminal",
@@ -5660,6 +5975,186 @@
       68,
       "test_note_slot_keeps_plain_text_owner_and_shared_copy",
       "(client)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      16,
+      "load",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      26,
+      "config",
+      "(limit=1)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      32,
+      "Runtime",
+      "class"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      33,
+      "Runtime.__init__",
+      "(self, port=1)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      34,
+      "Runtime.recover",
+      "(self)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      35,
+      "Runtime.launch",
+      "(self, user)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      36,
+      "Runtime.stop",
+      "(self, item)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      39,
+      "login",
+      "(client, user='1', password='fixture-password ')"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      43,
+      "test_separate_login_exact_password_limit_and_explicit_origin",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      44,
+      "test_separate_login_exact_password_limit_and_explicit_origin.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      63,
+      "test_nine_usernames_and_rate_limit_without_executing_browser",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      65,
+      "test_nine_usernames_and_rate_limit_without_executing_browser.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      75,
+      "test_websocket_disconnect_stops_only_its_browser_and_nonce_is_account_bound",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      76,
+      "test_websocket_disconnect_stops_only_its_browser_and_nonce_is_account_bound.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      95,
+      "test_gui_proxy_strips_credentials_and_streams_websocket",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      96,
+      "test_gui_proxy_strips_credentials_and_streams_websocket.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      98,
+      "test_gui_proxy_strips_credentials_and_streams_websocket.run.gui",
+      "(request)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      117,
+      "test_pinned_proxy_rejects_private_and_mixed_dns_results",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      121,
+      "test_pinned_proxy_rejects_private_and_mixed_dns_results.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      130,
+      "test_configure_uses_private_file_and_all_nine_accounts",
+      "(tmp_path)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      141,
+      "test_connect_proxy_streams_only_after_validating_and_pinning_target",
+      "(monkeypatch)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      145,
+      "test_connect_proxy_streams_only_after_validating_and_pinning_target.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      146,
+      "test_connect_proxy_streams_only_after_validating_and_pinning_target.run.echo",
+      "(reader, writer)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      151,
+      "test_connect_proxy_streams_only_after_validating_and_pinning_target.run.connect",
+      "(host, value)"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      164,
+      "test_idle_controller_requests_shutdown_without_starting_chrome",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      165,
+      "test_idle_controller_requests_shutdown_without_starting_chrome.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      177,
+      "test_shutdown_cancels_inflight_browser_launch_and_clears_reservation",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      178,
+      "test_shutdown_cancels_inflight_browser_launch_and_clears_reservation.run",
+      "()"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      180,
+      "test_shutdown_cancels_inflight_browser_launch_and_clears_reservation.run.Slow",
+      "class"
+    ],
+    [
+      "tests/test_remote_browser.py",
+      181,
+      "test_shutdown_cancels_inflight_browser_launch_and_clears_reservation.run.Slow.launch",
+      "(self, user)"
     ],
     [
       "tests/test_shared_dashboards.py",
