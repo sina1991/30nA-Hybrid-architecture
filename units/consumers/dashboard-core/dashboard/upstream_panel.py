@@ -266,6 +266,20 @@ PANEL = r'''
         throw error;
       }
     },
+    async uploadFile(file,visibility,recipient) {
+      if(!token||!authenticated)throw Error('Sign in to upload files.');
+      if(file.size>20971520)throw Error('File exceeds 20 MiB.');
+      const current=generation,controller=new AbortController(),parent=session.signal,abort=()=>controller.abort();
+      parent.addEventListener('abort',abort,{once:true});const timeout=setTimeout(abort,180000);
+      const params=new URLSearchParams({name:file.name,visibility});if(recipient)params.set('recipient',recipient);
+      try{
+        const response=await fetch('/api/upstreams/uploads/raw?'+params,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/octet-stream'},body:file,signal:controller.signal,cache:'no-store',redirect:'error',credentials:'omit'});
+        if(current!==generation)throw Error('The session changed.');
+        if(response.status===401){disconnect('Sign in again.');throw Error('Sign in again.');}
+        if(!response.ok)throw Error(response.status===413?'File exceeds the upload size limit.':'Upload failed. Refresh the list before retrying.');
+        return (await response.json()).payload;
+      }finally{clearTimeout(timeout);parent.removeEventListener('abort',abort);}
+    },
     async mediaBlob(path,signal) {
       if(!token||!authenticated||!/^media\/(server|upload)\//.test(path))throw Error('Invalid media request');
       const current=generation,controller=new AbortController(),signals=[session.signal,...(signal?[signal]:[])],abort=()=>controller.abort();

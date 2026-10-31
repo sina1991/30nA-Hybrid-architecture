@@ -172,7 +172,19 @@ def observed_quote(cfg):
         meta=dict(db.execute("SELECT key,value FROM collector_status WHERE key IN ('last_success','error')").fetchall())
     finally:db.close()
     now=time.time()
-    if not row or not meta.get('last_success') or meta.get('error') or not -5<=now-float(meta['last_success'])<=30 or not -5<=now-row['time']<=120:raise Unavailable('Fresh market data is unavailable; no demo execution was performed')
+    if not row or not meta.get('last_success'):
+        raise Unavailable('No market data received yet. Check the XAUUSD chart and Dashboard collector logs; no demo execution was performed.')
+    if meta.get('error'):
+        raise Unavailable('Market data collector could not fetch prices. Check Dashboard collector logs and upstream connectivity; no demo execution was performed.')
+    try: fetched=float(meta['last_success']); candle_time=float(row['time'])
+    except (ValueError,TypeError,OverflowError):
+        raise Unavailable('Invalid market data timestamps; no demo execution was performed') from None
+    if not -5<=now-fetched<=30:
+        raise Unavailable('Market data collector is not current (30-second limit). Check Dashboard collector logs and server UTC clock; no demo execution was performed.')
+    if not -5<=now-candle_time<=120:
+        from datetime import datetime, timezone
+        last=datetime.fromtimestamp(candle_time,timezone.utc).isoformat() if 0<=candle_time<=253402214400 else 'invalid timestamp'
+        raise Unavailable(f'Latest XAUUSD candle: {last}; a candle within 120 seconds is required. The market may be closed or the feed delayed. Trading resumes automatically with fresh data; no demo execution was performed.')
     bid=dec(row['close'],.01,1000000000).quantize(tick(cfg),rounding=ROUND_HALF_UP);ask=bid+cfg['spread_points']*tick(cfg)
     return {'bid':str(bid),'ask':str(ask),'time':float(meta['last_success']),'source':'XAUUSD sampled candle close + simulated spread','simulated_spread':True}
 

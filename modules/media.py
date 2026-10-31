@@ -1,7 +1,8 @@
 """Browser-played media descriptors. No transcoding or arbitrary server paths."""
 from pathlib import Path
 import os
-from urllib.parse import urlsplit,quote
+import re
+from urllib.parse import urlsplit,quote,parse_qs,urlencode
 from . import uploads
 
 KINDS=('media-player','media-image','media-audio','media-video')
@@ -89,10 +90,32 @@ def library(owner):
     return {'server_files':files,'uploads':own[:200],'max_server_bytes':MAX_BYTES}
 
 
+def youtube_video(url):
+    """Extract only a video ID; never forward arbitrary embed URLs or parameters."""
+    parsed=urlsplit(url);host=parsed.hostname
+    if host not in ('youtu.be','www.youtu.be','youtube.com','www.youtube.com','m.youtube.com','youtube-nocookie.com','www.youtube-nocookie.com'):return None
+    if parsed.port not in (None,443):raise ValueError('Invalid YouTube URL')
+    parts=parsed.path.strip('/').split('/')
+    if host in ('youtu.be','www.youtu.be') and len(parts)==1:ident=parts[0]
+    elif parsed.path=='/watch':ident=parse_qs(parsed.query).get('v',[''])[0]
+    elif len(parts)==2 and parts[0] in ('embed','shorts','live'):ident=parts[1]
+    else:raise ValueError('Use a YouTube video link, not a channel or playlist')
+    if not re.fullmatch(r'[A-Za-z0-9_-]{11}',ident):raise ValueError('Invalid YouTube video ID')
+    return ident
+
+
 def describe(owner,cfg,expected_kind=None):
     cfg=settings(cfg)
     if cfg['source']=='external':
         if not cfg['url']:return {'status':'needs_configuration','settings':cfg,'message':'Set a direct HTTPS media link or select a server file.'}
+        video=youtube_video(cfg['url'])
+        if video:
+            if expected_kind not in (None,'video'):raise ValueError('YouTube requires a Video Player')
+            params={'autoplay':'0','playsinline':'1','rel':'0'}
+            if cfg['loop']:params.update(loop='1',playlist=video)
+            return {'status':'ok','source':'external','provider':'youtube','kind':'video','format':'youtube',
+                    'url':'https://www.youtube.com/watch?v='+video,
+                    'embed_url':'https://www.youtube-nocookie.com/embed/'+video+'?'+urlencode(params),'settings':cfg}
         fmt=extension(urlsplit(cfg['url']).path) if cfg['format']=='auto' else cfg['format']
         if expected_kind is not None and FORMATS[fmt][0]!=expected_kind:raise ValueError('Media format does not match this player')
         return {'status':'ok','source':'external','url':cfg['url'],'format':fmt,'kind':FORMATS[fmt][0],'mime':FORMATS[fmt][1],'settings':cfg}

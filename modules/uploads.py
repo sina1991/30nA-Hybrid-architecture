@@ -10,7 +10,8 @@ import time
 from uuid import uuid4
 from . import accounts
 
-MAX_BYTES = 512 * 1024
+MAX_BYTES = 20 * 1024 * 1024
+LEGACY_MAX_BYTES = 512 * 1024
 
 
 @contextmanager
@@ -42,6 +43,17 @@ def principal(owner):
 
 
 def create(owner, name, visibility, recipient, content):
+    """Legacy JSON transport; large files use the bounded binary endpoint."""
+    principal(owner)
+    if not isinstance(content, str) or len(content) > 4 * ((LEGACY_MAX_BYTES + 2) // 3):
+        raise OverflowError('Legacy JSON uploads are limited to 512 KiB; use binary upload')
+    try: data = base64.b64decode(content, validate=True)
+    except (ValueError, binascii.Error): raise ValueError('Invalid file encoding') from None
+    if len(data) > LEGACY_MAX_BYTES: raise OverflowError('Legacy JSON upload too large')
+    return create_bytes(owner, name, visibility, recipient, data)
+
+
+def create_bytes(owner, name, visibility, recipient, data):
     principal(owner)
     if not isinstance(name, str) or not 1 <= len(name) <= 180 or name in ('.', '..') or re.search(r'[/\\\x00-\x1f\x7f]', name):
         raise ValueError('Invalid filename')
@@ -51,10 +63,8 @@ def create(owner, name, visibility, recipient, content):
         user = accounts.get_user(recipient)
         if not user or not user['enabled']: raise ValueError('Invalid recipient')
     elif recipient is not None: raise ValueError('Public files have no recipient')
-    if not isinstance(content, str) or len(content) > 4 * ((MAX_BYTES + 2) // 3): raise OverflowError('File exceeds 512 KiB')
-    try: data = base64.b64decode(content, validate=True)
-    except (ValueError, binascii.Error): raise ValueError('Invalid file encoding') from None
-    if len(data) > MAX_BYTES: raise OverflowError('File exceeds 512 KiB')
+    if not isinstance(data, bytes): raise ValueError('Invalid file content')
+    if len(data) > MAX_BYTES: raise OverflowError('File exceeds 20 MiB')
     item = dict(id=uuid4().hex, name=name, size=len(data), sender=owner, recipient=recipient, created_at=int(time.time()))
     with database() as db:
         db.execute('INSERT INTO uploads VALUES(?,?,?,?,?,?,?)', (*item.values(), data))

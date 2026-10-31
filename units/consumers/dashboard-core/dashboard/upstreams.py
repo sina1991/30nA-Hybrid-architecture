@@ -148,7 +148,7 @@ def create_router(credential_path, upstream_factory):
 
     def upload_error(exc):
         status = 404 if isinstance(exc, LookupError) else 403 if isinstance(exc, PermissionError) else 413 if isinstance(exc, OverflowError) else 422 if isinstance(exc, ValueError) else 503
-        raise HTTPException(status, {404:'File not found',403:'Account setup required',413:'File exceeds 512 KiB',422:'Invalid upload',503:'Upload storage unavailable'}[status]) from None
+        raise HTTPException(status, {404:'File not found',403:'Account setup required',413:'File exceeds the upload size limit (binary: 20 MiB; legacy JSON: 512 KiB)',422:'Invalid upload',503:'Upload storage unavailable'}[status]) from None
 
     @router.get('/uploads')
     def upload_list(identity=Depends(owner)):
@@ -160,6 +160,19 @@ def create_router(credential_path, upstream_factory):
     def upload_create(body: dict, identity=Depends(owner)):
         if set(body) != {'name','visibility','recipient','content'}: raise HTTPException(422, 'Invalid upload')
         try: item = uploads.create(identity, **body)
+        except (ValueError, OverflowError, PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
+        return JSONResponse(envelope({'file':item}), headers={'Cache-Control':'no-store'})
+
+    @router.post('/uploads/raw')
+    async def upload_binary(request: Request, name: str, visibility: str, recipient: str | None = None, identity=Depends(owner)):
+        if request.headers.get('content-type', '').split(';')[0] != 'application/octet-stream':
+            raise HTTPException(422, 'Use application/octet-stream')
+        data = bytearray()
+        async for chunk in request.stream():
+            if len(data) + len(chunk) > uploads.MAX_BYTES: raise HTTPException(413, 'File exceeds 20 MiB')
+            data.extend(chunk)
+        from starlette.concurrency import run_in_threadpool
+        try: item = await run_in_threadpool(uploads.create_bytes, identity, name, visibility, recipient, bytes(data))
         except (ValueError, OverflowError, PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
         return JSONResponse(envelope({'file':item}), headers={'Cache-Control':'no-store'})
 

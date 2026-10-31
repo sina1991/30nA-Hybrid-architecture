@@ -228,3 +228,17 @@ def test_account_quota_and_ownership_are_checked_before_expensive_pin_hash(marke
     assert len(calls)==10
     with pytest.raises(LookupError):demo.set_pin('bob','not-owned','0123')
     assert len(calls)==10
+
+
+def test_quote_diagnostics_distinguish_closed_or_delayed_market_from_collector_failure(tmp_path,monkeypatch):
+    monkeypatch.setenv('DASHBOARD_MODULE_STATE_DIR',str(tmp_path))
+    from market_data.data import connect
+    db=connect();now=time.time()
+    with pytest.raises(demo.Unavailable,match='No market data received yet'):demo.observed_quote(demo.configuration())
+    with db:
+        db.execute('INSERT INTO candles(time,open,high,low,close,is_open) VALUES(?,?,?,?,?,?)',(int(now)//60*60-86400,2000,2000,2000,2000,0))
+        db.execute("INSERT OR REPLACE INTO collector_status VALUES('last_success',?)",(str(now),))
+    with pytest.raises(demo.Unavailable,match='market may be closed or the feed delayed'):demo.observed_quote(demo.configuration())
+    with db:db.execute("INSERT OR REPLACE INTO collector_status VALUES('error','upstream unavailable')")
+    with pytest.raises(demo.Unavailable,match='collector could not fetch'):demo.observed_quote(demo.configuration())
+    db.close()

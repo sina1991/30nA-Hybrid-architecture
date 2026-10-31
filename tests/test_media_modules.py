@@ -50,3 +50,20 @@ def test_direct_media_checks_each_request_and_is_not_copied_into_shared_template
     row=next(row for row in slots.list_active(eve['id']) if row['slot'] in loaded['slots'])
     assert not row['media_settings']['file_id']
     assert client.post('/api/upstreams/modules/media-image/run',headers=auth(e),json={'input':data}).status_code==422
+
+
+def test_youtube_links_generate_only_allowlisted_non_autoplay_embeds():
+    links=('https://youtu.be/AaG953tIuZs','https://www.youtube.com/watch?v=AaG953tIuZs&autoplay=1',
+           'https://www.youtube.com/shorts/AaG953tIuZs','https://youtube.com/live/AaG953tIuZs',
+           'https://www.youtube-nocookie.com/embed/AaG953tIuZs')
+    for url in links:
+        result=run_module('media-video',{'settings':{'url':url}})
+        assert result['provider']=='youtube' and result['kind']=='video'
+        assert result['embed_url'].startswith('https://www.youtube-nocookie.com/embed/AaG953tIuZs?')
+        assert 'autoplay=0' in result['embed_url'] and 'autoplay=1' not in result['embed_url']
+    assert 'playlist=AaG953tIuZs' in media.describe(None,{'url':links[0],'loop':True})['embed_url']
+    for url in ('https://youtu.be/not-valid','https://youtube.com/channel/AaG953tIuZs',
+                'https://youtu.be.evil.test/AaG953tIuZs','https://youtube.com:444/watch?v=AaG953tIuZs',
+                'https://youtube.com/embed/%22%3Escript'):
+        with pytest.raises(ValueError):media.describe(None,{'url':url})
+    with pytest.raises(ValueError):run_module('media-audio',{'settings':{'url':links[0]}})

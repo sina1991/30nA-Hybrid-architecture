@@ -419,7 +419,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 .slot,.slot * {scrollbar-width:thin;scrollbar-color:rgba(145,162,187,.2) transparent}.slot::-webkit-scrollbar,.slot *::-webkit-scrollbar {width:5px;height:5px}.slot::-webkit-scrollbar-track,.slot *::-webkit-scrollbar-track,.slot::-webkit-scrollbar-corner,.slot *::-webkit-scrollbar-corner {background:transparent}.slot::-webkit-scrollbar-button,.slot *::-webkit-scrollbar-button {display:none;width:0;height:0}.slot::-webkit-scrollbar-thumb,.slot *::-webkit-scrollbar-thumb {background:rgba(145,162,187,.2);border-radius:8px}.slot::-webkit-scrollbar-thumb:hover,.slot *::-webkit-scrollbar-thumb:hover {background:rgba(145,162,187,.35)}
 #overview-grid .slot[data-slot-type="linear"] {grid-column:span 12;grid-row:span 2;min-height:0}#grid .slot[data-slot-type="linear"] {grid-column:1/-1;min-height:100px}.calendar-timeline {display:flex;gap:8px;overflow-x:auto;min-height:65px}.calendar-event {flex:0 0 235px;border-left:3px solid var(--accent);padding:5px 9px;background:var(--field);border-radius:5px;font-size:12px}.calendar-event strong,.calendar-event small {display:block}.calendar-footer {display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:10px}.calendar-footer p {margin:0}.slot[data-slot-type="linear"] .module-body {min-height:0;overflow:auto}.calendar-event[data-impact="High"] {border-color:#ef4444}.calendar-event[data-impact="Medium"] {border-color:#f59e0b}#viewer-identity,#workspace-status {font-size:12px;color:var(--muted)}
 .demo-metrics {display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin:10px 0}.demo-metric {display:grid;gap:6px;padding:10px;background:var(--field);border:1px solid var(--border);border-radius:8px}.demo-metric strong {font-size:18px}.demo-panels {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px}.demo-entry-form {display:grid;gap:8px}.demo-entry-form input,.demo-entry-form select {padding:7px;background:var(--field);border:1px solid var(--border);color:var(--text);border-radius:6px}.demo-buy,.demo-sell {padding:9px 22px;border:0;border-radius:6px;color:white;font:inherit;cursor:pointer}.demo-buy {background:#15803d}.demo-sell {background:#b91c1c}.demo-buy:disabled,.demo-sell:disabled {opacity:.4;cursor:default}.demo-entry-price {font-size:12px;color:var(--muted)}.demo-mini-pnl {font-size:20px}
-.slot-media {display:block;max-width:100%;max-height:100%;object-fit:contain}.media-player-host {min-height:0;overflow:auto}.media-player-host audio {width:100%}
+.slot-media {display:block;max-width:100%;max-height:100%;object-fit:contain}.media-player-host {min-height:0;overflow:auto}.media-player-host audio {width:100%}.youtube-player {width:100%;aspect-ratio:16/9;border:0}
 </style>
 </head>
 <body data-view="overview">
@@ -457,7 +457,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 <dialog id="load-dashboard-dialog" class="slot-options-dialog"><h3>Load shared dashboard</h3><p>Creates your own copies. Current slots remain in Slots. Existing workers keep their current state.</p><button type="button" data-close-workspace-dialog>Close</button><p id="dashboard-load-status" role="status"></p><div id="dashboard-catalog"></div></dialog>
 <main>
   <section class="page-view" data-page="uploads" hidden>
-    <h2>Upload Center</h2><p>Public files are shared with signed-in users. Direct files are restricted to sender and recipient. Maximum file size: 512 KiB.</p>
+    <h2>Upload Center</h2><p>Public files are shared with signed-in users. Direct files are restricted to sender and recipient. Maximum file size: 20 MiB.</p>
     <input type="file" id="upload-file" aria-label="File">
     <select id="upload-visibility" aria-label="Access"><option value="public">Public</option><option value="direct">Direct</option></select>
     <select id="upload-recipient" aria-label="Recipient" hidden></select>
@@ -499,8 +499,8 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <section class="page-view" data-page="media" hidden>
     <h2>Media</h2><p class="view-description">Images: JPG, PNG, GIF, WebP · Audio: MP3, WAV, OGG, M4A · Video: MP4, WebM. Playback uses your browser; no autoplay or server transcoding.</p>
     <div class="db-controls"><label>Component<select id="media-component"><option value="image">Image Viewer</option><option value="audio">Audio Player</option><option value="video">Video Player</option><option value="auto">Media Player (auto)</option></select></label>
-      <label>Source<select id="media-tab-source"><option value="external">External HTTPS link</option><option value="upload">Upload Center</option><option value="server">Shared server media</option></select></label>
-      <label id="media-url-label">Direct URL<input id="media-tab-url" type="url" placeholder="https://example.com/file.mp4"></label>
+      <label>Source<select id="media-tab-source"><option value="external">External link (HTTPS / YouTube)</option><option value="upload">Upload Center</option><option value="server">Shared server media</option></select></label>
+      <label id="media-url-label">Media URL<input id="media-tab-url" type="url" placeholder="https://example.com/file.mp4"></label>
       <label id="media-file-label" hidden>File<select id="media-tab-file"></select></label>
       <label>Format<select id="media-tab-format"><option>auto</option><option>jpg</option><option>png</option><option>gif</option><option>webp</option><option>mp3</option><option>wav</option><option>ogg</option><option>m4a</option><option>mp4</option><option>webm</option></select></label>
       <label><input id="media-tab-loop" type="checkbox">Loop</label><button type="button" id="media-refresh-library">Refresh library</button><button type="button" id="media-add-slot">Add to Overview</button>
@@ -602,14 +602,14 @@ document.getElementById('upload-refresh').addEventListener('click',refreshUpload
 document.getElementById('upload-send').addEventListener('click',async()=>{
   const file=document.getElementById('upload-file').files[0],status=document.getElementById('upload-status'),button=document.getElementById('upload-send'),bridge=window.dashboardModuleState;
   if(!bridge?.ready()){status.textContent='Sign in to upload files.';return;}
-  if(!file||file.size>524288){status.textContent='Choose a file no larger than 512 KiB.';return;}
+  if(!file||file.size>20971520){status.textContent='Choose a file no larger than 20 MiB.';return;}
   button.disabled=true;const owner=bridge.owner();
-  try{const bytes=new Uint8Array(await file.arrayBuffer());let raw='';for(let i=0;i<bytes.length;i+=8192)raw+=String.fromCharCode(...bytes.subarray(i,i+8192));
-    if(!bridge.ready()||bridge.owner()!==owner)throw Error();
+  try{status.textContent='Uploading…';
     const visibility=document.getElementById('upload-visibility').value;
-    await bridge.slotRequest('uploads',{name:file.name,visibility,recipient:visibility==='direct'?document.getElementById('upload-recipient').value:null,content:btoa(raw)});
+    await bridge.uploadFile(file,visibility,visibility==='direct'?document.getElementById('upload-recipient').value:null);
+    if(!bridge.ready()||bridge.owner()!==owner)return;
     document.getElementById('upload-file').value='';await refreshUploads();
-  }catch(_){status.textContent='Upload failed. Refresh the list before retrying.';}finally{button.disabled=false;}
+  }catch(error){status.textContent=error.message||'Upload failed. Refresh the list before retrying.';}finally{button.disabled=false;}
 });
 
 const saveDashboardDialog=document.getElementById('save-dashboard-dialog'),loadDashboardDialog=document.getElementById('load-dashboard-dialog');
@@ -666,7 +666,7 @@ function renderDemoTrade(body,slot=null,bot=false){
     const data=slot?await bridge.read(slot.id,bot?'demo-bot':'demo-trade'):await bridge.slotRequest('demo/state');if(!body.isConnected||!bridge.ready())return;current=data;
     if(pending&&(data.orders||[]).some(order=>order.request_id===pending.request_id)){pending=null;pin.value='';retry.hidden=true;status.textContent='Request confirmed in account history.';}
     const cfg=data.account?.settings;info.textContent=data.account?`${data.account.name} · ${cfg.lots} lots · 1:${cfg.leverage} · ${data.model}${data.message?' · '+data.message:''}`:'Create a demo account in Demo Trading first.';
-    entry.textContent=data.quote?`Entry at execution · Buy Ask ${data.quote.ask} / Sell Bid ${data.quote.bid}${data.quote.stale?' · stale':''}`:'Fresh quote unavailable';
+    entry.textContent=data.quote?`Entry at execution · Buy Ask ${data.quote.ask} / Sell Bid ${data.quote.bid}${data.quote.stale?' · stale':''}`:'Buy/Sell paused — waiting for fresh XAUUSD prices. See the data status above.';
     const active=slot?data.orders.find(order=>['open','pending'].includes(order.status)):null;position.replaceChildren();if(active)position.append(demoOrderTable({...data,orders:[active]}));
     form.hidden=Boolean(active);[buy,sell,submit].forEach(button=>button.disabled=busy||!data.account||!data.metrics?.quote_available);
   }catch(error){info.textContent=error.message||'Demo state unavailable.';}finally{readBusy=false;}}
@@ -737,7 +737,7 @@ async function refreshMediaLibrary(){
   const preview=document.getElementById('media-preview');if(!preview.querySelector('.media-player-widget'))renderMediaPlayer(preview,null,'media-player',()=>bridge.slotRequest('media/describe',{settings:mediaTabSettings(),kind:document.getElementById('media-component').value==='auto'?null:document.getElementById('media-component').value}));
   try{const owner=bridge.owner(),data=await bridge.slotRequest('media/library');if(!bridge.ready()||bridge.owner()!==owner)return;mediaLibrary=data;
     const select=document.getElementById('media-tab-file'),selected=select.value;select.replaceChildren();(source==='upload'?data.uploads:data.server_files).filter(file=>type==='auto'||file.kind===type).forEach(file=>{const option=makeElement('option','',`${file.name||file.filename} · ${Math.ceil(file.size/1024)} KiB`);option.value=source==='upload'?file.id:file.filename;select.append(option);});if([...select.options].some(option=>option.value===selected))select.value=selected;
-    status.textContent=source==='server'?'Shared server media: /var/lib/30na/dashboard/media · maximum 32 MiB per file.':source==='upload'?'Upload Center permissions apply. Direct files remain private.':'Use a direct media URL. The external server and your browser must support playback.';
+    status.textContent=source==='server'?'Shared server media: /var/lib/30na/dashboard/media · maximum 32 MiB per file.':source==='upload'?'Upload files up to 20 MiB in Upload Center, then select Refresh library here. Direct files remain private.':'Use a direct media URL or a YouTube video link. Playback depends on the provider and your browser.';
   }catch(_){status.textContent='Media library unavailable.';}
 }
 ['media-component','media-tab-source'].forEach(id=>document.getElementById(id).addEventListener('change',refreshMediaLibrary));document.getElementById('media-refresh-library').addEventListener('click',refreshMediaLibrary);
@@ -757,7 +757,7 @@ function openView(name) {
   document.body.classList.remove('nav-open');
   document.getElementById('mobile-menu').setAttribute('aria-expanded', 'false');
   if(name==='media')refreshMediaLibrary();
-  document.querySelectorAll('[data-page]').forEach(page=>{if(page.hidden)page.querySelectorAll('audio,video').forEach(player=>player.pause());});
+  document.querySelectorAll('[data-page]').forEach(page=>{if(page.hidden){page.querySelectorAll('audio,video').forEach(player=>player.pause());page.querySelectorAll('.media-player-widget').forEach(widget=>{if(widget.querySelector('iframe'))widget.dispatchEvent(new Event('media-unload'));});}});
   if(name==='demo')refreshDemoTab();
   if (name === 'uploads') refreshUploads();
   if (name === 'account') refreshAccountAdministration();
@@ -1808,15 +1808,20 @@ function renderMediaPlayer(body,slot,moduleId='media-player',descriptorSource=nu
   const host=makeElement('div','media-player-host'),status=makeElement('p','market-status','Media is not loaded.'),load=makeElement('button','','Load media'),stop=makeElement('button','','Unload');load.type=stop.type='button';stop.disabled=true;
   const actions=makeElement('div','slot-section-actions');actions.append(load,stop);body.append(actions,host,status);let player=null,url=null,controller=null;
   function clear(){if(controller)controller.abort();controller=null;if(player){if(player.pause)player.pause();player.removeAttribute('src');if(player.load)player.load();}host.replaceChildren();player=null;if(url){URL.revokeObjectURL(url);url=null;}stop.disabled=true;}
-  stop.addEventListener('click',()=>{clear();status.textContent='Media unloaded.';});
+  function unload(){clear();status.textContent='Media unloaded.';}stop.addEventListener('click',unload);body.addEventListener('media-unload',unload);
   load.addEventListener('click',async()=>{load.disabled=true;clear();try{
     const bridge=window.dashboardModuleState,data=descriptorSource?await descriptorSource():await bridge.read(slot.id,moduleId);if(!body.isConnected||!bridge.ready())return;
     if(data.status!=='ok'){status.textContent=data.message;return;}
     status.textContent=data.source==='external'?`Source: ${new URL(data.url).hostname}`:'Loading authorized server media…';let src=data.url;
     if(data.source!=='external'){controller=new AbortController();const blob=await bridge.mediaBlob(data.path,controller.signal);if(!body.isConnected||!bridge.ready())return;url=URL.createObjectURL(blob);src=url;}
+    if(data.provider==='youtube'){
+      const embed=new URL(data.embed_url);if(embed.origin!=='https://www.youtube-nocookie.com'||!/^\/embed\/[A-Za-z0-9_-]{11}$/.test(embed.pathname))throw Error('Invalid YouTube embed');
+      player=document.createElement('iframe');player.className='slot-media youtube-player';player.title='YouTube video player';player.referrerPolicy='strict-origin-when-cross-origin';player.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');player.allow='encrypted-media; picture-in-picture; fullscreen';player.allowFullscreen=true;player.src=embed.href;host.append(player);stop.disabled=false;
+      const link=makeElement('a','','Open on YouTube');link.href=data.url;link.target='_blank';link.rel='noopener noreferrer';host.append(link);
+      status.textContent='YouTube player loaded. Press Play. If embedding is disabled or YouTube is unreachable, use Open on YouTube.';return;
+    }
     player=document.createElement(data.kind==='image'?'img':data.kind);player.className='slot-media';player.referrerPolicy='no-referrer';
     if(data.kind==='image'){player.alt='Media image';player.loading='lazy';}else{player.controls=true;player.autoplay=false;player.preload='none';player.loop=data.settings.loop;}
-    if(data.source==='external'&&data.kind!=='image')player.crossOrigin='anonymous';
     if(data.kind==='image')player.addEventListener('load',()=>{status.textContent='Image loaded.';});
     player.addEventListener('error',()=>{status.textContent='Media cannot be decoded or the external source blocks playback.';});player.src=src;host.append(player);stop.disabled=false;status.textContent=data.kind==='image'?'Loading image…':'Ready. Press Play to start.';
   }catch(_){status.textContent='Media unavailable. Check file access, format and source.';}finally{load.disabled=false;}});
@@ -1825,7 +1830,7 @@ function renderMediaPlayer(body,slot,moduleId='media-player',descriptorSource=nu
 function configureMediaPanel(panel,row,slot){
   const expected={ 'media-image':'image','media-audio':'audio','media-video':'video'}[row.module_id];
   const cfg=row.media_settings||{source:'external',url:'',file_id:'',filename:'',format:'auto',loop:false};
-  const source=makeElement('select','');source.setAttribute('aria-label','Media source');[['external','External HTTPS link'],['upload','Upload Center'],['server','Shared server media']].forEach(([value,title])=>{const option=makeElement('option','',title);option.value=value;source.append(option);});source.value=cfg.source;
+  const source=makeElement('select','');source.setAttribute('aria-label','Media source');[['external','External link (HTTPS / YouTube)'],['upload','Upload Center'],['server','Shared server media']].forEach(([value,title])=>{const option=makeElement('option','',title);option.value=value;source.append(option);});source.value=cfg.source;
   const url=makeElement('input','');url.type='url';url.placeholder='https://example.com/video.mp4';url.value=cfg.url;url.setAttribute('aria-label','Media URL');
   const file=makeElement('select','');file.setAttribute('aria-label','Media file');const format=makeElement('select','');format.setAttribute('aria-label','Media format');['auto','jpg','png','gif','webp','mp3','wav','ogg','m4a','mp4','webm'].forEach(value=>{const option=makeElement('option','',value);option.value=value;format.append(option);});format.value=cfg.format;
   const loopLabel=makeElement('label','','Loop'),loop=makeElement('input','');loop.type='checkbox';loop.checked=cfg.loop;loopLabel.prepend(loop);
@@ -1836,7 +1841,7 @@ function configureMediaPanel(panel,row,slot){
     }catch(_){feedback.textContent='Media library unavailable.';}
   }
   source.addEventListener('change',refresh);save.addEventListener('click',async()=>{save.disabled=true;try{await window.dashboardModuleState.setSlotAppearance(slot.id,{media_settings:{source:source.value,url:source.value==='external'?url.value:'',format:source.value==='external'?format.value:'auto',file_id:source.value==='upload'?file.value:'',filename:source.value==='server'?file.value:'',loop:loop.checked}});slotGeneration++;await refreshActiveSlots();}catch(_){feedback.textContent='Invalid source or save unavailable.';save.disabled=false;}});
-  panel.append(makeElement('p','','Direct media links only. Playback takes place in your browser; server files load on request.'),source,url,file,format,loopLabel,save,feedback);refresh();
+  panel.append(makeElement('p','','Use direct media links or YouTube video links. Playback takes place in your browser; server files load on request.'),source,url,file,format,loopLabel,save,feedback);refresh();
 }
 
 function renderModuleContent(body, slot, moduleId) {
@@ -3009,7 +3014,15 @@ def create_app(*, credential_path=None, upstream_factory=None):
         instance.router.routes.append(route)
     if configured:
         from worker_manager.http_common import BodyLimitMiddleware, register_error_handlers
-        instance.add_middleware(BodyLimitMiddleware)
+        class DashboardBodyLimit:
+            def __init__(self, app):
+                from modules.uploads import MAX_BYTES
+                self.standard = BodyLimitMiddleware(app)
+                self.upload = BodyLimitMiddleware(app, max_bytes=MAX_BYTES)
+            async def __call__(self, scope, receive, send):
+                target = self.upload if scope.get('path') == '/api/upstreams/uploads/raw' and scope.get('method') == 'POST' else self.standard
+                await target(scope, receive, send)
+        instance.add_middleware(DashboardBodyLimit)
         register_error_handlers(instance)
         from .upstreams import create_router
         from .upstream_panel import ACCESS, PANEL

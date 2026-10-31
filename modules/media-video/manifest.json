@@ -1,7 +1,7 @@
 {
   "id": "media-video",
   "name": "Video Player",
-  "description": "Browser-native video from HTTPS links or authorized server media.",
+  "description": "Video from direct HTTPS links, YouTube embeds or authorized server media.",
   "version": "1.0.0",
   "api_version": "1",
   "type": "media-player"
