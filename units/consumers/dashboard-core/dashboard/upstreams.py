@@ -9,7 +9,7 @@ from worker_manager.api import RegisterBody, ConfigureBody
 from worker_manager.http_common import ERROR_RESPONSES, envelope, identifier, owner_dependency
 from public_api import ConsumerAPIError, _identifier
 from modules.execution import run_module
-from modules import slots, uploads, technical, chart_overlays
+from modules import slots, uploads, technical, chart_overlays, workspaces, client_ip
 from modules import slot_workers, indicator_profiles, signal_rules, accounts, chat_store
 from market_data.data import chart as gold_chart
 from market_data.data import indicator as market_indicator, database_table
@@ -118,7 +118,7 @@ def create_router(credential_path, upstream_factory):
         token=request.headers.get('authorization','')[7:]
         user=accounts.get_user(identity)
         response=JSONResponse(envelope({'user':user or {'id':identity,'username':identity,'role':'admin' if identity == 'customer' else 'user','enabled':True},
-                                        'legacy':not request.state.account_session,'worker_access':not request.state.account_session or accounts.upstream_credential(identity) is not None}))
+                                        'client_ip':client_ip.address(request), 'legacy':not request.state.account_session,'worker_access':not request.state.account_session or accounts.upstream_credential(identity) is not None}))
         response.headers['Cache-Control']='no-store'; return response
 
     @router.post('/account/logout')
@@ -233,9 +233,17 @@ def create_router(credential_path, upstream_factory):
     def market_candles(limit: int = Query(default=200, ge=1, le=1000),
                        period: int = Query(default=20, ge=1, le=500),
                        include_open: bool = True, end_time: int | None = Query(default=None, ge=0),
-                       interval: str = '1m', include_indicators: bool = False, identity=Depends(owner)):
+                       interval: str = '1m', include_indicators: bool = False, slot_id: str | None = None, identity=Depends(owner)):
         try:
-            profiles = [profile for profile in indicator_profiles.list_profiles(identity) if profile['enabled']]
+            profiles = indicator_profiles.list_profiles(identity)
+            if slot_id is not None:
+                config=slots.binding(identity,slot_id)
+                if not config or config['module_id']!='gold-chart':raise HTTPException(404,'Chart slot not found')
+                meta=slots.change(identity,'slot-meta',slot_id,None,lambda old:(old,False))
+                if meta is None:raise HTTPException(404,'Chart slot not found')
+                visibility=meta.get('profile_visibility',{})
+                profiles=[{**p,'enabled':visibility.get(p['id'],p['enabled'])} for p in profiles]
+            profiles = [profile for profile in profiles if profile['enabled']]
             result = gold_chart(limit=limit, period=period, include_open=include_open, end_time=end_time, interval=interval, include_indicators=include_indicators, profiles=[profile for profile in profiles if profile['type'] not in technical.KINDS] if include_indicators else None)
             if include_indicators: result['technical_overlays']=chart_overlays.calculate(identity,profiles,result,end_time)
         except (ValueError, OSError, sqlite3.Error):
@@ -244,6 +252,34 @@ def create_router(credential_path, upstream_factory):
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Vary'] = 'Authorization'
         return response
+
+    @router.get('/myip')
+    def my_ip(request: Request, identity=Depends(owner)):
+        return JSONResponse(envelope(run_module('myip',{'_request_ip':client_ip.address(request)})),headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+    @router.get('/dashboards')
+    def dashboard_list(identity=Depends(owner)):
+        return JSONResponse(envelope({'dashboards':workspaces.catalog(identity)}),headers={'Cache-Control':'no-store','Vary':'Authorization'})
+
+    @router.post('/dashboards')
+    def dashboard_save(body: dict, identity=Depends(owner)):
+        if set(body)!={'name','theme'}:raise HTTPException(422,'Invalid dashboard')
+        try:result=workspaces.save(identity,body['name'],body['theme'])
+        except ValueError as exc:raise HTTPException(422,str(exc)) from None
+        return envelope({'dashboard':result})
+
+    @router.post('/dashboards/{dashboard_id}/load')
+    def dashboard_load(dashboard_id: str, identity=Depends(owner)):
+        try:result=workspaces.load(identity,dashboard_id)
+        except LookupError:raise HTTPException(404,'Dashboard not found') from None
+        except ValueError as exc:raise HTTPException(422,str(exc)) from None
+        return envelope(result)
+
+    @router.delete('/dashboards/{dashboard_id}')
+    def dashboard_delete(dashboard_id: str, identity=Depends(owner)):
+        try:workspaces.delete(identity,dashboard_id)
+        except LookupError:raise HTTPException(404,'Dashboard not found') from None
+        return envelope({'deleted':True})
 
     @router.get('/indicator-presets')
     def indicator_presets(identity=Depends(owner)):
@@ -390,13 +426,13 @@ def create_router(credential_path, upstream_factory):
         return response
 
     @router.post('/modules/{module_id}/run')
-    def run_independent_module(module_id: str, body: dict, identity=Depends(owner)):
+    def run_independent_module(module_id: str, body: dict, request: Request, identity=Depends(owner)):
         if set(body) != {'input'} or not isinstance(body['input'], dict) or any(
                 str(key).startswith('_') or key in ('owner', 'slot') for key in body['input']):
             raise HTTPException(422, 'Invalid module input')
         try:
             slots._authorize_host_monitor(identity, module_id)
-            result = run_module(module_id, body['input'])
+            result = run_module(module_id, {**body['input'],**({'_request_ip':client_ip.address(request)} if module_id=='myip' else {})})
         except LookupError:
             raise HTTPException(404, 'Unknown module') from None
         except (ValueError, TypeError, OverflowError, KeyError, ZeroDivisionError):
@@ -502,11 +538,11 @@ def create_router(credential_path, upstream_factory):
         return response
 
     @router.post('/slots/{slot_id}/read')
-    def read_slot(slot_id: str, body: dict, identity=Depends(owner)):
+    def read_slot(slot_id: str, body: dict, request: Request, identity=Depends(owner)):
         if set(body) != {'module_id'} or not isinstance(body['module_id'], str):
             raise HTTPException(422, 'Invalid slot request')
         try:
-            value = slots.read(identity, slot_id)
+            value = slots.read(identity, slot_id, request_ip=client_ip.address(request))
             if value['module_id'] != body['module_id']:
                 raise ValueError('slot binding changed')
         except PermissionError:
@@ -521,11 +557,11 @@ def create_router(credential_path, upstream_factory):
         return response
 
     @router.post('/slots/{slot_id}/execute')
-    def execute_slot(slot_id: str, body: dict, identity=Depends(owner)):
+    def execute_slot(slot_id: str, body: dict, request: Request, identity=Depends(owner)):
         if set(body) != {'module_id', 'input'} or not isinstance(body['input'], dict):
             raise HTTPException(422, 'Invalid module input')
         try:
-            value = slots.execute(identity, slot_id, body['input'], expected_module=body['module_id'])
+            value = slots.execute(identity, slot_id, body['input'], expected_module=body['module_id'],request_ip=client_ip.address(request))
         except PermissionError:
             raise HTTPException(403, 'Room unavailable') from None
         except LookupError:

@@ -56,6 +56,7 @@ def nginx_config(domain, public_tls=False):
         proxy_pass http://127.0.0.1:PORT;
         proxy_set_header Host $host;
         proxy_set_header Authorization $http_authorization;
+        proxy_set_header X-30na-Client-IP $remote_addr;
         proxy_http_version 1.1;
         proxy_connect_timeout 10s;
         proxy_read_timeout 360s;

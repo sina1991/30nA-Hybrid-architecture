@@ -24,7 +24,9 @@ DROPIN=/etc/systemd/system/30na-dashboard.service.d/99-30na-release.conf
 [[ ! -e $LINK || -L $LINK ]] || { echo 'Dashboard path is not a managed symlink.' >&2; exit 1; }
 [[ ! -e $DROPIN || -f /etc/30na/dashboard-release ]] || { echo 'Existing unowned Dashboard override; review it before updating.' >&2; exit 1; }
 BACKUP=$(mktemp -d /tmp/30na-dashboard-update.XXXXXXXX)
-HAD_LINK=0 HAD_DROPIN=0 HAD_CLI=0 CHANGED=0
+HAD_LINK=0 HAD_DROPIN=0 HAD_CLI=0 CHANGED=0 HAD_NGINX=0
+NGINX_CONFIG=/etc/nginx/sites-available/30na
+if [[ -f $NGINX_CONFIG && ! -L $NGINX_CONFIG ]]; then HAD_NGINX=1; cp "$NGINX_CONFIG" "$BACKUP/nginx"; fi
 SYNC_SERVICE=/etc/systemd/system/30na-account-sync.service
 SYNC_TIMER=/etc/systemd/system/30na-account-sync.timer
 HAD_SYNC_SERVICE=0 HAD_SYNC_TIMER=0 SYNC_ENABLED=0 SYNC_ACTIVE=0
@@ -56,6 +58,7 @@ rollback() {
         if [[ $HAD_LINK == 1 ]]; then ln -sfn "$(cat "$BACKUP/link")" "$LINK"; else rm -f "$LINK"; fi
         if [[ $HAD_DROPIN == 1 ]]; then cp "$BACKUP/dropin" "$DROPIN"; else rm -f "$DROPIN"; fi
         if [[ $HAD_CLI == 1 ]]; then install -m 0755 "$BACKUP/cli" "$CLI_LAUNCHER"; else rm -f "$CLI_LAUNCHER"; fi
+        if [[ $HAD_NGINX == 1 ]]; then cp "$BACKUP/nginx" "$NGINX_CONFIG"; nginx -t && systemctl reload nginx; fi
         systemctl daemon-reload
         if [[ $SYNC_ENABLED == 1 ]]; then systemctl enable 30na-account-sync.timer; fi
         if [[ $SYNC_ACTIVE == 1 ]]; then systemctl start 30na-account-sync.timer; fi
@@ -91,10 +94,16 @@ else
 fi
 install -d -m 0755 "$(dirname "$DROPIN")"
 CHANGED=1
+if [[ $HAD_NGINX == 1 ]]; then
+    "$RELEASE/.venv/bin/python" "$RELEASE/scripts/deployment/configure_client_ip.py" "$NGINX_CONFIG"
+    nginx -t
+    systemctl reload nginx
+fi
 ln -sfn "$RELEASE" "$LINK"
 cat >"$DROPIN" <<'UNIT'
 [Service]
 ReadWritePaths=/var/lib/30na/dashboard
+Environment=DASHBOARD_TRUST_LOCAL_PROXY=1
 WorkingDirectory=/opt/30na/dashboard-current/units/consumers/dashboard-core
 Environment=PYTHONPATH=/opt/30na/dashboard-current:/opt/30na/dashboard-current/units/worker-manager:/opt/30na/dashboard-current/units/consumers/dashboard-core
 ExecStart=

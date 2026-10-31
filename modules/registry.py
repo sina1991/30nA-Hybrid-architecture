@@ -14,6 +14,8 @@ SUPPORTED_TYPES = {
     "session-windows",
     "session-clock",
     "price-levels",
+    "myip",
+    "economic-calendar",
     "empty",
     "health",
     "theme-summary",

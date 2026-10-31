@@ -1,0 +1,8 @@
+{
+  "id": "economic-calendar",
+  "name": "Economic Calendar",
+  "description": "Read-only Forex Factory weekly events in a horizontal timeline.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "economic-calendar"
+}

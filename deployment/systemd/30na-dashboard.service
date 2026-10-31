@@ -8,6 +8,7 @@ Group=30na
 WorkingDirectory=/opt/30na/current/units/consumers/dashboard-core
 Environment=PYTHONPATH=/opt/30na/current:/opt/30na/current/units/worker-manager:/opt/30na/current/units/consumers/dashboard-core
 EnvironmentFile=/etc/30na/dashboard.env
+Environment=DASHBOARD_TRUST_LOCAL_PROXY=1
 ExecStart=/opt/30na/current/.venv/bin/python -m uvicorn dashboard.production:create_app --factory --workers 1 --host 127.0.0.1 --port 8020 --no-access-log --no-proxy-headers --limit-concurrency 64 --timeout-keep-alive 5
 Restart=on-failure
 RestartSec=3

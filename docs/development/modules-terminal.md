@@ -147,3 +147,19 @@ python3 /opt/30na/dashboard-current/modules/session-windows/module.py --input '{
 دادهٔ پیش‌فرض قیمت، history موجود `XAUUSD` است. برای نماد دیگر باید `price` در Round Levels یا `candles` در سایر Moduleها بدهید؛ مسیر فایل یا URL دلخواه پذیرفته نمی‌شود. هر candle شامل `time` به UTC epoch seconds و `open/high/low/close` است؛ فهرست باید مرتب، بدون timestamp تکراری و حداکثر ۱۰۰۰۰ مورد باشد. دادهٔ ناقص، تضمین سقف و کف واقعی بروکر نیست؛ پاسخ با `coverage: available_history_only` این محدودیت را اعلام می‌کند. روز بدون candle ساخته نمی‌شود و سشن خالی با سشن قدیمی‌تر جایگزین نمی‌شود.
 
 Round Levels در اسلات و CLI دارای `--owner/--slot`، anchor فاصلهٔ خودکار را جداگانه نگه می‌دارد. در اجرای مستقل بدون owner، برای حفظ فاصله بین فراخوانی‌ها `spacing_state` پاسخ قبلی را به ورودی بعدی بدهید. جدول قیمت حداکثر ۵۰ روز و نمودار تعداد محدودی candle را برای نمایش نگه می‌دارد؛ برای مرور گذشته از `Show history (UTC)` استفاده کنید. پارامتر `days` محاسبات تا ۱۰۰۰ روز را می‌پذیرد، مشروط به history موجود. بدون اتصال به بروکر، زمان محاسبه‌شده با عنوان `not broker-verified` نمایش داده می‌شود.
+
+## My IP و Economic Calendar
+
+```bash
+30na modules run myip --input '{}'
+30na modules run myip --input '{"address":"203.0.113.10"}'
+30na modules run economic-calendar --input '{"settings":{"currencies":["USD","EUR"],"impacts":["High","Medium"],"limit":20}}'
+python3 /opt/30na/dashboard-current/modules/myip/module.py --input '{}'
+python3 /opt/30na/dashboard-current/modules/economic-calendar/module.py --input '{}'
+```
+
+My IP در HTTP، IP مشاهده‌شده برای درخواست احراز‌شده را برمی‌گرداند؛ CLI مرورگر ندارد و بدون `address` وضعیت `unavailable` می‌دهد. مقدار دستی CLI با `source: provided` مشخص می‌شود. هدر، Username و IP کاربر را کنار Account نمایش می‌دهد. Nginx نصب مدیریت‌شده هدر `X-30na-Client-IP` را با `$remote_addr` بازنویسی می‌کند؛ فقط peer محلی با `DASHBOARD_TRUST_LOCAL_PROXY=1` اجازه استفاده از این هدر را دارد. `X-Forwarded-For` دلخواه مبنای نمایش نیست. در استقرار پشت proxy اضافی، IP مشاهده‌شده می‌تواند متعلق به proxy باشد؛ تنظیم اعتماد زنجیره proxy جداگانه لازم است.
+
+اسلات `Linear` به‌صورت پیش‌فرض Economic Calendar دارد؛ همان سایر Moduleها را هم می‌توان در آن انتخاب کرد. منبع ثابت تقویم، feed عمومی هفتگی Forex Factory است؛ بدون iframe و بدون پذیرش URL یا فایل دلخواه از کاربر. داده ۱۵ دقیقه cache می‌شود و شکست منبع هم backoff دارد. در تب Module تنظیمات فیلتر کشور/ارز، اهمیت، تعداد و نمایش رویدادهای گذشته ذخیره می‌شوند. زمان در UI به timezone مرورگر نمایش داده می‌شود. نتیجهٔ `stale/unavailable` با موفقیت دریافت داده اشتباه گرفته نمی‌شود.
+
+دکمه‌های Save/Load کنار Edit layout قالب‌های نام‌دار مشترک می‌سازند. یادداشت‌ها و شمارنده‌ها، چیدمان و تنظیمات اسلات‌ها و محاسبات قابل انتقال Calculator/Dice ذخیره می‌شوند؛ تاریخچهٔ Chat خصوصی، Credential، ورودی Worker و خروجی مانیتور میزبان منتشر نمی‌شوند. Load برای گیرنده شناسه‌های جدید می‌سازد، اسلات‌های فعلی را در Slots نگه می‌دارد و Worker جدیدی فعال نمی‌کند. تنظیم نمایش اندیکاتورها در هر Chart مستقل است و شناسهٔ profile هنگام انتقال قالب به مالک جدید remap می‌شود.

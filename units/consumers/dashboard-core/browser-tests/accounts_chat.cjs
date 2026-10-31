@@ -45,7 +45,7 @@ const server = http.createServer((req,res) => {
     await page.waitForFunction(()=>document.getElementById('account-status').textContent.includes('being provisioned'));
     await page.locator('[data-nav="overview"]').click();
     await page.waitForSelector('.chat-box');
-    await page.locator('.slot-gear').click();
+    await page.locator('.slot').first().click({button:'right',position:{x:5,y:5}});
     const dialog=page.locator('dialog[open]');
     assert.equal(await dialog.getByRole('tab').count(),6);
     assert.equal(await dialog.getByRole('tab',{name:'Slot actions',exact:true}).getAttribute('aria-selected'),'true');

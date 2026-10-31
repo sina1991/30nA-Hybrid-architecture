@@ -127,7 +127,7 @@ def execute_module(module_id: str, data: dict) -> dict:
     try:
         from modules.execution import HOST_MONITORS, MARKET_MODULES
         from modules.technical import KINDS
-        if module_id in HOST_MONITORS or module_id in MARKET_MODULES or module_id in KINDS:
+        if module_id in HOST_MONITORS or module_id in MARKET_MODULES or module_id in KINDS or module_id in ('myip','economic-calendar'):
             raise HTTPException(status_code=403, detail="Sign in to use this module")
         if any(str(key).startswith('_') for key in data):
             raise ValueError('reserved input field')
@@ -416,6 +416,8 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 }
 .slot-settings-tabs {display:flex;flex-wrap:wrap;gap:6px;margin:14px 0}.slot-settings-tabs [aria-selected="true"] {background:var(--accent);color:white}.slot-options-dialog [hidden] {display:none!important}
 .slot[data-technical] .module-body {min-height:0;overflow:auto}.slot-settings-panel > .slot-icon {width:auto;padding:6px 10px;font-size:12px}.technical-view {overflow:auto;flex-shrink:0;touch-action:pan-y}.technical-details {overflow:auto;max-height:260px}.technical-details td,.technical-details th {padding:5px;white-space:nowrap;font-size:11px}.technical-view svg {display:block}
+.slot,.slot * {scrollbar-width:thin;scrollbar-color:rgba(145,162,187,.2) transparent}.slot::-webkit-scrollbar,.slot *::-webkit-scrollbar {width:5px;height:5px}.slot::-webkit-scrollbar-track,.slot *::-webkit-scrollbar-track,.slot::-webkit-scrollbar-corner,.slot *::-webkit-scrollbar-corner {background:transparent}.slot::-webkit-scrollbar-button,.slot *::-webkit-scrollbar-button {display:none;width:0;height:0}.slot::-webkit-scrollbar-thumb,.slot *::-webkit-scrollbar-thumb {background:rgba(145,162,187,.2);border-radius:8px}.slot::-webkit-scrollbar-thumb:hover,.slot *::-webkit-scrollbar-thumb:hover {background:rgba(145,162,187,.35)}
+#overview-grid .slot[data-slot-type="linear"] {grid-column:span 12;grid-row:span 2;min-height:0}#grid .slot[data-slot-type="linear"] {grid-column:1/-1;min-height:100px}.calendar-timeline {display:flex;gap:8px;overflow-x:auto;min-height:65px}.calendar-event {flex:0 0 235px;border-left:3px solid var(--accent);padding:5px 9px;background:var(--field);border-radius:5px;font-size:12px}.calendar-event strong,.calendar-event small {display:block}.calendar-footer {display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:10px}.calendar-footer p {margin:0}.slot[data-slot-type="linear"] .module-body {min-height:0;overflow:auto}.calendar-event[data-impact="High"] {border-color:#ef4444}.calendar-event[data-impact="Medium"] {border-color:#f59e0b}#viewer-identity,#workspace-status {font-size:12px;color:var(--muted)}
 </style>
 </head>
 <body data-view="overview">
@@ -441,8 +443,14 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
 <header>
   <button type="button" class="mobile-menu" id="mobile-menu" aria-controls="sidebar" aria-expanded="false">☰ Menu</button>
   <button type="button" class="dice-roll-button" id="edit-layout">Edit layout</button>
+  <button type="button" class="dice-roll-button" id="dashboard-save" disabled>Save</button>
+  <button type="button" class="dice-roll-button" id="dashboard-load" disabled>Load</button>
+  <span id="workspace-status" role="status"></span><span id="viewer-identity"></span>
   <button type="button" class="dice-roll-button" id="account-shortcut">Sign in</button>
 </header>
+<dialog id="save-dashboard-dialog" class="slot-options-dialog"><h3>Save shared dashboard</h3><p>Share all slots, their positions, notes, counters and display settings with all signed-in users. Saving with the same name updates your saved dashboard.</p>
+<form id="save-dashboard-form"><label>Name <input id="dashboard-name" required maxlength="80"></label><button id="save-dashboard-confirm" type="submit">Save shared dashboard</button><button type="button" data-close-workspace-dialog>Cancel</button><p id="dashboard-save-status" role="status"></p></form></dialog>
+<dialog id="load-dashboard-dialog" class="slot-options-dialog"><h3>Load shared dashboard</h3><p>Creates your own copies. Current slots remain in Slots. Existing workers keep their current state.</p><button type="button" data-close-workspace-dialog>Close</button><p id="dashboard-load-status" role="status"></p><div id="dashboard-catalog"></div></dialog>
 <main>
   <section class="page-view" data-page="uploads" hidden>
     <h2>Upload Center</h2><p>Public files are shared with signed-in users. Direct files are restricted to sender and recipient. Maximum file size: 512 KiB.</p>
@@ -459,6 +467,7 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
   <section class="page-view" data-page="slots" hidden>
   <h2 class="view-heading">Slots</h2><p class="view-description">Unpinned slots. Use the pin to show a slot on Overview.</p>
   <button type="button" class="dice-roll-button" id="add-slot" disabled>+ Add slot</button>
+  <button type="button" class="dice-roll-button" id="add-linear-slot" disabled>+ Linear slot</button>
   <button type="button" class="dice-roll-button" id="add-small-slot" disabled>+ Small slot</button>
   <button type="button" class="dice-roll-button" id="add-minimal-slot" disabled>+ Minimal slot</button>
   <button type="button" class="dice-roll-button" id="add-chat-slot" disabled>+ Chat slot</button>
@@ -568,6 +577,29 @@ document.getElementById('upload-send').addEventListener('click',async()=>{
   }catch(_){status.textContent='Upload failed. Refresh the list before retrying.';}finally{button.disabled=false;}
 });
 
+const saveDashboardDialog=document.getElementById('save-dashboard-dialog'),loadDashboardDialog=document.getElementById('load-dashboard-dialog');
+document.getElementById('dashboard-save').addEventListener('click',()=>saveDashboardDialog.showModal());
+document.getElementById('dashboard-load').addEventListener('click',async()=>{
+  loadDashboardDialog.showModal();const root=document.getElementById('dashboard-catalog');root.replaceChildren();
+  try{const data=await window.dashboardModuleState.slotRequest('dashboards');
+    data.dashboards.forEach(item=>{const card=makeElement('article','indicator-card');card.append(makeElement('strong','',item.name),makeElement('small','',`By ${item.sender_name} · ${new Date(item.created_at*1000).toLocaleString('en-US')}`));
+      const load=makeElement('button','','Load');load.type='button';load.addEventListener('click',async()=>{load.disabled=true;try{
+        const result=await window.dashboardModuleState.slotRequest('dashboards/'+item.id+'/load',{});
+        unlockedSlots.clear();layoutEditing=false;slotGeneration++;await refreshActiveSlots();
+        if([...themeSelect.options].some(option=>option.value===result.theme)){themeSelect.value=result.theme;await loadTheme(result.theme);try{localStorage.setItem('dashboard-core-active-theme-v1',result.theme);}catch(_){}}
+        loadDashboardDialog.close();openView('overview');document.getElementById('workspace-status').textContent=`Loaded ${result.name}${result.unavailable_modules.length?' · Some modules are unavailable to this account':''}`;
+      }catch(_){document.getElementById('dashboard-load-status').textContent='Could not load. Check the slot and indicator limits, then refresh before retrying.';load.disabled=false;}});card.append(load);
+      if(item.sender===window.dashboardModuleState.owner()){const remove=makeElement('button','','Delete saved dashboard');remove.type='button';remove.addEventListener('click',async()=>{if(!confirm(`Delete saved dashboard ${item.name}?`))return;try{await window.dashboardModuleState.slotRequest('dashboards/'+item.id,undefined,'DELETE');card.remove();}catch(_){document.getElementById('dashboard-load-status').textContent='Could not delete saved dashboard.';}});card.append(remove);}root.append(card);
+    });if(!data.dashboards.length)root.textContent='No saved dashboards.';
+  }catch(_){root.textContent='Could not load saved dashboards. Sign in and refresh.';}
+});
+document.querySelectorAll('[data-close-workspace-dialog]').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
+document.getElementById('save-dashboard-form').addEventListener('submit',async event=>{event.preventDefault();const button=document.getElementById('save-dashboard-confirm');button.disabled=true;try{
+  const result=await window.dashboardModuleState.slotRequest('dashboards',{name:document.getElementById('dashboard-name').value,theme:currentTheme?.id||'midnight'});
+  saveDashboardDialog.close();document.getElementById('workspace-status').textContent=`Saved ${result.dashboard.name} · available to all signed-in users`;
+}catch(_){document.getElementById('dashboard-save-status').textContent='Could not save. Check the name and template limit; refresh before retrying.';}finally{button.disabled=false;}});
+document.addEventListener('dashboard-viewer',event=>{document.getElementById('viewer-identity').textContent=event.detail.username?`${event.detail.username} · ${event.detail.ip||'IP unavailable'}`:'';});
+
 function openView(name) {
   if (!document.querySelector(`[data-page="${name}"]`)) name = 'overview';
   document.body.dataset.view = name;
@@ -597,6 +629,8 @@ document.addEventListener('click', event => {
 });
 document.addEventListener('dashboard-account-state', event => {
   document.getElementById('account-shortcut').textContent = event.detail.ready ? 'Account' : 'Sign in';
+  ['dashboard-save','dashboard-load'].forEach(id=>document.getElementById(id).disabled=!event.detail.ready);
+  if(!event.detail.ready){saveDashboardDialog.close();loadDashboardDialog.close();document.getElementById('dashboard-catalog').replaceChildren();document.getElementById('dashboard-name').value='';document.getElementById('workspace-status').textContent='';}
   document.querySelectorAll('[data-auth-note]').forEach(note => { note.hidden = event.detail.ready; });
   if (event.detail.ready && (document.body.dataset.view === 'uploads' || new URLSearchParams(location.search).has('download'))) { openView('uploads'); }
   if (event.detail.ready && document.body.dataset.view === 'account') refreshAccountAdministration();
@@ -1068,7 +1102,7 @@ function renderMarketModule(body, slot, module) {
     if (!cachedData?.candles.length || !bridge?.ready() || olderBusy || noOlder) return;
     olderBusy = true; const version = requestVersion;
     try {
-      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1, interval, module.type === 'gold-chart');
+      const oldest = cachedData.candles[0].time, data = await bridge.marketData(500, period, includeOpen, oldest - 1, interval, module.type === 'gold-chart',slot.id);
       if (version !== requestVersion || !body.isConnected || !bridge.ready()) return;
       const newCandles = data.candles.filter(item => item.time < oldest);
       if (!newCandles.length) { noOlder = true; status.textContent = 'No older candles in the local database.'; return; }
@@ -1101,8 +1135,11 @@ function renderMarketModule(body, slot, module) {
   toolbar.append(liveLabel);
   const indicatorChecks = {};
   if (module.type === 'gold-chart') {
-    const button = makeElement('button', 'chart-options-button', 'Indicators'); button.type = 'button';
-    button.addEventListener('click', () => openView('indicators')); toolbar.append(button);
+    const button = makeElement('button', 'chart-options-button', '☷'); button.type = 'button';button.setAttribute('aria-label','Chart indicators');button.title='Chart indicators';
+    const picker=makeElement('dialog','slot-options-dialog');picker.setAttribute('aria-label','Chart indicators');const choices=makeElement('div','');
+    const close=makeElement('button','','Close');close.type='button';close.addEventListener('click',()=>picker.close());picker.append(makeElement('h3','','Chart indicators'),choices,close);body.append(picker);
+    button.addEventListener('click',async()=>{picker.showModal();choices.textContent='Loading…';try{const profiles=await window.dashboardModuleState.listIndicatorProfiles();choices.replaceChildren();profiles.forEach(profile=>{const label=makeElement('label','',profile.name),input=makeElement('input','');input.type='checkbox';input.checked=(slot.profile_visibility||{})[profile.id]??profile.enabled;
+      input.addEventListener('change',async()=>{input.disabled=true;try{await saveOptions({profile_visibility:{...(slot.profile_visibility||{}),[profile.id]:input.checked}});}finally{input.disabled=false;}});label.prepend(input);choices.append(label);});if(!profiles.length)choices.textContent='Create indicator instances in Indicators first.';}catch(_){choices.textContent='Could not load indicator instances.';}});toolbar.append(button);
   }
   if (module.type === 'gold-chart') {
     [['−','Zoom out'],['+','Zoom in'],['←','Older candles'],['→','Newer candles']].forEach(([symbol, title]) => {
@@ -1149,7 +1186,7 @@ function renderMarketModule(body, slot, module) {
     const nextOpen = settings.chart_live !== false, nextOverlay = settings.chart_overlay !== false;
     const nextIndicators = new Set(settings.chart_indicators || []);
     const changed = nextPeriod !== period || nextInterval !== interval || nextOpen !== includeOpen ||
-      [...nextIndicators].sort().join(',') !== [...shownIndicators].sort().join(',');
+      [...nextIndicators].sort().join(',') !== [...shownIndicators].sort().join(',') || JSON.stringify(settings.profile_visibility||{})!==JSON.stringify(slot.profile_visibility||{});
     const overlayChanged = nextOverlay !== overlay;
     Object.assign(slot, settings); period = nextPeriod; interval = nextInterval; includeOpen = nextOpen; overlay = nextOverlay; shownIndicators = nextIndicators;
     periodSelect.value = String(period); overlayInput.checked = overlay; liveInput.checked = includeOpen;
@@ -1357,7 +1394,7 @@ function renderMarketModule(body, slot, module) {
     if (busy) { pendingRefresh = true; return; }
     busy = true; const version = requestVersion;
     try {
-      const data = await bridge.marketData(Math.max(500, period), period, includeOpen, null, interval, module.type === 'gold-chart');
+      const data = await bridge.marketData(Math.max(500, period), period, includeOpen, null, interval, module.type === 'gold-chart',slot.id);
       if (version === requestVersion && body.isConnected && bridge.ready()) { noOlder = false; plot(mergeHistory(data)); }
     } catch (_) { if (version === requestVersion && body.isConnected) status.textContent = cachedData ? 'Update failed · showing previous data' : 'Market data is unavailable.'; }
     finally { busy = false; if (pendingRefresh && body.isConnected) { pendingRefresh = false; refresh(); } }
@@ -1591,6 +1628,20 @@ function renderTechnicalModule(body,slot,module) {
   setTimeout(poll,0);setTimeout(tick,1000);
 }
 
+function renderCalendar(body,slot){
+  const timeline=makeElement('div','calendar-timeline'),status=makeElement('p','market-status','Loading economic calendar…'),source=makeElement('a','','Forex Factory calendar');source.href='https://www.forexfactory.com/calendar';source.target='_blank';source.rel='noopener noreferrer';const footer=makeElement('div','calendar-footer');footer.append(status,source);body.append(timeline,footer);let busy=false;
+  async function refresh(){const bridge=window.dashboardModuleState;if(busy||!bridge?.ready())return;busy=true;try{const data=await bridge.read(slot.id,'economic-calendar');if(!body.isConnected||!bridge.ready())return;timeline.replaceChildren();
+    data.events.forEach(event=>{const card=makeElement('article','calendar-event');card.dataset.impact=event.impact;card.append(makeElement('small','',`${new Date(event.time*1000).toLocaleString('en-US')} · ${event.country} · ${event.impact}`),makeElement('strong','',event.title),makeElement('small','',`Forecast: ${event.forecast||'—'} · Previous: ${event.previous||'—'}`));timeline.append(card);});
+    status.textContent=data.status==='unavailable'?'Calendar source unavailable.':data.status==='stale'?'Cached calendar · source unavailable.':data.events.length?'Times use your browser timezone.':'No upcoming events match the filters.';
+  }catch(_){status.textContent='Calendar unavailable.';}finally{busy=false;}}
+  body.addEventListener('slot-refresh',refresh);function tick(){if(!body.isConnected)return;refresh();setTimeout(tick,60000);}setTimeout(tick,0);
+}
+function renderMyIP(body,slot){
+  const value=makeElement('strong','market-price','Loading IP…'),status=makeElement('p','market-status');body.append(value,status);
+  async function refresh(){const bridge=window.dashboardModuleState;if(!bridge?.ready())return;try{const data=await bridge.read(slot.id,'myip');if(!body.isConnected||!bridge.ready())return;value.textContent=data.ip||'IP unavailable';status.textContent=data.ip?'Client IP observed by the server':'Client IP forwarding is unavailable.';}catch(_){value.textContent='IP unavailable';}}
+  body.addEventListener('slot-refresh',refresh);function tick(){if(!body.isConnected)return;refresh();setTimeout(tick,30000);}setTimeout(tick,0);
+}
+
 function renderModuleContent(body, slot, moduleId) {
   body.replaceChildren();
   const module = availableModules.find(item => item.id === moduleId);
@@ -1600,6 +1651,8 @@ function renderModuleContent(body, slot, moduleId) {
     return;
   }
 
+  if(module.type==='myip'){renderMyIP(body,slot);return;}
+  if(module.type==='economic-calendar'){renderCalendar(body,slot);return;}
   if (module.type === 'gold-chart' || module.type === 'moving-average') {
     renderMarketModule(body, slot, module);
     return;
@@ -1914,7 +1967,7 @@ function attachLayoutControls(card, handle, resize, row, notice) {
     const boxFor = element => {
       const r = element.getBoundingClientRect();
       return {x:Math.round((r.left - rect.left) / column), y:Math.round((r.top - rect.top) / rowHeight),
-              w:Math.max(element.dataset.slotType === 'minimal' ? 1 : 2, Math.round((r.width + gapX) / column)), h:Math.max(element.dataset.slotType === 'minimal' ? 1 : element.dataset.slotType === 'small' ? 3 : 4, Math.round((r.height + gapY) / rowHeight))};
+              w:Math.max(element.dataset.slotType === 'minimal' ? 1 : 2, Math.round((r.width + gapX) / column)), h:Math.max(['minimal','linear'].includes(element.dataset.slotType) ? 1 : element.dataset.slotType === 'small' ? 3 : 4, Math.round((r.height + gapY) / rowHeight))};
     };
     const original = boxFor(card), others = [...container.querySelectorAll('.slot')].filter(item => item !== card).map(boxFor);
     const oldColumn = card.style.gridColumn, oldRow = card.style.gridRow;
@@ -1924,7 +1977,7 @@ function attachLayoutControls(card, handle, resize, row, notice) {
       const dx = Math.round((moveEvent.clientX - event.clientX) / column), dy = Math.round((moveEvent.clientY - event.clientY) / rowHeight);
       const next = mode === 'move' ?
         {x:Math.max(0, Math.min(12-original.w, original.x + dx)), y:Math.max(0, Math.min(500, original.y + dy)), w:original.w, h:original.h} :
-        {x:original.x, y:original.y, w:Math.max(row.slot_type === 'minimal' ? 1 : 2, Math.min(12-original.x, original.w + dx)), h:Math.max(row.slot_type === 'minimal' ? 1 : row.slot_type === 'small' ? 3 : 4, Math.min(40, original.h + dy))};
+        {x:original.x, y:original.y, w:Math.max(row.slot_type === 'minimal' ? 1 : 2, Math.min(12-original.x, original.w + dx)), h:Math.max(['minimal','linear'].includes(row.slot_type) ? 1 : row.slot_type === 'small' ? 3 : 4, Math.min(40, original.h + dy))};
       const collision = others.some(other => next.x < other.x + other.w && next.x + next.w > other.x && next.y < other.y + other.h && next.y + next.h > other.y);
       if (collision) { notice.textContent = 'Choose a free area for this slot.'; return; }
       notice.textContent = ''; candidate = next;
@@ -2091,7 +2144,7 @@ function canRestoreSlot(card, layout) {
 function makeSlot(row, area) {
   const isChartSlot = ['chart','fix-chart'].includes(row.slot_type) && row.module_id === 'gold-chart';
   const slot = {id:row.slot, name:row.slot, display_theme:row.display_theme || 'visual',
-    chat_room:row.chat_room, chart_period:row.chart_period, chart_interval:row.chart_interval, chart_indicators:row.chart_indicators, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live};
+    chat_room:row.chat_room, chart_period:row.chart_period, chart_interval:row.chart_interval, chart_indicators:row.chart_indicators, indicator_period:row.indicator_period, chart_overlay:row.chart_overlay, chart_live:row.chart_live,profile_visibility:row.profile_visibility||{}};
   const card = makeElement('article', isChartSlot ? 'slot chart-slot' : 'slot');
   card.dataset.slotId = slot.id;
   if(row.technical_defaults)card.dataset.technical='true';
@@ -2132,7 +2185,7 @@ function makeSlot(row, area) {
   const actions = makeElement('div', 'slot-menu-actions');
   const typeLabel = makeElement('label', '', 'Slot type ');
   const slotType = makeElement('select', 'slot-display-theme');
-  [['standard','Standard'],['small','Small'],['minimal','Minimal'],['chart','Chart'],['fix-chart','Fix Chart'],['chat','Chat']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
+  [['standard','Standard'],['small','Small'],['minimal','Minimal'],['chart','Chart'],['fix-chart','Fix Chart'],['chat','Chat'],['linear','Linear']].forEach(([value,title]) => { const option = makeElement('option','',title); option.value = value; slotType.append(option); });
   slotType.value = row.slot_type || 'standard';
   slotType.addEventListener('change', async () => {
     slotType.disabled = true;
@@ -2142,7 +2195,8 @@ function makeSlot(row, area) {
   });
   typeLabel.append(slotType);
   menu.addEventListener('click', () => { if (!settingsDialog.open) settingsDialog.showModal(); menu.setAttribute('aria-expanded', 'true'); });
-  card.addEventListener('contextmenu', event => { if (event.target.closest('input,textarea,select')) return; event.preventDefault(); menu.click(); });
+  if(row.slot_type!=='fix-chart')card.addEventListener('contextmenu', event => { if (event.target.closest('input,textarea,select')) return; event.preventDefault();menu.click();});
+  if(!['chart','fix-chart'].includes(row.slot_type)){menu.style.display='none';card.tabIndex=0;card.addEventListener('keydown',event=>{if(event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')){event.preventDefault();menu.click();}});}
   const colorLabel = makeElement('label', '', 'Frame color ');
   const color = makeElement('input', 'slot-color'); color.type = 'color';
   color.value = row.frame_color || '#29374c'; color.setAttribute('aria-label', `Frame color for ${slot.id}`);
@@ -2331,7 +2385,7 @@ function makeSlot(row, area) {
       notice.textContent = '';
       if (settingsDialog.open) settingsDialog.close();
       if (['session-clock','session-windows','price-levels'].includes(moduleInfo?.type)) body.dispatchEvent(new CustomEvent('technical-result',{detail:result}));
-      else if (['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
+      else if (['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar'].includes(moduleInfo?.type) || body.querySelector('.slot-quick-result')) body.dispatchEvent(new Event('slot-refresh'));
       else if (!['clock', 'counter', 'slot-note', 'empty', 'dashboard-health', 'theme-summary'].includes(row.module_id)) {
         let resultView = body.querySelector('.slot-quick-result');
         if (!resultView) { resultView = makeElement('div', 'slot-quick-result'); body.append(resultView); }
@@ -2473,6 +2527,11 @@ function makeSlot(row, area) {
     if(['session-clock','session-windows'].includes(row.module_id)){const preset=makeElement('button','','Load supplied MT5 preset');preset.type='button';preset.addEventListener('click',()=>{config.value=JSON.stringify(row.technical_defaults,null,2);feedback.textContent='Preset loaded. Save indicator settings to apply.';});modulePanel.append(preset);}
     modulePanel.append(help,config,save,feedback);
   }
+  if(row.module_id==='economic-calendar'){
+    const config=makeElement('textarea','module-note-input');config.value=JSON.stringify(row.calendar_settings||{currencies:[],impacts:['High','Medium'],limit:20,include_past:false},null,2);
+    config.setAttribute('aria-label',`Calendar settings for ${slot.id}`);const save=makeElement('button','','Save calendar settings');save.type='button';const status=makeElement('p','market-status');
+    save.addEventListener('click',async()=>{save.disabled=true;try{await window.dashboardModuleState.setSlotAppearance(slot.id,{calendar_settings:JSON.parse(config.value)});slotGeneration++;await refreshActiveSlots();}catch(_){status.textContent='Invalid calendar settings or save unavailable.';save.disabled=false;}});modulePanel.append(config,save,status);
+  }
   const panels = [['Slot actions',actionsPanel],['Input',inputDrawer],['Commands',terminalDrawer],['Slot Worker',workerDrawer],['Output',outputDetails],['Module',modulePanel]];
   function selectSettingsTab(index) {
     panels.forEach(([,panel],i) => {panel.hidden=i!==index; tabs.children[i].setAttribute('aria-selected',String(i===index)); tabs.children[i].tabIndex=i===index?0:-1;});
@@ -2503,7 +2562,7 @@ function makeSlot(row, area) {
   if (!row.minimized && row.output_settings?.mode === 'summary') renderSlotSummary(body, row, moduleInfo);
   else if (!row.minimized && isChartSlot) renderMarketModule(body, slot, {id:'gold-chart', type:'gold-chart'});
   else if (!row.minimized) renderModuleContent(body, slot, selectedModule);
-  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
+  if (!row.minimized && row.output_settings?.mode !== 'summary' && !isChartSlot && !['host-monitor','gold-chart','moving-average','market-indicator','chat','session-clock','session-windows','price-levels','myip','economic-calendar'].includes(moduleInfo?.type)) attachSavedResult(body, slot, selectedModule);
   return card;
 }
 
@@ -2512,7 +2571,7 @@ function cardRenderKey(row) {
     interval_seconds:row.worker.interval_seconds, input:row.worker.input, revision:row.worker.revision,
     module_id:row.worker.module_id, binding_revision:row.worker.binding_revision} : null};
   if (['chart','fix-chart'].includes(row.slot_type) && row.module_id === 'gold-chart') {
-    ['chart_period','chart_interval','chart_overlay','chart_live','chart_indicators'].forEach(key => delete copy[key]);
+    ['chart_period','chart_interval','chart_overlay','chart_live','chart_indicators','profile_visibility'].forEach(key => delete copy[key]);
   }
   return JSON.stringify({row:copy, modules:availableModules.map(item => item.id)});
 }
@@ -2521,6 +2580,7 @@ function renderSlots() {
   const overview = document.getElementById('overview-grid');
   const ready = Boolean(window.dashboardModuleState?.ready());
   document.getElementById('add-slot').disabled = !ready;
+  document.getElementById('add-linear-slot').disabled = !ready;
   document.getElementById('add-chart-slot').disabled = !ready;
   document.getElementById('add-chat-slot').disabled = !ready;
   document.getElementById('add-small-slot').disabled = !ready;
@@ -2621,6 +2681,7 @@ document.getElementById('add-minimal-slot').addEventListener('click', async even
   catch (_) { document.getElementById('slots-message').textContent = 'Could not add minimal slot.'; }
   finally { event.currentTarget.disabled = !window.dashboardModuleState?.ready(); }
 });
+document.getElementById('add-linear-slot').addEventListener('click',async event=>{event.currentTarget.disabled=true;try{await window.dashboardModuleState.createSlot('linear');slotGeneration++;await refreshActiveSlots();}catch(_){document.getElementById('slots-message').textContent='Could not add linear slot.';}finally{event.currentTarget.disabled=!window.dashboardModuleState?.ready();}});
 document.getElementById('add-small-slot').addEventListener('click', async event => {
   event.currentTarget.disabled = true;
   try { await window.dashboardModuleState.createSlot('small'); slotGeneration++; await refreshActiveSlots(); }

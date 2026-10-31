@@ -7,7 +7,7 @@ import sqlite3
 from uuid import uuid4
 from market_data.indicators import CHART_DEFAULTS
 from .module_state import change
-from . import chat_store, technical
+from . import chat_store, technical, economic_calendar, indicator_profiles
 from .execution import MODULE_FILES, HOST_MONITORS, MARKET_MODULES, run_module
 
 
@@ -86,6 +86,7 @@ def list_active(owner):
             result.append({'slot': slot, **json.loads(value), 'overview': bool(meta.get('overview')),
                            'layout': meta.get('layout'), 'minimized': bool(meta.get('minimized', False)), 'output_settings':meta.get('output_settings', {'mode':'full','label':'','field':''}), 'frame_color': meta.get('frame_color'),
                            'display_theme': meta.get('display_theme', 'visual'), 'worker': meta.get('worker'),
+                           'calendar_settings':meta.get('calendar_settings',economic_calendar.settings()),'profile_visibility':meta.get('profile_visibility',{}),
                            'technical_settings':meta.get('technical_settings', {}), 'technical_defaults':technical.DEFAULTS.get(json.loads(value)['module_id']),
                            'slot_type': meta.get('slot_type', 'standard'), 'chat_room':meta.get('chat_room', 'public'),
                            'chart_period': meta.get('chart_period', 20), 'chart_interval': meta.get('chart_interval', '1m'), 'indicator_period': meta.get('indicator_period', 14), 'chart_overlay': meta.get('chart_overlay', True),
@@ -96,14 +97,14 @@ def list_active(owner):
 
 
 def create(owner, slot_type='standard'):
-    if slot_type not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat'): raise ValueError('invalid slot type')
+    if slot_type not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat', 'linear'): raise ValueError('invalid slot type')
     db = _layout_db(owner)
     try:
         count = db.execute("SELECT count(*) FROM module_state WHERE owner=? AND module='slot-meta'", (owner,)).fetchone()[0]
         if count >= 100:
             raise ValueError('slot limit reached')
         slot = 'slot-' + uuid4().hex[:12]
-        config = {'module_id': 'gold-chart' if slot_type in ('chart', 'fix-chart') else 'chat-box' if slot_type == 'chat' else 'empty', 'context': {}, 'revision': str(uuid4())}
+        config = {'module_id': 'gold-chart' if slot_type in ('chart', 'fix-chart') else 'chat-box' if slot_type == 'chat' else 'economic-calendar' if slot_type=='linear' else 'empty', 'context': {}, 'revision': str(uuid4())}
         db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-binding',?,?)", (owner, slot, json.dumps(config)))
         db.execute("INSERT INTO module_state(owner,module,slot,value) VALUES(?,'slot-meta',?,?)", (owner, slot, json.dumps({'overview': False, 'slot_type':slot_type})))
         db.commit()
@@ -178,8 +179,14 @@ def set_overview(owner, slot, visible):
 
 
 def update_appearance(owner, slot, updates):
-    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators', 'minimized', 'output_settings', 'chat_room', 'technical_settings'}:
+    if not isinstance(updates, dict) or not updates or set(updates) - {'layout', 'frame_color', 'display_theme', 'chart_period', 'chart_overlay', 'chart_live', 'slot_type', 'indicator_period', 'chart_interval', 'chart_indicators', 'minimized', 'output_settings', 'chat_room', 'technical_settings', 'profile_visibility', 'calendar_settings'}:
         raise ValueError('invalid slot appearance')
+    if 'profile_visibility' in updates:
+        visibility=updates['profile_visibility']
+        known={p['id'] for p in indicator_profiles.list_profiles(owner)}
+        if not isinstance(visibility,dict) or len(visibility)>24 or set(visibility)-known or any(type(v) is not bool for v in visibility.values()):raise ValueError('Invalid indicator visibility')
+    if 'calendar_settings' in updates:
+        updates=dict(updates,calendar_settings=economic_calendar.settings(updates['calendar_settings']))
     if 'technical_settings' in updates:
         configs=updates['technical_settings']
         if not isinstance(configs,dict) or not configs or set(configs)-set(technical.KINDS): raise ValueError('invalid technical settings')
@@ -217,7 +224,7 @@ def update_appearance(owner, slot, updates):
     if 'chat_room' in updates:
         if not isinstance(updates['chat_room'], str): raise ValueError('invalid chat room')
         if updates['chat_room'] not in {room['id'] for room in chat_store.list_rooms(owner)}: raise ValueError('invalid chat room')
-    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat'):
+    if 'slot_type' in updates and updates['slot_type'] not in ('standard', 'small', 'minimal', 'chart', 'fix-chart', 'chat', 'linear'):
         raise ValueError('invalid slot type')
     if 'chart_indicators' in updates and (not isinstance(updates['chart_indicators'], list) or len(updates['chart_indicators']) > len(CHART_DEFAULTS) or any(not isinstance(item, str) or item not in CHART_DEFAULTS for item in updates['chart_indicators']) or len(set(updates['chart_indicators'])) != len(updates['chart_indicators'])):
         raise ValueError('invalid chart indicators')
@@ -250,12 +257,12 @@ def update_appearance(owner, slot, updates):
         resulting_type = updates.get('slot_type', meta.get('slot_type', 'standard'))
         if 'layout' in updates:
             minimum_width = 1 if resulting_type == 'minimal' else 2
-            minimum_height = 1 if resulting_type == 'minimal' else 3 if resulting_type == 'small' else 4
+            minimum_height = 1 if resulting_type in ('minimal','linear') else 3 if resulting_type == 'small' else 4
             if updates['layout']['w'] < minimum_width or updates['layout']['h'] < minimum_height:
                 raise ValueError('layout out of bounds')
         if resulting_type == 'fix-chart' and 'layout' in updates and (updates['layout']['w'], updates['layout']['h']) != (8, 8):
             raise ValueError('fixed chart dimensions cannot be changed')
-        if resulting_type != meta.get('slot_type', 'standard') and (resulting_type in ('fix-chart', 'small', 'minimal') or meta.get('slot_type') in ('small', 'minimal')):
+        if resulting_type != meta.get('slot_type', 'standard') and (resulting_type in ('fix-chart', 'small', 'minimal','linear') or meta.get('slot_type') in ('small', 'minimal')):
             meta.pop('layout', None)
         if 'technical_settings' in updates:
             updates=dict(updates,technical_settings={**meta.get('technical_settings',{}),**updates['technical_settings']})
@@ -292,7 +299,7 @@ def _technical_preferences(owner, slot, module_id):
     return {'settings':meta.get('technical_settings',{}).get(module_id,{}), '_state_owner':owner, '_state_slot':slot}
 
 
-def execute(owner, slot, data, expected_module=None, expected_revision=None):
+def execute(owner, slot, data, expected_module=None, expected_revision=None, request_ip=None):
     config = binding(owner, slot)
     if config is None:
         raise LookupError('slot is not configured')
@@ -307,6 +314,10 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None):
     defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
     if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
     payload = {**defaults, **config.get('context', {}), **data}
+    if module_id=='myip':payload['_request_ip']=request_ip
+    if module_id=='economic-calendar':
+        meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}
+        payload={'settings':meta.get('calendar_settings',{}),**data}
     if module_id in technical.KINDS and isinstance(data.get('settings'), dict):
         payload['settings'] = {**defaults.get('settings', {}), **data['settings']}
     if module_id in ('counter', 'slot-note', 'chat-box'):
@@ -315,23 +326,27 @@ def execute(owner, slot, data, expected_module=None, expected_revision=None):
         meta = change(owner, 'slot-meta', slot, None, lambda old:(old,False)) or {}
         payload.setdefault('room', meta.get('chat_room','public'))
     result = run_module(module_id, payload)
-    if module_id not in ('clock', 'counter', 'slot-note', 'chat-box'):
+    if module_id not in ('clock', 'counter', 'slot-note', 'chat-box','myip','economic-calendar'):
         change(owner, 'slot-output', slot, None, lambda _: ({'module_id':module_id, 'binding_revision':config.get('revision'), 'result':result}, True))
     return {'slot':slot, 'module_id':module_id, 'result':result}
 
 
-def read(owner, slot):
+def read(owner, slot, request_ip=None):
     config = binding(owner, slot)
     if config is None:
         raise LookupError('slot is not configured')
     module_id = config['module_id']
     _authorize_host_monitor(owner, module_id)
-    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id in technical.KINDS or module_id == 'chat-box':
+    if module_id in ('clock', 'counter', 'slot-note', 'empty', 'theme-summary', 'dashboard-health') or module_id in MARKET_MODULES or module_id in technical.KINDS or module_id in ('chat-box','myip','economic-calendar'):
         data = {'action':'get'} if module_id in ('counter','slot-note') else {}
         # Reads never change the saved output or execute arbitrary code.
         defaults = _market_preferences(owner, slot, module_id) if module_id in MARKET_MODULES else {}
         if module_id in technical.KINDS: defaults=_technical_preferences(owner,slot,module_id)
         payload = {**defaults, **config.get('context', {}), **data}
+        if module_id=='myip':payload['_request_ip']=request_ip
+        if module_id=='economic-calendar':
+            meta=change(owner,'slot-meta',slot,None,lambda old:(old,False)) or {}
+            payload={'settings':meta.get('calendar_settings',{})}
         if module_id in ('counter','slot-note','chat-box'):
             payload.update(_state_owner=owner, _state_slot=slot)
         if module_id == 'chat-box':

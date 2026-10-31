@@ -213,6 +213,7 @@ PANEL = r'''
     el('worker-confirm-form').reset(); el('worker-confirm-status').textContent = '';
     el('worker-confirm-message').textContent = ''; el('edit-lifecycle').textContent = ''; el('worker-search').value = '';
     el('worker-list').replaceChildren(); el('history-worker').value = ''; el('history-status').value = ''; el('history-count').textContent = '';
+    document.dispatchEvent(new CustomEvent('dashboard-viewer',{detail:{username:'',ip:null}}));
     token = ''; slotOwner = ''; pending = null; sending = false; active = null; enabledWorkers = [];
     document.dispatchEvent(new CustomEvent('dashboard-overview', {detail:{ready:false}}));
     el('account-token').value = ''; el('account-password').value = '';
@@ -297,8 +298,8 @@ PANEL = r'''
     async chatMessages(room) { return this.slotRequest('chat/rooms/'+encodeURIComponent(room)+'/messages'); },
     async chatSend(room,text) { return this.slotRequest('chat/rooms/'+encodeURIComponent(room)+'/messages',{text}); },
     async listSlots() { const result = await this.slotRequest('slots/active'); slotOwner = result.owner; return result.slots; },
-    async marketData(limit, period, includeOpen, endTime = null, interval = '1m', indicators = false) {
-      return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen) + '&interval=' + encodeURIComponent(interval) + '&include_indicators=' + String(indicators) + (endTime === null ? '' : '&end_time=' + encodeURIComponent(endTime)));
+    async marketData(limit, period, includeOpen, endTime = null, interval = '1m', indicators = false, slotId = null) {
+      return this.slotRequest('market/candles?limit=' + encodeURIComponent(limit) + '&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen) + '&interval=' + encodeURIComponent(interval) + '&include_indicators=' + String(indicators) + (endTime === null ? '' : '&end_time=' + encodeURIComponent(endTime))+(slotId===null?'':'&slot_id='+encodeURIComponent(slotId)));
     },
     async marketIndicator(name, period, includeOpen) {
       return this.slotRequest('market/indicators/' + encodeURIComponent(name) + '?limit=200&period=' + encodeURIComponent(period) + '&include_open=' + String(includeOpen));
@@ -518,6 +519,7 @@ PANEL = r'''
       workerAccess = Boolean(account.worker_access);
       const [workers,history] = account.worker_access ? await Promise.all([request('workers'),request('executions')]) : [{workers:[]},{executions:[]}];
       if (current !== generation || ticket !== refreshTicket) return;
+      document.dispatchEvent(new CustomEvent('dashboard-viewer',{detail:{username:account.user.username,ip:account.client_ip}}));
       slotOwner = account.user.id; authenticated = true; allWorkers = workers.workers; renderWorkers();
       const previous = el('account-worker').value;
       enabledWorkers = workers.workers.filter(row => row.lifecycle === 'enabled');
