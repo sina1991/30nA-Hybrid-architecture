@@ -53,7 +53,7 @@ def create(owner, name, visibility, recipient, content):
     return create_bytes(owner, name, visibility, recipient, data)
 
 
-def create_bytes(owner, name, visibility, recipient, data):
+def validate_metadata(owner, name, visibility, recipient):
     principal(owner)
     if not isinstance(name, str) or not 1 <= len(name) <= 180 or name in ('.', '..') or re.search(r'[/\\\x00-\x1f\x7f]', name):
         raise ValueError('Invalid filename')
@@ -63,6 +63,10 @@ def create_bytes(owner, name, visibility, recipient, data):
         user = accounts.get_user(recipient)
         if not user or not user['enabled']: raise ValueError('Invalid recipient')
     elif recipient is not None: raise ValueError('Public files have no recipient')
+
+
+def create_bytes(owner, name, visibility, recipient, data):
+    validate_metadata(owner, name, visibility, recipient)
     if not isinstance(data, bytes): raise ValueError('Invalid file content')
     if len(data) > MAX_BYTES: raise OverflowError('File exceeds 20 MiB')
     item = dict(id=uuid4().hex, name=name, size=len(data), sender=owner, recipient=recipient, created_at=int(time.time()))

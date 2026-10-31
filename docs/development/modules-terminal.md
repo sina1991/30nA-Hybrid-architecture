@@ -195,3 +195,8 @@ Moduleهای `demo-account/demo-trade/demo-bot/demo-positions/demo-reports` در
 رسانه در مرورگر پخش می‌شود؛ خروجی CLI فقط descriptor است. `Media` شامل Media Player عمومی و Image/Audio/Video مستقل است. فایل سرور باید در `DASHBOARD_MODULE_STATE_DIR/media` باشد؛ مسیر دلخواه سیستم، symlink، SVG/HTML و فایل نامعتبر پذیرفته نمی‌شوند. سقف فایل سرور ۳۲ MiB است؛ آپلود مرورگری Upload Center از مسیر binary تا ۲۰ MiB پشتیبانی می‌شود؛ API قدیمی JSON/base64 همچنان سقف ۵۱۲ KiB دارد. فایل Direct در هر درخواست مجدداً authorize می‌شود و reference خصوصی آن در قالب داشبورد مشترک انتقال نمی‌یابد. بارگیری و پخش خودکار نداریم؛ native codec مرورگر و محدودیت منبع خارجی همچنان اعمال می‌شوند.
 
 لینک YouTube در `media-video` و `media-player` به descriptor پلیر رسمی `youtube-nocookie.com` تبدیل می‌شود؛ ID و hostname اعتبارسنجی می‌شوند، server فایل ویدئو را دریافت نمی‌کند و autoplay خاموش است. در صورت ممنوعیت Embed یا نبود دسترسی مرورگر، از `Open on YouTube` استفاده کنید.
+
+
+در Upload Center بخش `Download from URL` فایل HTTPS عمومی تا ۲۰ MiB را با همان قواعد Public/Direct دریافت می‌کند. نام اختیاری است و پیش‌فرض از URL گرفته می‌شود. Redirectها دوباره validate می‌شوند؛ DNS به IP عمومی اعتبارسنجی‌شده pin می‌شود، hostname در TLS بررسی می‌شود و آدرس‌های داخلی/metadata، Credential در URL، انتقال فشرده و پورت غیر 443 پذیرفته نمی‌شوند. Cookie/Session کاربر به منبع ارسال نمی‌شود. لینک صفحهٔ YouTube لینک فایل دانلود نیست. دانلود ناقص یا بزرگ‌تر از حد در فهرست ذخیره نمی‌شود.
+
+سقف Nginx در مسیر عمومی Dashboard در نصب جدید ۳۰ MiB است؛ updater برای locationهای Dashboard در تنظیمات managed همین override را اعمال می‌کند تا محدودیت قدیمی ۱ MiB مانع آپلود ۲۰ MiB نشود. سایر APIها محدودیت Backend قبلی خود را حفظ می‌کنند.

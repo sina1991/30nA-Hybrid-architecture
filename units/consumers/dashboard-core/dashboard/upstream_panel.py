@@ -228,7 +228,7 @@ PANEL = r'''
     const parent = session.signal;
     const abort = () => controller.abort();
     parent.addEventListener('abort', abort, {once:true});
-    const timeout = setTimeout(abort, 8000);
+    const timeout = setTimeout(abort, path === 'uploads/from-url' ? 90000 : 8000);
     try {
       const response = await fetch('/api/upstreams/' + path, {
         method,
@@ -241,7 +241,7 @@ PANEL = r'''
         const error = new Error(({401:'Invalid account credentials; sign in again.',403:'You are not authorized for this operation.',
           404:'Worker or execution not found.',409:'Duplicate ID or operation conflicts with the current Worker state.',
           413:'Input exceeds the size limit.',422:'Invalid request data.'})[response.status] || 'The service is temporarily unavailable.');
-        if(path.startsWith('demo/')){try{const data=await response.json();const message=data.detail||data.error?.message;if(typeof message==='string')error.message=message.slice(0,300);}catch(_){}}
+        if(path.startsWith('demo/')||path.startsWith('uploads/')){try{const data=await response.json();const message=data.detail||data.error?.message;if(typeof message==='string')error.message=message.slice(0,300);}catch(_){}}
         error.status = response.status; throw error;
       }
       const data = await response.json();
@@ -276,7 +276,11 @@ PANEL = r'''
         const response=await fetch('/api/upstreams/uploads/raw?'+params,{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/octet-stream'},body:file,signal:controller.signal,cache:'no-store',redirect:'error',credentials:'omit'});
         if(current!==generation)throw Error('The session changed.');
         if(response.status===401){disconnect('Sign in again.');throw Error('Sign in again.');}
-        if(!response.ok)throw Error(response.status===413?'File exceeds the upload size limit.':'Upload failed. Refresh the list before retrying.');
+        if(!response.ok){
+          if(response.status===413&&!response.headers.get('content-type')?.includes('application/json'))throw Error('The reverse proxy rejected this upload. Update the managed Nginx upload settings.');
+          let message='Upload failed. Refresh the list before retrying.';try{const data=await response.json();message=data.error?.message||data.detail||message;}catch(_){}
+          throw Error(typeof message==='string'?message.slice(0,300):'Upload failed.');
+        }
         return (await response.json()).payload;
       }finally{clearTimeout(timeout);parent.removeEventListener('abort',abort);}
     },

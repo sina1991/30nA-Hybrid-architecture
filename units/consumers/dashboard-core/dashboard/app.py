@@ -462,7 +462,13 @@ body[data-view="workers"] [data-workspace-pane="executions"],body[data-view="exe
     <select id="upload-visibility" aria-label="Access"><option value="public">Public</option><option value="direct">Direct</option></select>
     <select id="upload-recipient" aria-label="Recipient" hidden></select>
     <button type="button" id="upload-send">Upload</button><button type="button" id="upload-refresh">Refresh</button>
-    <p id="upload-status" role="status"></p><div id="upload-list"></div>
+    <p id="upload-status" role="status"></p>
+    <div class="info-card"><h3>Download from URL</h3>
+      <p>Save a public HTTPS file to Upload Center. Maximum 20 MiB. The Public/Direct access selection above applies. Video page links are not direct video files.</p>
+      <label>File URL<input id="upload-url" type="url" placeholder="https://example.com/video.mp4" maxlength="4096"></label>
+      <label>File name (optional)<input id="upload-url-name" maxlength="180" placeholder="video.mp4"></label>
+      <button type="button" id="upload-url-send">Download to Upload Center</button><p id="upload-url-status" role="status"></p>
+    </div><div id="upload-list"></div>
   </section>
   <section class="page-view" data-page="overview">
     <p class="slots-message" id="overview-empty">Sign in to view pinned slots.</p>
@@ -610,6 +616,20 @@ document.getElementById('upload-send').addEventListener('click',async()=>{
     if(!bridge.ready()||bridge.owner()!==owner)return;
     document.getElementById('upload-file').value='';await refreshUploads();
   }catch(error){status.textContent=error.message||'Upload failed. Refresh the list before retrying.';}finally{button.disabled=false;}
+});
+
+document.getElementById('upload-url-send').addEventListener('click',async()=>{
+  const bridge=window.dashboardModuleState,status=document.getElementById('upload-url-status'),button=document.getElementById('upload-url-send');
+  if(!bridge?.ready()){status.textContent='Sign in to download files.';return;}
+  const url=document.getElementById('upload-url').value.trim(),name=document.getElementById('upload-url-name').value.trim();
+  try{if(new URL(url).protocol!=='https:')throw Error();}catch(_){status.textContent='Enter a public HTTPS file URL.';return;}
+  const owner=bridge.owner(),visibility=document.getElementById('upload-visibility').value;button.disabled=true;status.textContent='Downloading to server…';
+  try{
+    const result=await bridge.slotRequest('uploads/from-url',{url,name,visibility,recipient:visibility==='direct'?document.getElementById('upload-recipient').value:null});
+    if(!bridge.ready()||bridge.owner()!==owner)return;
+    document.getElementById('upload-url').value='';document.getElementById('upload-url-name').value='';
+    status.textContent=`Saved ${result.file.name} (${result.file.size.toLocaleString('en-US')} bytes).`;await refreshUploads();
+  }catch(error){if(bridge.ready()&&bridge.owner()===owner)status.textContent=error.message||'Download failed. Refresh the file list before retrying.';}finally{button.disabled=false;}
 });
 
 const saveDashboardDialog=document.getElementById('save-dashboard-dialog'),loadDashboardDialog=document.getElementById('load-dashboard-dialog');
@@ -790,7 +810,7 @@ document.addEventListener('dashboard-account-state', event => {
     indicatorProfiles=[];document.getElementById('indicator-list').replaceChildren();document.getElementById('indicator-technical-list').replaceChildren();document.getElementById('indicator-status').textContent='Sign in to manage indicators.';
     document.getElementById('upload-list').replaceChildren();
     document.getElementById('upload-recipient').replaceChildren();
-    document.getElementById('upload-file').value='';
+    document.getElementById('upload-file').value='';document.getElementById('upload-url').value='';document.getElementById('upload-url-name').value='';document.getElementById('upload-url-status').textContent='';
     document.getElementById('account-administration').replaceChildren();
     document.getElementById('runner-output').textContent = '';
     document.getElementById('runner-status').textContent = '';

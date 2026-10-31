@@ -176,6 +176,16 @@ def create_router(credential_path, upstream_factory):
         except (ValueError, OverflowError, PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
         return JSONResponse(envelope({'file':item}), headers={'Cache-Control':'no-store'})
 
+    @router.post('/uploads/from-url')
+    def upload_from_url(body: dict, identity=Depends(owner)):
+        from modules import upload_download
+        if set(body) != {'url','name','visibility','recipient'}: raise HTTPException(422, 'Invalid download request')
+        try: item = upload_download.import_url(identity, **body)
+        except upload_download.DownloadBusy: raise HTTPException(429, 'Download capacity is busy. Try again later.') from None
+        except upload_download.DownloadError as exc: raise HTTPException(502, str(exc)) from None
+        except (ValueError, OverflowError, PermissionError, OSError, sqlite3.Error) as exc: upload_error(exc)
+        return JSONResponse(envelope({'file':item}), headers={'Cache-Control':'no-store'})
+
     @router.get('/uploads/{file_id}/content')
     def upload_download(file_id: str, identity=Depends(owner)):
         from urllib.parse import quote

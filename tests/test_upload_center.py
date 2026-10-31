@@ -70,7 +70,7 @@ def test_output_is_owner_scoped_and_does_not_change_result(client):
 
 def test_binary_upload_larger_than_legacy_limit_and_private_media(client):
     (alice,a),(bob,b),(eve,e)=create_accounts(client)
-    content=b'\x00\x00\x00\x18ftypmp42'+b'x'*(1024*1024)
+    content=b'\x00\x00\x00\x18ftypmp42'+b'x'*(2*1024*1024)
     params={'name':'clip.mp4','visibility':'direct','recipient':bob['id']}
     headers={**auth(a),'Content-Type':'application/octet-stream'}
     assert client.post('/api/upstreams/uploads/raw',params=params,content=content).status_code==401

@@ -81,7 +81,7 @@ def nginx_config(domain, public_tls=False):
     ssl_certificate_key /etc/letsencrypt/live/30na-dashboard/privkey.pem;
     add_header X-Content-Type-Options nosniff always;
     add_header Referrer-Policy same-origin always;
-''',proxy.replace('PORT','8020').replace('30m','1m'),'}\n']
+''',proxy.replace('PORT','8020'),'}\n']
     return ''.join(parts)
 
 
