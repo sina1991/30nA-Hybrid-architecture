@@ -1,0 +1,185 @@
+REMOTE BROWSER — INSTALLATION AND ACTIVATION NOTES
+Repository: sina1991/30nA-Hybrid-architecture
+Branch: main
+Feature release: a5002cf
+Target URL format: https://YOUR_HOSTNAME_OR_IP:9443/rb/
+
+============================================================
+1. UPDATE THE PROJECT REPOSITORY
+============================================================
+
+On the deployment machine:
+
+cd /home/sina/projects/30nA-Hybrid-architecture
+git status --short
+git pull --ff-only origin main
+
+Do not overwrite local changes if Git reports conflicts or a non-fast-forward condition.
+
+============================================================
+2. INSTALLATION PREREQUISITES
+============================================================
+
+The standalone installer expects:
+- Linux x86_64
+- Python 3.11 or newer, with venv support
+- Docker Engine 28 or newer, already installed and running
+- Docker Buildx
+- OpenSSL
+- Sufficient free RAM and disk space
+
+IMPORTANT:
+The normal browser runtime checks for at least 2200 MiB of available memory before starting Chromium.
+A VPS with only 1 GB RAM is not suitable for the default configuration.
+Use a stronger VPS and verify available memory before testing.
+
+The installer does NOT install, upgrade, restart, or reconfigure Docker.
+It does not edit Nginx or the main 30nA services.
+
+============================================================
+3. INSTALL FROM THE REPOSITORY CHECKOUT
+============================================================
+
+From the repository root, replace YOUR_HOSTNAME_OR_IP with the exact hostname or IP used to access the dashboard:
+
+sudo bash standalone/remote-browser/install.sh YOUR_HOSTNAME_OR_IP
+
+Example:
+
+sudo bash standalone/remote-browser/install.sh x.30na.top
+
+The installer:
+- Installs the standalone app under /opt/independent-browser
+- Creates private configuration under /etc/independent-browser
+- Builds the isolated egress sidecar image
+- Pulls the pinned Chromium image
+- Creates the independent-browser.service and independent-browser.socket units
+- Configures the service to listen on TCP port 9443
+- Prompts privately for the shared password for accounts 1 through 9
+- Does not put the password in Git, command-line arguments, or container environment variables
+
+The installation is independent of the repository after the files are copied to /opt.
+
+============================================================
+4. ORIGINAL RELEASE INSTALL COMMAND
+============================================================
+
+The command used on the previously tested VPS was:
+
+sudo bash /opt/30na/releases/dashboard-a5002cf990f8ef30317441280502997deee1e996/standalone/remote-browser/install.sh x.30na.top
+
+This path belongs to the old deployment release and should only be used if that exact release directory exists.
+For a new deployment, prefer the checkout-based command in section 3.
+
+============================================================
+5. ACTIVATE AND CHECK THE SERVICE
+============================================================
+
+Enable the socket:
+
+sudo systemctl enable --now independent-browser.socket
+
+Check the socket:
+
+sudo systemctl status independent-browser.socket --no-pager
+
+Check the service:
+
+sudo systemctl status independent-browser.service --no-pager
+
+The service is socket-activated. When idle, independent-browser.service may be inactive; this is normal.
+The socket should remain active/listening.
+
+Open:
+
+https://YOUR_HOSTNAME_OR_IP:9443/rb/
+
+Example:
+
+https://x.30na.top:9443/rb/
+
+If required, allow TCP port 9443 in the operating-system firewall and the VPS provider firewall.
+The installer does not change firewall rules.
+
+============================================================
+6. LOGS AND RESTART
+============================================================
+
+Read recent logs:
+
+sudo journalctl -u independent-browser.service -n 80 --no-pager
+
+Follow logs live:
+
+sudo journalctl -fu independent-browser.service
+
+Restart the service:
+
+sudo systemctl restart independent-browser.service
+
+Restart the socket:
+
+sudo systemctl restart independent-browser.socket
+
+============================================================
+7. STOP OR DISABLE
+============================================================
+
+Stop the service:
+
+sudo systemctl stop independent-browser.service
+
+Disable the socket and stop accepting new connections:
+
+sudo systemctl disable --now independent-browser.socket
+
+Enable it again later:
+
+sudo systemctl enable --now independent-browser.socket
+
+============================================================
+8. CONFIGURATION AND RESOURCE NOTES
+============================================================
+
+Private configuration:
+  /etc/independent-browser/config.json
+
+Application:
+  /opt/independent-browser/app/
+
+Systemd units:
+  /etc/systemd/system/independent-browser.service
+  /etc/systemd/system/independent-browser.socket
+
+Listener:
+  TCP 9443
+
+Default concurrent browser sessions:
+  1
+
+Default controller limits:
+  MemoryMax=192M
+  CPUQuota=50%
+  TasksMax=128
+
+The default Chromium container limit is 1536 MiB RAM and one CPU.
+The egress sidecar has a separate resource limit.
+The runtime checks for at least 2200 MiB available memory before launching a browser.
+
+The browser profile is temporary. Browser containers are removed when the session closes or expires.
+The default TLS certificate is self-signed; a browser trust warning is expected unless a trusted certificate is configured.
+
+Do not disable the memory check or lower container limits on a 1 GB VPS for normal use.
+Do not remove or restart the main Nginx, Docker, SSH, networking, or 30nA services to troubleshoot this component.
+
+============================================================
+9. DOCUMENTATION IN THE REPOSITORY
+============================================================
+
+See:
+  standalone/remote-browser/README.md
+  standalone/remote-browser/install.sh
+
+This text file is a deployment checklist. The README and installer in the repository remain the authoritative implementation and detailed design references.
+
+END
