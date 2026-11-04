@@ -6,53 +6,52 @@ artifact:
   artifact_id:
     type: string
     required: true
+    format: "source_id@source_version"
+  artifact_type:
+    type: string
+    required: true
+    allowed_values:
+      - built_artifact
   artifact_version:
     type: string
     required: true
+    algorithm: sha256
+    description: "Lowercase SHA-256 hex digest of the exact built artifact bytes."
   source_id:
     type: string
     required: true
   source_version:
     type: string
     required: true
-  source_format:
-    type: string
-    required: true
-    allowed_values:
-      - zip
   source_hash:
     type: string
     required: true
     algorithm: sha256
+    format: "sha256:<64 lowercase hex>"
+  build_id:
+    type: string
+    required: true
+    format: "32 lowercase hexadecimal characters"
   build_version:
     type: string
     required: true
-  build_profile:
+  dependency_lock:
     type: string
     required: true
-  runtime_target:
-    type: object
-    required: true
-    fields:
-      operating_system:
-        type: string
-        required: true
-      python_version:
-        type: string
-        required: true
+    pattern: "^(stdlib-only|sha256:[0-9a-f]{64})$"
+    description: "stdlib-only, or the SHA-256 of the canonical allowlisted wheel manifest."
   entrypoint:
     type: string
     required: true
     format: "module:function"
-  dependency_lock:
-    type: string
-    required: true
   input_schema:
     type: object
     required: true
+    max_serialized_bytes: 8192
   output_schema:
     type: object
     required: true
+    max_serialized_bytes: 8192
   calculation_version:
     type: string
     required: true
@@ -60,18 +59,48 @@ artifact:
     type: string
     required: true
     algorithm: sha256
+    format: "sha256:<64 lowercase hex>"
+  size_bytes:
+    type: integer
+    required: true
+    minimum: 1
   validation_status:
     type: string
     required: true
+    allowed_values:
+      - passed
+  provenance:
+    type: object
+    required: true
+    fields:
+      builder_version:
+        type: string
+        required: true
+      source_hash:
+        type: string
+        required: true
+      artifact_hash:
+        type: string
+        required: true
+      sandbox_image:
+        type: string
+        required: true
+      test_count:
+        type: integer
+        required: true
+      dependency_policy:
+        type: string
+        required: true
 
 rules:
-  - "An artifact MUST identify its exact source version and build version."
-  - "An artifact MUST identify the source ZIP hash from which it was built."
-  - "The artifact hash MUST be SHA-256 over the exact packaged artifact bytes."
-  - "Published artifacts MUST be immutable."
-  - "A rebuild MUST create a new artifact identity or version when its content differs."
-  - "Consumers MUST verify artifact identity and integrity before use."
-  - "Only artifacts passing all mandatory validation stages may be published."
+  - "An artifact MUST identify its exact source ID and source version."
+  - "source_hash MUST identify the original uploaded ZIP bytes."
+  - "artifact_hash and artifact_version MUST identify the exact final packaged bytes and MUST equal the blob SHA-256."
+  - "A built artifact MUST be distinct from a registered source ZIP."
+  - "Only an immutable build report with status succeeded, publishable true, valid provenance and every mandatory stage passed may be published."
+  - "Published artifacts MUST be immutable; repeated identical publication is idempotent and changed bytes or metadata conflict."
+  - "Consumers MUST verify artifact identity, ownership, manifest integrity and blob digest before use."
   - "Artifact retrieval MUST use the owning authorization interface."
   - "Artifact content MUST NOT contain credentials or secrets."
-  - "The artifact MUST preserve the declared entrypoint and input/output schemas."
+  - "The artifact MUST preserve the declared entrypoint, input/output schemas and calculation version."
+  - "The dependency lock MUST identify stdlib-only artifacts or the canonical hash of the exact allowlisted pure-Python wheel manifest. Every wheel's SHA-256 MUST be reverified by Worker Runtime before import."

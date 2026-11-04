@@ -15,11 +15,12 @@ pipeline:
     - inspect_archive
     - verify_source_hash
     - validate_archive_paths
-    - normalize_working_copy
     - syntax_check
     - dependency_check
     - contract_check
+    - normalize_working_copy
     - test
+    - reproducibility
     - package
     - hash
 
@@ -54,8 +55,11 @@ stage_requirements:
   dependency_check:
     required: true
     rules:
-      - "Validate dependency declarations against the supported dependency policy."
-      - "Do not silently install arbitrary dependencies during archive inspection."
+      - "Allow standard-library and archive-local imports without external dependencies."
+      - "External imports are permitted only when every imported module is mapped to a trusted package in CODE_MANAGER_DEPENDENCY_ALLOWLIST."
+      - "Only root requirements.txt is accepted, with exact package==version --hash=sha256 pins matching the trusted allowlist and wheel bytes in CODE_MANAGER_DEPENDENCY_WHEELHOUSE."
+      - "Only pure-Python py3-none-any wheels are supported. Transitive Requires-Dist entries must be unconditional exact-version pins and every dependency must be explicitly pinned and allowlisted; native extensions, markers, extras, .pth files and dynamic imports are blocked."
+      - "No package manager runs and no network access is available. Verified wheels are mounted read-only for tests and vendored into the final artifact with a hash manifest."
   contract_check:
     required: true
     rules:
@@ -64,8 +68,15 @@ stage_requirements:
   test:
     required: true
     rules:
-      - "Run only in an explicitly isolated build environment."
+      - "Resolve the declared entrypoint to a callable inside the isolated environment."
+      - "Run discovered test*.py files only in an explicitly isolated build environment."
+      - "A missing test suite or sandbox image MUST NOT pass."
       - "A test result must distinguish passed, failed, skipped, and not-run states."
+  reproducibility:
+    required: true
+    rules:
+      - "Run deterministic packaging twice and compare exact bytes."
+      - "A differing package hash MUST fail the build."
   package:
     required: true
     rules:
@@ -90,6 +101,8 @@ rules:
   - "Pipeline stage order is normative and MUST be preserved."
   - "inspect_archive MUST precede verify_source_hash as required by the current contract tests; inspection MUST be metadata-only and MUST NOT extract or execute source before hash verification."
   - "verify_source_hash MUST precede normalize_working_copy."
+  - "A successful build MUST include a nonempty test suite executed in the isolated sandbox."
+  - "External dependencies MUST be exact-version and SHA-256 pinned in root requirements.txt, match the trusted deployment allowlist and offline wheelhouse, and pass pure-Python wheel validation. Unsupported native wheels, markers, extras, and non-exact transitive requirements MUST block the build."
   - "A successful build MUST NOT be interpreted as proof that the artifact is safe to execute."
   - "Only artifacts whose mandatory validation stages passed may be eligible for publication."
   - "Build execution MUST use resource limits and isolation appropriate to untrusted source."
@@ -103,16 +116,23 @@ implementation_status:
     - verify_source_hash
     - validate_archive_paths
     - syntax_check
-    - partial_contract_check
-  blocked_or_not_implemented:
+    - stdlib_only_and_allowlisted_offline_wheel_gate
+    - contract_check_with_schema_size_limit
     - normalize_working_copy
-    - dependency_resolution
     - isolated_test_execution
+    - reproducibility
     - package
     - hash
-  publication_eligible: false
+    - durable_owner_scoped_build_history
+    - publication_gate
+  blocked_or_not_implemented:
+    - native_dependency_support
+    - production_host_acceptance_and_daemon_fault_injection
+  publication_eligible: conditional_on_all_stages_passed
   note: >-
-    The current POST /api/v1/builds endpoint is a static preflight only. It must
-    report not_run for mandatory stages that it does not execute and MUST NOT
-    create a publishable artifact. This contract remains draft until all
-    mandatory stages and their isolated execution controls are implemented.
+    POST /api/v1/builds runs the real pipeline. Third-party dependencies are
+    accepted only as allowlisted, hash-pinned pure-Python wheels from an offline
+    wheelhouse, and are vendored into the artifact with a hash manifest.
+    Transitive dependencies are supported only as explicitly pinned pure-Python wheels with exact unconditional Requires-Dist versions. Native dependencies and unsupported manifests fail closed.
+    A build without tests, with an invalid sandbox, or with any non-passed
+    mandatory stage is never publishable.
