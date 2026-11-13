@@ -11,7 +11,7 @@
 - [تحویل نسخه اولیه](deployment/first-delivery.md)
 - [Release checklist](PROJECT_FINALIZATION_STATUS.md)
 
-## منابع نزدیک به implementation
+## راهنماهای اندیکاتور Dashboard\n\n- [All Spikes](dashboard/spike-detector.md)\n- [AKO FX — P-Gap](dashboard/akofx.md)\n\n## منابع نزدیک به implementation
 
 - [معماری](architecture/overview.md)
 - [قراردادهای CORE](../contracts/core/README.md)
