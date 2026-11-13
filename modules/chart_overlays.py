@@ -9,6 +9,10 @@ def calculate(owner, profiles, chart, end_time=None):
         if profile['type'] not in technical.KINDS or not profile['enabled']: continue
         config=profile['parameters']
         data={'settings':config,'_state_owner':owner,'_state_slot':profile['id']}
+        if profile['type'] in ('spike-detector','akofx'):
+            # Pattern detectors must use the exact candles returned for this chart;
+            # do not substitute a separate history query for chart overlays.
+            data.update(candles=chart.get('candles',[]),symbol=chart.get('symbol','XAUUSD'))
         if profile['type']=='round-levels':
             # The automatic step is based on current market price, independent
             # of historical panning. Visible line placement happens in the SVG.

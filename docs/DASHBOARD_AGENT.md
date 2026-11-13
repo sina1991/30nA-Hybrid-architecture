@@ -20,7 +20,7 @@
 | Nginx/body size | `scripts/deployment/provision.py`: nginx_config؛ configure_client_ip.py؛ update_dashboard.sh؛ app.py: DashboardBodyLimit | `test_upload_proxy.py`، Dashboard `tests/test_installer.py` |
 | حساب/معامله/گزارش دمو | `modules/demo_trading.py`: submit/state/alter_order/report/observed_quote/process؛ demo_components.py | `test_demo_trading.py`، `test_demo_cli.py`، مرورگر demo_media |
 | Profile و Signal | `modules/indicator_profiles.py`؛ signal_rules.py: save/market_input/evaluate/evaluate_and_save | `test_chart_overlays.py`، `test_chart_overlay_browser.py` |
-| Chart و indicatorهای زمانی/سطوح | `market_data/data.py`، `modules/technical.py` و chart_overlays.py؛ renderMarketModule/renderTechnicalModule | `test_technical_indicators.py`، `test_technical_browser.py` |
+| Chart و indicatorهای زمانی/سطوح | `market_data/data.py`، `modules/technical.py` و chart_overlays.py؛ renderMarketModule/renderTechnicalModule؛ AKO FX P-Gap در `modules/akofx/` | `test_technical_indicators.py`، `test_technical_browser.py`، `test_akofx.py` |
 | Save/Load مشترک | `modules/workspaces.py`؛ UI save/load dialogs | `test_shared_dashboards.py`، `test_workspace_browser.py` |
 | Worker زمان‌بندی اسلات | `modules/slot_workers.py`: configure/SlotWorkerScheduler | Dashboard `tests/test_worker_management.py` |
 | CLI | فایل اجرایی ریشه `30na` و `modules/module_support.py` | `test_demo_cli.py` و تست subprocess feature |

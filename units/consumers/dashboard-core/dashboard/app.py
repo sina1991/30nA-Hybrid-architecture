@@ -875,7 +875,7 @@ document.getElementById('db-prev').addEventListener('click', () => { databaseOff
 document.getElementById('db-next').addEventListener('click', () => { databaseOffset += Number(document.getElementById('db-limit').value); refreshDatabase(); });
 const indicatorDefaults = {sma:{period:20}, rsi:{period:14}, macd:{fast:12,slow:26,signal:9}};
 let indicatorProfiles = [],indicatorPresets={};
-function technicalIndicators() {return availableModules.filter(module=>['session-windows','session-clock','price-levels'].includes(module.type));}
+function technicalIndicators() {return availableModules.filter(module=>['session-windows','session-clock','price-levels'].includes(module.type)||['spike-detector','akofx'].includes(module.id));}
 function populateIndicatorTypes(){
   const select=document.getElementById('indicator-new-type');
   technicalIndicators().forEach(module=>{if([...select.options].some(option=>option.value===module.id))return;const option=makeElement('option','',module.name);option.value=module.id;select.append(option);});
@@ -1412,6 +1412,22 @@ function renderMarketModule(body, slot, module) {
       const line=(value,label,style,left=8,right=718)=>{if(value<low||value>high||right<8||left>718)return;
         group.append(technicalSvg('line',{x1:Math.max(8,left),x2:Math.min(718,right),y1:y(value),y2:y(value),stroke:style.color,'stroke-width':style.width,'stroke-dasharray':dash[style.style]}));
         if(cfg.show_labels!==false)group.append(technicalSvg('text',{x:Math.min(720,Math.max(8,right)),y:y(value)-3,fill:cfg.label_color||style.color,'font-size':cfg.font_size||9},`${label} ${Number(value.toPrecision(12))}`));};
+      if(profile.type==='spike-detector'){
+        (result.events||[]).filter(event=>event.time>=start&&event.time<finish&&event.price>=low&&event.price<=high).forEach(event=>{
+          const x=timeX(event.time),py=y(event.price),radius=event.severity==='critical'?6:event.severity==='high'?5:4;
+          group.append(technicalSvg('circle',{cx:x,cy:py,r:radius,fill:event.color||cfg.combined_color,stroke:'#0b1120','stroke-width':1,'data-spike-event':event.event_type,'data-spike-time':event.time,'data-spike-severity':event.severity}));
+          if(cfg.show_labels)group.append(technicalSvg('text',{x:x+radius+2,y:py-3,fill:event.color||cfg.combined_color,'font-size':9,'data-spike-label':event.event_type},event.event_type.replace('-spike','').toUpperCase()));
+        });
+      }
+      if(profile.type==='akofx'){
+        (result.events||[]).filter(event=>event.time>=start&&event.time<finish&&event.gap_high>=low&&event.gap_low<=high).forEach(event=>{
+          const left=timeX(event.start_time),right=timeX(event.end_time+Number(interval.slice(0,-1))*60),top=y(event.gap_high),bottom=y(event.gap_low),color=event.color|| (event.direction==='bullish'?'#22c55e':'#ef4444');
+          backgrounds.append(technicalSvg('rect',{x:left,y:top,width:Math.max(2,right-left),height:Math.max(1,bottom-top),fill:color,'fill-opacity':0.16,stroke:color,'stroke-opacity':0.75,'stroke-width':1,'data-pgap-event':'true','data-pgap-direction':event.direction,'data-pgap-time':event.time}));
+          group.append(technicalSvg('line',{x1:left,x2:right,y1:top,y2:top,stroke:color,'stroke-width':1,'stroke-dasharray':'4 3'}),
+            technicalSvg('line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:color,'stroke-width':1,'stroke-dasharray':'4 3'}));
+          if(cfg.show_labels)group.append(technicalSvg('text',{x:Math.min(710,right+3),y:Math.max(12,top-4),fill:color,'font-size':10,'data-pgap-label':'true'},event.direction==='bullish'?'P-GAP ↑':'P-GAP ↓'));
+        });
+      }
       if(profile.type==='round-levels'){
         const step=result.step;let left=Math.ceil(low/step),right=Math.floor(high/step);const total=right-left+1,count=Math.max(0,Math.min(total,cfg.max_lines));left+=Math.max(0,Math.floor((total-count)/2));
         for(let index=left;index<left+count;index++)line(index*step,profile.name,cfg);
@@ -1781,6 +1797,18 @@ function renderTechnicalModule(body,slot,module) {
     if(module.id==='session-windows'&&cfg.day_start_lines)(data.day_lines||[]).filter(t=>t>=start&&t<=finish).forEach(t=>svg.append(technicalSvg('line',{x1:x(t),x2:x(t),y1:15,y2:280,stroke:cfg.text_color,'stroke-dasharray':'7 4'})));
     svg.append(technicalSvg('text',{x:10,y:321,fill:cfg.text_color,'font-size':10},`${new Date(start*1000).toISOString()} — ${new Date(finish*1000).toISOString()} · UTC`));details.append(svg);
   }
+  function paintPGap(data) {
+    view.replaceChildren();details.replaceChildren();
+    const events=data.events||[];
+    status.textContent=events.length?`${events.length} P-Gap pattern(s) found · provided candle history only`:'No P-Gap found in the available candle history.';
+    if(!events.length){details.append(makeElement('p','market-status','A valid P-Gap requires a non-overlapping first/third candle gap and a middle candle whose Body is strictly greater than the sum of both Shadows.'));return;}
+    const table=makeElement('table',''),head=makeElement('tr','');
+    ['Direction','Time (UTC)','Gap Low','Gap High','Middle Body','Total Shadow','State'].forEach(label=>head.append(makeElement('th','',label)));table.append(head);
+    [...events].reverse().forEach(event=>{const row=makeElement('tr','');
+      [event.direction.toUpperCase(),new Date(event.time*1000).toISOString().replace('T',' ').replace('.000Z',' UTC'),event.gap_low,event.gap_high,event.middle_body,event.middle_total_shadow,event.status].forEach(value=>row.append(makeElement('td','',String(value))));
+      table.append(row);
+    });details.append(table);
+  }
   function paintLevels(data) {
     view.replaceChildren();details.replaceChildren();
     const cfg=data.settings, candles=data.candles||[], days=data.days||[];
@@ -1809,11 +1837,11 @@ function renderTechnicalModule(body,slot,module) {
   }
   async function refresh(){
     const bridge=window.dashboardModuleState;if(busy||manual||!bridge?.ready())return;busy=true;
-    try{const data=await bridge.read(slot.id,module.id);if(!body.isConnected||!bridge.ready()||manual)return;last=data;received=performance.now();if(isSession)paintClock(data);else paintLevels(data);}
+    try{const data=await bridge.read(slot.id,module.id);if(!body.isConnected||!bridge.ready()||manual)return;last=data;received=performance.now();if(isSession)paintClock(data);else if(module.id==='akofx')paintPGap(data);else paintLevels(data);}
     catch(_){if(body.isConnected)status.textContent='Indicator unavailable. Check Module settings and market data.';}finally{busy=false;}
   }
   body.addEventListener('slot-refresh',()=>{manual=false;refresh();});
-  body.addEventListener('technical-result',event=>{manual=true;last=event.detail;received=performance.now();if(isSession)paintClock(last);else paintLevels(last);});
+  body.addEventListener('technical-result',event=>{manual=true;last=event.detail;received=performance.now();if(isSession)paintClock(last);else if(module.id==='akofx')paintPGap(last);else paintLevels(last);});
   function tick(){if(!body.isConnected)return;
     if(isSession&&last){paintClock(last);const elapsed=(performance.now()-received)/1000;if(!manual&&(elapsed>=15||(last.next_transition!==null&&last.now+elapsed>=last.next_transition)))refresh();}
     setTimeout(tick,1000);
@@ -1895,6 +1923,7 @@ function renderModuleContent(body, slot, moduleId) {
     renderMarketModule(body, slot, module);
     return;
   }
+  if (module.id === 'akofx') { renderTechnicalModule(body, slot, module); return; }
   if (module.type === 'market-indicator') { renderIndicator(body, slot, module); return; }
   if (['session-clock','session-windows','price-levels'].includes(module.type)) {renderTechnicalModule(body,slot,module);return;}
   if (module.type === 'chat') { renderChat(body, slot); return; }

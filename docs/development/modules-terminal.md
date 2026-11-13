@@ -210,3 +210,14 @@ python3 /opt/30na/dashboard-current/modules/music-player/module.py --owner OWNER
 ```
 
 ورودی ذخیره: `{"action":"set","tracks":[{"title":"Night sky","settings":{"source":"external","url":"https://example.com/audio.mp3"}}]}`. owner باید حساب فعال واقعی باشد؛ اجرای مستقیم فقط برای اپراتور محلی trusted است. state فهرست حداکثر ۱۰ Track برای همان owner ذخیره می‌شود. CLI descriptor می‌دهد؛ پخش فقط در مرورگر است. ماژول و تب Media یک Playlist و یک موتور پخش دارند؛ Logout آن را پاک می‌کند. [راهنمای کاربر](../dashboard/USER_GUIDE.md).
+
+## Spike Detector (All Spikes)
+
+The trusted `spike-detector` module independently evaluates Price Spike, Volume Spike, and Combined Spike modes from ordered OHLC candles. It returns structured `events` JSON and can be configured as an enabled chart indicator profile; profile parameters are owner-scoped. Historical coverage is limited to candles supplied by the market-data source. Volume detection is unavailable for candles without volume values; the detector does not fabricate volume.
+
+```bash
+30na modules run spike-detector --input '{}'
+python3 /opt/30na/dashboard-current/modules/spike-detector/module.py --input '{}'
+```
+
+Default configuration: baseline 5 candles, Price Spike threshold 0.2% change, Volume Spike threshold 1.2x average baseline volume, and Combined Spike thresholds 0.2% plus 1.2x. Each mode has an independent enable flag and its own threshold/color parameters. For profile use, open Indicators → Chart / Signal instances, add Spike Detector, enable Show on chart, and Save.\n\n## AKO FX — P-Gap\n\nThe trusted `akofx` module detects the AKO FX P-Gap definition agreed for this version. A bullish gap requires first-candle High < third-candle Low; a bearish gap requires first-candle Low > third-candle High. The middle candle is accepted only when its Body is strictly greater than the sum of its upper and lower Shadows. Equality is rejected. No additional Body-to-range percentage threshold is applied.\n\n~~~bash\n30na modules run akofx --input '{}'\npython3 /opt/30na/dashboard-current/modules/akofx/module.py --input '{}'\n~~~\n\nWith no explicit candles, the module reads available local XAUUSD M1 history. For another symbol or a standalone fixture, provide ordered candles in the JSON input. To display P-Gap on a chart, open Indicators → Chart / Signal instances, add AKO FX, enable Show on chart, and Save. The colored gap zone is drawn between the first and third candle timestamps. See [the AKO FX trader guide](../dashboard/akofx.md).

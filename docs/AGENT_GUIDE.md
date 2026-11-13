@@ -176,6 +176,7 @@ DATA direct envelope، provisioning children در HTTP و propagation سرتاس
 ## اندیکاتورهای زمان و قیمت
 
 - موتور trusted در `modules/technical.py` و پنج entrypoint مستقل `session-windows`، `session-clock`، `round-levels`، `previous-day-levels` و `previous-day-session-levels` قرار دارد. wrapperها executable ارسالی MT5 را اجرا نمی‌کنند. دستورها و محدودیت داده در `docs/development/modules-terminal.md` آمده‌اند.
+- ماژول `spike-detector` به همین موتور اضافه شده و Price Spike، Volume Spike و Combined Spike را با threshold و enable flag مستقل محاسبه می‌کند؛ رویدادهای حاصل در `events` بازگردانده و از `indicator_profiles` به‌صورت owner-scoped روی Chart رسم می‌شوند. ورودی volume باید از OHLC candles موجود باشد؛ پوشش فقط همان history تأمین‌شده است. تست: `tests/test_spike_detector.py`.
 - `technical_settings` در meta هر owner/slot نگهداری می‌شود؛ اعتبارسنجی با `technical.settings` انجام می‌شود. ساعت مرجع سشن با ساعت بروکر یکی فرض نمی‌شود. دو ابزار سشن موتور مشترک دارند؛ preset واقعی Inputs ارسالی کاربر در `modules/session_presets.py` قرار دارد. نمونه‌های تب Indicators با `indicator_profiles` ذخیره و از `chart_overlays.calculate` در API کندل‌ها، پس از احراز هویت همان owner، روی Chart اعمال می‌شوند. گروه‌بندی Teaching viewهای جزئی و شناسایی خودکار Supported broker از EX5 استنتاج نمی‌شود.
 - تست هدفمند: `tests/test_technical_indicators.py` و `tests/test_technical_browser.py`؛ بررسی DST، نیمه‌شب، داده ناقص، owner isolation و اجرای مستقل CLI. پذیرش VPS و برابری با executable اصلی انجام نشده است.
 

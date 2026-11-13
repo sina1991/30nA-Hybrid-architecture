@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo
 from .module_state import change
 from .session_presets import PRESET
 
-KINDS = ('session-windows', 'session-clock', 'round-levels', 'previous-day-levels', 'previous-day-session-levels')
+KINDS = ('session-windows', 'session-clock', 'round-levels', 'previous-day-levels', 'previous-day-session-levels', 'spike-detector', 'akofx')
 DEFAULTS = {
     'session-clock': {'winter_utc_minutes':None,'clock_change':'none','windows':[], 'points':[], 'teaching_view':'all',
                       'reference_timezone':None,'schedule_shift_minutes':0,'chart_minutes':15,'clock_size':360,'points_on_clock':True,'show_seconds':True,'highlight_minutes':5,
@@ -29,6 +29,8 @@ DEFAULTS = {
 }
 DEFAULTS['session-clock'].update(PRESET)
 DEFAULTS['session-windows'] = {**DEFAULTS['session-clock'], 'window_labels':True,'time_points':True,'countdown_panel':True,'day_start_lines':True,'window_shape':'filled'}
+DEFAULTS['spike-detector'] = {'price_enabled':True,'volume_enabled':True,'combined_enabled':True,'baseline_period':5,'price_change_percent':0.2,'volume_multiplier':1.2,'combined_price_change_percent':0.2,'combined_volume_multiplier':1.2,'show_labels':True,'price_color':'#f59e0b','volume_color':'#3b82f6','combined_color':'#a855f7'}
+DEFAULTS['akofx'] = {'show_labels':True,'bullish_color':'#22c55e','bearish_color':'#ef4444'}
 
 LEVEL_STYLES = {
     'high':{'color':'#c4b5fd','style':'solid','width':1}, 'low':{'color':'#c4b5fd','style':'solid','width':1},
@@ -73,6 +75,18 @@ def settings(kind, raw=None):
     cfg = {**DEFAULTS[kind],**raw}
     for key, default in DEFAULTS[kind].items():
         if type(default) is bool and type(cfg[key]) is not bool: raise ValueError('invalid '+key)
+    if kind == 'spike-detector':
+        for key in ('price_enabled','volume_enabled','combined_enabled','show_labels'):
+            if type(cfg[key]) is not bool: raise ValueError('invalid '+key)
+        integer(cfg['baseline_period'],2,200,'baseline period')
+        number(cfg['price_change_percent'],0.01,100,'price change percent')
+        number(cfg['volume_multiplier'],1.01,1000,'volume multiplier')
+        number(cfg['combined_price_change_percent'],0.01,100,'combined price change percent')
+        number(cfg['combined_volume_multiplier'],1.01,1000,'combined volume multiplier')
+        for key in ('price_color','volume_color','combined_color'): color(cfg[key])
+    elif kind == 'akofx':
+        if type(cfg['show_labels']) is not bool: raise ValueError('invalid show_labels')
+        for key in ('bullish_color','bearish_color'): color(cfg[key])
     if 'winter_utc_minutes' in cfg:
         offset = cfg['winter_utc_minutes']
         if offset is not None: integer(offset,-720,840,'winter UTC offset')
@@ -124,7 +138,7 @@ def settings(kind, raw=None):
         number(cfg['auto_percent'],0.001,100,'auto percent');number(cfg['manual_step'],1e-12,1e12,'manual step')
         integer(cfg['max_lines'],1,300,'max lines');color(cfg['color']);color(cfg['label_color'])
         line_style({k:cfg[k] for k in ('color','style','width')});integer(cfg['font_size'],8,32,'font size')
-    else:
+    elif kind in ('previous-day-levels','previous-day-session-levels'):
         if not isinstance(cfg['styles'],dict) or set(cfg['styles'])-set(LEVEL_STYLES): raise ValueError('invalid level styles')
         for style in cfg['styles'].values(): line_style(style)
         if kind == 'previous-day-session-levels':
@@ -358,6 +372,74 @@ def run(kind,data):
     extra={'price','visible_low','visible_high','spacing_state','symbol'} if kind=='round-levels' else {'candles','symbol'}
     if set(data)-common-extra: raise ValueError('unknown indicator input')
     cfg=settings(kind,data.get('settings'));now=timestamp(data.get('now',time.time()))
+    if kind == 'spike-detector':
+        rows=data.get('candles',[])
+        if not isinstance(rows,list) or len(rows)>10000: raise ValueError('at most 10000 input candles')
+        parsed=[]; previous=-1
+        for raw in rows:
+            item=candle(raw)
+            if item['time']<=previous or item['time']>now: raise ValueError('candles must be unique, ordered, and not in the future')
+            previous=item['time']
+            volume=raw.get('tick_volume',raw.get('volume'))
+            if volume is not None:
+                if type(volume) not in (int,float) or not math.isfinite(volume) or volume<0: raise ValueError('invalid candle volume')
+            parsed.append({**item,'volume':volume})
+        events=[]
+        period=cfg['baseline_period']
+        for index in range(period,len(parsed)):
+            current=parsed[index]; previous_close=parsed[index-1]['close']; baseline=parsed[index-period:index]
+            pct=(current['close']-previous_close)/previous_close*100
+            volumes=[item['volume'] for item in baseline if item['volume'] is not None]
+            current_volume=current['volume']; ratio=(current_volume/(sum(volumes)/len(volumes))) if volumes and current_volume is not None and sum(volumes)>0 else None
+            price_hit=abs(pct)>=cfg['price_change_percent']; volume_hit=ratio is not None and ratio>=cfg['volume_multiplier']
+            combined_hit=abs(pct)>=cfg['combined_price_change_percent'] and ratio is not None and ratio>=cfg['combined_volume_multiplier']
+            direction='bullish' if pct>0 else 'bearish' if pct<0 else 'neutral'
+            candidates=[]
+            if cfg['price_enabled'] and price_hit: candidates.append(('price-spike',cfg['price_color'],'high' if abs(pct)>=cfg['price_change_percent']*2 else 'medium'))
+            if cfg['volume_enabled'] and volume_hit: candidates.append(('volume-spike',cfg['volume_color'],'high' if ratio>=cfg['volume_multiplier']*2 else 'medium'))
+            if cfg['combined_enabled'] and combined_hit: candidates.append(('combined-spike',cfg['combined_color'],'critical' if abs(pct)>=cfg['combined_price_change_percent']*2 and ratio>=cfg['combined_volume_multiplier']*2 else 'high'))
+            for event_type,color_value,severity in candidates:
+                events.append({'module_id':'spike-detector','event_type':event_type,'symbol':data.get('symbol','XAUUSD'),'time':current['time'],'timestamp':current['time'],'direction':direction,'price_change_percent':round(pct,6),'volume_ratio':round(ratio,6) if ratio is not None else None,'severity':severity,'price':current['close'],'volume':current_volume,'color':color_value,'status':'confirmed' if not current['is_open'] else 'provisional'})
+        return {'status':'ok' if parsed else 'insufficient_data','settings':cfg,'events':events,'coverage':'provided_candles_only','event_count':len(events)}
+    if kind == 'akofx':
+        rows=data.get('candles')
+        source='provided_candles'
+        if rows is None:
+            if data.get('symbol','XAUUSD')!='XAUUSD': raise ValueError('Other symbols require candles')
+            from market_data.data import connect
+            db=connect()
+            try: stored=db.execute('SELECT time,open,high,low,close,is_open FROM candles WHERE time<=? ORDER BY time DESC LIMIT 1000',(now,)).fetchall()
+            finally: db.close()
+            rows=[dict(item) for item in reversed(stored)]
+            source='local_XAUUSD_M1'
+        if not isinstance(rows,list) or len(rows)>10000: raise ValueError('at most 10000 input candles')
+        parsed=[]; previous=-1
+        for raw in rows:
+            item=candle(raw)
+            if item['time']<=previous or item['time']>now: raise ValueError('candles must be unique, ordered, and not in the future')
+            previous=item['time']; parsed.append(item)
+        events=[]
+        for index in range(2,len(parsed)):
+            first,middle,current=parsed[index-2:index+1]
+            body=abs(middle['close']-middle['open'])
+            upper_shadow=middle['high']-max(middle['open'],middle['close'])
+            lower_shadow=min(middle['open'],middle['close'])-middle['low']
+            total_shadow=upper_shadow+lower_shadow
+            if body<=total_shadow: continue
+            if first['high']<current['low']:
+                direction='bullish';gap_low=first['high'];gap_high=current['low'];color_value=cfg['bullish_color']
+            elif first['low']>current['high']:
+                direction='bearish';gap_low=current['high'];gap_high=first['low'];color_value=cfg['bearish_color']
+            else: continue
+            events.append({'module_id':'akofx','event_type':'p-gap','symbol':data.get('symbol','XAUUSD'),
+                'direction':direction,'time':current['time'],'timestamp':current['time'],
+                'start_time':first['time'],'middle_time':middle['time'],'end_time':current['time'],
+                'gap_low':gap_low,'gap_high':gap_high,'price':(gap_low+gap_high)/2,
+                'middle_body':body,'middle_total_shadow':total_shadow,
+                'status':'provisional' if current['is_open'] else 'confirmed','color':color_value})
+        return {'status':'ok' if parsed else 'insufficient_data','settings':cfg,'events':events,
+                'source':source,'coverage':'provided_candles_only' if source=='provided_candles' else 'available_history_only',
+                'event_count':len(events)}
     if kind in ('session-clock','session-windows'):
         result=clock_result(cfg,now)
         if cfg['winter_utc_minutes'] is not None and (kind=='session-windows' or cfg['chart_point_lines']):

@@ -1,0 +1,8 @@
+{
+  "id": "spike-detector",
+  "name": "Spike Detector",
+  "description": "Detects price, volume, and combined spikes from XAUUSD candles; configurable All Spikes chart overlay.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "market-indicator"
+}
