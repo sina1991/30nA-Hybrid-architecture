@@ -210,3 +210,14 @@ python3 /opt/30na/dashboard-current/modules/music-player/module.py --owner OWNER
 ```
 
 ورودی ذخیره: `{"action":"set","tracks":[{"title":"Night sky","settings":{"source":"external","url":"https://example.com/audio.mp3"}}]}`. owner باید حساب فعال واقعی باشد؛ اجرای مستقیم فقط برای اپراتور محلی trusted است. state فهرست حداکثر ۱۰ Track برای همان owner ذخیره می‌شود. CLI descriptor می‌دهد؛ پخش فقط در مرورگر است. ماژول و تب Media یک Playlist و یک موتور پخش دارند؛ Logout آن را پاک می‌کند. [راهنمای کاربر](../dashboard/USER_GUIDE.md).
+
+## Spike Detector (All Spikes)
+
+The trusted `spike-detector` module independently evaluates Price Spike, Volume Spike, and Combined Spike modes from ordered OHLC candles. It returns structured `events` JSON and can be configured as an enabled chart indicator profile; profile parameters are owner-scoped. Historical coverage is limited to candles supplied by the market-data source. Volume detection is unavailable for candles without volume values; the detector does not fabricate volume.
+
+```bash
+30na modules run spike-detector --input '{}'
+python3 /opt/30na/dashboard-current/modules/spike-detector/module.py --input '{}'
+```
+
+Default configuration: baseline 20 candles, Price Spike threshold 2.5% change, Volume Spike threshold 3x average baseline volume, and Combined Spike thresholds 2.5% plus 3x. Each mode has an independent enable flag and its own threshold/color parameters. For profile use, open Indicators → Chart / Signal instances, add Spike Detector, enable Show on chart, and Save.
