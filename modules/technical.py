@@ -391,10 +391,9 @@ def run(kind,data):
             combined_hit=abs(pct)>=cfg['combined_price_change_percent'] and ratio is not None and ratio>=cfg['combined_volume_multiplier']
             direction='bullish' if pct>0 else 'bearish' if pct<0 else 'neutral'
             candidates=[]
+            if cfg['price_enabled'] and price_hit: candidates.append(('price-spike',cfg['price_color'],'high' if abs(pct)>=cfg['price_change_percent']*2 else 'medium'))
+            if cfg['volume_enabled'] and volume_hit: candidates.append(('volume-spike',cfg['volume_color'],'high' if ratio>=cfg['volume_multiplier']*2 else 'medium'))
             if cfg['combined_enabled'] and combined_hit: candidates.append(('combined-spike',cfg['combined_color'],'critical' if abs(pct)>=cfg['combined_price_change_percent']*2 and ratio>=cfg['combined_volume_multiplier']*2 else 'high'))
-            else:
-                if cfg['price_enabled'] and price_hit: candidates.append(('price-spike',cfg['price_color'],'high' if abs(pct)>=cfg['price_change_percent']*2 else 'medium'))
-                if cfg['volume_enabled'] and volume_hit: candidates.append(('volume-spike',cfg['volume_color'],'high' if ratio>=cfg['volume_multiplier']*2 else 'medium'))
             for event_type,color_value,severity in candidates:
                 events.append({'module_id':'spike-detector','event_type':event_type,'symbol':data.get('symbol','XAUUSD'),'time':current['time'],'timestamp':current['time'],'direction':direction,'price_change_percent':round(pct,6),'volume_ratio':round(ratio,6) if ratio is not None else None,'severity':severity,'price':current['close'],'volume':current_volume,'color':color_value,'status':'confirmed' if not current['is_open'] else 'provisional'})
         return {'status':'ok' if parsed else 'insufficient_data','settings':cfg,'events':events,'coverage':'provided_candles_only','event_count':len(events)}
