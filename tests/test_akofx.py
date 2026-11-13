@@ -36,7 +36,7 @@ def test_akofx_detects_bearish_p_gap():
 
 def test_akofx_rejects_equal_body_and_total_shadow():
     rows = bullish_gap()
-    rows[1] = {'time': 160, 'open': 100.0, 'high': 107.0, 'low': 98.0, 'close': 105.0}
+    rows[1] = {'time': 160, 'open': 100.0, 'high': 107.0, 'low': 97.0, 'close': 105.0}
     result = technical.run('akofx', {'candles': rows, 'now': 221})
     assert result['events'] == []
 
