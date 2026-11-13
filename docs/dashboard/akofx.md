@@ -1,6 +1,6 @@
 # راهنمای اندیکاتور AKO FX — تشخیص P-Gap
 
-این ماژول برای نمایش الگوهای P-Gap روی Chart طراحی شده است. منطق این نسخه فقط شامل قواعدی است که برای AKO FX تأیید شده‌اند؛ الگوهای دیگری مانند E-Gap در این نسخه پیاده‌سازی نشده‌اند.
+این ماژول برای نمایش الگوهای P-Gap روی Chart طراحی شده است. مبنای نسخه فعلی، تعریف P-Gap در Price Action ال بروکز است که برای استفاده در گروه AKO FX توسط کاربر تأیید شده است. منطق این نسخه فقط شامل قواعدی است که برای AKO FX تأیید شده‌اند؛ الگوهای دیگری مانند E-Gap در این نسخه پیاده‌سازی نشده‌اند.
 
 ## تعریف P-Gap
 
@@ -55,7 +55,7 @@ python3 modules/akofx/module.py --input '{"candles":[{"time":100,"open":99,"high
 خروجی JSON شامل events، جهت الگو، محدوده Gap، اندازه Body و مجموع Shadow، زمان کندل‌ها و وضعیت تأیید است. برای CLI نصب‌شده:
 
 ~~~bash
-30na modules run akofx --input '{"candles":[...],"symbol":"EURUSD"}'
+printf '%s' '{"candles":[{"time":100,"open":99,"high":100,"low":98,"close":99.5},{"time":160,"open":100,"high":108,"low":99.5,"close":105},{"time":220,"open":107,"high":108,"low":106,"close":107.5}],"now":221,"symbol":"EURUSD"}' | 30na modules run akofx --input -
 ~~~
 
 ## محدودیت‌ها
