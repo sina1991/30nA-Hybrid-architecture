@@ -875,7 +875,7 @@ document.getElementById('db-prev').addEventListener('click', () => { databaseOff
 document.getElementById('db-next').addEventListener('click', () => { databaseOffset += Number(document.getElementById('db-limit').value); refreshDatabase(); });
 const indicatorDefaults = {sma:{period:20}, rsi:{period:14}, macd:{fast:12,slow:26,signal:9}};
 let indicatorProfiles = [],indicatorPresets={};
-function technicalIndicators() {return availableModules.filter(module=>['session-windows','session-clock','price-levels'].includes(module.type));}
+function technicalIndicators() {return availableModules.filter(module=>['session-windows','session-clock','price-levels'].includes(module.type)||module.id==='spike-detector');}
 function populateIndicatorTypes(){
   const select=document.getElementById('indicator-new-type');
   technicalIndicators().forEach(module=>{if([...select.options].some(option=>option.value===module.id))return;const option=makeElement('option','',module.name);option.value=module.id;select.append(option);});
@@ -1412,6 +1412,13 @@ function renderMarketModule(body, slot, module) {
       const line=(value,label,style,left=8,right=718)=>{if(value<low||value>high||right<8||left>718)return;
         group.append(technicalSvg('line',{x1:Math.max(8,left),x2:Math.min(718,right),y1:y(value),y2:y(value),stroke:style.color,'stroke-width':style.width,'stroke-dasharray':dash[style.style]}));
         if(cfg.show_labels!==false)group.append(technicalSvg('text',{x:Math.min(720,Math.max(8,right)),y:y(value)-3,fill:cfg.label_color||style.color,'font-size':cfg.font_size||9},`${label} ${Number(value.toPrecision(12))}`));};
+      if(profile.type==='spike-detector'){
+        (result.events||[]).filter(event=>event.time>=start&&event.time<finish&&event.price>=low&&event.price<=high).forEach(event=>{
+          const x=timeX(event.time),py=y(event.price),radius=event.severity==='critical'?6:event.severity==='high'?5:4;
+          group.append(technicalSvg('circle',{cx:x,cy:py,r:radius,fill:event.color||cfg.combined_color,stroke:'#0b1120','stroke-width':1,'data-spike-event':event.event_type,'data-spike-time':event.time,'data-spike-severity':event.severity}));
+          if(cfg.show_labels)group.append(technicalSvg('text',{x:x+radius+2,y:py-3,fill:event.color||cfg.combined_color,'font-size':9,'data-spike-label':event.event_type},event.event_type.replace('-spike','').toUpperCase()));
+        });
+      }
       if(profile.type==='round-levels'){
         const step=result.step;let left=Math.ceil(low/step),right=Math.floor(high/step);const total=right-left+1,count=Math.max(0,Math.min(total,cfg.max_lines));left+=Math.max(0,Math.floor((total-count)/2));
         for(let index=left;index<left+count;index++)line(index*step,profile.name,cfg);
