@@ -29,7 +29,7 @@ DEFAULTS = {
 }
 DEFAULTS['session-clock'].update(PRESET)
 DEFAULTS['session-windows'] = {**DEFAULTS['session-clock'], 'window_labels':True,'time_points':True,'countdown_panel':True,'day_start_lines':True,'window_shape':'filled'}
-DEFAULTS['spike-detector'] = {'price_enabled':True,'volume_enabled':True,'combined_enabled':True,'baseline_period':20,'price_change_percent':2.5,'volume_multiplier':3.0,'combined_price_change_percent':2.5,'combined_volume_multiplier':3.0,'show_labels':True,'price_color':'#f59e0b','volume_color':'#3b82f6','combined_color':'#a855f7'}
+DEFAULTS['spike-detector'] = {'price_enabled':True,'volume_enabled':True,'combined_enabled':True,'baseline_period':5,'price_change_percent':0.2,'volume_multiplier':1.2,'combined_price_change_percent':0.2,'combined_volume_multiplier':1.2,'show_labels':True,'price_color':'#f59e0b','volume_color':'#3b82f6','combined_color':'#a855f7'}
 
 LEVEL_STYLES = {
     'high':{'color':'#c4b5fd','style':'solid','width':1}, 'low':{'color':'#c4b5fd','style':'solid','width':1},
