@@ -23,7 +23,7 @@ MODULE_FILES = {
 }
 
 HOST_MONITORS = frozenset(('system-monitor', 'service-monitor', 'disk-usage', 'network-monitor', 'process-monitor', 'alerts', 'log-viewer', 'docker-monitor'))
-MARKET_MODULES = frozenset(('gold-chart', 'moving-average', 'rsi', 'macd'))
+MARKET_MODULES = frozenset(('gold-chart', 'moving-average', 'rsi', 'macd', 'spike-detector'))
 
 
 class UnknownModule(LookupError):
