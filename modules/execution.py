@@ -11,6 +11,7 @@ MODULE_FILES = {
     'media-player':'media-player/module.py','music-player':'music-player/module.py',
     'myip':'myip/module.py','economic-calendar':'economic-calendar/module.py',
     'clock': 'clock/clock.py', 'calculator': 'calculator/module.py',
+    'akofx':'akofx/module.py',
     'counter': 'counter/module.py', 'dice-roller': 'dice-roller/module.py',
     'slot-note': 'slot-note/module.py', 'theme-summary': 'theme-summary/module.py',
     'dashboard-health': 'dashboard-health/module.py', 'empty': 'empty/module.py',
@@ -23,7 +24,7 @@ MODULE_FILES = {
 }
 
 HOST_MONITORS = frozenset(('system-monitor', 'service-monitor', 'disk-usage', 'network-monitor', 'process-monitor', 'alerts', 'log-viewer', 'docker-monitor'))
-MARKET_MODULES = frozenset(('gold-chart', 'moving-average', 'rsi', 'macd', 'spike-detector'))
+MARKET_MODULES = frozenset(('gold-chart', 'moving-average', 'rsi', 'macd', 'spike-detector', 'akofx'))
 
 
 class UnknownModule(LookupError):
