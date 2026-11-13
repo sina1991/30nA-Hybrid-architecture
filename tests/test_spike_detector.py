@@ -1,5 +1,6 @@
 """Spike Detector All Spikes behavior and trusted module integration."""
-import pytest\nimport time
+import pytest
+import time
 from modules import technical, indicator_profiles
 from modules.execution import run_module
 from test_account_chat_api import client, create_accounts, auth
@@ -50,7 +51,14 @@ def test_invalid_spike_settings_rejected(settings):
 
 def test_module_is_owner_scoped_via_indicator_profiles(client):
     (alice,a),(bob,b),_=create_accounts(client)
-    from market_data.data import connect\n    rows=candles()\n    db=connect()\n    with db:\n        for row in rows:\n            db.execute('INSERT OR REPLACE INTO candles(time,open,high,low,close,tick_volume,is_open) VALUES(?,?,?,?,?,?,?)',(row['time'],row['open'],row['high'],row['low'],row['close'],row['tick_volume'],int(row.get('is_open',False))))\n    db.close()\n    profile=client.post('/api/upstreams/indicator-profiles',headers=auth(a),json={
+    from market_data.data import connect
+    rows=candles()
+    db=connect()
+    with db:
+        for row in rows:
+            db.execute('INSERT OR REPLACE INTO candles(time,open,high,low,close,tick_volume,is_open) VALUES(?,?,?,?,?,?,?)',(row['time'],row['open'],row['high'],row['low'],row['close'],row['tick_volume'],int(row.get('is_open',False))))
+    db.close()
+    profile=client.post('/api/upstreams/indicator-profiles',headers=auth(a),json={
         'name':'Spike All','type':'spike-detector','parameters':config(),'enabled':True})
     assert profile.status_code==200,profile.text
     payload=client.get('/api/upstreams/market/candles?include_indicators=true&limit=100',headers=auth(a))
