@@ -402,7 +402,16 @@ def run(kind,data):
                 events.append({'module_id':'spike-detector','event_type':event_type,'symbol':data.get('symbol','XAUUSD'),'time':current['time'],'timestamp':current['time'],'direction':direction,'price_change_percent':round(pct,6),'volume_ratio':round(ratio,6) if ratio is not None else None,'severity':severity,'price':current['close'],'volume':current_volume,'color':color_value,'status':'confirmed' if not current['is_open'] else 'provisional'})
         return {'status':'ok' if parsed else 'insufficient_data','settings':cfg,'events':events,'coverage':'provided_candles_only','event_count':len(events)}
     if kind == 'akofx':
-        rows=data.get('candles',[])
+        rows=data.get('candles')
+        source='provided_candles'
+        if rows is None:
+            if data.get('symbol','XAUUSD')!='XAUUSD': raise ValueError('Other symbols require candles')
+            from market_data.data import connect
+            db=connect()
+            try: stored=db.execute('SELECT time,open,high,low,close,is_open FROM candles WHERE time<=? ORDER BY time DESC LIMIT 1000',(now,)).fetchall()
+            finally: db.close()
+            rows=[dict(item) for item in reversed(stored)]
+            source='local_XAUUSD_M1'
         if not isinstance(rows,list) or len(rows)>10000: raise ValueError('at most 10000 input candles')
         parsed=[]; previous=-1
         for raw in rows:
@@ -429,7 +438,8 @@ def run(kind,data):
                 'middle_body':body,'middle_total_shadow':total_shadow,
                 'status':'provisional' if current['is_open'] else 'confirmed','color':color_value})
         return {'status':'ok' if parsed else 'insufficient_data','settings':cfg,'events':events,
-                'coverage':'provided_candles_only','event_count':len(events)}
+                'source':source,'coverage':'provided_candles_only' if source=='provided_candles' else 'available_history_only',
+                'event_count':len(events)}
     if kind in ('session-clock','session-windows'):
         result=clock_result(cfg,now)
         if cfg['winter_utc_minutes'] is not None and (kind=='session-windows' or cfg['chart_point_lines']):
