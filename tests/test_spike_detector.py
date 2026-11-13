@@ -23,9 +23,9 @@ def config(**changes):
 def test_combined_spike_emits_one_combined_event():
     result=run_module('spike-detector',{'candles':candles(),'now':candles()[-1]['time']+1,'settings':config()})
     assert result['status']=='ok'
-    assert result['event_count']==1
-    event=result['events'][0]
-    assert event['event_type']=='combined-spike'
+    assert result['event_count']==3
+    assert {event['event_type'] for event in result['events']}=={'price-spike','volume-spike','combined-spike'}
+    event=next(event for event in result['events'] if event['event_type']=='combined-spike')
     assert event['direction']=='bullish'
     assert event['price_change_percent']==4.0
     assert event['volume_ratio']==5.0
