@@ -10,9 +10,8 @@ def calculate(owner, profiles, chart, end_time=None):
         config=profile['parameters']
         data={'settings':config,'_state_owner':owner,'_state_slot':profile['id']}
         if profile['type'] in ('spike-detector','akofx'):
-            # Spike detection must use the exact candles returned for this chart,
-            # including tick_volume; otherwise it receives no input and can never
-            # emit chart events.
+            # Pattern detectors must use the exact candles returned for this chart;
+            # do not substitute a separate history query for chart overlays.
             data.update(candles=chart.get('candles',[]),symbol=chart.get('symbol','XAUUSD'))
         if profile['type']=='round-levels':
             # The automatic step is based on current market price, independent
