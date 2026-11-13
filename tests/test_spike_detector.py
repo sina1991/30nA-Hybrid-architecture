@@ -1,5 +1,5 @@
 """Spike Detector All Spikes behavior and trusted module integration."""
-import pytest
+import pytest\nimport time
 from modules import technical, indicator_profiles
 from modules.execution import run_module
 from test_account_chat_api import client, create_accounts, auth
@@ -7,7 +7,7 @@ from test_account_chat_api import client, create_accounts, auth
 
 def candles(price_move=4.0, volume=50):
     rows=[]
-    stamp=1_800_000_000
+    stamp=int(time.time())//60*60-20*60
     for index in range(20):
         rows.append({'time':stamp+index*60,'open':100.0,'high':101.0,'low':99.0,'close':100.0,'tick_volume':10})
     rows.append({'time':stamp+20*60,'open':100.0,'high':100.0+price_move+1,'low':99.0,'close':100.0+price_move,'tick_volume':volume,'is_open':False})
@@ -21,7 +21,7 @@ def config(**changes):
 
 
 def test_combined_spike_emits_one_combined_event():
-    result=run_module('spike-detector',{'candles':candles(),'now':1_800_001_500,'settings':config()})
+    result=run_module('spike-detector',{'candles':candles(),'now':candles()[-1]['time']+1,'settings':config()})
     assert result['status']=='ok'
     assert result['event_count']==1
     event=result['events'][0]
@@ -34,7 +34,7 @@ def test_combined_spike_emits_one_combined_event():
 
 
 def test_independent_modes_emit_price_and_volume_separately():
-    result=technical.run('spike-detector',{'candles':candles(),'now':1_800_001_500,
+    result=technical.run('spike-detector',{'candles':candles(),'now':candles()[-1]['time']+1,
         'settings':config(combined_enabled=False)})
     assert {event['event_type'] for event in result['events']}=={'price-spike','volume-spike'}
 
@@ -50,7 +50,7 @@ def test_invalid_spike_settings_rejected(settings):
 
 def test_module_is_owner_scoped_via_indicator_profiles(client):
     (alice,a),(bob,b),_=create_accounts(client)
-    profile=client.post('/api/upstreams/indicator-profiles',headers=auth(a),json={
+    from market_data.data import connect\n    rows=candles()\n    db=connect()\n    with db:\n        for row in rows:\n            db.execute('INSERT OR REPLACE INTO candles(time,open,high,low,close,tick_volume,is_open) VALUES(?,?,?,?,?,?,?)',(row['time'],row['open'],row['high'],row['low'],row['close'],row['tick_volume'],int(row.get('is_open',False))))\n    db.close()\n    profile=client.post('/api/upstreams/indicator-profiles',headers=auth(a),json={
         'name':'Spike All','type':'spike-detector','parameters':config(),'enabled':True})
     assert profile.status_code==200,profile.text
     payload=client.get('/api/upstreams/market/candles?include_indicators=true&limit=100',headers=auth(a))
