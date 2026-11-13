@@ -59,3 +59,31 @@ def test_old_empty_session_profile_can_load_supplied_preset(client):
     response=client.put(path+'/'+created['id'],headers=auth(token),json=dict(name=created['name'],type=created['type'],enabled=True,parameters=presets['session-clock']))
     assert response.status_code==200 and response.json()['payload']['profile']['parameters']['windows'][10]['end']=='00:00'
     assert client.get('/api/upstreams/indicator-presets').status_code==401
+
+def test_spike_detector_receives_chart_candles_and_emits_visible_events(client):
+    (_,token),_,_=create_accounts(client)
+    from market_data.data import connect
+    now=int(datetime.now(timezone.utc).timestamp())//60*60
+    db=connect()
+    with db:
+        for index in range(7):
+            stamp=now-(6-index)*60
+            close=100.5 if index==6 else 100.0
+            volume=20 if index==6 else 10
+            db.execute('INSERT OR REPLACE INTO candles(time,open,high,low,close,tick_volume,is_open) VALUES(?,?,?,?,?,?,?)',
+                       (stamp,100.0,max(101.0,close),99.0,close,volume,0))
+    db.close()
+    parameters={'baseline_period':5,'price_change_percent':0.2,'volume_multiplier':1.2,
+                'combined_price_change_percent':0.2,'combined_volume_multiplier':1.2,
+                'price_enabled':True,'volume_enabled':True,'combined_enabled':True,'show_labels':True}
+    created=client.post('/api/upstreams/indicator-profiles',headers=auth(token),
+                        json={'name':'Spike visibility test','type':'spike-detector','parameters':parameters,'enabled':True})
+    assert created.status_code==200,created.text
+    response=client.get('/api/upstreams/market/candles?include_indicators=true&limit=100',headers=auth(token))
+    assert response.status_code==200,response.text
+    payload=response.json()['payload']
+    overlay=next(item for item in payload['technical_overlays'] if item['type']=='spike-detector')
+    assert overlay['result']['status']=='ok'
+    assert overlay['result']['event_count']==3
+    assert {event['event_type'] for event in overlay['result']['events']}=={'price-spike','volume-spike','combined-spike'}
+
