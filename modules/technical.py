@@ -134,7 +134,7 @@ def settings(kind, raw=None):
         number(cfg['auto_percent'],0.001,100,'auto percent');number(cfg['manual_step'],1e-12,1e12,'manual step')
         integer(cfg['max_lines'],1,300,'max lines');color(cfg['color']);color(cfg['label_color'])
         line_style({k:cfg[k] for k in ('color','style','width')});integer(cfg['font_size'],8,32,'font size')
-    else:
+    elif kind in ('previous-day-levels','previous-day-session-levels'):
         if not isinstance(cfg['styles'],dict) or set(cfg['styles'])-set(LEVEL_STYLES): raise ValueError('invalid level styles')
         for style in cfg['styles'].values(): line_style(style)
         if kind == 'previous-day-session-levels':
