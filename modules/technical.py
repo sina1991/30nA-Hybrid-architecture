@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo
 from .module_state import change
 from .session_presets import PRESET
 
-KINDS = ('session-windows', 'session-clock', 'round-levels', 'previous-day-levels', 'previous-day-session-levels')
+KINDS = ('session-windows', 'session-clock', 'round-levels', 'previous-day-levels', 'previous-day-session-levels', 'spike-detector')
 DEFAULTS = {
     'session-clock': {'winter_utc_minutes':None,'clock_change':'none','windows':[], 'points':[], 'teaching_view':'all',
                       'reference_timezone':None,'schedule_shift_minutes':0,'chart_minutes':15,'clock_size':360,'points_on_clock':True,'show_seconds':True,'highlight_minutes':5,
@@ -29,6 +29,7 @@ DEFAULTS = {
 }
 DEFAULTS['session-clock'].update(PRESET)
 DEFAULTS['session-windows'] = {**DEFAULTS['session-clock'], 'window_labels':True,'time_points':True,'countdown_panel':True,'day_start_lines':True,'window_shape':'filled'}
+DEFAULTS['spike-detector'] = {'price_enabled':True,'volume_enabled':True,'combined_enabled':True,'baseline_period':20,'price_change_percent':2.5,'volume_multiplier':3.0,'combined_price_change_percent':2.5,'combined_volume_multiplier':3.0,'show_labels':True,'price_color':'#f59e0b','volume_color':'#3b82f6','combined_color':'#a855f7'}
 
 LEVEL_STYLES = {
     'high':{'color':'#c4b5fd','style':'solid','width':1}, 'low':{'color':'#c4b5fd','style':'solid','width':1},
@@ -73,6 +74,15 @@ def settings(kind, raw=None):
     cfg = {**DEFAULTS[kind],**raw}
     for key, default in DEFAULTS[kind].items():
         if type(default) is bool and type(cfg[key]) is not bool: raise ValueError('invalid '+key)
+    if kind == 'spike-detector':
+        for key in ('price_enabled','volume_enabled','combined_enabled','show_labels'):
+            if type(cfg[key]) is not bool: raise ValueError('invalid '+key)
+        integer(cfg['baseline_period'],2,200,'baseline period')
+        number(cfg['price_change_percent'],0.01,100,'price change percent')
+        number(cfg['volume_multiplier'],1.01,1000,'volume multiplier')
+        number(cfg['combined_price_change_percent'],0.01,100,'combined price change percent')
+        number(cfg['combined_volume_multiplier'],1.01,1000,'combined volume multiplier')
+        for key in ('price_color','volume_color','combined_color'): color(cfg[key])
     if 'winter_utc_minutes' in cfg:
         offset = cfg['winter_utc_minutes']
         if offset is not None: integer(offset,-720,840,'winter UTC offset')
@@ -358,6 +368,36 @@ def run(kind,data):
     extra={'price','visible_low','visible_high','spacing_state','symbol'} if kind=='round-levels' else {'candles','symbol'}
     if set(data)-common-extra: raise ValueError('unknown indicator input')
     cfg=settings(kind,data.get('settings'));now=timestamp(data.get('now',time.time()))
+    if kind == 'spike-detector':
+        rows=data.get('candles',[])
+        if not isinstance(rows,list) or len(rows)>10000: raise ValueError('at most 10000 input candles')
+        parsed=[]; previous=-1
+        for raw in rows:
+            item=candle(raw)
+            if item['time']<=previous or item['time']>now: raise ValueError('candles must be unique, ordered, and not in the future')
+            previous=item['time']
+            volume=raw.get('tick_volume',raw.get('volume'))
+            if volume is not None:
+                if type(volume) not in (int,float) or not math.isfinite(volume) or volume<0: raise ValueError('invalid candle volume')
+            parsed.append({**item,'volume':volume})
+        events=[]
+        period=cfg['baseline_period']
+        for index in range(period,len(parsed)):
+            current=parsed[index]; previous_close=parsed[index-1]['close']; baseline=parsed[index-period:index]
+            pct=(current['close']-previous_close)/previous_close*100
+            volumes=[item['volume'] for item in baseline if item['volume'] is not None]
+            current_volume=current['volume']; ratio=(current_volume/(sum(volumes)/len(volumes))) if volumes and current_volume is not None and sum(volumes)>0 else None
+            price_hit=abs(pct)>=cfg['price_change_percent']; volume_hit=ratio is not None and ratio>=cfg['volume_multiplier']
+            combined_hit=abs(pct)>=cfg['combined_price_change_percent'] and ratio is not None and ratio>=cfg['combined_volume_multiplier']
+            direction='bullish' if pct>0 else 'bearish' if pct<0 else 'neutral'
+            candidates=[]
+            if cfg['combined_enabled'] and combined_hit: candidates.append(('combined-spike',cfg['combined_color'],'critical' if abs(pct)>=cfg['combined_price_change_percent']*2 and ratio>=cfg['combined_volume_multiplier']*2 else 'high'))
+            else:
+                if cfg['price_enabled'] and price_hit: candidates.append(('price-spike',cfg['price_color'],'high' if abs(pct)>=cfg['price_change_percent']*2 else 'medium'))
+                if cfg['volume_enabled'] and volume_hit: candidates.append(('volume-spike',cfg['volume_color'],'high' if ratio>=cfg['volume_multiplier']*2 else 'medium'))
+            for event_type,color_value,severity in candidates:
+                events.append({'module_id':'spike-detector','event_type':event_type,'symbol':data.get('symbol','XAUUSD'),'time':current['time'],'timestamp':current['time'],'direction':direction,'price_change_percent':round(pct,6),'volume_ratio':round(ratio,6) if ratio is not None else None,'severity':severity,'price':current['close'],'volume':current_volume,'color':color_value,'status':'confirmed' if not current['is_open'] else 'provisional'})
+        return {'status':'ok' if parsed else 'insufficient_data','settings':cfg,'events':events,'coverage':'provided_candles_only','event_count':len(events)}
     if kind in ('session-clock','session-windows'):
         result=clock_result(cfg,now)
         if cfg['winter_utc_minutes'] is not None and (kind=='session-windows' or cfg['chart_point_lines']):
