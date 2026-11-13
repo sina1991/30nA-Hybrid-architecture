@@ -1,0 +1,8 @@
+{
+  "id": "akofx",
+  "name": "AKO FX",
+  "description": "Detects bullish and bearish P-Gap structures using the agreed AKO FX three-candle rules.",
+  "version": "1.0.0",
+  "api_version": "1",
+  "type": "market-indicator"
+}
