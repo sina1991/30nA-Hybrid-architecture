@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080b12" />
+    <meta
+      name="description"
+      content="محیط مستقل توسعه رابط کاربری داشبورد 30nA"
+    />
+    <title>30nA — فضای کار شما، یکپارچه</title>
+    <link rel="icon" href="assets/sun.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#workspace">رفتن به داشبورد</a>
+    <header class="site-header shell">
+      <a class="brand" href="#home" aria-label="30nA خانه" dir="ltr"
+        >30nA<span class="brand-sun" aria-hidden="true"></span
+        ><small>HYBRID</small></a
+      >
+      <nav aria-label="ناوبری اصلی">
+        <a href="#workspace">داشبورد</a><a href="#capabilities">قابلیت‌ها</a
+        ><a href="#development">مسیر توسعه</a>
+      </nav>
+      <a class="button primary small" href="#workspace"
+        >ورود به فضای کار <span aria-hidden="true">↗</span></a
+      >
+    </header>
+    <main id="home">
+      <section class="hero shell" aria-labelledby="hero-title">
+        <a class="release" href="#development"
+          ><span>نسخهٔ نمایشی</span> شروع یک تجربهٔ تازه
+          <b aria-hidden="true">←</b></a
+        >
+        <h1 id="hero-title">
+          تمام ابزارهای شما.<br /><span>یک فضای کار هوشمند.</span>
+        </h1>
+        <p>
+          از داده تا اجرا، همه‌چیز در یک نگاه.<br />داشبورد ماژولار 30nA را به
+          سبک خودتان بسازید.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="#workspace"
+            >کاوش داشبورد <span aria-hidden="true">←</span></a
+          ><a class="button" href="#capabilities">آشنایی با امکانات</a>
+        </div>
+        <div class="orbit" aria-hidden="true">
+          <div class="sun"></div>
+          <div class="planet"></div>
+        </div>
+      </section>
+      <section
+        class="workspace shell"
+        id="workspace"
+        aria-label="داشبورد نمایشی"
+      >
+        <div class="dashboard">
+          <div class="dashboard-nav">
+            <a class="brand" href="#home" dir="ltr"
+              >30nA<span class="brand-sun" aria-hidden="true"></span
+            ></a>
+            <div class="tabs" role="tablist" aria-label="بخش‌های داشبورد">
+              <button
+                role="tab"
+                id="tab-overview"
+                aria-controls="overview"
+                aria-selected="true"
+                tabindex="0"
+                data-tab="overview"
+              >
+                ◫ <span>نمای کلی</span>
+              </button>
+              <button
+                role="tab"
+                id="tab-modules"
+                aria-controls="modules"
+                aria-selected="false"
+                tabindex="-1"
+                data-tab="modules"
+              >
+                ◇ <span>ماژول‌ها</span>
+              </button>
+              <button
+                role="tab"
+                id="tab-activity"
+                aria-controls="activity"
+                aria-selected="false"
+                tabindex="-1"
+                data-tab="activity"
+              >
+                ≋ <span>فعالیت‌ها</span>
+              </button>
+            </div>
+            <div class="user-actions">
+              <button
+                class="icon-button"
+                id="theme-toggle"
+                aria-label="تغییر به حالت روشن"
+                aria-pressed="false"
+              >
+                ☼</button
+              ><span class="avatar" aria-label="کاربر نمایشی">S</span>
+            </div>
+          </div>
+          <div class="dashboard-body">
+            <div class="workspace-heading">
+              <div>
+                <span class="eyebrow">WORKSPACE / 01</span>
+                <h2>فضای کار من<span class="dot"></span></h2>
+              </div>
+              <button class="button" id="add-module">＋ افزودن ماژول</button>
+            </div>
+            <p class="demo-notice">
+              <span class="dot"></span> پیش‌نمایش رابط کاربری · تمام اعداد و
+              وضعیت‌ها نمونه هستند · اتصال به Backend برقرار نیست.
+            </p>
+            <section
+              id="overview"
+              role="tabpanel"
+              aria-labelledby="tab-overview"
+            >
+              <div class="stats">
+                <article class="stat">
+                  <span>ماژول‌های فضای کار</span>
+                  <div>
+                    <strong id="module-count">4</strong
+                    ><small>قابل شخصی‌سازی</small>
+                  </div>
+                  <svg viewBox="0 0 160 34" aria-hidden="true">
+                    <path
+                      d="M0 28 15 24 25 26 43 14 57 18 70 8 84 15 98 5 112 12 129 4 144 10 160 2"
+                    />
+                  </svg>
+                </article>
+                <article class="stat">
+                  <span>اجرای نمونه</span>
+                  <div><strong>128</strong><small>+۱۲٪ نمونه</small></div>
+                  <svg viewBox="0 0 160 34" aria-hidden="true">
+                    <path
+                      d="M0 26 16 20 28 27 43 10 58 14 70 20 85 7 98 15 112 5 127 10 144 4 160 7"
+                    />
+                  </svg>
+                </article>
+                <article class="stat">
+                  <span>زمان پاسخ نمونه</span>
+                  <div>
+                    <strong dir="ltr">42 <em>ms</em></strong
+                    ><small>دادهٔ آزمایشی</small>
+                  </div>
+                  <svg viewBox="0 0 160 34" aria-hidden="true">
+                    <path
+                      d="M0 10 20 15 32 6 46 20 60 16 77 28 90 18 106 25 121 14 140 20 160 25"
+                    />
+                  </svg>
+                </article>
+                <article class="stat">
+                  <span>اتصال به سرویس‌ها</span>
+                  <div>
+                    <strong class="offline">آفلاین</strong
+                    ><small>حالت پیش‌نمایش</small>
+                  </div>
+                  <svg viewBox="0 0 160 34" aria-hidden="true">
+                    <path d="M0 23H160" />
+                  </svg>
+                </article>
+              </div>
+              <div class="panels">
+                <article class="panel chart-panel">
+                  <div class="panel-title">
+                    <div>
+                      <h3>نمای فعالیت</h3>
+                      <p>تعداد اجراها · داده‌های نمونه</p>
+                    </div>
+                    <div
+                      class="segmented"
+                      role="group"
+                      aria-label="بازه نمودار"
+                    >
+                      <button
+                        class="active"
+                        aria-pressed="true"
+                        data-period="week"
+                      >
+                        هفته</button
+                      ><button aria-pressed="false" data-period="month">
+                        ماه
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="chart"
+                    id="chart"
+                    role="img"
+                    aria-label="نمودار نمونه تعداد اجراهای هفتگی"
+                  ></div>
+                  <div class="chart-footer">
+                    <span><i></i> اجرای موفق نمونه</span
+                    ><span id="chart-total"></span>
+                  </div>
+                </article>
+                <article class="panel">
+                  <div class="panel-title">
+                    <div>
+                      <h3>ماژول‌های شما</h3>
+                      <p>ابزارهای مستقل، کنار یکدیگر</p>
+                    </div>
+                    <span class="subtle">4 / 4</span>
+                  </div>
+                  <div class="module-list" id="quick-modules"></div>
+                  <button class="text-button" id="show-modules">
+                    مشاهدهٔ همهٔ ماژول‌ها <span aria-hidden="true">←</span>
+                  </button>
+                </article>
+              </div>
+              <div class="bottom-grid">
+                <article class="panel note-panel">
+                  <div class="panel-title">
+                    <h3>یادداشت فضای کار</h3>
+                    <span class="subtle">فقط در این مرورگر</span>
+                  </div>
+                  <label for="workspace-note" class="sr-only"
+                    >یادداشت فضای کار</label
+                  ><textarea
+                    id="workspace-note"
+                    maxlength="2000"
+                    placeholder="ایدهٔ بعدی شما از اینجا شروع می‌شود…"
+                  ></textarea>
+                  <div class="note-footer">
+                    <span id="note-status" role="status">ذخیرهٔ محلی</span
+                    ><span aria-hidden="true">↗</span>
+                  </div>
+                </article>
+                <article class="panel next-panel">
+                  <span class="eyebrow">BUILD YOUR OWN WORKSPACE</span>
+                  <h3>فضای کار، به سبک شما.</h3>
+                  <p>
+                    ماژول‌ها را انتخاب کنید و چیدمان اولیهٔ خودتان را بسازید.
+                  </p>
+                  <button class="text-button" id="customize">
+                    شخصی‌سازی داشبورد ←
+                  </button>
+                  <div class="mini-sun" aria-hidden="true"></div>
+                </article>
+              </div>
+            </section>
+            <section
+              id="modules"
+              role="tabpanel"
+              aria-labelledby="tab-modules"
+              hidden
+            >
+              <div class="section-heading">
+                <h3>کتابخانهٔ ماژول‌ها</h3>
+                <label class="search"
+                  ><span class="sr-only">جستجوی ماژول</span
+                  ><input
+                    type="search"
+                    id="module-search"
+                    placeholder="جستجوی ماژول…"
+                /></label>
+              </div>
+              <p class="subtle">
+                این کارت‌ها پیش‌نمایش هستند؛ ماژول واقعی اجرا نمی‌شود.
+              </p>
+              <div class="catalog" id="catalog"></div>
+              <p id="empty-search" hidden>ماژولی با این نام پیدا نشد.</p>
+            </section>
+            <section
+              id="activity"
+              role="tabpanel"
+              aria-labelledby="tab-activity"
+              hidden
+            >
+              <div class="section-heading">
+                <h3>فعالیت‌های نمونه</h3>
+                <span class="subtle">تاریخچهٔ واقعی نیست</span>
+              </div>
+              <div class="activity-list" id="activity-list"></div>
+            </section>
+          </div>
+          <footer class="dashboard-footer">
+            <span><span class="dot"></span> محیط توسعهٔ Frontend</span
+            ><span dir="ltr">30nA / REDSUN EDITION</span>
+          </footer>
+        </div>
+      </section>
+      <section class="capabilities shell" id="capabilities">
+        <span class="eyebrow">EVERYTHING IN ONE PLACE</span>
+        <h2>ساخته‌شده برای یک جریان کاری بهتر.</h2>
+        <p>یک زبان بصری یکپارچه، برای ابزارهایی که مستقل کار می‌کنند.</p>
+        <div class="feature-grid">
+          <article>
+            <span class="feature-icon">◫</span>
+            <h3>داشبورد ماژولار</h3>
+            <p>
+              ماژول‌های مورد نیازتان را انتخاب کنید و یک فضای کار شخصی بسازید.
+            </p>
+          </article>
+          <article>
+            <span class="feature-icon">⌘</span>
+            <h3>توسعهٔ مستقل</h3>
+            <p>
+              فایل‌های HTML، CSS و JavaScript مجزا؛ آماده برای توسعهٔ رابط جدید.
+            </p>
+          </article>
+          <article>
+            <span class="feature-icon">↗</span>
+            <h3>در هر اندازه، منظم</h3>
+            <p>چیدمان انعطاف‌پذیر برای نمایشگر دسکتاپ، تبلت و موبایل.</p>
+          </article>
+        </div>
+      </section>
+      <section class="development shell" id="development">
+        <span class="eyebrow">THE NEXT CHAPTER</span>
+        <h2>این شروع فضای کار تازهٔ شماست.</h2>
+        <p>
+          نسخهٔ اول روی ظاهر و تعاملات تمرکز دارد. اتصال به API، احراز هویت و
+          داده‌های واقعی، مراحل بعدی توسعه هستند.
+        </p>
+        <a class="button primary" href="#workspace">بازگشت به داشبورد ←</a>
+      </section>
+    </main>
+    <footer class="site-footer shell">
+      <a class="brand" href="#home" dir="ltr"
+        >30nA<span class="brand-sun" aria-hidden="true"></span></a
+      ><span>رابط مستقل · الهام‌گرفته از Redsun</span
+      ><a href="#home">بازگشت به بالا ↑</a>
+    </footer>
+    <dialog id="module-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-heading">
+        <h2 id="dialog-title">افزودن ماژول نمایشی</h2>
+        <button class="icon-button" id="close-dialog" aria-label="بستن">
+          ×
+        </button>
+      </div>
+      <p>انتخاب‌ها فقط در همین مرورگر ذخیره می‌شوند.</p>
+      <div id="module-options"></div>
+      <p class="subtle">این عملیات فقط ظاهر پیش‌نمایش را تغییر می‌دهد.</p>
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+  </body>
+</html>
