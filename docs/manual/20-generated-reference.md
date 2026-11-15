@@ -3,7 +3,7 @@
 این فصل از فایل‌های Git، AST کد و OpenAPI ساخته شده است. هیچ env، credential یا DB عملیاتی خوانده نمی‌شود.
 فایل‌های documentation از manifest فنی زیر کنار گذاشته شده‌اند تا خروجی به خودش وابسته نشود؛ checker همه صفحات Markdown را جداگانه بررسی می‌کند.
 
-تعداد فایل‌های فنی و پشتیبان: **364**؛ تعداد نمادهای Python: **1514**.
+تعداد فایل‌های فنی و پشتیبان: **372**؛ تعداد نمادهای Python: **1514**.
 
 ## موجودی کامل فایل‌های فنی
 
@@ -13,6 +13,7 @@
 | [.gitattributes](../../.gitattributes) | 108 | `5c74770b9a41953e78518fc6f380870b3d0b1b7985a19f8cd6ad52e8bcd07b08` |
 | [.github/workflows/baseline-verification.yml](../../.github/workflows/baseline-verification.yml) | 4601 | `43337a0b754e591affe6f08657892e35202a16978aa7ca8f5086f8dda730b088` |
 | [.github/workflows/ci.yml](../../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
+| [.github/workflows/frontend-preview.yml](../../.github/workflows/frontend-preview.yml) | 2605 | `bc824f6a268c24c56fc80659516eaec8cf9022b9e3459ad2018700a6ea4cc281` |
 | [.github/workflows/release.yml](../../.github/workflows/release.yml) | 3091 | `f509fd3ba0721c1991a598ebfa4f376d77225c96ba18f11206ae5ab24c7b6052` |
 | [.gitignore](../../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
 | [30na](../../30na) | 23425 | `da6ed0a5cb32962c36e637593db0dd3e92ca0657426772a2fc4bc5216d84119e` |
@@ -84,6 +85,12 @@
 | [examples/sample-text/tests/__init__.py](../../examples/sample-text/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [examples/sample-text/tests/test_worker.py](../../examples/sample-text/tests/test_worker.py) | 335 | `faca1d30bf7b472fa9b7d63189aeea25556edb8573fec9de09fc6bbeaf5eccfa` |
 | [examples/sample-text/worker.py](../../examples/sample-text/worker.py) | 570 | `cef255818e1e6fb58a36ab09e135390b4f0d07c24617b1f314addfaaebf64276` |
+| [frontend/dashboard/README.md](../../frontend/dashboard/README.md) | 4566 | `d0505fd21196014aedda32757369825f3d2617c1ada2f12e914a273d7d0204a4` |
+| [frontend/dashboard/app.js](../../frontend/dashboard/app.js) | 10322 | `b9b9114e7f8d676cd5b0cf512812e998ea0d803d0de4856e48f7302ceeae701d` |
+| [frontend/dashboard/assets/sun.svg](../../frontend/dashboard/assets/sun.svg) | 287 | `462a130ce0d09ce9cc5fd0bc7a8c57a769894d062edbfbdebaf09f195c6bf349` |
+| [frontend/dashboard/index.html](../../frontend/dashboard/index.html) | 14758 | `cf115f234d9c12bfded6eb6b33a72ef6545d25fd9df3324708a84a17712055b2` |
+| [frontend/dashboard/styles.css](../../frontend/dashboard/styles.css) | 19468 | `34f07ebe17014950653ce433b51ab97969dd10fe54d685f3962254d8e38f1cf0` |
+| [frontend/dashboard/tests/browser.cjs](../../frontend/dashboard/tests/browser.cjs) | 6202 | `66dfb56986f826fe18ae1c5e767962ea89aec16986c5de3dd6e002caa6175e46` |
 | [install.sh](../../install.sh) | 15408 | `5622bffacee91d3262bb66bc171a401dceed51ba692d3c20b2ebb7025d0a8ad7` |
 | [market_data/__init__.py](../../market_data/__init__.py) | 53 | `3817c4d1ed64d67f252f75fdfa0abb3fa353a503620f170a34fd0a117e69d334` |
 | [market_data/collector.py](../../market_data/collector.py) | 3684 | `0a747940fdaec46f3b8349a2f2d3d069cb1154ebbca5d2f4d7bda111026b222b` |
@@ -373,6 +380,7 @@
 | [units/worker-runtime/worker_runtime/production.py](../../units/worker-runtime/worker_runtime/production.py) | 1477 | `6cc8b877e8c59b75a0d45be9610972385e6539f89213e7d694f2ed1b967796f1` |
 | [units/worker-runtime/worker_runtime/runtime.py](../../units/worker-runtime/worker_runtime/runtime.py) | 21328 | `23cfe1d3cc9e6690987807db6173aac94f53e0467e4603bdfc2b5a54a551aafb` |
 | [units/worker-runtime/worker_runtime/sqlite_store.py](../../units/worker-runtime/worker_runtime/sqlite_store.py) | 6453 | `a76d79185f001898a49385420cd7b657bd0070e4fe50257303ef146c0334b18d` |
+| [ریموت.txt](../../ریموت.txt) | 6018 | `e1a689f0d8331f02046f5da8f42d7002d6ffc34a4236a8b7bfbfdd7128ac0178` |
 
 ## محل خواندن متغیرهای محیطی
 

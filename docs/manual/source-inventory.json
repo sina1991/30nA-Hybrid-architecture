@@ -1139,6 +1139,11 @@
       "sha256": "889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf"
     },
     {
+      "bytes": 2605,
+      "path": ".github/workflows/frontend-preview.yml",
+      "sha256": "bc824f6a268c24c56fc80659516eaec8cf9022b9e3459ad2018700a6ea4cc281"
+    },
+    {
       "bytes": 3091,
       "path": ".github/workflows/release.yml",
       "sha256": "f509fd3ba0721c1991a598ebfa4f376d77225c96ba18f11206ae5ab24c7b6052"
@@ -1492,6 +1497,36 @@
       "bytes": 570,
       "path": "examples/sample-text/worker.py",
       "sha256": "cef255818e1e6fb58a36ab09e135390b4f0d07c24617b1f314addfaaebf64276"
+    },
+    {
+      "bytes": 4566,
+      "path": "frontend/dashboard/README.md",
+      "sha256": "d0505fd21196014aedda32757369825f3d2617c1ada2f12e914a273d7d0204a4"
+    },
+    {
+      "bytes": 10322,
+      "path": "frontend/dashboard/app.js",
+      "sha256": "b9b9114e7f8d676cd5b0cf512812e998ea0d803d0de4856e48f7302ceeae701d"
+    },
+    {
+      "bytes": 287,
+      "path": "frontend/dashboard/assets/sun.svg",
+      "sha256": "462a130ce0d09ce9cc5fd0bc7a8c57a769894d062edbfbdebaf09f195c6bf349"
+    },
+    {
+      "bytes": 14758,
+      "path": "frontend/dashboard/index.html",
+      "sha256": "cf115f234d9c12bfded6eb6b33a72ef6545d25fd9df3324708a84a17712055b2"
+    },
+    {
+      "bytes": 19468,
+      "path": "frontend/dashboard/styles.css",
+      "sha256": "34f07ebe17014950653ce433b51ab97969dd10fe54d685f3962254d8e38f1cf0"
+    },
+    {
+      "bytes": 6202,
+      "path": "frontend/dashboard/tests/browser.cjs",
+      "sha256": "66dfb56986f826fe18ae1c5e767962ea89aec16986c5de3dd6e002caa6175e46"
     },
     {
       "bytes": 15408,
@@ -2937,6 +2972,11 @@
       "bytes": 6453,
       "path": "units/worker-runtime/worker_runtime/sqlite_store.py",
       "sha256": "a76d79185f001898a49385420cd7b657bd0070e4fe50257303ef146c0334b18d"
+    },
+    {
+      "bytes": 6018,
+      "path": "ریموت.txt",
+      "sha256": "e1a689f0d8331f02046f5da8f42d7002d6ffc34a4236a8b7bfbfdd7128ac0178"
     }
   ],
   "symbols": [
