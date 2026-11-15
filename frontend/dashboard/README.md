@@ -67,3 +67,5 @@ clear
 node --check frontend/dashboard/app.js
 git diff --check
 ```
+
+Workflow اختصاصی در push به همین branch و PR اجرا می‌شود. برای ثبت مجدد خروجی‌های تولیدشدهٔ راهنما و PDF در همین branch، عبارت `[refresh-docs]` را در پیام Commit تغییرات قرار دهید. ذخیره فقط پس از موفقیت browser و documentation checks انجام می‌شود؛ به main یا branch دیگر push نمی‌کند و به‌روزرسانی هم‌زمان branch را با force بازنویسی نمی‌کند. اجرای عادی CI فقط خروجی بررسی و تصاویر را به‌صورت artifact نگه می‌دارد.

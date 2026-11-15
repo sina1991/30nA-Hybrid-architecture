@@ -34,7 +34,7 @@ jobs:
       # Sync generated manuals only on this isolated development branch.
       # A normal push rejects a concurrent branch update; never force-push.
       - name: Save generated documentation on development branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/frontend/redsun-dashboard'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/frontend/redsun-dashboard' && contains(github.event.head_commit.message, '[refresh-docs]')
         run: |
           git add docs/AGENT_GUIDE.md docs/manual/20-generated-reference.md docs/manual/source-inventory.json docs/manual/BOOK.md docs/manual/PROJECT_MANUAL.html docs/manual/PROJECT_MANUAL.pdf docs/manual/pdf-manifest.json
           if ! git diff --cached --quiet; then
