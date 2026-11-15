@@ -8,7 +8,10 @@ permissions:
   contents: read
 jobs:
   browser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
@@ -28,6 +31,16 @@ jobs:
           node scripts/documentation/render_pdf.cjs
           python scripts/documentation/check_docs.py
           python scripts/documentation/build_manual.py --check
+      # Sync generated manuals only on this isolated development branch.
+      # A normal push rejects a concurrent branch update; never force-push.
+      - name: Save generated documentation on development branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/frontend/redsun-dashboard'
+        run: |
+          git add docs/AGENT_GUIDE.md docs/manual/20-generated-reference.md docs/manual/source-inventory.json docs/manual/BOOK.md docs/manual/PROJECT_MANUAL.html docs/manual/PROJECT_MANUAL.pdf docs/manual/pdf-manifest.json
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'docs: refresh generated manuals for frontend workspace'
+            git push origin HEAD:refs/heads/frontend/redsun-dashboard
+          fi
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         if: always()
         with:

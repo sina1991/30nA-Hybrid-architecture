@@ -22,6 +22,7 @@ const browserPath =
   try {
     const context = await browser.newContext({
       viewport: { width: 1440, height: 1100 },
+      reducedMotion: "reduce",
     });
     const page = await context.newPage();
     const errors = [],
@@ -87,6 +88,11 @@ const browserPath =
     assert.equal(await page.locator("#activity").isVisible(), true);
     await page.getByRole("tab", { name: /نمای کلی/ }).click();
     await page.locator("#theme-toggle").click();
+    await page.evaluate(() => {
+      for (const key of ["modules", "note", "theme"]) localStorage.removeItem(`30na.redsun.${key}`);
+    });
+    await page.reload();
+    await page.locator("h1").click();
     const destination = process.env.FRONTEND_SCREENSHOTS;
     if (destination) {
       fs.mkdirSync(destination, { recursive: true });
@@ -107,6 +113,7 @@ const browserPath =
       await page.locator("#add-module").click();
       assert.equal(await page.getByRole("dialog").isVisible(), true);
       await page.keyboard.press("Escape");
+      await page.locator("h1").click();
       if (destination && width === 390)
         await page.screenshot({
           path: path.join(destination, "mobile.png"),
