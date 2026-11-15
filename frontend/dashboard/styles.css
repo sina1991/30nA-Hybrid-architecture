@@ -890,7 +890,7 @@ dialog > p {
   .hero::before {
     content: "";
     position: absolute;
-    left: -150px;
+    left: 0;
     top: -150px;
     width: 400px;
     height: 600px;
