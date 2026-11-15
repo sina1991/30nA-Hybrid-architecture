@@ -10,6 +10,10 @@
 
 این فایل اطلاعات شروع و قرارداد را یکجا می‌دهد؛ تحلیل اثر تغییر، خواندن بدنه تابع مرتبط و اعتبارسنجی واقعی همچنان ضروری است. signature به‌تنهایی معنای side effect یا تضمین امنیتی نیست. نمادهای private و test در پیوست، API عمومی محسوب نمی‌شوند.
 
+## توسعهٔ مستقل Frontend — Redsun
+
+رابط جدید در [frontend/dashboard](../frontend/dashboard/README.md) توسعه می‌یابد. این پوشه Landing و Dashboard نمایشی مستقل دارد؛ داده‌ها fixture هستند و به API، account یا Worker متصل نیست. اجرای محلی: `python3 -m http.server 8030 --bind 127.0.0.1 --directory frontend/dashboard`. تغییر ظاهری در HTML/CSS/JavaScript همین پوشه انجام شود؛ مسیر Dashboard فعلی در جدول پایین است. پیش از اتصال واقعی، auth، owner binding، منطق Backend/CLI و صداقت status رعایت شوند. تست اختصاصی `frontend/dashboard/tests/browser.cjs` است و workflow مستقل Frontend تصاویر و خروجی بررسی را تولید می‌کند.
+
 ## مسیریابی تغییر
 
 همه مسیرهای جدول نسبت به root مخزن‌اند. پوشه‌های دارای خط تیره نام package import نیستند؛ runner مسیرهای Python را آماده می‌کند.
