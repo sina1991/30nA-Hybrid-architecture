@@ -1421,7 +1421,7 @@ http_contracts:
 | [.gitattributes](../.gitattributes) | 108 | `5c74770b9a41953e78518fc6f380870b3d0b1b7985a19f8cd6ad52e8bcd07b08` |
 | [.github/workflows/baseline-verification.yml](../.github/workflows/baseline-verification.yml) | 4601 | `43337a0b754e591affe6f08657892e35202a16978aa7ca8f5086f8dda730b088` |
 | [.github/workflows/ci.yml](../.github/workflows/ci.yml) | 3917 | `889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf` |
-| [.github/workflows/frontend-preview.yml](../.github/workflows/frontend-preview.yml) | 2605 | `bc824f6a268c24c56fc80659516eaec8cf9022b9e3459ad2018700a6ea4cc281` |
+| [.github/workflows/frontend-preview.yml](../.github/workflows/frontend-preview.yml) | 2669 | `0a2150de613066ed43dbe001ef4b6cfdb6106511137881f32c6a56ed2a87d43e` |
 | [.github/workflows/release.yml](../.github/workflows/release.yml) | 3091 | `f509fd3ba0721c1991a598ebfa4f376d77225c96ba18f11206ae5ab24c7b6052` |
 | [.gitignore](../.gitignore) | 265 | `0bbeff214cfeeb3adb54f8fb30dc6ff80e4a4fd3bb0e730a3be575422e306c2e` |
 | [30na](../30na) | 23425 | `da6ed0a5cb32962c36e637593db0dd3e92ca0657426772a2fc4bc5216d84119e` |
@@ -1493,7 +1493,7 @@ http_contracts:
 | [examples/sample-text/tests/__init__.py](../examples/sample-text/tests/__init__.py) | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
 | [examples/sample-text/tests/test_worker.py](../examples/sample-text/tests/test_worker.py) | 335 | `faca1d30bf7b472fa9b7d63189aeea25556edb8573fec9de09fc6bbeaf5eccfa` |
 | [examples/sample-text/worker.py](../examples/sample-text/worker.py) | 570 | `cef255818e1e6fb58a36ab09e135390b4f0d07c24617b1f314addfaaebf64276` |
-| [frontend/dashboard/README.md](../frontend/dashboard/README.md) | 4566 | `d0505fd21196014aedda32757369825f3d2617c1ada2f12e914a273d7d0204a4` |
+| [frontend/dashboard/README.md](../frontend/dashboard/README.md) | 5221 | `229fb627d688007466675afd63e31ec56871d751099f8387ce4289556a7e6875` |
 | [frontend/dashboard/app.js](../frontend/dashboard/app.js) | 10322 | `b9b9114e7f8d676cd5b0cf512812e998ea0d803d0de4856e48f7302ceeae701d` |
 | [frontend/dashboard/assets/sun.svg](../frontend/dashboard/assets/sun.svg) | 287 | `462a130ce0d09ce9cc5fd0bc7a8c57a769894d062edbfbdebaf09f195c6bf349` |
 | [frontend/dashboard/index.html](../frontend/dashboard/index.html) | 14758 | `cf115f234d9c12bfded6eb6b33a72ef6545d25fd9df3324708a84a17712055b2` |

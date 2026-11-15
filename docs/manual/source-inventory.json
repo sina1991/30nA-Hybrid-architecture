@@ -1139,9 +1139,9 @@
       "sha256": "889ffc2c74382f327697964a45f4d972cf9f576115cc7ef50eb07690e0a7bdcf"
     },
     {
-      "bytes": 2605,
+      "bytes": 2669,
       "path": ".github/workflows/frontend-preview.yml",
-      "sha256": "bc824f6a268c24c56fc80659516eaec8cf9022b9e3459ad2018700a6ea4cc281"
+      "sha256": "0a2150de613066ed43dbe001ef4b6cfdb6106511137881f32c6a56ed2a87d43e"
     },
     {
       "bytes": 3091,
@@ -1499,9 +1499,9 @@
       "sha256": "cef255818e1e6fb58a36ab09e135390b4f0d07c24617b1f314addfaaebf64276"
     },
     {
-      "bytes": 4566,
+      "bytes": 5221,
       "path": "frontend/dashboard/README.md",
-      "sha256": "d0505fd21196014aedda32757369825f3d2617c1ada2f12e914a273d7d0204a4"
+      "sha256": "229fb627d688007466675afd63e31ec56871d751099f8387ce4289556a7e6875"
     },
     {
       "bytes": 10322,
